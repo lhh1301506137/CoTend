@@ -1,0 +1,24 @@
+.codegraph/
+.private-provenance/
+__pycache__/
+*.pyc
+
+# Local AI development governance; never include in the public repository.
+/STATUS.md
+/REVIEW-LOG.md
+/QUALITY-SIGNALS.md
+/PROJECT-DECISION-LOG.md
+/PROJECT-KNOWLEDGE-CHANGELOG.md
+/PROJECT-PLAN-TREE.md
+/PROJECT-PLAN-NODES/
+/PROJECT-UNDERSTANDING/
+
+# Unconfirmed design-history candidates; local reference only until revalidated.
+/docs/COMMAND-CONTRACTS.md
+/docs/V1-ARCHITECTURE.md
+/docs/PROJECT-STATE-CONTRACT.md
+
+# Local raw intake artifacts; never include in the public distribution.
+公开版产品想法.txt
+公开版框架提案_claude致Codex.md
+公开版项目_新会话接手启动文档.md
