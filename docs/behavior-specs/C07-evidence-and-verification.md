@@ -98,6 +98,8 @@ If a claim cannot be made precise, it remains `unverified` until clarified.
 7. Report the strongest claim the evidence supports, never the claim originally hoped for.
 8. Invalidate or qualify evidence when relevant code, configuration, environment, state, or user intent changes.
 
+A reliable check that contradicts a target claim is successful evidence work. The claim state describes the evaluated subject; the workflow outcome describes whether C07 produced a trustworthy verdict.
+
 ## 6. Logical State Semantics
 
 Reads:
@@ -137,9 +139,9 @@ Invariants:
 
 | Outcome | Entry condition | User-facing result | Logical state effect | Required evidence | Automatic continuation |
 |---|---|---|---|---|---|
-| `success` | Every material claim has sufficient current evidence or is honestly narrowed. | Supported claims, evidence strength, and remaining limits. | Claim mappings and evidence are recorded. | Current `executed`, `inspection`, or explicitly bounded `inference` evidence appropriate to each claim. | Yes, within C06 authority. |
+| `success` | Verification completed reliably and every material claim received a supported, partially supported, contradicted, or honestly narrowed verdict. | Claim verdicts, evidence strength, and remaining limits. | Claim mappings, including contradictions, and evidence are recorded. | Current `executed`, `inspection`, or explicitly bounded `inference` evidence appropriate to each claim. | Only where each resulting claim state permits. |
 | `blocked` | Required verification crosses a user-only boundary or unavailable system. | Which evidence is blocked, why, and safe alternatives. | Claim remains evidence-blocked. | A `blocked` evidence item with the unavailable surface and reason. | Only on unrelated safe work. |
-| `failure` | Verification ran and failed, contradicted the claim, or evidence recording was unreliable. | Failed check or contradiction and impact. | Contradicted or failed state is durable. | `executed` or `inspection` evidence showing the failed check, contradiction, or recording defect. | No claim-dependent continuation. |
+| `failure` | The verifier, evidence capture, or evidence recording failed in a way that prevents a trustworthy verdict. | Verification-system failure, affected claims, and recovery action. | Affected claims remain unverified and the workflow failure is durable. | `executed` or `inspection` evidence showing the verifier or recording failure. | No claim-dependent continuation. |
 | `deferred` | Verification is intentionally postponed before being attempted. | Deferred check, reason, and reactivation condition. | Claim remains unverified. | `not_run` plus the recorded deferral reason. | Only where the claim is not required. |
 | `interrupted` | Verification stops before a reliable result. | Completed observations, missing portion, and invalid claims. | Partial evidence is labeled incomplete. | Partial `executed` or `inspection` evidence with the interruption boundary. | Only after safe resume. |
 | `recovery_required` | Evidence records are corrupt, conflicting, stale beyond use, or cannot be tied to current scope. | Why evidence cannot be trusted and what must be rerun. | Dependent claims return to unverified. | `inspection` of the inconsistency, or `blocked` when records are inaccessible. | No. |
@@ -228,7 +230,8 @@ Adapters must preserve evidence classes, claim states, scope, freshness, and blo
 | Executed pass | A deterministic test runs and passes for the target behavior. | Claim supported within stated scope. | Evidence item and supported claim mapping are current. | “Everything works” beyond scope. | `executed`. |
 | Inspection only | Code or configuration is read without execution. | Claim marked inspection-based or inferred. | Evidence item remains inspection-class and any inference is explicit. | Describing it as tested. | `inspection`. |
 | Imprecise claim | A broad “done” claim cannot be tied to a falsifiable responsibility. | Claim remains unverified until narrowed. | Unverified claim and clarification need are recorded. | Assigning support from unrelated checks. | `not_run`. |
-| Failed check | Test runs and fails. | Claim contradicted or failed; route affected. | Failed evidence and contradicted claim remain durable. | Omitting failure from summary. | `executed`. |
+| Failed target check | A reliable test runs and shows that the target behavior does not satisfy its claim. | Evidence workflow succeeds; target claim is contradicted and its dependent route cannot claim success. | Failed target observation and contradicted claim remain durable; verifier remains healthy. | Omitting the failed result, supporting the claim, or labeling the reliable verifier as failed. | `executed`. |
+| Verifier failure | The test runner crashes or evidence capture becomes unreliable before a trustworthy verdict exists. | Evidence workflow fails and affected claims remain unverified. | Workflow failure and rerun requirement are durable. | Treating the missing verdict as a contradiction or success. | Failed `executed` or `inspection`. |
 | User observation | User reports a visual problem not reproduced by AI. | Evidence remains user-reported. | Claim mapping records the observation without independent-verification status. | Claiming independent reproduction. | `user_reported`. |
 | Unauthorized verifier | A check would require private data outside current authority. | Verification stops with a safe alternative. | Claim is evidence-blocked; no private payload is retained. | Accessing the data after generic continue. | `blocked`. |
 | Tool unavailable | Required verifier cannot run. | Evidence blocked and claim unverified. | Blocked reason and unverified claim are recorded. | Treating absence of failure as success. | `blocked`. |
@@ -243,6 +246,7 @@ Adapters must preserve evidence classes, claim states, scope, freshness, and blo
 - Evidence classes cannot be silently upgraded.
 - Scope, environment, and freshness are visible when they matter.
 - Failed, contradicted, blocked, and not-run states remain distinguishable.
+- A reliable contradicted result is successful evidence work, while verifier or recording failure is a workflow failure.
 - Sensitive evidence is summarized safely.
 - C10 may use C07 evidence but cannot convert it into final user acceptance.
 - Final user confirmation of this contract remains separate from document review.

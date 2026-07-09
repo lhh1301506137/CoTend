@@ -29,6 +29,17 @@ FORBIDDEN_PUBLIC_PATTERNS = {
     "internal authority label": re.compile(r"\bprimary_ai_(?:auto|observed|proposed)\w*", re.IGNORECASE),
     "absolute Windows path": re.compile(r"\b[A-Z]:[\\/]", re.IGNORECASE),
 }
+FORBIDDEN_UNCONFIRMED_PRD_PATTERNS = {
+    "fixed interface-count candidate": re.compile(r"\b5\+1\b", re.IGNORECASE),
+    "fixed project-state path": re.compile(r"\.cotend[\\/]", re.IGNORECASE),
+    "fixed invocation namespace": re.compile(r"\$cotend:|(?<![\w/])\/cot\b", re.IGNORECASE),
+    "fixed plugin and skill bundle": re.compile(
+        r"\bPlugin\b.{0,80}\b(?:6|six)\b.{0,40}\bSkills?\b|"
+        r"\b(?:6|six)\b.{0,40}\bSkills?\b.{0,80}\bPlugin\b",
+        re.IGNORECASE | re.DOTALL,
+    ),
+    "fixed plugin namespace field": re.compile(r"\bplugin_namespace\b", re.IGNORECASE),
+}
 
 
 def git_candidates() -> set[str]:
@@ -66,6 +77,100 @@ def public_inputs(spec_text: str) -> list[str]:
 
 def metadata_values(text: str, key: str) -> set[str]:
     return set(re.findall(rf"^\s*{re.escape(key)}:\s*([^\s#]+)", text, re.MULTILINE))
+
+
+def metadata_list(text: str, key: str) -> list[str] | None:
+    match = re.search(
+        rf"^{re.escape(key)}:\s*(?P<inline>\[[^\n]*\])?\s*$",
+        text,
+        re.MULTILINE,
+    )
+    if not match:
+        return None
+    inline = match.group("inline")
+    if inline is not None:
+        content = inline[1:-1].strip()
+        return [] if not content else [value.strip() for value in content.split(",")]
+
+    values: list[str] = []
+    for line in text[match.end() :].splitlines():
+        if not line.strip():
+            continue
+        item = re.match(r"^  -\s+(.+?)\s*$", line)
+        if not item:
+            break
+        values.append(item.group(1))
+    return values
+
+
+def index_dependencies(index_text: str) -> dict[str, list[str]]:
+    dependencies: dict[str, list[str]] = {}
+    for line in index_text.splitlines():
+        if not re.match(r"^\| C\d{2} \|", line):
+            continue
+        cells = [value.strip() for value in line.strip("|").split("|")]
+        dependencies[cells[0]] = (
+            [] if cells[3] == "none" else [value.strip() for value in cells[3].split(",")]
+        )
+    return dependencies
+
+
+def contract_relationship_errors(index_text: str, specs: dict[str, str]) -> list[str]:
+    errors: list[str] = []
+    dependencies = index_dependencies(index_text)
+    if set(dependencies) != EXPECTED_CAPABILITIES:
+        errors.append("behavior dependency index must contain C01-C19")
+
+    for capability, required in dependencies.items():
+        unknown = set(required) - set(dependencies)
+        if unknown:
+            errors.append(f"{capability}: unknown dependencies {sorted(unknown)}")
+
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(capability: str) -> None:
+        if capability in visiting:
+            errors.append(f"behavior dependency cycle includes {capability}")
+            return
+        if capability in visited:
+            return
+        visiting.add(capability)
+        for dependency in dependencies.get(capability, []):
+            visit(dependency)
+        visiting.remove(capability)
+        visited.add(capability)
+
+    for capability in dependencies:
+        visit(capability)
+
+    owner_to_spec: dict[str, str] = {}
+    for spec_path, spec_text in specs.items():
+        spec_ids = metadata_values(spec_text, "spec_id")
+        if len(spec_ids) != 1:
+            errors.append(f"{spec_path}: expected one spec_id")
+            continue
+        spec_id = next(iter(spec_ids))
+        declared_dependencies = metadata_list(spec_text, "depends_on")
+        declared_consumers = metadata_list(spec_text, "required_by")
+        owners = metadata_list(spec_text, "shared_rule_owners")
+        if declared_dependencies is None or declared_consumers is None or owners is None:
+            errors.append(f"{spec_path}: missing relationship metadata")
+            continue
+        if declared_dependencies != dependencies.get(spec_id):
+            errors.append(f"{spec_id}: depends_on does not match behavior index")
+        expected_consumers = sorted(
+            capability for capability, required in dependencies.items() if spec_id in required
+        )
+        if sorted(declared_consumers) != expected_consumers:
+            errors.append(f"{spec_id}: required_by is not the inverse dependency index")
+        for owner in owners:
+            previous = owner_to_spec.get(owner)
+            if previous is not None:
+                errors.append(f"shared rule owner {owner} is duplicated by {previous} and {spec_id}")
+            owner_to_spec[owner] = spec_id
+
+    return errors
 
 
 def main() -> int:
@@ -107,10 +212,18 @@ def main() -> int:
     ):
         if metadata_values(prd_text, key) != {"unconfirmed"}:
             errors.append(f"PRD {key} must remain unconfirmed")
+    for label, pattern in FORBIDDEN_UNCONFIRMED_PRD_PATTERNS.items():
+        if pattern.search(prd_text):
+            errors.append(f"docs/PRODUCT-PRD.md: {label}")
 
-    spec_paths = sorted(path for path in candidates if path.startswith("docs/behavior-specs/") and path.endswith(".md"))
+    spec_paths = sorted(
+        path
+        for path in candidates
+        if path.startswith("docs/behavior-specs/") and path.endswith(".md")
+    )
+    spec_texts = {spec_path: read(spec_path) for spec_path in spec_paths}
     for spec_path in spec_paths:
-        spec_text = read(spec_path)
+        spec_text = spec_texts[spec_path]
         inputs = public_inputs(spec_text)
         if not inputs:
             errors.append(f"{spec_path}: missing public_inputs")
@@ -119,6 +232,7 @@ def main() -> int:
                 errors.append(f"{spec_path}: public input is missing or ignored: {input_path}")
         if metadata_values(spec_text, "product_baseline_version") != {"0.1.0"}:
             errors.append(f"{spec_path}: product baseline mismatch")
+    errors.extend(contract_relationship_errors(index_text, spec_texts))
 
     status_path = ROOT / "STATUS.md"
     plan_path = ROOT / "PROJECT-PLAN-TREE.md"
