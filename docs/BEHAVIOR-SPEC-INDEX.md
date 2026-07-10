@@ -8,7 +8,7 @@ product_baseline_version: 0.1.0
 coverage_source: docs/CAPABILITY-COVERAGE.md
 capability_count: 19
 current_wave: W5-platform-delivery-lifecycle
-current_gate: W5-specification-and-review
+current_gate: W5-user-confirmation
 implementation_allowed: false
 ```
 
@@ -59,7 +59,7 @@ This index assigns every confirmed CoTend capability to one clean-room behavior 
 | C09 | Diagnosis without modification | W4 | C03, C04, C06, C07, C18, C19 | contextual | `behavior-specs/C09-diagnosis-without-modification.md` | active user confirmed |
 | C12 | Model role and upgrade lifecycle | W4 | C03, C04, C06, C07, C08, C13, C17 | advanced | `behavior-specs/C12-model-role-and-upgrade-lifecycle.md` | active user confirmed |
 | C14 | Framework adaptation and learning | W4 | C03, C06, C07, C08, C15, C17, C19 | maintainer | `behavior-specs/C14-framework-adaptation-and-learning.md` | active user confirmed |
-| C16 | Platform delivery lifecycle | W5 | C02, C03, C06, C07, C13, C15, C19 | contextual | `behavior-specs/C16-platform-delivery-lifecycle.md` | planned |
+| C16 | Platform delivery lifecycle | W5 | C02, C03, C06, C07, C13, C15, C19 | contextual | `behavior-specs/C16-platform-delivery-lifecycle.md` | reviewed pending user confirmation |
 
 ## Shared Rule Ownership
 
@@ -98,4 +98,4 @@ W4 and W5 remain part of the confirmed full product. They are sequenced later be
 
 ## Current Wave
 
-C09, C12, and C14 are active, user-confirmed W4 contracts for diagnosis, model-role lifecycle, and framework learning. W5 now specifies the platform delivery lifecycle for safe install, update, repair, migration, disablement, and uninstall behavior before any channel or packaging design is selected. Product implementation remains blocked until the relevant contracts are active and a clean implementation handoff exists.
+C09, C12, and C14 are active, user-confirmed W4 contracts for diagnosis, model-role lifecycle, and framework learning. C16 passed formal contract review and now awaits user confirmation of the W5 platform delivery lifecycle for safe install, enable, update, repair, migration, disable, and uninstall behavior before any channel or packaging design is selected. C16 is not active and cannot drive implementation until that confirmation. Product implementation remains blocked until the relevant contracts are active and a clean implementation handoff exists.
