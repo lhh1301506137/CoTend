@@ -8,7 +8,7 @@ product_baseline_version: 0.1.0
 coverage_source: docs/CAPABILITY-COVERAGE.md
 capability_count: 19
 current_wave: W2-development-core
-current_gate: W2-specification-and-review
+current_gate: W2-user-confirmation
 implementation_allowed: false
 ```
 
@@ -49,10 +49,10 @@ This index assigns every confirmed CoTend capability to one clean-room behavior 
 | C19 | Project standards and context injection | W1 | C03, C06, C07, C18 | contextual | `behavior-specs/C19-project-standards-and-context-injection.md` | active user confirmed |
 | C04 | Plan and direction continuity | W1 | C03, C06, C07 | default | `behavior-specs/C04-plan-and-direction-continuity.md` | active user confirmed |
 | C13 | Context and handoff portability | W1 | C03, C07, C19 | contextual | `behavior-specs/C13-context-and-handoff-portability.md` | active user confirmed |
-| C01 | Idea to consensus | W2 | C03, C04, C06, C07 | default | `behavior-specs/C01-idea-to-consensus.md` | planned |
-| C02 | Project initialization and recovery | W2 | C03, C06, C07, C19 | default | `behavior-specs/C02-project-initialization-and-recovery.md` | planned |
-| C05 | Delegated continuous development | W2 | C03, C04, C06, C07, C17, C18, C19 | default | `behavior-specs/C05-delegated-continuous-development.md` | planned |
-| C08 | Review and quality protection | W2 | C03, C05, C06, C07, C17, C18 | contextual | `behavior-specs/C08-review-and-quality-protection.md` | planned |
+| C01 | Idea to consensus | W2 | C03, C04, C06, C07 | default | `behavior-specs/C01-idea-to-consensus.md` | reviewed pending user confirmation |
+| C02 | Project initialization and recovery | W2 | C03, C06, C07, C19 | default | `behavior-specs/C02-project-initialization-and-recovery.md` | reviewed pending user confirmation |
+| C05 | Delegated continuous development | W2 | C03, C04, C06, C07, C17, C18, C19 | default | `behavior-specs/C05-delegated-continuous-development.md` | reviewed pending user confirmation |
+| C08 | Review and quality protection | W2 | C03, C05, C06, C07, C17, C18 | contextual | `behavior-specs/C08-review-and-quality-protection.md` | reviewed pending user confirmation |
 | C10 | User-readable acceptance | W3 | C03, C06, C07, C08 | default | `behavior-specs/C10-user-readable-acceptance.md` | planned |
 | C11 | Intent drift and Done Gate | W3 | C03, C04, C06, C07, C10 | contextual | `behavior-specs/C11-intent-drift-and-done-gate.md` | planned |
 | C15 | Release hardening | W3 | C03, C06, C07, C08, C10, C11 | contextual | `behavior-specs/C15-release-hardening.md` | planned |
@@ -98,4 +98,4 @@ W4 and W5 remain part of the confirmed full product. They are sequenced later be
 
 ## Current Wave
 
-C03, C19, C04, and C13 are active, user-confirmed contracts for project truth and continuity. W2 now specifies idea intake, initialization and recovery, delegated development, and review against the active W0-W1 foundation. Product implementation remains blocked until the relevant contracts are active and a clean implementation handoff exists.
+C01, C02, C05, and C08 passed public-safety, relationship, deterministic-scenario, and formal CodexSelf review gates and now await one consolidated product-owner confirmation. Product implementation remains blocked until the relevant contracts are active and a clean implementation handoff exists.
