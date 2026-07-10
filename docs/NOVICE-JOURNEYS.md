@@ -1,7 +1,7 @@
 # CoTend Novice Product Journeys
 
 ```yaml
-status: reviewed_pending_user_confirmation
+status: active_user_confirmed
 authority: derived_from_active_behavior_contracts
 product_baseline_version: 0.1.0
 phase: P2_design_novice_product_surface
