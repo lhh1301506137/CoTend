@@ -42,9 +42,9 @@ source_state: consolidated_public_product_requirements
 
 产品化路线包括行为盘点、用户价值翻译、clean-room 契约、最小架构验证、平台适配、完整验证、安装生命周期、发布收紧和基于证据的推广。详见 [`docs/PRODUCTIZATION-ROADMAP.md`](PRODUCTIZATION-ROADMAP.md)。
 
-## P1 行为规范系统（进行中）
+## P1 行为规范系统（已完成）
 
-19 类能力按照 [`docs/BEHAVIOR-SPECIFICATION-STANDARD.md`](BEHAVIOR-SPECIFICATION-STANDARD.md) 转换为平台中立、架构中立的可观察行为契约；[`docs/BEHAVIOR-SPEC-INDEX.md`](BEHAVIOR-SPEC-INDEX.md) 负责唯一覆盖和依赖顺序。只有达到 `active_user_confirmed` 且形成 clean implementation handoff 的契约才能驱动产品实现。
+19 类能力已按照 [`docs/BEHAVIOR-SPECIFICATION-STANDARD.md`](BEHAVIOR-SPECIFICATION-STANDARD.md) 转换为平台中立、架构中立的可观察行为契约，并全部达到 `active_user_confirmed`；[`docs/BEHAVIOR-SPEC-INDEX.md`](BEHAVIOR-SPEC-INDEX.md) 负责唯一覆盖和依赖顺序。公开路线现进入 P2 小白产品表面设计。产品实现仍要求相关契约、获批设计和 clean implementation handoff，P1 完成不等于实现授权。
 
 ## 产品与测试载体边界（已确认）
 
