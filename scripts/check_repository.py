@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import re
 import subprocess
 import sys
@@ -8,6 +9,47 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_CAPABILITIES = {f"C{number:02d}" for number in range(1, 20)}
+EXPECTED_JOURNEYS = [f"J{number}" for number in range(1, 7)]
+EXPECTED_NOVICE_STATUSES = {
+    "draft_for_review",
+    "reviewed_pending_user_confirmation",
+    "active_user_confirmed",
+}
+EXPECTED_JOURNEY_RESULTS = [
+    "success",
+    "blocked",
+    "failure",
+    "deferred",
+    "interrupted",
+    "recovery_required",
+]
+EXPECTED_NOVICE_FIXTURES = {
+    "F01": ("start", "question_or_confirmation", "yes", "framework"),
+    "F02": ("start", "question_or_confirmation", "yes", "framework"),
+    "F03": ("start", "question_or_confirmation", "yes", "framework"),
+    "F04": ("start", "readiness_report", "no", "framework"),
+    "F05": ("continue", "work_checkpoint", "no", "framework"),
+    "F06": ("continue", "blocked_decision", "yes", "framework"),
+    "F07": ("continue", "work_checkpoint", "yes", "framework"),
+    "F08": ("continue", "failure_containment", "no", "framework"),
+    "F09": ("change", "change_disposition", "yes", "framework"),
+    "F10": ("change", "change_disposition", "no", "framework"),
+    "F11": ("change", "interruption_checkpoint", "yes", "framework"),
+    "F12": ("change", "change_disposition", "no", "framework"),
+    "F13": ("recover", "recovery_report", "no", "framework"),
+    "F14": ("recover", "recovery_report", "yes", "framework"),
+    "F15": ("recover", "handoff_readiness", "no", "framework"),
+    "F16": ("recover", "recovery_report", "no", "framework"),
+    "F17": ("evaluate", "acceptance_walkthrough", "yes", "framework"),
+    "F18": ("evaluate", "done_gate", "yes", "framework"),
+    "F19": ("evaluate", "blocked_decision", "yes", "framework"),
+    "F20": ("advanced", "diagnosis_report", "yes", "framework"),
+    "F21": ("advanced", "model_options", "yes", "framework"),
+    "F22": ("advanced", "learning_proposal", "yes", "framework"),
+    "F23": ("advanced", "release_readiness", "yes", "framework"),
+    "F24": ("advanced", "delivery_preflight", "yes", "framework"),
+}
+EXPECTED_NOVICE_PROMPT_SHA256 = "6852cad0c78a44e33b7f784e107165e6a59cb7f4afd04a52732d4efc4a3ba0f7"
 LOCAL_ONLY_PATHS = {
     "STATUS.md",
     "REVIEW-LOG.md",
@@ -113,6 +155,131 @@ def index_dependencies(index_text: str) -> dict[str, list[str]]:
             [] if cells[3] == "none" else [value.strip() for value in cells[3].split(",")]
         )
     return dependencies
+
+
+def marked_section(text: str, start: str, end: str) -> str | None:
+    pattern = re.compile(
+        rf"<!-- {re.escape(start)} -->(?P<body>.*?)<!-- {re.escape(end)} -->",
+        re.DOTALL,
+    )
+    match = pattern.search(text)
+    return None if match is None else match.group("body")
+
+
+def novice_journey_errors(journey_text: str) -> list[str]:
+    errors: list[str] = []
+
+    journey_statuses = metadata_values(journey_text, "status")
+    if len(journey_statuses) != 1 or not journey_statuses <= EXPECTED_NOVICE_STATUSES:
+        errors.append("novice journey status is not an allowed lifecycle state")
+    try:
+        journey_text.encode("ascii")
+    except UnicodeEncodeError:
+        errors.append("novice journey public text must remain ASCII English")
+
+    for marker in (
+        "novice-guide-start",
+        "novice-guide-end",
+        "fixture-prompts-start",
+        "fixture-prompts-end",
+    ):
+        if journey_text.count(f"<!-- {marker} -->") != 1:
+            errors.append(f"novice journey marker must appear exactly once: {marker}")
+
+    for key in (
+        "interface_design_status",
+        "architecture_design_status",
+        "project_state_layout_status",
+        "distribution_design_status",
+    ):
+        if metadata_values(journey_text, key) != {"unconfirmed"}:
+            errors.append(f"novice journeys {key} must remain unconfirmed")
+
+    if metadata_values(journey_text, "product_baseline_version") != {"0.1.0"}:
+        errors.append("novice journey product baseline must be 0.1.0")
+    if metadata_values(journey_text, "phase") != {"P2_design_novice_product_surface"}:
+        errors.append("novice journey phase must remain P2 design")
+    if metadata_values(journey_text, "public_language") != {"en"}:
+        errors.append("novice journey public language must be en")
+    if metadata_values(journey_text, "fixture_corpus_version") != {"3"}:
+        errors.append("novice journey fixture corpus version must be 3")
+    if metadata_values(journey_text, "fixture_count") != {"24"}:
+        errors.append("novice journey fixture count must be 24")
+    if metadata_values(journey_text, "fixture_prompt_sha256") != {
+        EXPECTED_NOVICE_PROMPT_SHA256
+    }:
+        errors.append("novice journey prompt hash metadata does not match corpus version 3")
+
+    guide_section = marked_section(journey_text, "novice-guide-start", "novice-guide-end")
+    if guide_section is None:
+        errors.append("novice guide packet markers are missing or out of order")
+        guide_section = ""
+    journey_ids = re.findall(r"^## (J\d+)\b", guide_section, re.MULTILINE)
+    if journey_ids != EXPECTED_JOURNEYS:
+        errors.append(f"evaluator-visible novice journey IDs must be J1-J6 in order: {journey_ids}")
+    all_journey_ids = re.findall(r"^## (J\d+)\b", journey_text, re.MULTILINE)
+    if all_journey_ids != EXPECTED_JOURNEYS:
+        errors.append(f"novice journey IDs outside the evaluator packet are not allowed: {all_journey_ids}")
+
+    journey_matches = list(re.finditer(r"^## (J\d+)\b", guide_section, re.MULTILINE))
+    for index, match in enumerate(journey_matches):
+        end = journey_matches[index + 1].start() if index + 1 < len(journey_matches) else len(guide_section)
+        body = guide_section[match.start() : end]
+        results = re.findall(
+            r"^\| `(success|blocked|failure|deferred|interrupted|recovery_required)` \|",
+            body,
+            re.MULTILINE,
+        )
+        if results != EXPECTED_JOURNEY_RESULTS:
+            errors.append(f"{match.group(1)} result map is incomplete or out of order: {results}")
+
+    capability_rows = re.findall(r"^\| (C\d{2}) \|", journey_text, re.MULTILINE)
+    expected_capability_rows = [f"C{number:02d}" for number in range(1, 20)]
+    if capability_rows != expected_capability_rows:
+        errors.append(
+            "novice journey capability matrix must contain C01-C19 exactly once and in order"
+        )
+
+    prompt_section = marked_section(journey_text, "fixture-prompts-start", "fixture-prompts-end")
+    if prompt_section is None:
+        errors.append("novice journey fixture prompt markers are missing")
+    else:
+        prompt_hash = hashlib.sha256(prompt_section.encode("utf-8")).hexdigest()
+        if prompt_hash != EXPECTED_NOVICE_PROMPT_SHA256:
+            errors.append(f"novice journey prompt corpus hash mismatch: {prompt_hash}")
+        prompt_ids = re.findall(r"^\| (F\d{2}) \|", prompt_section, re.MULTILINE)
+        if prompt_ids != list(EXPECTED_NOVICE_FIXTURES):
+            errors.append(f"novice journey prompts must be frozen F01-F24: {prompt_ids}")
+
+    answer_match = re.search(
+        r"^### Frozen Answer Key\s*$\n(?P<body>.*?)(?=^### Pass Criteria\s*$)",
+        journey_text,
+        re.MULTILINE | re.DOTALL,
+    )
+    if answer_match is None:
+        errors.append("novice journey answer key is missing")
+    else:
+        answer_rows = re.findall(
+            r"^\| (F\d{2}) \| `([a-z_]+)` \| `([a-z_]+)` \| `(yes|no)` \| `(framework|downstream_project|unclear)` \|$",
+            answer_match.group("body"),
+            re.MULTILINE,
+        )
+        answer_ids = [fixture_id for fixture_id, _, _, _, _ in answer_rows]
+        if answer_ids != list(EXPECTED_NOVICE_FIXTURES):
+            errors.append(f"novice journey answers must be frozen F01-F24: {answer_ids}")
+        actual_answers = {
+            fixture_id: (entry_class, next_outcome, decision, cotend_role)
+            for fixture_id, entry_class, next_outcome, decision, cotend_role in answer_rows
+        }
+        if actual_answers != EXPECTED_NOVICE_FIXTURES:
+            errors.append("novice journey frozen answer key does not match corpus version 3")
+
+    if "CoTend is the product." not in journey_text:
+        errors.append("novice journeys must preserve the framework product boundary")
+    if "The downstream software used in this proof is a fixture." not in journey_text:
+        errors.append("novice journeys must preserve the downstream fixture boundary")
+
+    return errors
 
 
 def contract_relationship_errors(index_text: str, specs: dict[str, str]) -> list[str]:
@@ -233,6 +400,12 @@ def main() -> int:
         if metadata_values(spec_text, "product_baseline_version") != {"0.1.0"}:
             errors.append(f"{spec_path}: product baseline mismatch")
     errors.extend(contract_relationship_errors(index_text, spec_texts))
+
+    journey_path = "docs/NOVICE-JOURNEYS.md"
+    if journey_path not in candidates:
+        errors.append("novice journey specification is missing or ignored")
+    else:
+        errors.extend(novice_journey_errors(read(journey_path)))
 
     status_path = ROOT / "STATUS.md"
     plan_path = ROOT / "PROJECT-PLAN-TREE.md"
