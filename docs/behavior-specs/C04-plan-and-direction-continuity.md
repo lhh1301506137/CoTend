@@ -15,6 +15,7 @@ depends_on:
 required_by:
   - C01
   - C05
+  - C09
   - C11
   - C12
 shared_rule_owners:

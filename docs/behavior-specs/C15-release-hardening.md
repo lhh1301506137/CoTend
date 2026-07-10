@@ -16,6 +16,7 @@ depends_on:
   - C10
   - C11
 required_by:
+  - C14
   - C16
 shared_rule_owners:
   - release_trigger_and_posture
