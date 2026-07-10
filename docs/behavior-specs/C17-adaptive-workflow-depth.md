@@ -3,8 +3,8 @@
 ```yaml
 spec_id: C17
 title: Adaptive Workflow Depth
-status: reviewed_pending_user_confirmation
-authority: product_owner_confirmation_required
+status: active_user_confirmed
+authority: product_owner_confirmed
 product_baseline_version: 0.1.0
 product_target: core_lifecycle
 user_visibility: contextual

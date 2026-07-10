@@ -3,8 +3,8 @@
 ```yaml
 spec_id: C06
 title: Authority, Risk, And Stop Boundaries
-status: reviewed_pending_user_confirmation
-authority: product_owner_confirmation_required
+status: active_user_confirmed
+authority: product_owner_confirmed
 product_baseline_version: 0.1.0
 product_target: constitutional
 user_visibility: default
