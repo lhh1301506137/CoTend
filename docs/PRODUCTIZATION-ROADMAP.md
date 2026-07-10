@@ -5,7 +5,7 @@ status: active_user_confirmed
 authority: product_owner_confirmed
 product_baseline_version: 0.1.0
 route_type: clean_room_productization
-current_phase: P1-clean-room-behavioral-specifications
+current_phase: P2-design-novice-product-surface
 ```
 
 ## Productization Route
