@@ -7,8 +7,8 @@ standard_version: 0.1.0
 product_baseline_version: 0.1.0
 coverage_source: docs/CAPABILITY-COVERAGE.md
 capability_count: 19
-current_wave: W3-acceptance-and-release
-current_gate: W3-user-confirmation
+current_wave: W4-diagnosis-models-and-learning
+current_gate: W4-specification-and-review
 implementation_allowed: false
 ```
 
@@ -53,9 +53,9 @@ This index assigns every confirmed CoTend capability to one clean-room behavior 
 | C02 | Project initialization and recovery | W2 | C03, C06, C07, C19 | default | `behavior-specs/C02-project-initialization-and-recovery.md` | active user confirmed |
 | C05 | Delegated continuous development | W2 | C03, C04, C06, C07, C17, C18, C19 | default | `behavior-specs/C05-delegated-continuous-development.md` | active user confirmed |
 | C08 | Review and quality protection | W2 | C03, C05, C06, C07, C17, C18 | contextual | `behavior-specs/C08-review-and-quality-protection.md` | active user confirmed |
-| C10 | User-readable acceptance | W3 | C03, C06, C07, C08 | default | `behavior-specs/C10-user-readable-acceptance.md` | reviewed pending user confirmation |
-| C11 | Intent drift and Done Gate | W3 | C03, C04, C06, C07, C10 | contextual | `behavior-specs/C11-intent-drift-and-done-gate.md` | reviewed pending user confirmation |
-| C15 | Release hardening | W3 | C03, C06, C07, C08, C10, C11 | contextual | `behavior-specs/C15-release-hardening.md` | reviewed pending user confirmation |
+| C10 | User-readable acceptance | W3 | C03, C06, C07, C08 | default | `behavior-specs/C10-user-readable-acceptance.md` | active user confirmed |
+| C11 | Intent drift and Done Gate | W3 | C03, C04, C06, C07, C10 | contextual | `behavior-specs/C11-intent-drift-and-done-gate.md` | active user confirmed |
+| C15 | Release hardening | W3 | C03, C06, C07, C08, C10, C11 | contextual | `behavior-specs/C15-release-hardening.md` | active user confirmed |
 | C09 | Diagnosis without modification | W4 | C03, C06, C07, C18, C19 | contextual | `behavior-specs/C09-diagnosis-without-modification.md` | planned |
 | C12 | Model role and upgrade lifecycle | W4 | C03, C04, C06, C07, C08, C13, C17 | advanced | `behavior-specs/C12-model-role-and-upgrade-lifecycle.md` | planned |
 | C14 | Framework adaptation and learning | W4 | C03, C07, C08, C17, C19 | maintainer | `behavior-specs/C14-framework-adaptation-and-learning.md` | planned |
@@ -98,4 +98,4 @@ W4 and W5 remain part of the confirmed full product. They are sequenced later be
 
 ## Current Wave
 
-C10, C11, and C15 have passed public-safety and formal behavior review and now await one consolidated product-owner confirmation. They are not active contracts, and their review does not constitute implementation verification, AI UAT, release approval, or user acceptance. Product implementation remains blocked until the relevant contracts are active and a clean implementation handoff exists.
+C10, C11, and C15 are active, user-confirmed W3 contracts that complete the first proof journey at the behavior-contract level. W4 now specifies diagnosis without modification, model-role and upgrade lifecycle, and framework adaptation and learning. Product implementation remains blocked until the relevant contracts are active and a clean implementation handoff exists.
