@@ -50,6 +50,44 @@ EXPECTED_NOVICE_FIXTURES = {
     "F24": ("advanced", "delivery_preflight", "yes", "framework"),
 }
 EXPECTED_NOVICE_PROMPT_SHA256 = "6852cad0c78a44e33b7f784e107165e6a59cb7f4afd04a52732d4efc4a3ba0f7"
+EXPECTED_INTERFACE_GATES = [f"H{number}" for number in range(1, 9)]
+EXPECTED_INTERFACE_CANDIDATES = [f"I{number}" for number in range(1, 7)]
+EXPECTED_INTERFACE_DESTINATIONS = {
+    "start": ("core", ("first", "confirmed", "route")),
+    "continue": ("core", ("already current", "failure", "bounded", "verified")),
+    "change": ("core", ("user correction", "new idea", "priority", "stop")),
+    "recover": ("core", ("resume", "project truth", "hand")),
+    "evaluate": ("core", ("test", "user's decision", "without implying acceptance")),
+    "advanced:diagnosis": ("contextual", ("without editing", "repair", "user-authorized")),
+    "advanced:model_roles": ("contextual", ("advice", "takeovers", "rollback", "cost", "data")),
+    "advanced:framework_learning": (
+        "contextual",
+        ("repeated failures", "reversible", "improvement proposal"),
+    ),
+    "advanced:release": (
+        "contextual",
+        ("before", "push", "without performing the external action"),
+    ),
+    "advanced:platform_delivery": (
+        "contextual",
+        ("install", "update", "permissions", "state retention", "rollback"),
+    ),
+}
+EXPECTED_INTERFACE_FIXTURE_DESTINATIONS = {
+    **{f"F{number:02d}": "start" for number in range(1, 5)},
+    **{f"F{number:02d}": "continue" for number in range(5, 9)},
+    **{f"F{number:02d}": "change" for number in range(9, 13)},
+    **{f"F{number:02d}": "recover" for number in range(13, 17)},
+    **{f"F{number:02d}": "evaluate" for number in range(17, 20)},
+    "F20": "advanced:diagnosis",
+    "F21": "advanced:model_roles",
+    "F22": "advanced:framework_learning",
+    "F23": "advanced:release",
+    "F24": "advanced:platform_delivery",
+}
+EXPECTED_PLATFORM_CLAIMS = [f"P{number:02d}" for number in range(1, 10)]
+
+# checker-self-scan-allowlist-start
 LOCAL_ONLY_PATHS = {
     "STATUS.md",
     "REVIEW-LOG.md",
@@ -82,6 +120,7 @@ FORBIDDEN_UNCONFIRMED_PRD_PATTERNS = {
     ),
     "fixed plugin namespace field": re.compile(r"\bplugin_namespace\b", re.IGNORECASE),
 }
+# checker-self-scan-allowlist-end
 
 
 def git_candidates() -> set[str]:
@@ -282,6 +321,320 @@ def novice_journey_errors(journey_text: str) -> list[str]:
     return errors
 
 
+def interface_evidence_errors(
+    evidence_text: str,
+    interface_text: str,
+    journey_text: str,
+    expected_mapping: dict[str, tuple[str, str]],
+    catalog_skill_ids: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    try:
+        evidence_text.encode("ascii")
+    except UnicodeEncodeError:
+        errors.append("interface evidence must remain ASCII English")
+
+    exact_metadata = {
+        "status": {"executed_public_safe"},
+        "source_document": {"docs/INTERFACE-CANDIDATE-EVALUATION.md"},
+        "journey_prompt_sha256": {EXPECTED_NOVICE_PROMPT_SHA256},
+        "repository_access": {"none"},
+        "tool_use": {"none"},
+        "expected_rows": {"24"},
+        "exact_rows": {"24"},
+        "correct_decision_flags": {"24"},
+        "required_user_stops": {"16_of_16"},
+        "verdict": {"pass"},
+    }
+    for key, expected in exact_metadata.items():
+        if metadata_values(evidence_text, key) != expected:
+            errors.append(f"interface evidence metadata mismatch: {key}")
+
+    interface_versions = metadata_values(interface_text, "interface_mapping_version")
+    if metadata_values(evidence_text, "evaluation_version") != interface_versions:
+        errors.append("interface evidence version does not match the candidate packet")
+    catalog_hashes = metadata_values(interface_text, "interface_catalog_sha256")
+    if metadata_values(evidence_text, "catalog_sha256") != catalog_hashes:
+        errors.append("interface evidence catalog hash does not match the candidate packet")
+    if len(metadata_values(evidence_text, "evaluator_surface")) != 1:
+        errors.append("interface evidence must record one evaluator surface")
+    if len(metadata_values(evidence_text, "evaluator_model")) != 1:
+        errors.append("interface evidence must record one evaluator model label")
+    evaluator_cli = metadata_values(evidence_text, "evaluator_cli")
+    if len(evaluator_cli) != 1 or not re.fullmatch(r"\d+\.\d+\.\d+", next(iter(evaluator_cli), "")):
+        errors.append("interface evidence must record one semantic CLI version")
+
+    for marker in (
+        "evaluator-rules-start",
+        "evaluator-rules-end",
+        "evaluator-output-start",
+        "evaluator-output-end",
+    ):
+        if evidence_text.count(f"<!-- {marker} -->") != 1:
+            errors.append(f"interface evidence marker must appear exactly once: {marker}")
+
+    rules = marked_section(evidence_text, "evaluator-rules-start", "evaluator-rules-end") or ""
+    catalog = marked_section(interface_text, "interface-catalog-start", "interface-catalog-end") or ""
+    prompts = marked_section(journey_text, "fixture-prompts-start", "fixture-prompts-end") or ""
+    packet_hash = hashlib.sha256((rules + catalog + prompts).encode("utf-8")).hexdigest()
+    if metadata_values(evidence_text, "packet_sha256") != {packet_hash}:
+        errors.append("interface evidence packet hash mismatch")
+
+    output = marked_section(evidence_text, "evaluator-output-start", "evaluator-output-end") or ""
+    output_hash = hashlib.sha256(output.encode("utf-8")).hexdigest()
+    if metadata_values(evidence_text, "raw_output_sha256") != {output_hash}:
+        errors.append("interface evidence raw-output hash mismatch")
+    output_block = re.fullmatch(r"\s*```text\n(?P<rows>.*?)\n```\s*", output, re.DOTALL)
+    if output_block is None:
+        errors.append("interface evidence output must contain exactly one text block")
+        output_rows: list[tuple[str, str, str]] = []
+    else:
+        rows_text = output_block.group("rows")
+        output_rows = re.findall(
+            r"^(F\d{2}) \| (\$cotend-[a-z0-9-]+) \| (yes|no)$",
+            rows_text,
+            re.MULTILINE,
+        )
+        if len(output_rows) != len(rows_text.splitlines()):
+            errors.append("interface evidence output contains an unexpected line")
+
+    output_ids = [fixture_id for fixture_id, _, _ in output_rows]
+    if output_ids != list(expected_mapping):
+        errors.append(f"interface evidence output must contain F01-F24 in order: {output_ids}")
+    actual_output = {
+        fixture_id: (skill_id, decision)
+        for fixture_id, skill_id, decision in output_rows
+    }
+    if actual_output != expected_mapping:
+        errors.append("interface evidence output does not score 24 of 24")
+    if {skill_id for _, skill_id, _ in output_rows} != catalog_skill_ids:
+        errors.append("interface evidence does not exercise every catalog entry")
+
+    return errors
+
+
+def interface_candidate_errors(
+    interface_text: str,
+    journey_text: str,
+    evidence_text: str | None = None,
+) -> list[str]:
+    errors: list[str] = []
+
+    statuses = metadata_values(interface_text, "status")
+    if len(statuses) != 1 or statuses - EXPECTED_NOVICE_STATUSES:
+        errors.append("interface evaluation must declare one allowed lifecycle status")
+    try:
+        interface_text.encode("ascii")
+    except UnicodeEncodeError:
+        errors.append("interface evaluation public text must remain ASCII English")
+
+    exact_metadata = {
+        "product_baseline_version": {"0.1.0"},
+        "phase": {"P2_design_novice_product_surface"},
+        "public_language": {"en"},
+        "launch_platform": {"Codex"},
+        "recommendation_status": {"pending_user_confirmation"},
+        "interface_design_status": {"unconfirmed"},
+        "architecture_design_status": {"unconfirmed"},
+        "project_state_layout_status": {"unconfirmed"},
+        "distribution_design_status": {"unconfirmed"},
+        "fixture_source": {"docs/NOVICE-JOURNEYS.md"},
+        "fixture_source_version": {"3"},
+        "fixture_source_prompt_sha256": {EXPECTED_NOVICE_PROMPT_SHA256},
+        "interface_mapping_count": {"24"},
+        "blind_exact_rows": {"24_of_24"},
+        "blind_user_stops": {"16_of_16"},
+        "blind_result": {"pass"},
+    }
+    for key, expected in exact_metadata.items():
+        if metadata_values(interface_text, key) != expected:
+            errors.append(f"interface evaluation metadata mismatch: {key}")
+
+    recommendation_candidates = metadata_values(interface_text, "recommendation_candidate")
+    recommendation_strategies = metadata_values(interface_text, "recommendation_strategy")
+    if len(recommendation_candidates) != 1:
+        errors.append("interface evaluation must name one recommendation candidate")
+    if len(recommendation_strategies) != 1 or not re.fullmatch(
+        r"[a-z][a-z0-9_]+", next(iter(recommendation_strategies), "")
+    ):
+        errors.append("interface evaluation must name one recommendation strategy")
+    mapping_versions = metadata_values(interface_text, "interface_mapping_version")
+    if len(mapping_versions) != 1 or not next(iter(mapping_versions), "").isdigit():
+        errors.append("interface mapping version must be a positive integer")
+
+    for marker in (
+        "platform-evidence-start",
+        "platform-evidence-end",
+        "interface-catalog-start",
+        "interface-catalog-end",
+    ):
+        if interface_text.count(f"<!-- {marker} -->") != 1:
+            errors.append(f"interface marker must appear exactly once: {marker}")
+
+    gate_ids = re.findall(r"^\| (H\d+) \|", interface_text, re.MULTILINE)
+    if gate_ids != EXPECTED_INTERFACE_GATES:
+        errors.append(f"interface hard gates must be H1-H8 in order: {gate_ids}")
+
+    candidate_rows = re.findall(
+        r"^\| (I\d+) \| (?P<candidate>[^|]+) \| (?P<strength>[^|]+) \| "
+        r"(?P<weakness>[^|]+) \| (?P<disposition>[^|]+) \|$",
+        interface_text,
+        re.MULTILINE,
+    )
+    candidate_ids = [row[0] for row in candidate_rows]
+    if candidate_ids != EXPECTED_INTERFACE_CANDIDATES:
+        errors.append(f"interface candidates must be I1-I6 in order: {candidate_ids}")
+    recommendation_candidate = next(iter(recommendation_candidates), "")
+    dispositions = {row[0]: row[4].strip() for row in candidate_rows}
+    if recommendation_candidate not in dispositions or not dispositions.get(
+        recommendation_candidate, ""
+    ).startswith("Recommend"):
+        errors.append("the metadata recommendation must match the recommended candidate row")
+
+    platform_evidence = marked_section(
+        interface_text, "platform-evidence-start", "platform-evidence-end"
+    ) or ""
+    platform_hash = hashlib.sha256(platform_evidence.encode("utf-8")).hexdigest()
+    if metadata_values(interface_text, "platform_evidence_sha256") != {platform_hash}:
+        errors.append("platform evidence table hash mismatch")
+    platform_rows = re.findall(
+        r"^\| (P\d{2}) \| ([^|]+) \| \[[^\]]+\]"
+        r"\((https://learn\.chatgpt\.com/[^)]+)\) \| (\d{4}-\d{2}-\d{2}) \| ([^|]+) \|$",
+        platform_evidence,
+        re.MULTILINE,
+    )
+    platform_ids = [claim_id for claim_id, _, _, _, _ in platform_rows]
+    if platform_ids != EXPECTED_PLATFORM_CLAIMS:
+        errors.append(f"platform evidence claims must be P01-P09 in order: {platform_ids}")
+    evidence_dates = metadata_values(interface_text, "platform_evidence_date")
+    if len(evidence_dates) != 1 or any(row[3] not in evidence_dates for row in platform_rows):
+        errors.append("platform evidence rows must use the recorded access date")
+    for claim_id, claim, _, _, boundary in platform_rows:
+        if len(claim.strip()) < 24 or len(boundary.strip()) < 24:
+            errors.append(f"platform evidence claim is not bounded enough: {claim_id}")
+    p04_boundary = next((row[4].casefold() for row in platform_rows if row[0] == "P04"), "")
+    if "vary" not in p04_boundary or "verify" not in p04_boundary:
+        errors.append("slash-list evidence must disclose environment variation and re-verification")
+
+    catalog = marked_section(interface_text, "interface-catalog-start", "interface-catalog-end") or ""
+    catalog_hash = hashlib.sha256(catalog.encode("utf-8")).hexdigest()
+    if metadata_values(interface_text, "interface_catalog_sha256") != {catalog_hash}:
+        errors.append("interface catalog metadata hash mismatch")
+    catalog_rows = re.findall(
+        r"^\| `([^`]+)` \| `([^`]+)` \| (core|contextual) \| `([^`]+)` \| ([^|]+) \|$",
+        catalog,
+        re.MULTILINE,
+    )
+    if len(catalog_rows) != len(EXPECTED_INTERFACE_DESTINATIONS):
+        errors.append("interface catalog must contain ten unique semantic destinations")
+    actual_entries = {
+        skill_id: (display_name, layer, destination, description.strip())
+        for skill_id, display_name, layer, destination, description in catalog_rows
+    }
+    if len(actual_entries) != len(catalog_rows):
+        errors.append("interface catalog Skill IDs must be unique")
+    if len({row[1] for row in catalog_rows}) != len(catalog_rows):
+        errors.append("interface catalog display names must be unique")
+    destination_to_skill = {destination: skill_id for skill_id, _, _, destination, _ in catalog_rows}
+    if set(destination_to_skill) != set(EXPECTED_INTERFACE_DESTINATIONS):
+        errors.append("interface catalog semantic destinations are incomplete or duplicated")
+    for skill_id, (display_name, layer, destination, description) in actual_entries.items():
+        if not skill_id.startswith("$cotend-"):
+            errors.append(f"interface Skill ID lacks the cotend- prefix: {skill_id}")
+        if not display_name.startswith("CoTend "):
+            errors.append(f"interface display name lacks the CoTend prefix: {display_name}")
+        expected_layer, required_terms = EXPECTED_INTERFACE_DESTINATIONS.get(
+            destination, (None, ())
+        )
+        if layer != expected_layer:
+            errors.append(f"interface destination has the wrong surface layer: {destination}")
+        description_text = description.casefold()
+        missing_terms = [term for term in required_terms if term not in description_text]
+        if missing_terms:
+            errors.append(f"interface description is incomplete for {destination}: {missing_terms}")
+    if "$cotend-advanced" in actual_entries or any(
+        display_name == "CoTend Advanced"
+        for display_name, _, _, _ in actual_entries.values()
+    ):
+        errors.append("a generic advanced entry is not allowed")
+
+    expected_mapping = {
+        fixture_id: (
+            destination_to_skill.get(destination, ""),
+            EXPECTED_NOVICE_FIXTURES[fixture_id][2],
+        )
+        for fixture_id, destination in EXPECTED_INTERFACE_FIXTURE_DESTINATIONS.items()
+    }
+    mapping_match = re.search(
+        r"^### Frozen Interface Mapping\s*$\n(?P<body>.*?)(?=^### Pass Criteria\s*$)",
+        interface_text,
+        re.MULTILINE | re.DOTALL,
+    )
+    if mapping_match is None:
+        errors.append("frozen interface mapping is missing")
+    else:
+        mapping_rows = re.findall(
+            r"^\| (F\d{2}) \| `([^`]+)` \| `(yes|no)` \|$",
+            mapping_match.group("body"),
+            re.MULTILINE,
+        )
+        mapping_ids = [fixture_id for fixture_id, _, _ in mapping_rows]
+        if mapping_ids != list(expected_mapping):
+            errors.append(f"interface mapping must contain F01-F24 in order: {mapping_ids}")
+        actual_mapping = {
+            fixture_id: (skill_id, decision)
+            for fixture_id, skill_id, decision in mapping_rows
+        }
+        if actual_mapping != expected_mapping:
+            errors.append("interface frozen mapping does not match its semantic catalog")
+
+    evidence_paths = metadata_values(interface_text, "blind_evidence")
+    if len(evidence_paths) != 1 or not next(iter(evidence_paths), "").startswith("docs/evidence/"):
+        errors.append("interface evaluation must name one public-safe blind evidence file")
+    elif evidence_text is None:
+        errors.append("interface blind evidence file is missing")
+    else:
+        errors.extend(
+            interface_evidence_errors(
+                evidence_text,
+                interface_text,
+                journey_text,
+                expected_mapping,
+                set(actual_entries),
+            )
+        )
+
+    if "docs/COMMAND-CONTRACTS.md" in interface_text:
+        errors.append("interface evaluation must not use ignored design history as a public source")
+    if "CoTend is the product:" not in interface_text:
+        errors.append("interface evaluation must preserve the framework product boundary")
+    if "There is no generic `CoTend Advanced` entry" not in interface_text:
+        errors.append("interface evaluation must reject a generic advanced placeholder")
+    if metadata_values(journey_text, "fixture_prompt_sha256") != {
+        EXPECTED_NOVICE_PROMPT_SHA256
+    }:
+        errors.append("interface evaluation fixture source no longer matches the journey corpus")
+
+    return errors
+
+
+def checker_self_scan_errors(checker_text: str) -> list[str]:
+    errors: list[str] = []
+    starts = list(
+        re.finditer(r"^# checker-self-scan-allowlist-start$", checker_text, re.MULTILINE)
+    )
+    ends = list(
+        re.finditer(r"^# checker-self-scan-allowlist-end$", checker_text, re.MULTILINE)
+    )
+    if len(starts) != 1 or len(ends) != 1 or starts[0].start() >= ends[0].end():
+        return ["checker self-scan allowlist markers are invalid"]
+    reduced = checker_text[: starts[0].start()] + checker_text[ends[0].end() :]
+    for label, pattern in FORBIDDEN_PUBLIC_PATTERNS.items():
+        if pattern.search(reduced):
+            errors.append(f"scripts/check_repository.py: {label} outside the policy allowlist")
+    return errors
+
+
 def contract_relationship_errors(index_text: str, specs: dict[str, str]) -> list[str]:
     errors: list[str] = []
     dependencies = index_dependencies(index_text)
@@ -358,6 +711,7 @@ def main() -> int:
         for label, pattern in FORBIDDEN_PUBLIC_PATTERNS.items():
             if pattern.search(text):
                 errors.append(f"{relative_path}: {label}")
+    errors.extend(checker_self_scan_errors(read("scripts/check_repository.py")))
 
     coverage_ids = table_capabilities("docs/CAPABILITY-COVERAGE.md")
     index_ids = table_capabilities("docs/BEHAVIOR-SPEC-INDEX.md")
@@ -402,10 +756,22 @@ def main() -> int:
     errors.extend(contract_relationship_errors(index_text, spec_texts))
 
     journey_path = "docs/NOVICE-JOURNEYS.md"
+    journey_text = ""
     if journey_path not in candidates:
         errors.append("novice journey specification is missing or ignored")
     else:
-        errors.extend(novice_journey_errors(read(journey_path)))
+        journey_text = read(journey_path)
+        errors.extend(novice_journey_errors(journey_text))
+
+    interface_path = "docs/INTERFACE-CANDIDATE-EVALUATION.md"
+    if interface_path not in candidates:
+        errors.append("interface candidate evaluation is missing or ignored")
+    else:
+        interface_text = read(interface_path)
+        evidence_paths = metadata_values(interface_text, "blind_evidence")
+        evidence_path = next(iter(evidence_paths), "") if len(evidence_paths) == 1 else ""
+        evidence_text = read(evidence_path) if evidence_path in candidates else None
+        errors.extend(interface_candidate_errors(interface_text, journey_text, evidence_text))
 
     status_path = ROOT / "STATUS.md"
     plan_path = ROOT / "PROJECT-PLAN-TREE.md"
