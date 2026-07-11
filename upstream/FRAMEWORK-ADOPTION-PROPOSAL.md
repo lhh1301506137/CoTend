@@ -9,6 +9,8 @@ role_map: upstream/CODEX-SKILL-ROLE-MAP.json
 role_layer_status: user_confirmed
 role_layer_decision: product_owner_confirmed
 user_owned_skill_name_status: user_confirmed
+MIT_companion_bundling_status: user_confirmed
+codex_skill_set_decisions_status: complete
 adoption_state: not_adopted
 final_framework_lock_exists: false
 analysis_language: zh-CN
@@ -24,7 +26,7 @@ analysis_language: zh-CN
 4. `diagnose-only` 和 `dual-model-upgrade` 是情境/进阶能力。
 5. `grill-me` 和 `karpathy-guidelines` 是 MIT 伴随 Skill，不拥有产品生命周期或项目真相。
 
-用户已确认保留这套分层，并确认五个用户原创 Skill 分别命名为 `cotend-init`、`cotend-project-init`、`cotend-collaboration`、`cotend-diagnose-only` 和 `cotend-model-upgrade`。这不重新建立 I6 十入口目录，也不把内部角色提升为日常入口；MIT Skill bundling 和实际导入仍需后续确认与验证。
+用户已确认保留这套分层，确认五个用户原创 Skill 分别命名为 `cotend-init`、`cotend-project-init`、`cotend-collaboration`、`cotend-diagnose-only` 和 `cotend-model-upgrade`，并确认 Codex 首发包直接内置 `grill-me` 与 `karpathy-guidelines`。这不重新建立 I6 十入口目录，也不把内部角色提升为日常入口；实际文件 adoption、适配、安装载体和发布仍需后续授权与验证。
 
 ## 候选 release 证据
 
@@ -51,8 +53,8 @@ analysis_language: zh-CN
 | `dual-ai-collaboration` | 共享治理核心 | 隐式核心；审查等情境可显式进入 | `adapted` + `platform_adaptation` | 已确认 `cotend-collaboration`。 |
 | `diagnose-only` | 只读诊断 | 自然语言优先的情境入口 | `adapted` + `platform_adaptation` | 已确认 `cotend-diagnose-only`。 |
 | `dual-model-upgrade` | 模型顾问/试用/接手/回退/复诊生命周期 | 进阶显式入口 | `adapted` + `platform_adaptation` | 已确认 `cotend-model-upgrade`。 |
-| `grill-me` | 一次一问的需求澄清伴随 Skill | 内部情境调用，可选显式 | `deferred` | 如打包应保留第三方身份与 MIT 归属。 |
-| `karpathy-guidelines` | AI 编码纪律伴随 Skill | 隐式内部规则 | `deferred` | 如打包应保留第三方身份与 MIT 归属。 |
+| `grill-me` | 一次一问的需求澄清伴随 Skill | 内部情境调用，可选显式 | 提议 `adopted` + `direct_adoption` | 已确认随包内置，保留第三方身份与 MIT 归属。 |
+| `karpathy-guidelines` | AI 编码纪律伴随 Skill | 隐式内部规则 | 提议 `adopted` + `direct_adoption` | 已确认随包内置，保留第三方身份与 MIT 归属。 |
 
 完整机器映射见 [`CODEX-SKILL-ROLE-MAP.json`](CODEX-SKILL-ROLE-MAP.json)。
 
@@ -85,7 +87,7 @@ analysis_language: zh-CN
 - `grill-me` 是 Matt Pocock Skill 的本地改编。
 - `karpathy-guidelines` 与固定 upstream Skill 内容匹配。
 
-按当前固定 commit 的 MIT 声明、包内许可证文本和来源记录，两者可以作为 bundling 候选，但必须保留各自 MIT 许可证和归属，不能被 CoTend 顶层 Apache-2.0 重新许可。`karpathy-guidelines` 的固定 upstream commit 没有独立 `LICENSE` 文件，当前依据其 Skill frontmatter、README 声明和分享包单独保留的 MIT 文本；首次公开分发前仍需再次复核。是否随首发载体一起打包属于产品/分发决定；当前保持 `deferred`。
+按当前固定 commit 的 MIT 声明、包内许可证文本和来源记录，用户已确认两者随 Codex 首发包内置。实施时必须保留各自 MIT 许可证和归属，不能被 CoTend 顶层 Apache-2.0 重新许可。`karpathy-guidelines` 的固定 upstream commit 没有独立 `LICENSE` 文件，当前依据其 Skill frontmatter、README 声明和分享包单独保留的 MIT 文本；首次公开分发前仍需再次复核。该产品决定不等于文件已经复制或 adoption 已完成。
 
 ### External runtime 与 platform capability
 
@@ -118,15 +120,19 @@ release_notes_reviewed: yes
 changed_surfaces: initial_import_no_previous_CoTend_lock
 role_layers: user_confirmed
 user_owned_skill_names: user_confirmed
+MIT_companion_bundling: user_confirmed
+codex_skill_set_decisions: complete
 final_names_confirmed: yes
-adapted_candidates:
+proposed_adapted_candidates:
   - dual-ai-init
   - dual-ai-project-init
   - dual-ai-collaboration
   - diagnose-only
   - dual-model-upgrade
-needs_user_decision:
-  - MIT companion Skill bundling versus external dependency
+proposed_adopted_candidates:
+  - grill-me
+  - karpathy-guidelines
+needs_user_decision: []
 deferred:
   - Claude carrier
   - physical package/plugin carrier
@@ -137,7 +143,7 @@ resulting_CoTend_commit: pending
 framework_lock: forbidden_until_adaptation_and_verification_commit
 ```
 
-这里的 `final_names_confirmed` 只确认五个用户原创 Skill ID，以及第三方 Skill 如被采用时必须保留原身份；它不确认物理 Skill 数量、MIT bundling、文件导入或 adoption 已完成。
+这里的 `final_names_confirmed` 只确认五个用户原创 Skill ID，以及第三方 Skill 如被采用时必须保留原身份。`physical_skill_count_confirmed` 只确认仓库内 Codex 技能源集合固定为 7 个目录；它不确认 live 安装、Plugin/Marketplace 载体、文件导入或 adoption 已完成。
 
 ## 正式 lock 创建门
 
@@ -149,7 +155,8 @@ framework_lock: forbidden_until_adaptation_and_verification_commit
 4. 入口、委派、停止、恢复和行为契约验证通过。
 5. MIT notices 与许可证随实际 bundling 完整落位。
 6. adoption log 与适配文件在同一 CoTend commit 中完成。
-7. lock 指向该 commit，而不是当前候选审查提交。
+7. lock 使用 `containing_commit` 语义，由 Git 解析“最近一次修改该 lock 的提交”，避免在文件中嵌入自身 commit hash 的不可能自引用。
+8. lock 只能在 adoption 或 upgrade 提交中修改，且同一提交必须同时修改对应 Skill set 与 adoption log，防止普通文档修改使锚点漂移。
 
 ## 当前未验证
 

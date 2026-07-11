@@ -860,6 +860,7 @@ def owner_document_language_errors(
         "docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md",
         "UPSTREAM-SOURCES.md",
         "upstream/FRAMEWORK-ADOPTION-PROPOSAL.md",
+        "upstream/FRAMEWORK-ADOPTION-PLAN.md",
     )
     for path in expected_analysis_paths:
         text = analysis_documents.get(path)
@@ -994,10 +995,11 @@ def productization_truth_errors(
         "## UP01 dual-ai 分享包",
         "role: primary_productization_source",
         "reviewed_release: 2026.07.11.3",
-        "adoption_status: integrity_and_provenance_reviewed_not_imported",
+        "adoption_status: product_disposition_confirmed_not_imported",
         "candidate_record: upstream/FRAMEWORK-CANDIDATE.json",
         "codex_role_map: upstream/CODEX-SKILL-ROLE-MAP.json",
         "adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md",
+        "adoption_plan: upstream/FRAMEWORK-ADOPTION-PLAN.md",
         "final_framework_lock: not_created",
     ):
         if required_text not in registry_text:
@@ -1060,6 +1062,7 @@ def upstream_candidate_mapping_errors(
     candidate_text: str,
     role_map_text: str,
     proposal_text: str,
+    adoption_plan_text: str,
     public_candidates: set[str],
 ) -> list[str]:
     errors: list[str] = []
@@ -1133,13 +1136,15 @@ def upstream_candidate_mapping_errors(
     if role_map.get("candidate_release") != "2026.07.11.3":
         errors.append("Codex role map release mismatch")
     if role_map.get("public_interface_authority") != (
-        "role_layers_and_names_confirmed_third_party_bundling_pending"
+        "codex_skill_set_product_decisions_complete_adoption_pending"
     ):
         errors.append("Codex role map role-layer/name authority boundary drift")
     if role_map.get("role_layer_decision") != "product_owner_confirmed":
         errors.append("Codex role map role-layer decision mismatch")
     if role_map.get("user_owned_naming_decision") != "product_owner_confirmed":
         errors.append("Codex role map user-owned naming decision mismatch")
+    if role_map.get("third_party_bundling_decision") != "product_owner_confirmed":
+        errors.append("Codex role map third-party bundling decision mismatch")
     if role_map.get("skill_count") != 7:
         errors.append("Codex role map skill_count must be 7")
 
@@ -1199,15 +1204,15 @@ def upstream_candidate_mapping_errors(
         "grill-me": (
             "adapted_third_party",
             "internal_clarification_companion",
-            "deferred",
-            "pending",
+            "adopted",
+            "direct_adoption",
             None,
         ),
         "karpathy-guidelines": (
             "bundled_third_party",
             "internal_ai_implementation_discipline",
-            "deferred",
-            "pending",
+            "adopted",
+            "direct_adoption",
             None,
         ),
     }
@@ -1244,9 +1249,8 @@ def upstream_candidate_mapping_errors(
     if init_entry.get("delegates_to") != ["dual-ai-project-init"]:
         errors.append("dual-ai-init must remain the thin entry delegating to project init")
     for third_party_id in ("grill-me", "karpathy-guidelines"):
-        modes = roles_by_id.get(third_party_id, {}).get("candidate_implementation_modes")
-        if modes != ["direct_adoption", "external_dependency"]:
-            errors.append(f"{third_party_id} bundling/external choice must remain unresolved")
+        if roles_by_id.get(third_party_id, {}).get("bundling_status") != "user_confirmed":
+            errors.append(f"{third_party_id} bundling decision drift")
 
     adoption = role_map.get("adoption")
     if not isinstance(adoption, dict):
@@ -1260,8 +1264,12 @@ def upstream_candidate_mapping_errors(
             "final_names_scope": (
                 "five_user_owned_ids_plus_preserved_third_party_identity"
             ),
-            "physical_skill_count_confirmed": False,
-            "third_party_bundling_confirmed": False,
+            "physical_skill_count_confirmed": True,
+            "physical_skill_count_scope": "repository_codex_skill_source_set",
+            "confirmed_codex_skill_count": 7,
+            "third_party_bundling_confirmed": True,
+            "codex_skill_set_decisions_complete": True,
+            "actual_adoption_authorized": False,
             "final_framework_lock_exists": False,
         }
         for key, expected in expected_adoption_boundary.items():
@@ -1279,6 +1287,8 @@ def upstream_candidate_mapping_errors(
         "role_layer_status": {"user_confirmed"},
         "role_layer_decision": {"product_owner_confirmed"},
         "user_owned_skill_name_status": {"user_confirmed"},
+        "MIT_companion_bundling_status": {"user_confirmed"},
+        "codex_skill_set_decisions_status": {"complete"},
         "adoption_state": {"not_adopted"},
         "final_framework_lock_exists": {"false"},
         "analysis_language": {"zh-CN"},
@@ -1292,12 +1302,62 @@ def upstream_candidate_mapping_errors(
         "dual-ai-project-init` 是入口内部的 Auto Mode 引擎",
         "用户已确认保留这套分层",
         "五个用户原创 Skill 分别命名为",
+        "确认 Codex 首发包直接内置 `grill-me` 与 `karpathy-guidelines`",
         "`final_names_confirmed` 只确认五个用户原创 Skill ID",
         "现在不得创建 `upstream/framework.lock.json`",
         "adoption_state: not_adopted",
     ):
         if required_text not in proposal_text:
             errors.append(f"framework adoption proposal is missing: {required_text}")
+
+    plan_statuses = metadata_values(adoption_plan_text, "status")
+    if plan_statuses not in (
+        {"draft_for_review"},
+        {"reviewed_pending_user_confirmation"},
+    ):
+        errors.append("framework adoption plan lifecycle status is invalid")
+    exact_plan_metadata = {
+        "candidate_release": {"2026.07.11.3"},
+        "target_platform": {"Codex"},
+        "target_source_carrier": {"codex-skills/"},
+        "live_install_target": {"not_authorized"},
+        "plugin_or_marketplace_carrier": {"deferred"},
+        "implementation_authority": {"pending_product_owner_confirmation"},
+        "adoption_state": {"not_adopted"},
+        "final_framework_lock_exists": {"false"},
+        "analysis_language": {"zh-CN"},
+    }
+    for key, expected in exact_plan_metadata.items():
+        if metadata_values(adoption_plan_text, key) != expected:
+            errors.append(f"framework adoption plan metadata mismatch: {key}")
+    for required_text in (
+        "7 个技能目录，共 30 个文件",
+        "codex-skills/cotend-init/",
+        "codex-skills/cotend-project-init/",
+        "codex-skills/cotend-collaboration/",
+        "codex-skills/cotend-diagnose-only/",
+        "codex-skills/cotend-model-upgrade/",
+        "codex-skills/grill-me/",
+        "codex-skills/karpathy-guidelines/",
+        "cotend-collaboration-v1.52",
+        "cotend-model-upgrade-v1.7",
+        "mechanism_budget: two_validation_mechanisms_no_new_user_workflow",
+        "不新增命令层、路由层、状态目录或重复内核",
+        '"type": "containing_commit"',
+        "锁文件只能在采用或升级提交中修改",
+        "不安装到用户全局 Codex 目录",
+    ):
+        if required_text not in adoption_plan_text:
+            errors.append(f"framework adoption plan is missing: {required_text}")
+
+    premature_skill_files = sorted(
+        path for path in public_candidates if path.startswith("codex-skills/")
+    )
+    if premature_skill_files:
+        errors.append(
+            "Codex Skill implementation exists before implementation authority: "
+            + ", ".join(premature_skill_files[:3])
+        )
 
     final_lock_path = "upstream/framework.lock.json"
     if final_lock_path in public_candidates or (ROOT / final_lock_path).exists():
@@ -1314,7 +1374,7 @@ def local_recovery_truth_errors(status_text: str, plan_text: str) -> list[str]:
         "framework_release_candidate": {"dual_ai_share_2026_07_11_3"},
         "framework_release_adoption": {"not_adopted"},
         "interface_authority": {
-            "role_layers_and_names_confirmed_third_party_bundling_pending"
+            "codex_skill_set_product_decisions_complete_adoption_pending"
         },
     }
     for key, expected in exact_status.items():
@@ -1472,6 +1532,7 @@ def main() -> int:
     framework_candidate_path = "upstream/FRAMEWORK-CANDIDATE.json"
     codex_role_map_path = "upstream/CODEX-SKILL-ROLE-MAP.json"
     adoption_proposal_path = "upstream/FRAMEWORK-ADOPTION-PROPOSAL.md"
+    adoption_plan_path = "upstream/FRAMEWORK-ADOPTION-PLAN.md"
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
     if upstream_registry_path not in candidates:
@@ -1480,6 +1541,7 @@ def main() -> int:
         framework_candidate_path,
         codex_role_map_path,
         adoption_proposal_path,
+        adoption_plan_path,
     ):
         if path not in candidates:
             errors.append(f"upstream candidate mapping artifact is missing or ignored: {path}")
@@ -1508,6 +1570,7 @@ def main() -> int:
         reference_study_path,
         upstream_registry_path,
         adoption_proposal_path,
+        adoption_plan_path,
     )
     errors.extend(
         owner_document_language_errors(
@@ -1594,6 +1657,7 @@ def main() -> int:
         framework_candidate_path,
         codex_role_map_path,
         adoption_proposal_path,
+        adoption_plan_path,
     }
     if upstream_mapping_paths <= candidates:
         errors.extend(
@@ -1601,6 +1665,7 @@ def main() -> int:
                 read(framework_candidate_path),
                 read(codex_role_map_path),
                 read(adoption_proposal_path),
+                read(adoption_plan_path),
                 candidates,
             )
         )

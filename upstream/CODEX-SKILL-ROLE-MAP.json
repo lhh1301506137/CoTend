@@ -5,9 +5,10 @@
   "candidate_release": "2026.07.11.3",
   "platform": "Codex",
   "launch_adapter": true,
-  "public_interface_authority": "role_layers_and_names_confirmed_third_party_bundling_pending",
+  "public_interface_authority": "codex_skill_set_product_decisions_complete_adoption_pending",
   "role_layer_decision": "product_owner_confirmed",
   "user_owned_naming_decision": "product_owner_confirmed",
+  "third_party_bundling_decision": "product_owner_confirmed",
   "mapping_basis": [
     "Skill frontmatter",
     "agents/openai.yaml",
@@ -167,12 +168,9 @@
         "the packaged adaptation owns one-question-at-a-time and option-1 acceptance behavior",
         "it is not a lifecycle or project-state owner"
       ],
-      "proposed_adoption_status": "deferred",
-      "proposed_implementation_mode": "pending",
-      "candidate_implementation_modes": [
-        "direct_adoption",
-        "external_dependency"
-      ],
+      "proposed_adoption_status": "adopted",
+      "proposed_implementation_mode": "direct_adoption",
+      "bundling_status": "user_confirmed",
       "proposed_cotend_skill_id": null,
       "naming_status": "preserve_third_party_identity_if_bundled",
       "required_notice": "Retain the Matt Pocock MIT attribution and license text"
@@ -190,12 +188,9 @@
         "the Skill defines simplicity, surgical edits, assumptions and verifiable goals",
         "it does not own project lifecycle, user authority or product state"
       ],
-      "proposed_adoption_status": "deferred",
-      "proposed_implementation_mode": "pending",
-      "candidate_implementation_modes": [
-        "direct_adoption",
-        "external_dependency"
-      ],
+      "proposed_adoption_status": "adopted",
+      "proposed_implementation_mode": "direct_adoption",
+      "bundling_status": "user_confirmed",
       "proposed_cotend_skill_id": null,
       "naming_status": "preserve_third_party_identity_if_bundled",
       "required_notice": "Retain the upstream-contributor MIT attribution and license text"
@@ -220,8 +215,12 @@
     "user_owned_skill_names_confirmed": true,
     "final_names_confirmed": true,
     "final_names_scope": "five_user_owned_ids_plus_preserved_third_party_identity",
-    "physical_skill_count_confirmed": false,
-    "third_party_bundling_confirmed": false,
+    "physical_skill_count_confirmed": true,
+    "physical_skill_count_scope": "repository_codex_skill_source_set",
+    "confirmed_codex_skill_count": 7,
+    "third_party_bundling_confirmed": true,
+    "codex_skill_set_decisions_complete": true,
+    "actual_adoption_authorized": false,
     "final_framework_lock_exists": false
   }
 }
