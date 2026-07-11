@@ -93,6 +93,38 @@ EXPECTED_INTERFACE_FIXTURE_DESTINATIONS = {
     "F24": "advanced:platform_delivery",
 }
 EXPECTED_PLATFORM_CLAIMS = [f"P{number:02d}" for number in range(1, 10)]
+EXPECTED_REFERENCE_SOURCES = {
+    "RF01": (
+        "https://github.com/obra/superpowers",
+        "d884ae04edebef577e82ff7c4e143debd0bbec99",
+        "MIT",
+    ),
+    "RF02": (
+        "https://github.com/mindfold-ai/trellis",
+        "bde902cad75813c73f1413bf8da581168a835b37",
+        "AGPL-3.0",
+    ),
+    "RF03": (
+        "https://github.com/github/spec-kit",
+        "1be42992e64b08ff0dce3d7a914eaabf04284ffb",
+        "MIT",
+    ),
+    "RF04": (
+        "https://github.com/Fission-AI/OpenSpec",
+        "0a99f410457271aa773d8b106f03f637f7c6b3c0",
+        "MIT",
+    ),
+    "RF05": (
+        "https://github.com/open-gsd/gsd-core",
+        "e3a8c063b8f6059aa4c0214302aec51615a4f831",
+        "MIT",
+    ),
+    "RF06": (
+        "https://github.com/bmad-code-org/BMAD-METHOD",
+        "49069b8b5276afd21402bc3b978b69ad78a7d2ef",
+        "MIT",
+    ),
+}
 
 # checker-self-scan-allowlist-start
 LOCAL_ONLY_PATHS = {
@@ -734,6 +766,81 @@ def checker_self_scan_errors(checker_text: str) -> list[str]:
     return errors
 
 
+def reference_study_errors(study_text: str, registry_text: str) -> list[str]:
+    errors: list[str] = []
+
+    for path, text in (
+        ("docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md", study_text),
+        ("UPSTREAM-SOURCES.md", registry_text),
+    ):
+        try:
+            text.encode("ascii")
+        except UnicodeEncodeError:
+            errors.append(f"{path}: reference research must remain ASCII English")
+
+    exact_study_metadata = {
+        "status": {"research_evidence"},
+        "authority": {"design_input_only"},
+        "sample": {"four_core_plus_two_selective"},
+        "source_registry": {"../UPSTREAM-SOURCES.md"},
+        "architecture_design_status": {"unconfirmed"},
+        "project_state_layout_status": {"unconfirmed"},
+        "distribution_design_status": {"unconfirmed"},
+        "execution_evidence": {"none"},
+        "source_copying": {"none"},
+    }
+    for key, expected in exact_study_metadata.items():
+        if metadata_values(study_text, key) != expected:
+            errors.append(f"reference study metadata mismatch: {key}")
+
+    if metadata_values(registry_text, "implementation_dependency") != {"none"}:
+        errors.append("upstream registry must not declare an implementation dependency")
+    if metadata_values(registry_text, "source_copying") != {"none"}:
+        errors.append("upstream registry must preserve the no-copying boundary")
+
+    blocks = list(
+        re.finditer(
+            r"^## (RF\d{2}) [^\n]+\n(?P<body>.*?)(?=^## RF\d{2} |^## Review Controls|\Z)",
+            registry_text,
+            re.MULTILINE | re.DOTALL,
+        )
+    )
+    source_ids = [match.group(1) for match in blocks]
+    if source_ids != list(EXPECTED_REFERENCE_SOURCES):
+        errors.append(f"upstream source IDs must be RF01-RF06 in order: {source_ids}")
+
+    for match in blocks:
+        source_id = match.group(1)
+        expected = EXPECTED_REFERENCE_SOURCES.get(source_id)
+        if expected is None:
+            continue
+        body = match.group("body")
+        expected_source, expected_commit, expected_license = expected
+        exact_values = {
+            "source": expected_source,
+            "reviewed_commit": expected_commit,
+            "declared_license": expected_license,
+            "adoption_status": "no_source_adoption",
+        }
+        for key, value in exact_values.items():
+            if metadata_values(body, key) != {value}:
+                errors.append(f"{source_id}: upstream registry mismatch for {key}")
+
+    required_findings = (
+        "Semantic entries are not physical Skills",
+        "Project truth must outlive the adapter",
+        "Generated-file ownership needs deterministic evidence",
+        "Hooks are an optional accelerator, not an MVP assumption",
+        "Installation is part of the novice product",
+        "This study does not approve an architecture",
+    )
+    for finding in required_findings:
+        if finding not in study_text:
+            errors.append(f"reference study is missing a required boundary: {finding}")
+
+    return errors
+
+
 def contract_relationship_errors(index_text: str, specs: dict[str, str]) -> list[str]:
     errors: list[str] = []
     dependencies = index_dependencies(index_text)
@@ -811,6 +918,20 @@ def main() -> int:
             if pattern.search(text):
                 errors.append(f"{relative_path}: {label}")
     errors.extend(checker_self_scan_errors(read("scripts/check_repository.py")))
+
+    reference_study_path = "docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md"
+    upstream_registry_path = "UPSTREAM-SOURCES.md"
+    if reference_study_path not in candidates:
+        errors.append("reference framework implementation study is missing or ignored")
+    if upstream_registry_path not in candidates:
+        errors.append("upstream source registry is missing or ignored")
+    if reference_study_path in candidates and upstream_registry_path in candidates:
+        errors.extend(
+            reference_study_errors(
+                read(reference_study_path),
+                read(upstream_registry_path),
+            )
+        )
 
     coverage_ids = table_capabilities("docs/CAPABILITY-COVERAGE.md")
     index_ids = table_capabilities("docs/BEHAVIOR-SPEC-INDEX.md")

@@ -57,7 +57,7 @@ source_state: consolidated_public_product_requirements
 
 P2 界面基线已由用户确认，见 [`docs/INTERFACE-CANDIDATE-EVALUATION.md`](INTERFACE-CANDIDATE-EVALUATION.md)：完整英文统一前缀入口优先，搜索与菜单只负责发现，自然语言复用同一语义，短别名与翻译后置；目录包含五个核心入口和五个具体情境入口，不设置通用 Advanced 或占位入口。该目录是设计基线，不表示十个入口已经启用或实现。
 
-运行时与打包架构、项目状态的物理布局、首个实现切片实际启用的入口，以及安装和分发渠道仍未确认。它们必须从获批行为契约、用户旅程、活动界面基线、平台能力和最小复杂度要求推导；任何本地历史设计稿都不构成公开实现权威。
+运行时与打包架构、项目状态的物理布局、首个实现切片实际启用的入口，以及安装和分发渠道仍未确认。它们必须从获批行为契约、用户旅程、活动界面基线、平台能力、最小复杂度要求和固定来源的公开实现研究推导；[`docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md`](REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md) 只提供证据与待验证问题，不构成架构、Skill 数量或安装方案的实现权威。
 
 已确认的约束仅包括：核心行为保持平台中立；项目真相必须可恢复且不得保存密钥；共享规则不能在多个入口中复制；安装、更新、修复、迁移、禁用和卸载需要作为完整生命周期设计。
 

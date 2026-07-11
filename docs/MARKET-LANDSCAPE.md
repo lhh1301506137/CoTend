@@ -5,7 +5,7 @@ status: research_baseline_accepted_for_positioning
 authority: public_research_summary
 positioning_status: product_owner_confirmed
 product_baseline_version: 0.1.0
-checked_at: 2026-07-10
+checked_at: 2026-07-11
 source_policy: public_primary_sources_preferred
 ```
 
@@ -28,6 +28,7 @@ Adjacent products cover parts of this problem. The reviewed products do not comb
 | [GitHub Spec Kit](https://github.github.com/spec-kit/) | Spec-driven development through Spec, Plan, Tasks, and Implement across many coding agents. | Developers and organizations adopting SDD and CLI-based project setup. | Centers specification artifacts, not the full novice control and acceptance loop. |
 | [OpenSpec](https://openspec.dev/) | Lightweight, universal spec-driven development for many AI coding tools. | Users able to install a CLI and operate specification workflows. | Lightweight intent management, but not a complete novice governance layer. |
 | [BMAD Method](https://docs.bmad-method.org/) | Agentic planning, agile roles, PRDs, architecture, stories, testing, and modules. | Users adopting structured agile and engineering roles. | Broad methodology, but terminology and process remain professional-development oriented. |
+| [GSD Core](https://github.com/open-gsd/gsd-core) | Context engineering, spec-driven phases, fresh-context agents, persistent project state, and verification across multiple coding tools. | Users managing milestone and phase workflows with agent orchestration. | Strong context and execution machinery, but its full command, agent, and planning vocabulary is developer-oriented. |
 | [Replit Agent](https://replit.com/ai) and no-code AI builders | Generate and deploy applications from natural language with little or no coding. | Non-programmers who want an app-building environment. | Accessible creation surface, but it owns the builder environment rather than governing arbitrary local AI coding tools and project truth. |
 | [Vibe Coding Assistant](https://vibecodingassistant.dev/) | GUI-driven prompt generation, code generation, compilation, and running for non-programmers. | Non-programmers and rapid prototypers. | Focuses on generation convenience, not durable governance across the development lifecycle. |
 | [CLAVE Framework](https://claveframework.org/) | Enterprise governance of applications created with AI tools: inventory, ownership, risk, security, and lifecycle. | Organizations governing citizen-developed applications. | Governs deployed application output at an organizational level, not an individual's in-tool development loop. |
@@ -51,4 +52,4 @@ CoTend should compete on five linked responsibilities:
 
 ## Research Follow-up
 
-Before public launch, repeat this review with a documented search protocol, include newly launched novice-governance tools, and validate the positioning with target-user interviews rather than relying only on product documentation.
+The source-pinned implementation comparison is recorded in [`REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md`](REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md). Before public launch, repeat the market review with a documented search protocol, include newly launched novice-governance tools, and validate the positioning with target-user interviews rather than relying only on product documentation.

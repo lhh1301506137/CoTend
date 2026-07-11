@@ -43,15 +43,20 @@ Gate: every retained capability has a public-safe contract and provenance dispos
 - Use plain English and progressive disclosure.
 - Derive commands, automatic triggers, aliases, and menus from user journeys.
 - Choose interface count, names, and invocation only after journey testing.
+- Compare pinned public reference implementations before architecture selection, while keeping observed patterns separate from product authority.
+- Treat the confirmed semantic catalog and the physical Skill/command/package layout as separate decisions.
 
 Gate: target users can predict what to invoke and understand every stop or outcome without reading code.
 
 ### P3 - Validate The Minimum Architecture
 
 - Choose the smallest platform-neutral governance core that satisfies the behavioral specs.
+- Use [`REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md`](REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md) as bounded evidence, not as a template or majority vote.
 - Derive project-owned state from recovery and audit needs.
 - Select runtime, packaging, shared-core, and state-layout boundaries from behavioral evidence.
 - Define adapter boundaries for Codex first without hard-coding Codex into product truth.
+- Decide which semantic destinations need physical top-level Skills, whether hooks are necessary, and which truth must survive disable or uninstall.
+- Validate generated-file ownership, update conflict handling, repair, migration, and removal before choosing an installation channel.
 
 Gate: architecture decisions trace to required behavior and have negative tests and migration boundaries.
 
@@ -120,7 +125,7 @@ Gate: product changes are driven by evidence from target users, not feature-coun
 
 ## Unconfirmed Design Questions
 
-- The public interface count, names, and invocation strategy.
+- The physical mapping of the confirmed semantic catalog to Skills, commands, menus, automatic triggers, and packages on each host.
 - Requiring every advanced capability to appear as a first-release visible command.
 - Runtime, packaging, adapter, and shared-core boundaries.
 - The exact project-state storage layout.
