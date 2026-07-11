@@ -24,10 +24,15 @@ release_anchor: dual-ai-share-2026.07.11.3
 declared_license_scope: Apache-2.0_for_user_owned_content_with_separate_MIT_components
 relationship: rename_first_preserve_first_candidate
 adoption_status: integrity_and_provenance_reviewed_not_imported
+candidate_record: upstream/FRAMEWORK-CANDIDATE.json
+codex_role_map: upstream/CODEX-SKILL-ROLE-MAP.json
+adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md
+mapping_status: proposal_in_progress_not_imported
+final_framework_lock: not_created
 automatic_update: forbidden
 ```
 
-审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容允许直接改名或适配，对 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。公开分发位置、CoTend framework lock 和逐项 adoption 尚未建立，因此本条不是当前代码导入授权。
+审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容允许直接改名或适配，对 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。当前只建立 candidate-only 身份、Codex Skill 角色映射和 adoption 提案；公开分发位置、最终 CoTend framework lock、实际适配和逐文件 adoption 均未完成，因此本条不是代码导入授权。
 
 ## RF01 Superpowers
 

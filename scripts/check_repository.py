@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import subprocess
 import sys
@@ -858,6 +859,7 @@ def owner_document_language_errors(
         "docs/MARKET-LANDSCAPE.md",
         "docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md",
         "UPSTREAM-SOURCES.md",
+        "upstream/FRAMEWORK-ADOPTION-PROPOSAL.md",
     )
     for path in expected_analysis_paths:
         text = analysis_documents.get(path)
@@ -865,6 +867,7 @@ def owner_document_language_errors(
             errors.append(f"owner-facing analysis is missing or ignored: {path}")
             continue
         prose = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+        prose = re.sub(r"`[^`\n]+`", "", prose)
         prose = re.sub(r"\]\([^)]+\)", "]", prose)
         cjk_count = len(re.findall(r"[\u4e00-\u9fff]", prose))
         latin_count = len(re.findall(r"[A-Za-z]", prose))
@@ -992,6 +995,10 @@ def productization_truth_errors(
         "role: primary_productization_source",
         "reviewed_release: 2026.07.11.3",
         "adoption_status: integrity_and_provenance_reviewed_not_imported",
+        "candidate_record: upstream/FRAMEWORK-CANDIDATE.json",
+        "codex_role_map: upstream/CODEX-SKILL-ROLE-MAP.json",
+        "adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md",
+        "final_framework_lock: not_created",
     ):
         if required_text not in registry_text:
             errors.append(f"upstream registry is missing primary source evidence: {required_text}")
@@ -1045,6 +1052,226 @@ def productization_truth_errors(
             errors.append("interface evidence still appears to grant current authority")
         if metadata_values(interface_evidence_text, "current_interface_authority") != {"none"}:
             errors.append("interface evidence current authority must be none")
+
+    return errors
+
+
+def upstream_candidate_mapping_errors(
+    candidate_text: str,
+    role_map_text: str,
+    proposal_text: str,
+    public_candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    try:
+        candidate = json.loads(candidate_text)
+    except (TypeError, json.JSONDecodeError) as exc:
+        return [f"upstream framework candidate JSON is invalid: {exc}"]
+    try:
+        role_map = json.loads(role_map_text)
+    except (TypeError, json.JSONDecodeError) as exc:
+        return [f"upstream Codex role-map JSON is invalid: {exc}"]
+
+    def value(data: dict[str, object], *keys: str) -> object:
+        current: object = data
+        for key in keys:
+            if not isinstance(current, dict) or key not in current:
+                return None
+            current = current[key]
+        return current
+
+    expected_candidate_values = {
+        ("schema",): "cotend.framework-candidate",
+        ("schema_version",): 1,
+        ("status",): "reviewed_not_adopted",
+        ("candidate_only",): True,
+        ("release_id",): "2026.07.11.3",
+        ("framework_protocol_version",): "1.52",
+        ("dual_model_upgrade_version",): "1.7",
+        ("package_schema_version",): 2,
+        ("source_framework_commit",): "5496073e19e239ef19eb055f2b470185fab25d3a",
+        ("release_anchor", "type"): "annotated_git_tag",
+        ("release_anchor", "tag"): "dual-ai-share-2026.07.11.3",
+        ("release_anchor", "tag_object"): "cef8add414a6d9704d3f58785a128bc56f44b263",
+        ("release_anchor", "release_commit"): "71e45d9ebeff4d9d61c180711c25267b9fe31549",
+        ("release_anchor", "package_tree"): "a70231e0445d9795a00212e8e6c53c149bfbc431",
+        ("release_anchor", "publisher_identity_authenticated"): False,
+        ("integrity", "manifest_sha256"): (
+            "919fe34254b51619ddca1d010445281d4f7ceec958ee8cfd1958eaccb02bd006"
+        ),
+        ("integrity", "manifest_entries"): 65,
+        ("integrity", "provenance_covered_files"): 66,
+        ("integrity", "verification"): "passed",
+        ("carriers", "codex", "skill_count"): 7,
+        ("carriers", "claude", "skill_count"): 3,
+        ("adoption", "state"): "not_adopted",
+        ("adoption", "final_framework_lock_exists"): False,
+    }
+    for keys, expected in expected_candidate_values.items():
+        if value(candidate, *keys) != expected:
+            errors.append(f"upstream candidate mismatch: {'.'.join(keys)}")
+    for empty_key in ("imported_files", "adapted_files"):
+        if value(candidate, "adoption", empty_key) != []:
+            errors.append(f"upstream candidate must not claim {empty_key}")
+
+    expected_skill_trees = {
+        "diagnose-only": "88dc2e47dba438720a336c38103308aeae3d635e",
+        "dual-ai-collaboration": "b75114a7e0fd2027943ed98217a0f9d581cbdae9",
+        "dual-ai-init": "cb233ade310c37e0cd038ff5752eeced92a303f0",
+        "dual-ai-project-init": "1f2fdd44e90f31fec310eaf78b02e48de4fed53c",
+        "dual-model-upgrade": "dfb25bd4464e0266b665af138a5f3902b44ce281",
+        "grill-me": "70df660726ef12349a40dc0353a681c82414fe95",
+        "karpathy-guidelines": "e119339197d600aa39a24fd7a95c946800c9c949",
+    }
+    if value(candidate, "carriers", "codex", "skill_trees") != expected_skill_trees:
+        errors.append("upstream candidate Codex Skill tree inventory drift")
+
+    if role_map.get("schema") != "cotend.codex-skill-role-map":
+        errors.append("Codex role map schema mismatch")
+    if role_map.get("status") != "proposal_not_adopted":
+        errors.append("Codex role map must remain a not-adopted proposal")
+    if role_map.get("candidate_release") != "2026.07.11.3":
+        errors.append("Codex role map release mismatch")
+    if role_map.get("public_interface_authority") != "unconfirmed":
+        errors.append("Codex role map must not grant interface authority")
+    if role_map.get("skill_count") != 7:
+        errors.append("Codex role map skill_count must be 7")
+
+    role_entries = role_map.get("skills")
+    if not isinstance(role_entries, list):
+        errors.append("Codex role map skills must be a list")
+        role_entries = []
+    roles_by_id: dict[str, dict[str, object]] = {}
+    for entry in role_entries:
+        if not isinstance(entry, dict) or not isinstance(entry.get("source_skill_id"), str):
+            errors.append("Codex role map contains an invalid Skill entry")
+            continue
+        skill_id = entry["source_skill_id"]
+        if skill_id in roles_by_id:
+            errors.append(f"Codex role map duplicates Skill: {skill_id}")
+            continue
+        roles_by_id[skill_id] = entry
+    if set(roles_by_id) != set(expected_skill_trees):
+        errors.append("Codex role map must contain exactly the seven candidate Skills")
+
+    expected_roles = {
+        "dual-ai-init": (
+            "user_owned_original",
+            "unified_visible_entry",
+            "adapted",
+            "rename_only",
+            "cotend-init",
+        ),
+        "dual-ai-project-init": (
+            "user_owned_original",
+            "internal_auto_mode_engine",
+            "adapted",
+            "platform_adaptation",
+            "cotend-project-init",
+        ),
+        "dual-ai-collaboration": (
+            "user_owned_original",
+            "shared_governance_core",
+            "adapted",
+            "platform_adaptation",
+            "cotend-collaboration",
+        ),
+        "diagnose-only": (
+            "user_owned_original",
+            "contextual_read_only_diagnosis",
+            "needs_user_decision",
+            "platform_adaptation",
+            None,
+        ),
+        "dual-model-upgrade": (
+            "user_owned_original",
+            "advanced_model_role_lifecycle",
+            "needs_user_decision",
+            "platform_adaptation",
+            None,
+        ),
+        "grill-me": (
+            "adapted_third_party",
+            "internal_clarification_companion",
+            "deferred",
+            "pending",
+            None,
+        ),
+        "karpathy-guidelines": (
+            "bundled_third_party",
+            "internal_ai_implementation_discipline",
+            "deferred",
+            "pending",
+            None,
+        ),
+    }
+    for skill_id, expected in expected_roles.items():
+        entry = roles_by_id.get(skill_id)
+        if entry is None:
+            continue
+        actual = (
+            entry.get("source_relationship"),
+            entry.get("current_role"),
+            entry.get("proposed_adoption_status"),
+            entry.get("proposed_implementation_mode"),
+            entry.get("proposed_cotend_skill_id"),
+        )
+        if actual != expected:
+            errors.append(f"Codex role mapping drift: {skill_id}")
+        if entry.get("source_tree") != expected_skill_trees[skill_id]:
+            errors.append(f"Codex role map tree mismatch: {skill_id}")
+
+    init_entry = roles_by_id.get("dual-ai-init", {})
+    if init_entry.get("delegates_to") != ["dual-ai-project-init"]:
+        errors.append("dual-ai-init must remain the thin entry delegating to project init")
+    for third_party_id in ("grill-me", "karpathy-guidelines"):
+        modes = roles_by_id.get(third_party_id, {}).get("candidate_implementation_modes")
+        if modes != ["direct_adoption", "external_dependency"]:
+            errors.append(f"{third_party_id} bundling/external choice must remain unresolved")
+
+    adoption = role_map.get("adoption")
+    if not isinstance(adoption, dict):
+        errors.append("Codex role map adoption boundary is missing")
+    else:
+        expected_adoption_boundary = {
+            "state": "not_adopted",
+            "final_names_confirmed": False,
+            "physical_skill_count_confirmed": False,
+            "third_party_bundling_confirmed": False,
+            "final_framework_lock_exists": False,
+        }
+        for key, expected in expected_adoption_boundary.items():
+            if adoption.get(key) != expected:
+                errors.append(f"Codex role-map adoption boundary mismatch: {key}")
+
+    proposal_statuses = metadata_values(proposal_text, "status")
+    if proposal_statuses not in (
+        {"draft_for_review"},
+        {"reviewed_pending_user_confirmation"},
+    ):
+        errors.append("framework adoption proposal lifecycle status is invalid")
+    exact_proposal_metadata = {
+        "candidate_release": {"2026.07.11.3"},
+        "adoption_state": {"not_adopted"},
+        "final_framework_lock_exists": {"false"},
+        "analysis_language": {"zh-CN"},
+    }
+    for key, expected in exact_proposal_metadata.items():
+        if metadata_values(proposal_text, key) != expected:
+            errors.append(f"framework adoption proposal metadata mismatch: {key}")
+    for required_text in (
+        "7 个 Codex Skill 直接理解成 7 个同级公开命令",
+        "dual-ai-init` 是普通用户的统一入口",
+        "dual-ai-project-init` 是入口内部的 Auto Mode 引擎",
+        "现在不得创建 `upstream/framework.lock.json`",
+        "adoption_state: not_adopted",
+    ):
+        if required_text not in proposal_text:
+            errors.append(f"framework adoption proposal is missing: {required_text}")
+
+    final_lock_path = "upstream/framework.lock.json"
+    if final_lock_path in public_candidates or (ROOT / final_lock_path).exists():
+        errors.append("final framework lock must not exist before actual adoption")
 
     return errors
 
@@ -1210,10 +1437,20 @@ def main() -> int:
 
     reference_study_path = "docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md"
     upstream_registry_path = "UPSTREAM-SOURCES.md"
+    framework_candidate_path = "upstream/FRAMEWORK-CANDIDATE.json"
+    codex_role_map_path = "upstream/CODEX-SKILL-ROLE-MAP.json"
+    adoption_proposal_path = "upstream/FRAMEWORK-ADOPTION-PROPOSAL.md"
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
     if upstream_registry_path not in candidates:
         errors.append("upstream source registry is missing or ignored")
+    for path in (
+        framework_candidate_path,
+        codex_role_map_path,
+        adoption_proposal_path,
+    ):
+        if path not in candidates:
+            errors.append(f"upstream candidate mapping artifact is missing or ignored: {path}")
     if reference_study_path in candidates and upstream_registry_path in candidates:
         errors.extend(
             reference_study_errors(
@@ -1238,6 +1475,7 @@ def main() -> int:
         "docs/MARKET-LANDSCAPE.md",
         reference_study_path,
         upstream_registry_path,
+        adoption_proposal_path,
     )
     errors.extend(
         owner_document_language_errors(
@@ -1319,6 +1557,21 @@ def main() -> int:
             evidence_text,
         )
     )
+
+    upstream_mapping_paths = {
+        framework_candidate_path,
+        codex_role_map_path,
+        adoption_proposal_path,
+    }
+    if upstream_mapping_paths <= candidates:
+        errors.extend(
+            upstream_candidate_mapping_errors(
+                read(framework_candidate_path),
+                read(codex_role_map_path),
+                read(adoption_proposal_path),
+                candidates,
+            )
+        )
 
     status_path = ROOT / "STATUS.md"
     plan_path = ROOT / "PROJECT-PLAN-TREE.md"

@@ -1,0 +1,222 @@
+{
+  "schema": "cotend.codex-skill-role-map",
+  "schema_version": 1,
+  "status": "proposal_not_adopted",
+  "candidate_release": "2026.07.11.3",
+  "platform": "Codex",
+  "launch_adapter": true,
+  "public_interface_authority": "unconfirmed",
+  "mapping_basis": [
+    "Skill frontmatter",
+    "agents/openai.yaml",
+    "explicit delegation references",
+    "PROMPTS.md",
+    "FRAMEWORK-INTRO.md",
+    "THIRD-PARTY-SOURCES.json"
+  ],
+  "skill_count": 7,
+  "skills": [
+    {
+      "source_skill_id": "dual-ai-init",
+      "source_tree": "cb233ade310c37e0cd038ff5752eeced92a303f0",
+      "source_relationship": "user_owned_original",
+      "license": "Apache-2.0",
+      "current_role": "unified_visible_entry",
+      "current_visibility": "default_user_entry",
+      "delegates_to": [
+        "dual-ai-project-init"
+      ],
+      "role_evidence": [
+        "SKILL.md calls itself the short visible entry point",
+        "SKILL.md delegates all detailed behavior to dual-ai-project-init Auto Mode",
+        "PROMPTS.md and FRAMEWORK-INTRO.md recommend dual-ai-init for ordinary and long-running projects"
+      ],
+      "proposed_adoption_status": "adapted",
+      "proposed_implementation_mode": "rename_only",
+      "proposed_cotend_skill_id": "cotend-init",
+      "naming_status": "candidate_not_confirmed",
+      "preserve": [
+        "one simple entry",
+        "automatic init/update/repair/migrate/resume classification",
+        "pending-human-question boundary",
+        "continue-readiness report"
+      ]
+    },
+    {
+      "source_skill_id": "dual-ai-project-init",
+      "source_tree": "1f2fdd44e90f31fec310eaf78b02e48de4fed53c",
+      "source_relationship": "user_owned_original",
+      "license": "Apache-2.0",
+      "current_role": "internal_auto_mode_engine",
+      "current_visibility": "delegated_engine_with_explicit_fallback",
+      "delegates_to": [],
+      "uses": [
+        "dual-ai-collaboration",
+        "diagnose-only",
+        "grill-me",
+        "karpathy-guidelines"
+      ],
+      "role_evidence": [
+        "dual-ai-init explicitly delegates to this Skill",
+        "this Skill owns Auto Mode state classification and project governance setup",
+        "its own trigger accepts direct invocation as a fallback rather than requiring users to classify project state"
+      ],
+      "proposed_adoption_status": "adapted",
+      "proposed_implementation_mode": "platform_adaptation",
+      "proposed_cotend_skill_id": "cotend-project-init",
+      "naming_status": "candidate_not_confirmed",
+      "preserve": [
+        "Auto Mode",
+        "fresh/update/repair/resume/blocked classification",
+        "high-level confirmation gates",
+        "project-owned recovery truth"
+      ]
+    },
+    {
+      "source_skill_id": "dual-ai-collaboration",
+      "source_tree": "b75114a7e0fd2027943ed98217a0f9d581cbdae9",
+      "source_relationship": "user_owned_original",
+      "license": "Apache-2.0",
+      "current_role": "shared_governance_core",
+      "current_visibility": "implicit_core_with_contextual_explicit_entry",
+      "delegates_to": [],
+      "used_by": [
+        "dual-ai-project-init",
+        "dual-model-upgrade"
+      ],
+      "role_evidence": [
+        "owns risk, evidence, review, Plan Tree, acceptance, continuation and release boundaries",
+        "dual-ai-project-init routes collaboration governance to this Skill",
+        "PROMPTS.md uses explicit loading mainly for reviewer-role scenarios"
+      ],
+      "proposed_adoption_status": "adapted",
+      "proposed_implementation_mode": "platform_adaptation",
+      "proposed_cotend_skill_id": "cotend-collaboration",
+      "naming_status": "candidate_not_confirmed",
+      "preserve": [
+        "human-led delegated development",
+        "CodexSelf-first review with optional external reviewer",
+        "risk and stop boundaries",
+        "evidence and user acceptance separation",
+        "adaptive workflow depth"
+      ]
+    },
+    {
+      "source_skill_id": "diagnose-only",
+      "source_tree": "88dc2e47dba438720a336c38103308aeae3d635e",
+      "source_relationship": "user_owned_original",
+      "license": "Apache-2.0",
+      "current_role": "contextual_read_only_diagnosis",
+      "current_visibility": "natural_language_first_contextual_entry",
+      "delegates_to": [],
+      "role_evidence": [
+        "triggered when the user explicitly withholds edit authorization",
+        "PROMPTS.md says users do not need to remember the Skill name",
+        "dual-ai-collaboration and project-init route diagnosis failures here"
+      ],
+      "proposed_adoption_status": "needs_user_decision",
+      "proposed_implementation_mode": "platform_adaptation",
+      "proposed_cotend_skill_id": null,
+      "naming_status": "needs_user_decision",
+      "preserve": [
+        "read-only default",
+        "evidence-backed root cause",
+        "explicit handoff from diagnosis to authorized fix"
+      ]
+    },
+    {
+      "source_skill_id": "dual-model-upgrade",
+      "source_tree": "dfb25bd4464e0266b665af138a5f3902b44ce281",
+      "source_relationship": "user_owned_original",
+      "license": "Apache-2.0",
+      "current_role": "advanced_model_role_lifecycle",
+      "current_visibility": "advanced_explicit_entry",
+      "delegates_to": [],
+      "uses": [
+        "dual-ai-collaboration",
+        "grill-me"
+      ],
+      "role_evidence": [
+        "PROMPTS.md uses it for premium advisor, takeover and milestone re-entry",
+        "the Skill owns advisor/trial/takeover/rollback rather than a narrow ask-an-advisor action",
+        "it imports non-thinnable authority boundaries from the shared governance core"
+      ],
+      "proposed_adoption_status": "needs_user_decision",
+      "proposed_implementation_mode": "platform_adaptation",
+      "proposed_cotend_skill_id": null,
+      "naming_status": "needs_user_decision",
+      "preserve": [
+        "advisor versus takeover distinction",
+        "premium model packet and handoff",
+        "rollback and milestone re-entry",
+        "framework thinning only after user-confirmed primary change"
+      ]
+    },
+    {
+      "source_skill_id": "grill-me",
+      "source_tree": "70df660726ef12349a40dc0353a681c82414fe95",
+      "source_relationship": "adapted_third_party",
+      "license": "MIT",
+      "current_role": "internal_clarification_companion",
+      "current_visibility": "contextual_internal_with_optional_explicit_entry",
+      "delegates_to": [],
+      "role_evidence": [
+        "project-init uses it as the clarification style for fuzzy requirements",
+        "the packaged adaptation owns one-question-at-a-time and option-1 acceptance behavior",
+        "it is not a lifecycle or project-state owner"
+      ],
+      "proposed_adoption_status": "deferred",
+      "proposed_implementation_mode": "pending",
+      "candidate_implementation_modes": [
+        "direct_adoption",
+        "external_dependency"
+      ],
+      "proposed_cotend_skill_id": null,
+      "naming_status": "preserve_third_party_identity_if_bundled",
+      "required_notice": "Retain the Matt Pocock MIT attribution and license text"
+    },
+    {
+      "source_skill_id": "karpathy-guidelines",
+      "source_tree": "e119339197d600aa39a24fd7a95c946800c9c949",
+      "source_relationship": "bundled_third_party",
+      "license": "MIT",
+      "current_role": "internal_ai_implementation_discipline",
+      "current_visibility": "implicit_internal_companion",
+      "delegates_to": [],
+      "role_evidence": [
+        "project-init assigns coding behavior to this Skill",
+        "the Skill defines simplicity, surgical edits, assumptions and verifiable goals",
+        "it does not own project lifecycle, user authority or product state"
+      ],
+      "proposed_adoption_status": "deferred",
+      "proposed_implementation_mode": "pending",
+      "candidate_implementation_modes": [
+        "direct_adoption",
+        "external_dependency"
+      ],
+      "proposed_cotend_skill_id": null,
+      "naming_status": "preserve_third_party_identity_if_bundled",
+      "required_notice": "Retain the upstream-contributor MIT attribution and license text"
+    }
+  ],
+  "deferred_platform_carriers": [
+    {
+      "platform": "Claude",
+      "skill_count": 3,
+      "skills": [
+        "diagnose-only",
+        "dual-ai-collaboration",
+        "dual-model-upgrade"
+      ],
+      "proposed_adoption_status": "deferred",
+      "reason": "Codex is the confirmed launch adapter and the Claude carrier intentionally omits the Codex project-init engine"
+    }
+  ],
+  "adoption": {
+    "state": "not_adopted",
+    "final_names_confirmed": false,
+    "physical_skill_count_confirmed": false,
+    "third_party_bundling_confirmed": false,
+    "final_framework_lock_exists": false
+  }
+}

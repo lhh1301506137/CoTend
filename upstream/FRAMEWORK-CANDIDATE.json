@@ -1,0 +1,87 @@
+{
+  "schema": "cotend.framework-candidate",
+  "schema_version": 1,
+  "status": "reviewed_not_adopted",
+  "candidate_only": true,
+  "verified_at": "2026-07-12",
+  "release_id": "2026.07.11.3",
+  "previous_release": "2026.07.11.2",
+  "framework_protocol_version": "1.52",
+  "dual_model_upgrade_version": "1.7",
+  "package_schema_version": 2,
+  "source_framework_commit": "5496073e19e239ef19eb055f2b470185fab25d3a",
+  "source_distribution": {
+    "status": "public_location_pending",
+    "automatic_update": false
+  },
+  "release_anchor": {
+    "type": "annotated_git_tag",
+    "tag": "dual-ai-share-2026.07.11.3",
+    "tag_object": "cef8add414a6d9704d3f58785a128bc56f44b263",
+    "release_commit": "71e45d9ebeff4d9d61c180711c25267b9fe31549",
+    "package_tree": "a70231e0445d9795a00212e8e6c53c149bfbc431",
+    "publisher_identity_authenticated": false
+  },
+  "integrity": {
+    "manifest": "SHA256SUMS",
+    "manifest_sha256": "919fe34254b51619ddca1d010445281d4f7ceec958ee8cfd1958eaccb02bd006",
+    "manifest_entries": 65,
+    "provenance_covered_files": 66,
+    "verification": "passed"
+  },
+  "carriers": {
+    "codex": {
+      "path": "codex-skills/",
+      "skill_count": 7,
+      "skill_trees": {
+        "diagnose-only": "88dc2e47dba438720a336c38103308aeae3d635e",
+        "dual-ai-collaboration": "b75114a7e0fd2027943ed98217a0f9d581cbdae9",
+        "dual-ai-init": "cb233ade310c37e0cd038ff5752eeced92a303f0",
+        "dual-ai-project-init": "1f2fdd44e90f31fec310eaf78b02e48de4fed53c",
+        "dual-model-upgrade": "dfb25bd4464e0266b665af138a5f3902b44ce281",
+        "grill-me": "70df660726ef12349a40dc0353a681c82414fe95",
+        "karpathy-guidelines": "e119339197d600aa39a24fd7a95c946800c9c949"
+      }
+    },
+    "claude": {
+      "path": "claude-skills/",
+      "skill_count": 3,
+      "skill_trees": {
+        "diagnose-only": "aad84ae9d9c87af3cbfc314aee0c8ca5cb4dc1fb",
+        "dual-ai-collaboration": "763c86580049cea239e75a389ded79ec8a41d845",
+        "dual-model-upgrade": "97a57692f31b0d3ccfb07cd2cacea38292d1770e"
+      },
+      "adoption_status": "deferred_non_launch_adapter"
+    }
+  },
+  "executed_verification": [
+    {
+      "check": "annotated_tag_object_verifier",
+      "evidence_type": "executed",
+      "result": "passed"
+    },
+    {
+      "check": "v1.52_share_package_walkthrough",
+      "evidence_type": "executed",
+      "result": "passed_7_codex_3_claude_66_files_3_negative_cases"
+    },
+    {
+      "check": "CoTend_tagged_candidate_and_role_verifier",
+      "evidence_type": "executed",
+      "result": "passed_release_2026.07.11.3_codex_7_claude_3"
+    }
+  ],
+  "adoption": {
+    "state": "not_adopted",
+    "imported_files": [],
+    "adapted_files": [],
+    "final_framework_lock_exists": false,
+    "required_before_lock": [
+      "reviewed_role_map",
+      "resolved_user_owned_decisions",
+      "approved_file_level_adoption_record",
+      "CoTend_specific_compatibility_evidence",
+      "committed_CoTend_adaptations"
+    ]
+  }
+}
