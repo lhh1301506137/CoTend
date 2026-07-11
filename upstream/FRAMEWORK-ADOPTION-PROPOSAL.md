@@ -6,6 +6,8 @@ authority: productization_proposal
 candidate_release: 2026.07.11.3
 candidate_record: upstream/FRAMEWORK-CANDIDATE.json
 role_map: upstream/CODEX-SKILL-ROLE-MAP.json
+role_layer_status: user_confirmed
+role_layer_decision: product_owner_confirmed
 adoption_state: not_adopted
 final_framework_lock_exists: false
 analysis_language: zh-CN
@@ -21,7 +23,7 @@ analysis_language: zh-CN
 4. `diagnose-only` 和 `dual-model-upgrade` 是情境/进阶能力。
 5. `grill-me` 和 `karpathy-guidelines` 是 MIT 伴随 Skill，不拥有产品生命周期或项目真相。
 
-因此，推荐先保留这套分层并做 CoTend 品牌与平台适配，不重新建立 I6 十入口目录。当前提案只确定候选方向；最终可见名称、MIT Skill bundling 和实际导入仍需后续确认与验证。
+用户已确认保留这套分层并做 CoTend 品牌与平台适配，不重新建立 I6 十入口目录。该确认只固定角色层次；最终可见名称、MIT Skill bundling 和实际导入仍需后续确认与验证。
 
 ## 候选 release 证据
 
@@ -46,7 +48,7 @@ analysis_language: zh-CN
 | `dual-ai-init` | 统一入口 | 默认入口 | `adapted` + `rename_only` | 候选 `cotend-init`，未确认。 |
 | `dual-ai-project-init` | 内部 Auto Mode 引擎 | 委派为主，显式调用仅作 fallback | `adapted` + `platform_adaptation` | 候选 `cotend-project-init`，未确认。 |
 | `dual-ai-collaboration` | 共享治理核心 | 隐式核心；审查等情境可显式进入 | `adapted` + `platform_adaptation` | 候选 `cotend-collaboration`，未确认。 |
-| `diagnose-only` | 只读诊断 | 自然语言优先的情境入口 | `needs_user_decision` | 是否改为 `cotend-diagnose` 待确认。 |
+| `diagnose-only` | 只读诊断 | 自然语言优先的情境入口 | `needs_user_decision` | 推荐 `cotend-diagnose-only`，精确名称待确认。 |
 | `dual-model-upgrade` | 模型顾问/试用/接手/回退/复诊生命周期 | 进阶显式入口 | `needs_user_decision` | 推荐保留完整 “Model Upgrade” 含义，精确名称待确认。 |
 | `grill-me` | 一次一问的需求澄清伴随 Skill | 内部情境调用，可选显式 | `deferred` | 如打包应保留第三方身份与 MIT 归属。 |
 | `karpathy-guidelines` | AI 编码纪律伴随 Skill | 隐式内部规则 | `deferred` | 如打包应保留第三方身份与 MIT 归属。 |
@@ -92,16 +94,16 @@ Trellis、CodeGraph、Playwright、Git、Python 和 PowerShell 保持 external r
 
 Claude 包只含 3 个 Skill，并明确没有 Codex 的 project-init 引擎。Codex 是已确认的首发适配器，因此 Claude 载体整体 `deferred`，等 Codex 纵向切片通过后再单独做平台适配，不需要本轮重新询问。
 
-## 提议的最小 CoTend 表面
+## 已确认分层下的 CoTend 命名候选
 
-以下只是下一决策的推荐候选，不是当前确认结果：
+以下层次已经确认，但名称仍只是下一决策的推荐候选：
 
 | 层次 | 推荐候选 | 用户心智 |
 |---|---|---|
 | 默认入口 | `CoTend Init` / `cotend-init` | 新项目、旧项目、更新、修复和续接都从这里开始，由 Auto Mode 判断。 |
 | 内部引擎 | `cotend-project-init` | 保留可调试的显式 fallback，但不要求普通用户理解或选择。 |
 | 共享核心 | `cotend-collaboration` | 主要由其他入口调用；审查/角色配置等高级情境可显式使用。 |
-| 情境入口 | 候选 `cotend-diagnose` | 用户说“先别改、只诊断”即可触发，名称只帮助发现。 |
+| 情境入口 | 候选 `cotend-diagnose-only` | 用户说“先别改、只诊断”即可触发；名称保留“不修改”的安全语义。 |
 | 进阶入口 | 候选 `cotend-model-upgrade` | 保留顾问、试用、接手、回退和复诊的完整覆盖，不缩成 Ask an Advisor。 |
 | 内部伴随 | `grill-me`、`karpathy-guidelines` | 不作为 CoTend 日常生命周期入口。 |
 
@@ -113,13 +115,13 @@ Claude 包只含 3 个 Skill，并明确没有 Codex 的 project-init 引擎。C
 candidate_integrity: passed
 release_notes_reviewed: yes
 changed_surfaces: initial_import_no_previous_CoTend_lock
+role_layers: user_confirmed
 adapted_candidates:
   - dual-ai-init
   - dual-ai-project-init
   - dual-ai-collaboration
 needs_user_decision:
-  - diagnose-only public CoTend name and discovery role
-  - dual-model-upgrade public CoTend name and discovery role
+  - exact CoTend names for the five user-owned Skills
   - MIT companion Skill bundling versus external dependency
 deferred:
   - Claude carrier

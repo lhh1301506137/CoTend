@@ -1132,8 +1132,10 @@ def upstream_candidate_mapping_errors(
         errors.append("Codex role map must remain a not-adopted proposal")
     if role_map.get("candidate_release") != "2026.07.11.3":
         errors.append("Codex role map release mismatch")
-    if role_map.get("public_interface_authority") != "unconfirmed":
-        errors.append("Codex role map must not grant interface authority")
+    if role_map.get("public_interface_authority") != "role_layers_confirmed_names_pending":
+        errors.append("Codex role map role-layer/name authority boundary drift")
+    if role_map.get("role_layer_decision") != "product_owner_confirmed":
+        errors.append("Codex role map role-layer decision mismatch")
     if role_map.get("skill_count") != 7:
         errors.append("Codex role map skill_count must be 7")
 
@@ -1235,6 +1237,7 @@ def upstream_candidate_mapping_errors(
     else:
         expected_adoption_boundary = {
             "state": "not_adopted",
+            "role_layers_confirmed": True,
             "final_names_confirmed": False,
             "physical_skill_count_confirmed": False,
             "third_party_bundling_confirmed": False,
@@ -1252,6 +1255,8 @@ def upstream_candidate_mapping_errors(
         errors.append("framework adoption proposal lifecycle status is invalid")
     exact_proposal_metadata = {
         "candidate_release": {"2026.07.11.3"},
+        "role_layer_status": {"user_confirmed"},
+        "role_layer_decision": {"product_owner_confirmed"},
         "adoption_state": {"not_adopted"},
         "final_framework_lock_exists": {"false"},
         "analysis_language": {"zh-CN"},
@@ -1263,6 +1268,7 @@ def upstream_candidate_mapping_errors(
         "7 个 Codex Skill 直接理解成 7 个同级公开命令",
         "dual-ai-init` 是普通用户的统一入口",
         "dual-ai-project-init` 是入口内部的 Auto Mode 引擎",
+        "用户已确认保留这套分层",
         "现在不得创建 `upstream/framework.lock.json`",
         "adoption_state: not_adopted",
     ):
@@ -1283,7 +1289,7 @@ def local_recovery_truth_errors(status_text: str, plan_text: str) -> list[str]:
         "productization_default": {"rename_first_preserve_first"},
         "framework_release_candidate": {"dual_ai_share_2026_07_11_3"},
         "framework_release_adoption": {"not_adopted"},
-        "interface_authority": {"none_pending_upstream_surface_mapping"},
+        "interface_authority": {"role_layers_confirmed_names_pending"},
     }
     for key, expected in exact_status.items():
         if metadata_values(status_text, key) != expected:

@@ -5,7 +5,8 @@
   "candidate_release": "2026.07.11.3",
   "platform": "Codex",
   "launch_adapter": true,
-  "public_interface_authority": "unconfirmed",
+  "public_interface_authority": "role_layers_confirmed_names_pending",
+  "role_layer_decision": "product_owner_confirmed",
   "mapping_basis": [
     "Skill frontmatter",
     "agents/openai.yaml",
@@ -214,6 +215,7 @@
   ],
   "adoption": {
     "state": "not_adopted",
+    "role_layers_confirmed": true,
     "final_names_confirmed": false,
     "physical_skill_count_confirmed": false,
     "third_party_bundling_confirmed": false,
