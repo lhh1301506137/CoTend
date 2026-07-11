@@ -1,4 +1,4 @@
-# Reference Framework Implementation Study
+# 参考框架实现研究
 
 ```yaml
 status: research_evidence
@@ -13,91 +13,91 @@ execution_evidence: none
 source_copying: none
 ```
 
-## Purpose
+## 目的
 
-This study examines how adjacent AI development frameworks deliver reusable workflow behavior. It answers architecture questions that market positioning alone cannot answer: how users discover actions, how semantic behavior reaches different AI tools, where project truth lives, how updates preserve local changes, and which mechanisms create unnecessary burden for a user who does not read code.
+本研究考察相邻 AI 开发框架如何交付可复用的工作流行为，回答仅靠市场定位无法回答的架构问题：用户如何发现操作，语义行为如何到达不同 AI 工具，项目真相保存在哪里，更新如何保护本地修改，以及哪些机制会给不读代码的用户增加不必要负担。
 
-The study is not a feature vote. A pattern does not become a CoTend requirement because several projects use it. Any later architecture decision must still trace to CoTend's behavior contracts, novice journeys, confirmed interface baseline, Codex capabilities, and minimum-complexity requirement.
+本研究不是功能投票。某个模式被多个项目采用，并不自动使它成为 CoTend 的要求。任何后续架构决定仍必须追溯到 CoTend 的行为契约、小白旅程、已确认界面基线、Codex 能力和最小复杂度要求。
 
-## Method And Boundary
+## 方法与边界
 
-- Four core references received the full comparison: Superpowers, Trellis, GitHub Spec Kit, and OpenSpec.
-- GSD Core was inspected only for command/Skill surface control, context management, and compact state.
-- BMAD Method was inspected only for modularity, adaptive depth, role-based interaction, and complexity limits.
-- Each official source was pinned to one commit and license in [`UPSTREAM-SOURCES.md`](../UPSTREAM-SOURCES.md).
-- Inspection covered repository responsibilities, manifests, installation and lifecycle documentation, architecture documentation, and narrowly relevant implementation boundaries.
-- No installer, hook, script, build, or test was executed. No source code, prompt, template, generated artifact, or repository layout is reproduced here.
+- 四个核心参考接受完整对比：Superpowers、Trellis、GitHub Spec Kit 和 OpenSpec。
+- GSD Core 只检查指令与 Skill 表面控制、上下文管理和紧凑状态。
+- BMAD Method 只检查模块化、自适应深度、基于角色的交互和复杂度上限。
+- 每个官方来源都在 [`UPSTREAM-SOURCES.md`](../UPSTREAM-SOURCES.md) 中固定到一个 commit 和许可证。
+- 检查范围包括仓库职责、manifest、安装与生命周期文档、架构文档，以及与问题直接相关的窄实现边界。
+- 没有执行安装器、hook、脚本、构建或测试。本文不复制源码、提示词、模板、生成产物或仓库布局。
 
-## Comparison
+## 对比
 
-| Reference | Delivery and invocation | Project truth and recovery | Lifecycle safety | Main novice cost | CoTend disposition |
+| 参考项目 | 交付与调用 | 项目真相与恢复 | 生命周期安全 | 对小白的主要成本 | CoTend 的处理方向 |
 |---|---|---|---|---|---|
-| Superpowers | One shared Skill corpus with host-specific discovery, bootstrap, tool mapping, and packaging. Codex uses native Skill discovery through a plugin and does not reuse the generic session hook. | Designs and plans are files, but the reviewed surface does not provide a general project-state substrate. | Host-native installation is simple; a cross-host removal contract was not found in the bounded read set. | Engineering concepts such as worktrees, TDD, branches, and code review remain central. | Retain a shared semantic core, thin adapters, and native host packaging. Do not require one universal bootstrap mechanism. |
-| Trellis | A CLI generates shared Skills plus host-specific Skills, agents, hooks, settings, and commands. Natural language and auto-triggering handle most daily work. | Workflow, specs, tasks, workspace memory, and per-session runtime pointers are separate project-owned layers. | Template hashes protect local modifications during update. Its uninstall removes the full project-state directory, which is not acceptable for CoTend truth. | Node and Python prerequisites, terminal initialization, generated file volume, hook enablement, and engineering terminology. | Retain project-owned truth, per-session task pointers, selective context manifests, and hash-aware updates. Separate product removal from truth deletion. |
-| GitHub Spec Kit | Common command templates are rendered by versioned integration classes into host-specific Skills or commands. | Feature artifacts are durable, but teams must choose their own spec-persistence model. An optional workflow engine persists run state and gates. | Integration installs are manifest-backed and rollback partial failure. Modified generated files survive uninstall unless removal is forced. | A long visible command chain, Python tooling, Git/branch concepts, and multiple extension systems. | Retain generated adapters, per-file ownership hashes, transactional lifecycle, machine-readable status, and curated trust boundaries. Defer the workflow engine and catalog ecosystem. |
-| OpenSpec | A shared CLI owns semantics while Skills and commands provide per-host steering. A five-action default profile hides the expanded action set. | Current specs are separate from proposed change deltas; archive folds accepted deltas into current truth and preserves history. | Updates regenerate selected host files. Removal is manual, although the docs warn users not to discard project history accidentally. | Users must understand the difference between terminal commands and AI-chat commands; manual cleanup remains technical. | Retain current-truth/change separation, archive merge, and progressive profiles. Avoid manual lifecycle cleanup and non-blocking verification for protected CoTend claims. |
-| GSD Core | Install profiles and live surface controls reduce a very large Skill/command inventory. Namespace routing works only on compatible hosts; Codex remains a flat Skill surface. | A compact living state digest points to scoped context, plans, summaries, and verification artifacts. | Profile choice persists through updates. Removal was outside the bounded read set. | Full milestone, phase, agent, and command vocabulary is expert-scale even when a smaller profile exists. | Retain context budgets, compact status, profiles, and light routes. Do not ship a large flat first-release Skill surface or assume nested routing works in Codex. |
-| BMAD Method | Modules generate many Skills and group them under named roles, natural-language activation, menus, and help. | Planning, implementation, and long-lived knowledge use separate configurable artifact areas. | Installer supports stable, next, and pinned module channels plus update modes. Removal was outside the bounded read set. | Role ownership, personas, modules, channels, agile terms, and a broad Skill set create a large mental model. | Retain adaptive depth and high-leverage human checkpoints as principles. Treat personas and the module ecosystem as a complexity ceiling, not an MVP shape. |
+| Superpowers | 使用一套共享 Skill 语料，再按宿主提供发现、bootstrap、工具映射和打包。Codex 通过 plugin 使用原生 Skill 发现，不复用通用 session hook。 | 设计和计划以文件保存，但本次受限读取范围内没有发现通用项目状态底座。 | 宿主原生安装较简单；受限读取范围内没有找到跨宿主统一卸载契约。 | worktree、TDD、分支和代码审查等工程概念仍处于中心位置。 | 保留共享语义核心、薄适配器和宿主原生打包；不要求所有宿主使用同一种 bootstrap 机制。 |
+| Trellis | CLI 生成共享 Skills，以及按宿主生成的 Skills、agents、hooks、settings 和 commands。多数日常工作依靠自然语言和自动触发。 | 工作流、规范、任务、workspace memory 和单会话运行指针属于彼此分离、由项目拥有的层。 | 模板 hash 在更新时保护本地修改。其卸载会移除整个项目状态目录，这不适用于 CoTend 的项目真相。 | Node 和 Python 前置条件、终端初始化、生成文件数量、hook 启用和工程术语。 | 保留项目自有真相、单会话任务指针、选择性上下文 manifest 和 hash 感知更新；把产品卸载与真相删除分开。 |
+| GitHub Spec Kit | 通用指令模板通过带版本的 integration class 渲染为宿主特定的 Skills 或 commands。 | 功能产物可长期保存，但团队需要自行选择规范持久化模型。可选 workflow engine 能保存运行状态和 gate。 | integration 安装有 manifest，并能在部分失败时回滚。除非强制删除，已修改的生成文件会在卸载时保留。 | 可见指令链较长，需要 Python 工具、Git/分支概念，并存在多套扩展系统。 | 保留生成适配器、逐文件所有权 hash、事务式生命周期、机器可读状态和受控信任边界；后置 workflow engine 与目录生态。 |
+| OpenSpec | 共享 CLI 持有语义，Skills 和 commands 提供各宿主的引导。默认五操作 profile 隐藏扩展操作集。 | 当前规范与拟议变更 delta 分开；归档会把已接受 delta 合并进当前真相并保留历史。 | 更新会重新生成选定宿主文件。卸载需要手动完成，但文档会提醒用户不要意外丢弃项目历史。 | 用户必须理解终端命令与 AI 聊天指令的区别；手动清理仍然偏技术。 | 保留当前真相与变更分离、归档合并和渐进 profile；避免手动生命周期清理，也不允许非阻塞验证覆盖 CoTend 的受保护声明。 |
+| GSD Core | 安装 profile 和运行时表面控制可以缩小很大的 Skill/command 库。命名空间路由只适用于兼容宿主；Codex 仍是扁平 Skill 表面。 | 紧凑的活动状态摘要指向范围受控的上下文、计划、总结和验证产物。 | profile 选择会在更新后保留。卸载不在受限读取范围内。 | 即使有较小 profile，完整的 milestone、phase、agent 和 command 词汇仍属于专家级。 | 保留上下文预算、紧凑状态、profile 和轻量路由；首版不交付庞大的扁平 Skill 表面，也不假定 Codex 支持嵌套路由。 |
+| BMAD Method | 模块生成大量 Skills，并通过命名角色、自然语言激活、菜单和帮助组织这些 Skills。 | 规划、实现和长期知识使用彼此分离、可配置的产物区域。 | 安装器支持 stable、next 和固定版本的模块渠道及更新模式。卸载不在受限读取范围内。 | 角色归属、persona、模块、渠道、敏捷术语和大量 Skill 形成较大的心智模型。 | 把自适应深度和高价值人工检查点保留为原则；把 persona 与模块生态视为复杂度上限，而不是 MVP 形态。 |
 
-## Findings For CoTend
+## 对 CoTend 的发现
 
-### 1. Semantic entries are not physical Skills
+### 1. 语义入口不等于实体 Skill
 
-Portable frameworks vary the number and shape of installed artifacts by host, profile, and capability. Some use one Skill per visible action, some add an implicit bootstrap, some generate both Skills and commands, and some route through a smaller namespace layer only where the host supports it.
+可移植框架会根据宿主、profile 和能力改变安装产物的数量与形态。有的为每个可见操作提供一个 Skill，有的增加隐式 bootstrap，有的同时生成 Skills 和 commands，还有的只在宿主支持时通过较小的命名空间层路由。
 
-Therefore, the confirmed I6 catalog remains a semantic and discovery contract. It does not require ten top-level Skill directories. P3 must test the minimum physical surface that preserves searchability, explicit recovery, natural-language equivalence, and complete behavior.
+因此，已确认的 I6 目录仍是语义与发现契约，并不要求十个顶层 Skill 目录。P3 必须验证最小实体表面是否仍能保持可搜索性、显式恢复、自然语言等价和完整行为。
 
-### 2. A common semantic core needs thin adapters
+### 2. 共同语义核心需要薄适配器
 
-Every sampled portable reference separates reusable workflow meaning from at least part of the host delivery mechanism. Tool names, Skill paths, command syntax, hooks, subagent dispatch, and packaging change across hosts.
+所有抽样的可移植参考项目，都把可复用工作流含义与至少一部分宿主交付机制分离。工具名、Skill 路径、command 语法、hooks、subagent 调度和打包会随宿主变化。
 
-CoTend should test a platform-neutral semantic core plus a Codex adapter rather than treating Codex file layout as product truth. This is an architecture hypothesis, not an approved module structure.
+CoTend 应验证“平台中立语义核心 + Codex 适配器”，而不是把 Codex 文件布局当作产品真相。这是待验证的架构假设，不是已批准的模块结构。
 
-### 3. Project truth must outlive the adapter
+### 3. 项目真相必须独立于适配器
 
-The strongest state systems separate durable project truth from generated integration files and transient runtime pointers. Update and uninstall become dangerous when these categories share one ownership boundary.
+较强的状态系统会把持久项目真相、生成的集成文件和临时运行指针分开。当这些类别共用一个所有权边界时，更新和卸载会变得危险。
 
-CoTend must design disable, adapter replacement, and uninstall so they can remove runtime and generated delivery files without deleting accepted project truth, evidence, or history. Deleting that truth must be a separate, explicit user operation.
+CoTend 必须让禁用、替换适配器和卸载能够移除运行时及生成的交付文件，而不删除已接受的项目真相、证据或历史。删除这些真相必须是一个单独、明确的用户操作。
 
-### 4. Generated-file ownership needs deterministic evidence
+### 4. 生成文件所有权需要确定性证据
 
-Hash-backed manifests let an updater distinguish unchanged generated files, user modifications, user deletions, and unknown files. Transactional install and machine-readable status make repair and migration reviewable.
+基于 hash 的 manifest 能让更新器区分未变化的生成文件、用户修改、用户删除和未知文件。事务式安装和机器可读状态能让修复与迁移具备可审查性。
 
-P3 should evaluate the smallest ownership manifest that supports install, update, repair, migration, disable, and uninstall without silently overwriting user content.
+P3 应评价能支持安装、更新、修复、迁移、禁用和卸载的最小所有权 manifest，并确保它不会静默覆盖用户内容。
 
-### 5. Progressive disclosure applies below the interface too
+### 5. 渐进披露也适用于界面以下
 
-A short visible catalog can still create a large eager Skill description budget or a large runtime context. Profiles, optional clusters, lazy references, and compact state all address different parts of this problem.
+较短的可见目录仍可能造成很大的预加载 Skill 描述预算或运行时上下文。profile、可选能力簇、延迟引用和紧凑状态分别解决这个问题的不同部分。
 
-CoTend should measure both user-visible complexity and model-loaded complexity. It should not solve one by hiding cost in the other.
+CoTend 应同时测量用户可见复杂度和模型加载复杂度，不能通过把成本藏到另一层来假装解决其中一个问题。
 
-### 6. Hooks are an optional accelerator, not an MVP assumption
+### 6. Hook 是可选增强，不是 MVP 前提
 
-Hooks can inject current state automatically, but they introduce host-version behavior, permission review, user-level configuration, security prompts, and maintenance across adapters. Native Skill/plugin discovery plus explicit start/recover paths may be enough for the first Codex proof.
+Hook 可以自动注入当前状态，但也会引入宿主版本行为、权限审查、用户级配置、安全提示和跨适配器维护。原生 Skill/plugin 发现加显式 start/recover 路径，可能已足够完成首个 Codex 证明。
 
-P3 should first test the trustworthy journey without mandatory hooks. A hook should be added only if a measured recovery or continuity gap remains.
+P3 应先在没有强制 hook 的情况下验证可信旅程。只有实际测得恢复或连续性缺口时，才应增加 hook。
 
-### 7. Installation is part of the novice product
+### 7. 安装本身就是小白产品的一部分
 
-Several references require the user to cross between a terminal installer and an AI-chat workflow. OpenSpec's documentation explicitly identifies confusion between those surfaces as a common newcomer problem. Node, Python, Git, package managers, global paths, and host-specific approvals multiply that burden.
+多个参考项目要求用户在终端安装器和 AI 聊天工作流之间切换。OpenSpec 文档明确把这两个表面的混淆列为新用户常见问题。Node、Python、Git、包管理器、全局路径和宿主特定批准都会叠加负担。
 
-The supported CoTend path should not require the target user to understand those tools. Marketplace or host-native installation should be tested before a general CLI becomes a requirement. A CLI may still exist for maintainers, offline use, repair, or unsupported hosts.
+受支持的 CoTend 路径不应要求目标用户理解这些工具。应先验证 marketplace 或宿主原生安装，再把通用 CLI 视为必要条件。CLI 仍可服务于维护者、离线使用、修复或不受支持的宿主。
 
-### 8. Verification and user acceptance stay distinct
+### 8. 验证与用户验收继续分开
 
-References vary from strict test/review loops to advisory verification that does not block archive. CoTend already reserves product direction, dangerous operations, publication, and final acceptance for the user.
+参考项目从严格测试/审查循环到不阻止归档的建议性验证都有。CoTend 已经把产品方向、危险操作、公开发布和最终验收保留给用户。
 
-No upstream workflow changes that authority. Automated verification may support a claim, but it cannot convert AI review into user acceptance or bypass a required stop.
+任何上游工作流都不能改变这项权限。自动验证可以支持一项声明，但不能把 AI 审查转化为用户验收，也不能绕过必须停止的边界。
 
-## P3 Validation Questions
+## P3 待验证问题
 
-1. What is the smallest platform-neutral semantic core that satisfies the active behavior contracts?
-2. Which confirmed I6 destinations require top-level Codex Skills in the first vertical slice, and which can be state-routed or progressively delivered without losing discovery?
-3. Can native Codex plugin and Skill discovery prove initialization, one governed slice, a human stop, evidence reporting, acceptance guidance, and cross-session recovery without hooks?
-4. Which project-owned truth survives disable, adapter replacement, and uninstall, and which runtime state can be removed safely?
-5. What ownership manifest and hash rules are sufficient for deterministic update, repair, migration, and uninstall?
-6. Which installation path avoids requiring Git, Node, Python, package-manager, or terminal knowledge from the target user?
+1. 满足活动行为契约的最小平台中立语义核心是什么？
+2. 已确认 I6 目的地中，哪些需要在首个垂直切片中成为顶层 Codex Skills，哪些可以由状态路由或渐进交付，而不损失发现性？
+3. 不使用 hooks 时，Codex 原生 plugin 与 Skill 发现能否证明初始化、一个受治理切片、人工停止、证据报告、验收引导和跨会话恢复？
+4. 哪些项目自有真相必须在禁用、替换适配器和卸载后保留，哪些运行状态可以安全移除？
+5. 哪些所有权 manifest 和 hash 规则足以确定性支持更新、修复、迁移与卸载？
+6. 哪种安装路径能够避免要求目标用户掌握 Git、Node、Python、包管理器或终端？
 
-## Current Decision Boundary
+## 本研究不批准任何架构
 
-This study does not approve an architecture, state directory, runtime, package format, hook, installation channel, Skill count, or first implementation slice. Those choices remain unconfirmed until P3 evaluates them against CoTend evidence and the product owner confirms the resulting route.
+本研究不批准架构、状态目录、运行时、包格式、hook、安装渠道、Skill 数量或首个实现切片。这些选择仍未确认，必须等待 P3 根据 CoTend 证据完成评价，并由产品 owner 确认最终路线。

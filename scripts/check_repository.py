@@ -769,15 +769,6 @@ def checker_self_scan_errors(checker_text: str) -> list[str]:
 def reference_study_errors(study_text: str, registry_text: str) -> list[str]:
     errors: list[str] = []
 
-    for path, text in (
-        ("docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md", study_text),
-        ("UPSTREAM-SOURCES.md", registry_text),
-    ):
-        try:
-            text.encode("ascii")
-        except UnicodeEncodeError:
-            errors.append(f"{path}: reference research must remain ASCII English")
-
     exact_study_metadata = {
         "status": {"research_evidence"},
         "authority": {"design_input_only"},
@@ -800,7 +791,7 @@ def reference_study_errors(study_text: str, registry_text: str) -> list[str]:
 
     blocks = list(
         re.finditer(
-            r"^## (RF\d{2}) [^\n]+\n(?P<body>.*?)(?=^## RF\d{2} |^## Review Controls|\Z)",
+            r"^## (RF\d{2}) [^\n]+\n(?P<body>.*?)(?=^## RF\d{2} |^## 审查控制|\Z)",
             registry_text,
             re.MULTILINE | re.DOTALL,
         )
@@ -827,16 +818,62 @@ def reference_study_errors(study_text: str, registry_text: str) -> list[str]:
                 errors.append(f"{source_id}: upstream registry mismatch for {key}")
 
     required_findings = (
-        "Semantic entries are not physical Skills",
-        "Project truth must outlive the adapter",
-        "Generated-file ownership needs deterministic evidence",
-        "Hooks are an optional accelerator, not an MVP assumption",
-        "Installation is part of the novice product",
-        "This study does not approve an architecture",
+        "语义入口不等于实体 Skill",
+        "项目真相必须独立于适配器",
+        "生成文件所有权需要确定性证据",
+        "Hook 是可选增强，不是 MVP 前提",
+        "安装本身就是小白产品的一部分",
+        "本研究不批准任何架构",
     )
     for finding in required_findings:
         if finding not in study_text:
             errors.append(f"reference study is missing a required boundary: {finding}")
+
+    return errors
+
+
+def owner_document_language_errors(
+    prd_text: str,
+    analysis_documents: dict[str, str],
+) -> list[str]:
+    errors: list[str] = []
+    exact_language_metadata = {
+        "launch_language": {"en"},
+        "launch_localization_mode": {"english_only"},
+        "canonical_interface_language": {"en"},
+        "analysis_document_language": {"zh-CN"},
+        "analysis_document_language_authority": {"product_owner_confirmed"},
+    }
+    for key, expected in exact_language_metadata.items():
+        if metadata_values(prd_text, key) != expected:
+            errors.append(f"PRD language policy mismatch: {key}")
+
+    for required_boundary in (
+        "面向产品 owner 的分析、研究、比较、评估和审查说明正文默认使用简体中文",
+        "I6 的规范入口显示名、首发产品表面、安装说明和面向最终用户的产品文档继续使用英文",
+    ):
+        if required_boundary not in prd_text:
+            errors.append(f"PRD language boundary is missing: {required_boundary}")
+
+    expected_analysis_paths = (
+        "docs/MARKET-LANDSCAPE.md",
+        "docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md",
+        "UPSTREAM-SOURCES.md",
+    )
+    for path in expected_analysis_paths:
+        text = analysis_documents.get(path)
+        if text is None:
+            errors.append(f"owner-facing analysis is missing or ignored: {path}")
+            continue
+        prose = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+        prose = re.sub(r"\]\([^)]+\)", "]", prose)
+        cjk_count = len(re.findall(r"[\u4e00-\u9fff]", prose))
+        latin_count = len(re.findall(r"[A-Za-z]", prose))
+        if cjk_count == 0 or cjk_count < latin_count:
+            errors.append(
+                f"{path}: owner-facing prose must be predominantly Chinese "
+                f"(cjk={cjk_count}, latin={latin_count})"
+            )
 
     return errors
 
@@ -945,6 +982,18 @@ def main() -> int:
         errors.append("behavior index capability_count must be 19")
 
     prd_text = read("docs/PRODUCT-PRD.md")
+    analysis_paths = (
+        "docs/MARKET-LANDSCAPE.md",
+        reference_study_path,
+        upstream_registry_path,
+    )
+    errors.extend(
+        owner_document_language_errors(
+            prd_text,
+            {path: read(path) for path in analysis_paths if path in candidates},
+        )
+    )
+
     for key in (
         "architecture_design_status",
         "project_state_layout_status",

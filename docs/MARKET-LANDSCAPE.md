@@ -1,4 +1,4 @@
-# CoTend Market Landscape
+# CoTend 市场格局
 
 ```yaml
 status: research_baseline_accepted_for_positioning
@@ -9,47 +9,47 @@ checked_at: 2026-07-11
 source_policy: public_primary_sources_preferred
 ```
 
-## Research Verdict
+## 研究结论
 
-There is a credible product gap, but CoTend should not claim that no competitor exists.
+市场上存在可信的产品空缺，但 CoTend 不应声称完全没有竞品。
 
-The more defensible position is:
+更稳妥的定位是：
 
-> CoTend is a local, tool-embedded development governance framework designed first for people who build with AI but do not review code. It helps them clarify intent, delegate work, understand evidence and risk, recover across sessions, and perform final acceptance.
+> CoTend 是一个本地、嵌入 AI 工具的开发治理框架，首先为依靠 AI 开发但不审查代码的人设计。它帮助用户澄清意图、委派工作、理解证据与风险、跨会话恢复，并亲自完成最终验收。
 
-Adjacent products cover parts of this problem. The reviewed products do not combine this audience, local/tool-embedded form, and full idea-to-acceptance governance loop as their primary product promise.
+相邻产品分别覆盖这个问题的一部分。在本次检查的产品中，没有发现把这一目标人群、本地工具内形态，以及从想法到验收的完整治理闭环同时作为首要产品承诺的项目。
 
-## Adjacent Categories
+## 相邻类别
 
-| Product/category | Primary promise in its own materials | Main audience signal | Gap relative to CoTend |
+| 产品或类别 | 其官方材料中的主要承诺 | 主要受众信号 | 相对 CoTend 的空缺 |
 |---|---|---|---|
-| [Trellis](https://github.com/mindfold-ai/Trellis) | Engineering framework with specs, tasks, memory, workflows, and multi-platform setup. | Teams and developers working with repository specs, Node, Python, and command-line initialization. | Strong project substrate; not designed around a non-coder's authority, evidence comprehension, and acceptance journey. |
-| [Superpowers](https://github.com/obra/superpowers) | A complete software-development methodology for coding agents using brainstorming, plans, TDD, worktrees, subagents, and code review. | Coding-agent users comfortable with engineering workflow concepts. | Strong development discipline; its public model is still developer-methodology first. |
-| [GitHub Spec Kit](https://github.github.com/spec-kit/) | Spec-driven development through Spec, Plan, Tasks, and Implement across many coding agents. | Developers and organizations adopting SDD and CLI-based project setup. | Centers specification artifacts, not the full novice control and acceptance loop. |
-| [OpenSpec](https://openspec.dev/) | Lightweight, universal spec-driven development for many AI coding tools. | Users able to install a CLI and operate specification workflows. | Lightweight intent management, but not a complete novice governance layer. |
-| [BMAD Method](https://docs.bmad-method.org/) | Agentic planning, agile roles, PRDs, architecture, stories, testing, and modules. | Users adopting structured agile and engineering roles. | Broad methodology, but terminology and process remain professional-development oriented. |
-| [GSD Core](https://github.com/open-gsd/gsd-core) | Context engineering, spec-driven phases, fresh-context agents, persistent project state, and verification across multiple coding tools. | Users managing milestone and phase workflows with agent orchestration. | Strong context and execution machinery, but its full command, agent, and planning vocabulary is developer-oriented. |
-| [Replit Agent](https://replit.com/ai) and no-code AI builders | Generate and deploy applications from natural language with little or no coding. | Non-programmers who want an app-building environment. | Accessible creation surface, but it owns the builder environment rather than governing arbitrary local AI coding tools and project truth. |
-| [Vibe Coding Assistant](https://vibecodingassistant.dev/) | GUI-driven prompt generation, code generation, compilation, and running for non-programmers. | Non-programmers and rapid prototypers. | Focuses on generation convenience, not durable governance across the development lifecycle. |
-| [CLAVE Framework](https://claveframework.org/) | Enterprise governance of applications created with AI tools: inventory, ownership, risk, security, and lifecycle. | Organizations governing citizen-developed applications. | Governs deployed application output at an organizational level, not an individual's in-tool development loop. |
+| [Trellis](https://github.com/mindfold-ai/Trellis) | 提供规范、任务、memory、工作流和多平台配置的工程框架。 | 使用仓库规范、Node、Python 和命令行初始化的团队与开发者。 | 项目底座较强，但不是围绕不读代码用户的权限、证据理解和验收旅程设计。 |
+| [Superpowers](https://github.com/obra/superpowers) | 为编码 agent 提供包含 brainstorming、计划、TDD、worktrees、subagents 和代码审查的完整软件开发方法。 | 熟悉工程工作流概念的编码 agent 用户。 | 开发纪律较强，但公开模型仍以开发者方法论为中心。 |
+| [GitHub Spec Kit](https://github.github.com/spec-kit/) | 通过 Spec、Plan、Tasks 和 Implement，在多种编码 agent 中进行规范驱动开发。 | 采用 SDD 和 CLI 项目配置的开发者与组织。 | 以规范产物为中心，不覆盖完整的小白控制与验收闭环。 |
+| [OpenSpec](https://openspec.dev/) | 为多种 AI 编码工具提供轻量、通用的规范驱动开发。 | 能够安装 CLI 并操作规范工作流的用户。 | 意图管理较轻量，但不是完整的小白治理层。 |
+| [BMAD Method](https://docs.bmad-method.org/) | 提供 agentic 规划、敏捷角色、PRD、架构、stories、测试和模块。 | 采用结构化敏捷与工程角色的用户。 | 方法覆盖广，但术语和流程仍面向专业开发。 |
+| [GSD Core](https://github.com/open-gsd/gsd-core) | 在多种编码工具中提供上下文工程、规范驱动阶段、独立上下文 agents、持久项目状态和验证。 | 使用 agent 编排管理 milestone 与 phase 工作流的用户。 | 上下文与执行机制较强，但完整 command、agent 和规划词汇仍偏开发者。 |
+| [Replit Agent](https://replit.com/ai) 与无代码 AI builder | 用自然语言生成和部署应用，几乎不需要编码。 | 希望直接获得应用构建环境的非程序员。 | 创建表面容易，但由平台拥有 builder 环境，不负责治理任意本地 AI 编码工具和项目真相。 |
+| [Vibe Coding Assistant](https://vibecodingassistant.dev/) | 为非程序员提供 GUI 驱动的提示生成、代码生成、编译和运行。 | 非程序员与快速原型用户。 | 重点是生成便利性，不是贯穿开发生命周期的持久治理。 |
+| [CLAVE Framework](https://claveframework.org/) | 对 AI 工具创建的应用进行企业级治理，包括清单、所有权、风险、安全和生命周期。 | 治理 citizen-developed applications 的组织。 | 在组织层治理已产生的应用，不治理个人在工具内的开发闭环。 |
 
-## CoTend Differentiation Hypothesis
+## CoTend 差异化假设
 
-CoTend should compete on five linked responsibilities:
+CoTend 应围绕五项相互关联的职责竞争：
 
-1. **Novice authority**: product direction, dangerous actions, publication, and final acceptance remain visibly owned by the user.
-2. **Understandable evidence**: claims are translated into what was actually executed, inspected, inferred, blocked, or not run.
-3. **Delegation without disappearance**: AI can work continuously, but route, checkpoints, and stop boundaries remain recoverable.
-4. **Acceptance as a first-class outcome**: the user receives a short walkthrough and expected results instead of being told to review a diff.
-5. **Tool independence over time**: project truth belongs to the project and can survive a new session, model, or supported AI tool.
+1. **小白用户拥有裁决权**：产品方向、危险操作、公开发布和最终验收明确归用户所有。
+2. **证据可理解**：把声明转换为实际执行了什么、检查了什么、推断了什么、被什么阻止，以及什么没有运行。
+3. **委派不等于失去过程**：AI 可以连续工作，但路线、检查点和停止边界必须能够恢复。
+4. **验收是一等结果**：用户得到简短 walkthrough 和预期结果，而不是被要求审查 diff。
+5. **长期工具独立**：项目真相属于项目，能够跨新会话、新模型或受支持的 AI 工具延续。
 
-## Claims We Should Avoid
+## 应避免的声明
 
-- “The first” or “the only” framework without a broader, repeatable market study.
-- “No competitors exist.”
-- Security, correctness, or release guarantees that exceed the recorded evidence.
-- Treating app generators, enterprise governance frameworks, and developer methodologies as identical competitors.
+- 在没有更广泛且可复现的市场研究前，声称“第一个”或“唯一一个”。
+- 声称“没有竞品”。
+- 超出已记录证据的安全、正确性或发布保证。
+- 把应用生成器、企业治理框架和开发者方法论当成完全相同的竞品。
 
-## Research Follow-up
+## 后续研究
 
-The source-pinned implementation comparison is recorded in [`REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md`](REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md). Before public launch, repeat the market review with a documented search protocol, include newly launched novice-governance tools, and validate the positioning with target-user interviews rather than relying only on product documentation.
+固定来源的实现对比记录在 [`REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md`](REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md)。公开发布前，应使用有记录的搜索协议重新进行市场检查，纳入新出现的小白治理工具，并通过目标用户访谈验证定位，而不是只依赖产品文档。

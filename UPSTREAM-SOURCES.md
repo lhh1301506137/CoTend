@@ -1,4 +1,4 @@
-# Upstream Sources
+# 上游来源台账
 
 ```yaml
 status: active_research_registry
@@ -9,7 +9,7 @@ source_copying: none
 update_policy: manual_pinned_review_before_architecture_adoption_or_release
 ```
 
-This registry records public projects inspected as design evidence for CoTend. They are not bundled dependencies, implementation inputs, or authority for CoTend behavior. A listed source may support an observation or a design question; it does not authorize copying its code, prompts, templates, generated files, or repository layout.
+本台账记录为 CoTend 设计证据而检查的公开项目。它们不是捆绑依赖、实现输入或 CoTend 行为的权威。列出的来源可以支持一项观察或设计问题，但不授权复制其代码、提示词、模板、生成文件或仓库布局。
 
 ## RF01 Superpowers
 
@@ -24,7 +24,7 @@ relationship: design_inspiration
 adoption_status: no_source_adoption
 ```
 
-Review focus: shared Skills, host-specific bootstrap and tool mapping, Codex plugin packaging, implicit invocation, and workflow verification.
+审查重点：共享 Skills、宿主特定 bootstrap 与工具映射、Codex plugin 打包、隐式调用和工作流验证。
 
 ## RF02 Trellis
 
@@ -39,7 +39,7 @@ relationship: restricted_design_inspiration
 adoption_status: no_source_adoption
 ```
 
-Review focus: project-owned workflow/spec/task/memory state, generated platform integrations, context injection, update ownership hashes, and uninstall boundaries. No Trellis source, prompt, template, or generated file may enter CoTend's Apache-2.0 implementation.
+审查重点：项目自有的工作流、规范、任务和 memory 状态，生成的平台集成，上下文注入，更新所有权 hash，以及卸载边界。任何 Trellis 源码、提示词、模板或生成文件都不得进入 CoTend 的 Apache-2.0 实现。
 
 ## RF03 GitHub Spec Kit
 
@@ -54,7 +54,7 @@ relationship: design_inspiration
 adoption_status: no_source_adoption
 ```
 
-Review focus: generated integrations, install manifests, modified-file protection, spec lifecycle, multi-integration safety, and extension trust boundaries.
+审查重点：生成的集成、安装 manifest、已修改文件保护、规范生命周期、多集成安全和扩展信任边界。
 
 ## RF04 OpenSpec
 
@@ -69,7 +69,7 @@ relationship: design_inspiration
 adoption_status: no_source_adoption
 ```
 
-Review focus: current truth versus proposed changes, delta specs, archive merge, progressive command profiles, host adapters, and terminal-versus-chat onboarding.
+审查重点：当前真相与拟议变更、delta specs、归档合并、渐进 command profiles、宿主适配器，以及终端与聊天两种新手引导表面。
 
 ## RF05 GSD Core
 
@@ -84,9 +84,9 @@ relationship: design_inspiration
 adoption_status: no_source_adoption
 ```
 
-Review focus: Skill surface budgets, install profiles, runtime surface controls, compact state, context isolation, and host-dependent namespace routing.
+审查重点：Skill 表面预算、安装 profiles、运行时表面控制、紧凑状态、上下文隔离和依赖宿主的命名空间路由。
 
-The earlier `gsd-build/get-shit-done` repository was checked only long enough to verify its current redirect to this source. No current GSD conclusion uses the redirected repository as implementation evidence.
+此前的 `gsd-build/get-shit-done` 仓库只被检查到足以确认它当前重定向到本来源。所有现有 GSD 结论都没有把被重定向的仓库作为实现证据。
 
 ## RF06 BMAD Method
 
@@ -101,13 +101,13 @@ relationship: design_inspiration_and_complexity_ceiling
 adoption_status: no_source_adoption
 ```
 
-Review focus: modular installation, named roles, adaptive workflow depth, high-value human checkpoints, and the cognitive cost of a broad role/workflow system.
+审查重点：模块化安装、命名角色、自适应工作流深度、高价值人工检查点，以及宽角色/工作流系统带来的认知成本。
 
-## Review Controls
+## 审查控制
 
-- Sources were inspected at the exact commits above in an isolated, non-distributed research area.
-- No source working tree was checked out.
-- No source installer, hook, script, build, or test was executed.
-- The public comparison contains observations and CoTend-specific implications, not source excerpts.
-- Any future code or dependency adoption requires a separate license, provenance, behavior, and replacement review.
-- Source updates are manual. A newer upstream version cannot silently change CoTend behavior or active product truth.
+- 各来源均在隔离、不会分发的研究区域中按上述精确 commit 检查。
+- 没有 checkout 任何来源的工作树。
+- 没有执行任何来源的安装器、hook、脚本、构建或测试。
+- 公开对比只包含观察和针对 CoTend 的含义，不包含来源原文摘录。
+- 未来如要采用任何代码或依赖，必须另行完成许可证、来源、行为和替代性审查。
+- 来源更新必须手动进行。较新的上游版本不能静默改变 CoTend 行为或活动产品真相。
