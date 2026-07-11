@@ -1132,10 +1132,14 @@ def upstream_candidate_mapping_errors(
         errors.append("Codex role map must remain a not-adopted proposal")
     if role_map.get("candidate_release") != "2026.07.11.3":
         errors.append("Codex role map release mismatch")
-    if role_map.get("public_interface_authority") != "role_layers_confirmed_names_pending":
+    if role_map.get("public_interface_authority") != (
+        "role_layers_and_names_confirmed_third_party_bundling_pending"
+    ):
         errors.append("Codex role map role-layer/name authority boundary drift")
     if role_map.get("role_layer_decision") != "product_owner_confirmed":
         errors.append("Codex role map role-layer decision mismatch")
+    if role_map.get("user_owned_naming_decision") != "product_owner_confirmed":
+        errors.append("Codex role map user-owned naming decision mismatch")
     if role_map.get("skill_count") != 7:
         errors.append("Codex role map skill_count must be 7")
 
@@ -1181,16 +1185,16 @@ def upstream_candidate_mapping_errors(
         "diagnose-only": (
             "user_owned_original",
             "contextual_read_only_diagnosis",
-            "needs_user_decision",
+            "adapted",
             "platform_adaptation",
-            None,
+            "cotend-diagnose-only",
         ),
         "dual-model-upgrade": (
             "user_owned_original",
             "advanced_model_role_lifecycle",
-            "needs_user_decision",
+            "adapted",
             "platform_adaptation",
-            None,
+            "cotend-model-upgrade",
         ),
         "grill-me": (
             "adapted_third_party",
@@ -1223,6 +1227,19 @@ def upstream_candidate_mapping_errors(
         if entry.get("source_tree") != expected_skill_trees[skill_id]:
             errors.append(f"Codex role map tree mismatch: {skill_id}")
 
+    expected_naming_status = {
+        "dual-ai-init": "user_confirmed",
+        "dual-ai-project-init": "user_confirmed",
+        "dual-ai-collaboration": "user_confirmed",
+        "diagnose-only": "user_confirmed",
+        "dual-model-upgrade": "user_confirmed",
+        "grill-me": "preserve_third_party_identity_if_bundled",
+        "karpathy-guidelines": "preserve_third_party_identity_if_bundled",
+    }
+    for skill_id, expected in expected_naming_status.items():
+        if roles_by_id.get(skill_id, {}).get("naming_status") != expected:
+            errors.append(f"Codex role-map naming status drift: {skill_id}")
+
     init_entry = roles_by_id.get("dual-ai-init", {})
     if init_entry.get("delegates_to") != ["dual-ai-project-init"]:
         errors.append("dual-ai-init must remain the thin entry delegating to project init")
@@ -1238,7 +1255,11 @@ def upstream_candidate_mapping_errors(
         expected_adoption_boundary = {
             "state": "not_adopted",
             "role_layers_confirmed": True,
-            "final_names_confirmed": False,
+            "user_owned_skill_names_confirmed": True,
+            "final_names_confirmed": True,
+            "final_names_scope": (
+                "five_user_owned_ids_plus_preserved_third_party_identity"
+            ),
             "physical_skill_count_confirmed": False,
             "third_party_bundling_confirmed": False,
             "final_framework_lock_exists": False,
@@ -1257,6 +1278,7 @@ def upstream_candidate_mapping_errors(
         "candidate_release": {"2026.07.11.3"},
         "role_layer_status": {"user_confirmed"},
         "role_layer_decision": {"product_owner_confirmed"},
+        "user_owned_skill_name_status": {"user_confirmed"},
         "adoption_state": {"not_adopted"},
         "final_framework_lock_exists": {"false"},
         "analysis_language": {"zh-CN"},
@@ -1269,6 +1291,8 @@ def upstream_candidate_mapping_errors(
         "dual-ai-init` 是普通用户的统一入口",
         "dual-ai-project-init` 是入口内部的 Auto Mode 引擎",
         "用户已确认保留这套分层",
+        "五个用户原创 Skill 分别命名为",
+        "`final_names_confirmed` 只确认五个用户原创 Skill ID",
         "现在不得创建 `upstream/framework.lock.json`",
         "adoption_state: not_adopted",
     ):
@@ -1289,7 +1313,9 @@ def local_recovery_truth_errors(status_text: str, plan_text: str) -> list[str]:
         "productization_default": {"rename_first_preserve_first"},
         "framework_release_candidate": {"dual_ai_share_2026_07_11_3"},
         "framework_release_adoption": {"not_adopted"},
-        "interface_authority": {"role_layers_confirmed_names_pending"},
+        "interface_authority": {
+            "role_layers_and_names_confirmed_third_party_bundling_pending"
+        },
     }
     for key, expected in exact_status.items():
         if metadata_values(status_text, key) != expected:

@@ -5,8 +5,9 @@
   "candidate_release": "2026.07.11.3",
   "platform": "Codex",
   "launch_adapter": true,
-  "public_interface_authority": "role_layers_confirmed_names_pending",
+  "public_interface_authority": "role_layers_and_names_confirmed_third_party_bundling_pending",
   "role_layer_decision": "product_owner_confirmed",
+  "user_owned_naming_decision": "product_owner_confirmed",
   "mapping_basis": [
     "Skill frontmatter",
     "agents/openai.yaml",
@@ -35,7 +36,7 @@
       "proposed_adoption_status": "adapted",
       "proposed_implementation_mode": "rename_only",
       "proposed_cotend_skill_id": "cotend-init",
-      "naming_status": "candidate_not_confirmed",
+      "naming_status": "user_confirmed",
       "preserve": [
         "one simple entry",
         "automatic init/update/repair/migrate/resume classification",
@@ -65,7 +66,7 @@
       "proposed_adoption_status": "adapted",
       "proposed_implementation_mode": "platform_adaptation",
       "proposed_cotend_skill_id": "cotend-project-init",
-      "naming_status": "candidate_not_confirmed",
+      "naming_status": "user_confirmed",
       "preserve": [
         "Auto Mode",
         "fresh/update/repair/resume/blocked classification",
@@ -93,7 +94,7 @@
       "proposed_adoption_status": "adapted",
       "proposed_implementation_mode": "platform_adaptation",
       "proposed_cotend_skill_id": "cotend-collaboration",
-      "naming_status": "candidate_not_confirmed",
+      "naming_status": "user_confirmed",
       "preserve": [
         "human-led delegated development",
         "CodexSelf-first review with optional external reviewer",
@@ -115,10 +116,10 @@
         "PROMPTS.md says users do not need to remember the Skill name",
         "dual-ai-collaboration and project-init route diagnosis failures here"
       ],
-      "proposed_adoption_status": "needs_user_decision",
+      "proposed_adoption_status": "adapted",
       "proposed_implementation_mode": "platform_adaptation",
-      "proposed_cotend_skill_id": null,
-      "naming_status": "needs_user_decision",
+      "proposed_cotend_skill_id": "cotend-diagnose-only",
+      "naming_status": "user_confirmed",
       "preserve": [
         "read-only default",
         "evidence-backed root cause",
@@ -142,10 +143,10 @@
         "the Skill owns advisor/trial/takeover/rollback rather than a narrow ask-an-advisor action",
         "it imports non-thinnable authority boundaries from the shared governance core"
       ],
-      "proposed_adoption_status": "needs_user_decision",
+      "proposed_adoption_status": "adapted",
       "proposed_implementation_mode": "platform_adaptation",
-      "proposed_cotend_skill_id": null,
-      "naming_status": "needs_user_decision",
+      "proposed_cotend_skill_id": "cotend-model-upgrade",
+      "naming_status": "user_confirmed",
       "preserve": [
         "advisor versus takeover distinction",
         "premium model packet and handoff",
@@ -216,7 +217,9 @@
   "adoption": {
     "state": "not_adopted",
     "role_layers_confirmed": true,
-    "final_names_confirmed": false,
+    "user_owned_skill_names_confirmed": true,
+    "final_names_confirmed": true,
+    "final_names_scope": "five_user_owned_ids_plus_preserved_third_party_identity",
     "physical_skill_count_confirmed": false,
     "third_party_bundling_confirmed": false,
     "final_framework_lock_exists": false

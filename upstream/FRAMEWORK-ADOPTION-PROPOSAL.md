@@ -8,6 +8,7 @@ candidate_record: upstream/FRAMEWORK-CANDIDATE.json
 role_map: upstream/CODEX-SKILL-ROLE-MAP.json
 role_layer_status: user_confirmed
 role_layer_decision: product_owner_confirmed
+user_owned_skill_name_status: user_confirmed
 adoption_state: not_adopted
 final_framework_lock_exists: false
 analysis_language: zh-CN
@@ -23,7 +24,7 @@ analysis_language: zh-CN
 4. `diagnose-only` 和 `dual-model-upgrade` 是情境/进阶能力。
 5. `grill-me` 和 `karpathy-guidelines` 是 MIT 伴随 Skill，不拥有产品生命周期或项目真相。
 
-用户已确认保留这套分层并做 CoTend 品牌与平台适配，不重新建立 I6 十入口目录。该确认只固定角色层次；最终可见名称、MIT Skill bundling 和实际导入仍需后续确认与验证。
+用户已确认保留这套分层，并确认五个用户原创 Skill 分别命名为 `cotend-init`、`cotend-project-init`、`cotend-collaboration`、`cotend-diagnose-only` 和 `cotend-model-upgrade`。这不重新建立 I6 十入口目录，也不把内部角色提升为日常入口；MIT Skill bundling 和实际导入仍需后续确认与验证。
 
 ## 候选 release 证据
 
@@ -45,11 +46,11 @@ analysis_language: zh-CN
 
 | Upstream Skill | 真实角色 | 当前用户可见性 | 提议处置 | CoTend 名称状态 |
 |---|---|---|---|---|
-| `dual-ai-init` | 统一入口 | 默认入口 | `adapted` + `rename_only` | 候选 `cotend-init`，未确认。 |
-| `dual-ai-project-init` | 内部 Auto Mode 引擎 | 委派为主，显式调用仅作 fallback | `adapted` + `platform_adaptation` | 候选 `cotend-project-init`，未确认。 |
-| `dual-ai-collaboration` | 共享治理核心 | 隐式核心；审查等情境可显式进入 | `adapted` + `platform_adaptation` | 候选 `cotend-collaboration`，未确认。 |
-| `diagnose-only` | 只读诊断 | 自然语言优先的情境入口 | `needs_user_decision` | 推荐 `cotend-diagnose-only`，精确名称待确认。 |
-| `dual-model-upgrade` | 模型顾问/试用/接手/回退/复诊生命周期 | 进阶显式入口 | `needs_user_decision` | 推荐保留完整 “Model Upgrade” 含义，精确名称待确认。 |
+| `dual-ai-init` | 统一入口 | 默认入口 | `adapted` + `rename_only` | 已确认 `cotend-init`。 |
+| `dual-ai-project-init` | 内部 Auto Mode 引擎 | 委派为主，显式调用仅作 fallback | `adapted` + `platform_adaptation` | 已确认 `cotend-project-init`。 |
+| `dual-ai-collaboration` | 共享治理核心 | 隐式核心；审查等情境可显式进入 | `adapted` + `platform_adaptation` | 已确认 `cotend-collaboration`。 |
+| `diagnose-only` | 只读诊断 | 自然语言优先的情境入口 | `adapted` + `platform_adaptation` | 已确认 `cotend-diagnose-only`。 |
+| `dual-model-upgrade` | 模型顾问/试用/接手/回退/复诊生命周期 | 进阶显式入口 | `adapted` + `platform_adaptation` | 已确认 `cotend-model-upgrade`。 |
 | `grill-me` | 一次一问的需求澄清伴随 Skill | 内部情境调用，可选显式 | `deferred` | 如打包应保留第三方身份与 MIT 归属。 |
 | `karpathy-guidelines` | AI 编码纪律伴随 Skill | 隐式内部规则 | `deferred` | 如打包应保留第三方身份与 MIT 归属。 |
 
@@ -94,20 +95,20 @@ Trellis、CodeGraph、Playwright、Git、Python 和 PowerShell 保持 external r
 
 Claude 包只含 3 个 Skill，并明确没有 Codex 的 project-init 引擎。Codex 是已确认的首发适配器，因此 Claude 载体整体 `deferred`，等 Codex 纵向切片通过后再单独做平台适配，不需要本轮重新询问。
 
-## 已确认分层下的 CoTend 命名候选
+## 已确认的 CoTend 分层与名称
 
-以下层次已经确认，但名称仍只是下一决策的推荐候选：
+以下角色层次和五个用户原创 Skill 名称均已确认：
 
-| 层次 | 推荐候选 | 用户心智 |
+| 层次 | 已确认名称 | 用户心智 |
 |---|---|---|
 | 默认入口 | `CoTend Init` / `cotend-init` | 新项目、旧项目、更新、修复和续接都从这里开始，由 Auto Mode 判断。 |
 | 内部引擎 | `cotend-project-init` | 保留可调试的显式 fallback，但不要求普通用户理解或选择。 |
 | 共享核心 | `cotend-collaboration` | 主要由其他入口调用；审查/角色配置等高级情境可显式使用。 |
-| 情境入口 | 候选 `cotend-diagnose-only` | 用户说“先别改、只诊断”即可触发；名称保留“不修改”的安全语义。 |
-| 进阶入口 | 候选 `cotend-model-upgrade` | 保留顾问、试用、接手、回退和复诊的完整覆盖，不缩成 Ask an Advisor。 |
+| 情境入口 | `cotend-diagnose-only` | 用户说“先别改、只诊断”即可触发；名称保留“不修改”的安全语义。 |
+| 进阶入口 | `cotend-model-upgrade` | 保留顾问、试用、接手、回退和复诊的完整覆盖，不缩成 Ask an Advisor。 |
 | 内部伴随 | `grill-me`、`karpathy-guidelines` | 不作为 CoTend 日常生命周期入口。 |
 
-这套候选沿用现有框架结构，同时满足统一 `cotend-` 搜索前缀。它不恢复 I6 的十个语义入口，也不把内部恢复分支拆成独立命令。
+这套已确认表面沿用现有框架结构，同时满足统一 `cotend-` 搜索前缀。它不恢复 I6 的十个语义入口，也不把内部恢复分支拆成独立命令。
 
 ## Adoption 状态提案
 
@@ -116,12 +117,15 @@ candidate_integrity: passed
 release_notes_reviewed: yes
 changed_surfaces: initial_import_no_previous_CoTend_lock
 role_layers: user_confirmed
+user_owned_skill_names: user_confirmed
+final_names_confirmed: yes
 adapted_candidates:
   - dual-ai-init
   - dual-ai-project-init
   - dual-ai-collaboration
+  - diagnose-only
+  - dual-model-upgrade
 needs_user_decision:
-  - exact CoTend names for the five user-owned Skills
   - MIT companion Skill bundling versus external dependency
 deferred:
   - Claude carrier
@@ -132,6 +136,8 @@ compatibility_evidence: candidate_integrity_tagged_role_verifier_and_static_mapp
 resulting_CoTend_commit: pending
 framework_lock: forbidden_until_adaptation_and_verification_commit
 ```
+
+这里的 `final_names_confirmed` 只确认五个用户原创 Skill ID，以及第三方 Skill 如被采用时必须保留原身份；它不确认物理 Skill 数量、MIT bundling、文件导入或 adoption 已完成。
 
 ## 正式 lock 创建门
 
