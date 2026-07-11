@@ -15,7 +15,7 @@ implementation_authority: false
 
 This standard defines how CoTend capabilities are converted into public-safe, testable behavior contracts. A behavior contract states what users and supported AI tools must be able to observe. It must not select source code, prompt wording, command count, storage layout, runtime language, package structure, or installation channel unless a later user-confirmed design decision explicitly adds that constraint.
 
-An approved contract must be sufficient for a new implementation context to build the behavior without opening private upstream material or restricted third-party source files.
+An approved contract must be sufficient to verify either direct adaptation from an explicitly adopted upstream release or an independent implementation. It must not require access to unreleased/private upstream working files or restricted third-party source.
 
 ## Normative Language
 
@@ -32,7 +32,7 @@ The terms **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are no
 7. **Progressive disclosure changes presentation, not protection.** Advanced detail may stay hidden until relevant, but user control, evidence, and stop boundaries must not disappear.
 8. **Adapters preserve semantics.** Platforms may translate invocation and presentation but must not weaken or fork the behavior contract.
 9. **One owner per shared rule.** A cross-capability rule is defined once and referenced elsewhere instead of being copied.
-10. **Independent implementation is mandatory.** Public contracts must not reproduce private wording, template structure, personal defaults, or restricted-source implementation choices.
+10. **Source-aware implementation is mandatory.** Files from an explicitly adopted user-owned or permissively licensed release may be renamed or adapted with traceability. Restricted, unknown, private, or non-adopted source must remain unavailable to implementation.
 
 ## File Contract
 
@@ -51,7 +51,7 @@ The specification ID is stable. Renaming a title must not change the ID. Splitti
 | `planned` | Indexed but not drafted. | No |
 | `draft_public_safe` | Behavior drafted from approved product inputs and screened for prohibited material. | No |
 | `reviewed_pending_user_confirmation` | Completeness, consistency, tests, and provenance were reviewed. | No |
-| `active_user_confirmed` | User-visible behavior and authority boundaries were confirmed. | Yes, through a clean implementation context |
+| `active_user_confirmed` | User-visible behavior and authority boundaries were confirmed. | Yes, after an upstream adoption/implementation-input record selects direct adaptation or independent implementation |
 | `superseded` | Replaced by a later confirmed contract. | No |
 
 Primary AI may make editorial, link, evidence-pointer, and observed-fact updates within an active contract. Changes to user promises, authority, stop boundaries, logical state ownership, product scope, acceptance meaning, or release behavior require user confirmation.
@@ -76,6 +76,8 @@ architecture_neutral: true
 source_review_id: SR-C00-001
 source_review_status: pending | verified | blocked
 public_safety_review: pending | passed | blocked
+upstream_productization_trace: pending | mapped | not_applicable
+implementation_mode: direct_adoption | rename_only | platform_adaptation | external_dependency | independent | mixed | pending
 ```
 
 `depends_on` contains only direct behavioral dependencies. `required_by` lists direct behavioral consumers and is the inverse index used for consistency checks. Neither field may encode the current command, Plugin, Skill, state-layout, or installation candidates.
@@ -203,6 +205,7 @@ provenance:
     - docs/CAPABILITY-COVERAGE.md
     - docs/PRODUCT-PRD.md
   source_classes_considered:
+    - user_owned_upstream_release
     - user_owned_original
     - permissive_external
     - copyleft_or_restricted
@@ -220,9 +223,10 @@ provenance:
   implementation_allowlist:
     - this approved specification
     - listed public product contracts
+    - files from an explicitly adopted and integrity-verified upstream release
     - separately approved dependency documentation
   implementation_denylist:
-    - private upstream files
+    - unreleased or private upstream working files
     - restricted-source files
     - raw intake artifacts
   similarity_review_required: true
@@ -230,22 +234,26 @@ provenance:
 
 Exact private-source locations, excerpts, and sensitive evidence remain outside the public repository. The public `source_review_id` is an opaque audit reference, not a path or a substitute for maintaining restricted evidence in its authorized private location.
 
-`source_review_status: verified` requires that an authorized reviewer resolved the ID to its restricted record and confirmed the public summary without copying restricted evidence into this repository. `public_safety_review: passed` requires a separate scan of the actual public specification.
+`source_review_status: verified` requires that an authorized reviewer resolved the ID to its source record or immutable release evidence and confirmed the public summary without copying private evidence into this repository. `public_safety_review: passed` requires a separate scan of the actual public specification.
 
-## Clean Implementation Handoff
+`upstream_productization_trace` is separate from behavior authority. A contract may remain `active_user_confirmed` while its exact release files are still `pending`; product implementation stays blocked until an adoption record changes the relevant mapping to `mapped` and selects an `implementation_mode`.
 
-Before implementation begins for an active specification, prepare a handoff containing only:
+## Source-Aware Implementation Handoff
+
+Before implementation begins for an active specification, prepare a handoff containing:
 
 - the active behavior specification;
 - its active behavioral dependencies;
 - approved public product contracts;
 - allowed public dependency documentation;
 - deterministic verification scenarios;
-- explicit forbidden inputs and stop boundaries.
+- explicit forbidden inputs and stop boundaries;
+- the applicable framework lock and adoption entries;
+- the selected mode for each input: direct adoption, rename only, platform adaptation, external dependency, independent implementation, or mixed.
 
-The handoff also includes a machine-readable or reviewable input manifest with relative public paths and content hashes. The implementation attestation identifies that manifest; it must not rely only on a free-form statement that private material was not read.
+The handoff also includes a machine-readable or reviewable input manifest with relative paths, source release paths, content hashes, relationship, license, target paths, and intended changes. It must not rely only on a free-form provenance statement.
 
-The implementation context must attest that it did not read private upstream, raw intake, or restricted-source files. A separate review must check contract compliance, provenance, and unexplained textual or structural similarity before the implementation is accepted.
+Direct adoption, rename-only adaptation, and platform adaptation may read only files named by the adoption record. External dependencies remain outside the product payload. Independent implementation must not read unreleased/private upstream, raw intake, restricted-source, unknown, or rejected files. A separate review checks behavior compliance, provenance, licenses, declared modifications, and unexplained similarity outside the adopted inputs.
 
 ## Specification Review Gate
 
@@ -258,7 +266,7 @@ A specification may advance to `reviewed_pending_user_confirmation` only when:
 - logical state is defined without premature storage design;
 - progressive disclosure preserves constitutional information;
 - tests include success, negative, stop, interruption, and recovery behavior as applicable;
-- provenance is public-safe and implementation inputs are allowlisted;
+- provenance is public-safe and implementation inputs can be selected through an adoption record;
 - `source_review_status` is `verified` and `public_safety_review` is `passed`;
 - dependencies do not form an unexplained cycle;
 - no command, platform, architecture, schema, or installation candidate has been silently promoted.

@@ -1,13 +1,14 @@
 # CoTend Novice Product Journeys
 
 ```yaml
-status: active_user_confirmed
-authority: derived_from_active_behavior_contracts
+status: reviewed_pending_user_confirmation
+authority: historical_journey_baseline_pending_upstream_trace
 product_baseline_version: 0.1.0
 phase: P2_design_novice_product_surface
 audience: people_who_build_with_ai_without_reading_code
 public_language: en
-interface_design_status: baseline_user_confirmed
+interface_design_status: unconfirmed
+revalidation_reason: rename_first_upstream_surface_not_mapped
 architecture_design_status: unconfirmed
 project_state_layout_status: unconfirmed
 distribution_design_status: unconfirmed
@@ -22,7 +23,7 @@ This document defines how a person should experience CoTend before any command s
 
 CoTend is the product. It is a reusable AI development governance framework that helps a person turn an idea into controlled, evidence-backed development. A task board, website, game, or other downstream project may be used later as a test fixture, but it is never the CoTend product and cannot define the framework by itself.
 
-The journeys below derive from the active [capability baseline](CAPABILITY-COVERAGE.md) and [behavior contracts](BEHAVIOR-SPEC-INDEX.md). They describe observable product behavior, not an implementation design.
+The journeys below derive from the active [capability baseline](CAPABILITY-COVERAGE.md) and [behavior contracts](BEHAVIOR-SPEC-INDEX.md). They remain useful coverage evidence, but they are pending revalidation against the existing dual-ai user surface. They must not be used to replace that surface by default.
 
 ## Product-Surface Rules
 

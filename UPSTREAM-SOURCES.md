@@ -1,15 +1,33 @@
 # 上游来源台账
 
 ```yaml
-status: active_research_registry
-checked_at: 2026-07-11
-relationship: public_design_references_only
+status: active_productization_and_research_registry
+checked_at: 2026-07-12
+relationship: primary_user_owned_productization_source_plus_secondary_public_references
 implementation_dependency: none
 source_copying: none
 update_policy: manual_pinned_review_before_architecture_adoption_or_release
 ```
 
-本台账记录为 CoTend 设计证据而检查的公开项目。它们不是捆绑依赖、实现输入或 CoTend 行为的权威。列出的来源可以支持一项观察或设计问题，但不授权复制其代码、提示词、模板、生成文件或仓库布局。
+本台账同时区分 CoTend 的用户原创产品化母体和外部设计参考。只有 `UP01` 是首要产品化来源；RF01-RF06 仍只是二级比较证据，不能按竞品多数做法改变 CoTend。
+
+当前仓库尚未导入任何 upstream 文件，因此 `implementation_dependency` 和 `source_copying` 仍为 `none`。未来只有完成 CoTend framework lock、adoption 记录、许可证与隐私检查的具体 release 文件，才可成为实现输入。
+
+## UP01 dual-ai 分享包
+
+```yaml
+role: primary_productization_source
+product_relationship: user_owned_upstream_framework
+source: public_distribution_location_pending
+reviewed_release: 2026.07.11.3
+release_anchor: dual-ai-share-2026.07.11.3
+declared_license_scope: Apache-2.0_for_user_owned_content_with_separate_MIT_components
+relationship: rename_first_preserve_first_candidate
+adoption_status: integrity_and_provenance_reviewed_not_imported
+automatic_update: forbidden
+```
+
+审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容允许直接改名或适配，对 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。公开分发位置、CoTend framework lock 和逐项 adoption 尚未建立，因此本条不是当前代码导入授权。
 
 ## RF01 Superpowers
 

@@ -149,7 +149,6 @@ FORBIDDEN_PUBLIC_PATTERNS = {
     "absolute Windows path": re.compile(r"\b[A-Z]:[\\/]", re.IGNORECASE),
 }
 FORBIDDEN_UNCONFIRMED_PRD_PATTERNS = {
-    "fixed interface-count candidate": re.compile(r"\b5\+1\b", re.IGNORECASE),
     "fixed project-state path": re.compile(r"\.cotend[\\/]", re.IGNORECASE),
     "fixed invocation namespace": re.compile(r"\$cotend:|(?<![\w/])\/cot\b", re.IGNORECASE),
     "fixed plugin and skill bundle": re.compile(
@@ -850,7 +849,7 @@ def owner_document_language_errors(
 
     for required_boundary in (
         "面向产品 owner 的分析、研究、比较、评估和审查说明正文默认使用简体中文",
-        "I6 的规范入口显示名、首发产品表面、安装说明和面向最终用户的产品文档继续使用英文",
+        "首发产品表面、安装说明和面向最终用户的产品文档继续使用英文",
     ):
         if required_boundary not in prd_text:
             errors.append(f"PRD language boundary is missing: {required_boundary}")
@@ -874,6 +873,259 @@ def owner_document_language_errors(
                 f"{path}: owner-facing prose must be predominantly Chinese "
                 f"(cjk={cjk_count}, latin={latin_count})"
             )
+
+    return errors
+
+
+def productization_truth_errors(
+    prd_text: str,
+    clean_room_text: str,
+    coverage_text: str,
+    roadmap_text: str,
+    behavior_standard_text: str,
+    registry_text: str,
+    specs: dict[str, str],
+    journey_text: str,
+    interface_text: str,
+    interface_evidence_text: str | None,
+) -> list[str]:
+    errors: list[str] = []
+
+    exact_prd_metadata = {
+        "productization_source": {"dual-ai"},
+        "productization_default": {"rename_first_preserve_first"},
+        "upstream_adoption_status": {"candidate_reviewed_not_imported"},
+        "interface_design_status": {"unconfirmed"},
+        "stage": {"productization_truth_reconciliation"},
+    }
+    for key, expected in exact_prd_metadata.items():
+        if metadata_values(prd_text, key) != expected:
+            errors.append(f"PRD productization truth mismatch: {key}")
+
+    for required_text in (
+        "默认产品化方法是 `rename-first`、`preserve-first`",
+        "当前没有活动界面基线",
+        "用户原创且由已验证 release 以 Apache-2.0 发布的 dual-ai 内容，可以",
+        "/dual-ai-project-init",
+        "/cotend-project-init",
+    ):
+        if required_text not in prd_text:
+            errors.append(f"PRD is missing rename-first boundary: {required_text}")
+    for stale_text in (
+        "clean-room 独立实现的公开产品",
+        "P2 界面基线已由用户确认",
+        "I6 的规范入口显示名",
+        "当前没有第三方归属声明",
+    ):
+        if stale_text in prd_text:
+            errors.append(f"PRD retains superseded productization text: {stale_text}")
+
+    exact_clean_metadata = {
+        "productization_default": {"rename_first_preserve_first"},
+        "clean_room_scope": {"restricted_unknown_or_private_material"},
+    }
+    for key, expected in exact_clean_metadata.items():
+        if metadata_values(clean_room_text, key) != expected:
+            errors.append(f"source-aware policy metadata mismatch: {key}")
+    for required_text in (
+        "user_owned_upstream_release",
+        "adopted",
+        "adapted",
+        "未列入 adoption 记录",
+        "framework lock",
+    ):
+        if required_text not in clean_room_text:
+            errors.append(f"source-aware policy is missing: {required_text}")
+    for stale_text in (
+        "私有上游只提供抽象理念",
+        "公开版的实现、命名、文案、模板和测试必须从本产品需求重新设计并独立编写",
+        "禁止边看上游文件边逐段改名",
+    ):
+        if stale_text in clean_room_text:
+            errors.append(f"source-aware policy retains superseded rule: {stale_text}")
+
+    if metadata_values(coverage_text, "source_method") != {
+        "user_owned_upstream_release_trace_plus_user_scenarios"
+    }:
+        errors.append("capability coverage source method is not upstream-trace based")
+    if metadata_values(coverage_text, "productization_default") != {
+        "preserve_existing_behavior_before_redesign"
+    }:
+        errors.append("capability coverage does not preserve upstream behavior by default")
+    if "Rename-first productization disposition" not in coverage_text:
+        errors.append("capability coverage lacks rename-first dispositions")
+
+    exact_roadmap_metadata = {
+        "route_type": {"source_aware_rename_first_productization"},
+        "current_phase": {"P2-reconcile-and-map-upstream-productization"},
+    }
+    for key, expected in exact_roadmap_metadata.items():
+        if metadata_values(roadmap_text, key) != expected:
+            errors.append(f"productization roadmap mismatch: {key}")
+    if "直接改名和最小适配是默认起点" not in roadmap_text:
+        errors.append("productization roadmap lacks the confirmed rename-first default")
+
+    expected_mode_line = (
+        "implementation_mode: direct_adoption | rename_only | platform_adaptation | "
+        "external_dependency | independent | mixed | pending"
+    )
+    expected_handoff_line = (
+        "Direct adoption, rename-only adaptation, and platform adaptation may read "
+        "only files named by the adoption record."
+    )
+    for required_text in (expected_mode_line, expected_handoff_line):
+        if required_text not in behavior_standard_text:
+            errors.append(
+                f"behavior standard lacks a rename-first implementation mode: {required_text}"
+            )
+    stale_mode_line = "implementation_mode: direct_adaptation | independent | mixed | pending"
+    if stale_mode_line in behavior_standard_text:
+        errors.append("behavior standard retains the coarse direct-adaptation mode set")
+
+    if (
+        "relationship: primary_user_owned_productization_source_plus_secondary_public_references"
+        not in registry_text
+    ):
+        errors.append("upstream registry does not separate primary and secondary sources")
+    for required_text in (
+        "## UP01 dual-ai 分享包",
+        "role: primary_productization_source",
+        "reviewed_release: 2026.07.11.3",
+        "adoption_status: integrity_and_provenance_reviewed_not_imported",
+    ):
+        if required_text not in registry_text:
+            errors.append(f"upstream registry is missing primary source evidence: {required_text}")
+
+    if len(specs) != len(EXPECTED_CAPABILITIES):
+        errors.append("productization trace check requires all 19 behavior specs")
+    for spec_path, spec_text in specs.items():
+        if metadata_values(spec_text, "upstream_productization_trace") != {"pending"}:
+            errors.append(f"{spec_path}: upstream productization trace must remain pending")
+        if metadata_values(spec_text, "implementation_mode") != {"pending"}:
+            errors.append(f"{spec_path}: implementation mode must remain pending")
+        for required_text in (
+            "user_owned_upstream_release",
+            "files named by an explicitly adopted and integrity-verified upstream release record",
+            "unreleased or private upstream working files",
+        ):
+            if required_text not in spec_text:
+                errors.append(f"{spec_path}: source-aware implementation boundary is missing")
+                break
+
+    exact_journey_metadata = {
+        "status": {"reviewed_pending_user_confirmation"},
+        "interface_design_status": {"unconfirmed"},
+        "revalidation_reason": {"rename_first_upstream_surface_not_mapped"},
+    }
+    for key, expected in exact_journey_metadata.items():
+        if metadata_values(journey_text, key) != expected:
+            errors.append(f"novice journey revalidation metadata mismatch: {key}")
+
+    exact_interface_metadata = {
+        "status": {"reviewed_pending_user_confirmation"},
+        "recommendation_status": {"pending_user_confirmation"},
+        "interface_design_status": {"unconfirmed"},
+        "revalidation_reason": {"existing_dual_ai_surface_was_not_mapped_first"},
+    }
+    for key, expected in exact_interface_metadata.items():
+        if metadata_values(interface_text, key) != expected:
+            errors.append(f"interface reopening metadata mismatch: {key}")
+    for required_text in (
+        "historical candidate evidence",
+        "current default is to map and rename the existing surface first",
+    ):
+        if required_text not in interface_text:
+            errors.append(f"interface reopening explanation is missing: {required_text}")
+    if interface_evidence_text is None:
+        errors.append("historical interface evidence is missing")
+    else:
+        if metadata_values(interface_evidence_text, "authority") != {
+            "historical_candidate_evidence_only"
+        }:
+            errors.append("interface evidence still appears to grant current authority")
+        if metadata_values(interface_evidence_text, "current_interface_authority") != {"none"}:
+            errors.append("interface evidence current authority must be none")
+
+    return errors
+
+
+def local_recovery_truth_errors(status_text: str, plan_text: str) -> list[str]:
+    errors: list[str] = []
+
+    exact_status = {
+        "productization_default": {"rename_first_preserve_first"},
+        "framework_release_candidate": {"dual_ai_share_2026_07_11_3"},
+        "framework_release_adoption": {"not_adopted"},
+        "interface_authority": {"none_pending_upstream_surface_mapping"},
+    }
+    for key, expected in exact_status.items():
+        if metadata_values(status_text, key) != expected:
+            errors.append(f"local STATUS productization truth mismatch: {key}")
+
+    exact_plan = {
+        "productization_default": {"rename_first_preserve_first"},
+    }
+    for key, expected in exact_plan.items():
+        if metadata_values(plan_text, key) != expected:
+            errors.append(f"local plan productization truth mismatch: {key}")
+
+    status_leaves = metadata_values(status_text, "current_next_leaf")
+    plan_leaves = metadata_values(plan_text, "current_next_leaf")
+    active_nodes = metadata_values(plan_text, "active_node")
+    if len(status_leaves) != 1 or status_leaves != plan_leaves:
+        errors.append(
+            f"local active leaf drift: STATUS={sorted(status_leaves)} "
+            f"PLAN={sorted(plan_leaves)}"
+        )
+        return errors
+    if active_nodes != plan_leaves:
+        errors.append(
+            f"local active node drift: NODE={sorted(active_nodes)} "
+            f"LEAF={sorted(plan_leaves)}"
+        )
+        return errors
+
+    current_leaf = next(iter(plan_leaves))
+    active_leaf_path = ROOT / "PROJECT-PLAN-NODES" / f"{current_leaf}.md"
+    if not active_leaf_path.exists():
+        errors.append(f"local active leaf document is missing: {current_leaf}")
+        return errors
+    active_leaf_text = active_leaf_path.read_text(encoding="utf-8")
+    if metadata_values(active_leaf_text, "route_state") != {"active"}:
+        errors.append(f"local active leaf route state is not active: {current_leaf}")
+
+    governing_decisions = metadata_values(plan_text, "governing_decision")
+    activation_decisions = metadata_values(active_leaf_text, "activation_decision")
+    if len(governing_decisions) != 1 or governing_decisions != activation_decisions:
+        errors.append("local plan governing decision does not match active leaf activation")
+
+    current_stages = metadata_values(plan_text, "current_stage")
+    if len(current_stages) != 1:
+        errors.append(f"local plan must identify one current stage: {sorted(current_stages)}")
+        return errors
+    current_stage = next(iter(current_stages))
+    stage_path = ROOT / "PROJECT-PLAN-NODES" / f"{current_stage}.md"
+    if not stage_path.exists():
+        errors.append(f"local current stage document is missing: {current_stage}")
+        return errors
+    stage_text = stage_path.read_text(encoding="utf-8")
+    if metadata_values(stage_text, "active_leaf") != plan_leaves:
+        errors.append("local current stage does not point to the plan's active leaf")
+
+    understanding_match = re.search(
+        r"^\s*expanded:\s*(\S+)\s*$", stage_text, re.MULTILINE
+    )
+    if understanding_match is None:
+        errors.append("local current stage lacks an expanded understanding link")
+        return errors
+    understanding_path = ROOT / understanding_match.group(1)
+    if not understanding_path.exists():
+        errors.append("local current-stage understanding document is missing")
+        return errors
+    understanding_text = understanding_path.read_text(encoding="utf-8")
+    understanding_leaves = metadata_values(understanding_text, "current_leaf")
+    if understanding_leaves and understanding_leaves != plan_leaves:
+        errors.append("local current-stage understanding points to a different active leaf")
 
     return errors
 
@@ -1033,6 +1285,7 @@ def main() -> int:
 
     interface_path = "docs/INTERFACE-CANDIDATE-EVALUATION.md"
     interface_text = ""
+    evidence_text: str | None = None
     if interface_path not in candidates:
         errors.append("interface candidate evaluation is missing or ignored")
     else:
@@ -1052,13 +1305,29 @@ def main() -> int:
             )
         )
 
+    errors.extend(
+        productization_truth_errors(
+            prd_text,
+            read("docs/CLEAN-ROOM-POLICY.md"),
+            read("docs/CAPABILITY-COVERAGE.md"),
+            read("docs/PRODUCTIZATION-ROADMAP.md"),
+            read("docs/BEHAVIOR-SPECIFICATION-STANDARD.md"),
+            read(upstream_registry_path),
+            spec_texts,
+            journey_text,
+            interface_text,
+            evidence_text,
+        )
+    )
+
     status_path = ROOT / "STATUS.md"
     plan_path = ROOT / "PROJECT-PLAN-TREE.md"
     if status_path.exists() and plan_path.exists():
-        status_leaves = metadata_values(read("STATUS.md"), "current_next_leaf")
-        plan_leaves = metadata_values(read("PROJECT-PLAN-TREE.md"), "current_next_leaf")
-        if len(status_leaves) != 1 or status_leaves != plan_leaves:
-            errors.append(f"local active leaf drift: STATUS={sorted(status_leaves)} PLAN={sorted(plan_leaves)}")
+        errors.extend(
+            local_recovery_truth_errors(read("STATUS.md"), read("PROJECT-PLAN-TREE.md"))
+        )
+    elif status_path.exists() or plan_path.exists():
+        errors.append("local recovery truth requires both STATUS and PROJECT-PLAN-TREE")
 
     understanding_index = ROOT / "PROJECT-UNDERSTANDING" / "README.md"
     if understanding_index.exists() and "active_route:" in understanding_index.read_text(encoding="utf-8"):

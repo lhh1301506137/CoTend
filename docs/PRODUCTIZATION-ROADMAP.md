@@ -1,134 +1,126 @@
-# CoTend Productization Roadmap
+# CoTend 产品化路线
 
 ```yaml
 status: active_user_confirmed
 authority: product_owner_confirmed
 product_baseline_version: 0.1.0
-route_type: clean_room_productization
-current_phase: P2-design-novice-product-surface
+route_type: source_aware_rename_first_productization
+current_phase: P2-reconcile-and-map-upstream-productization
 ```
 
-## Productization Route
+## 路线原则
 
-CoTend uses this clean-room sequence:
+CoTend 不从零重做一个“更小白”的 dual-ai。默认路线是：
 
-> inventory proven behavior -> translate it into novice user outcomes -> write public clean-room contracts -> validate the smallest architecture -> implement platform adapters -> prove behavior -> package and release -> promote with evidence.
+> 固定可重建 release -> 核对来源与权利 -> 盘点现有入口和角色 -> 最小改名与公开清理 -> 验证行为等价 -> 只对证据支持的问题做产品改进 -> 完成安装与发布产品化。
 
-## Phases
+19 类能力和行为契约是覆盖与验收护栏，不是强制重写清单。外部框架只在出现具体问题时提供二级候选做法，不按多数投票决定 CoTend。
 
-### P0 - Establish The Product Baseline
+## 阶段
 
-- Verify the market gap and avoid unsupported uniqueness claims.
-- Build full capability coverage before freezing commands or architecture.
-- Keep interface, architecture, state layout, and delivery choices unconfirmed until behavioral evidence supports them.
+### P0 - 确认产品基线
 
-Gate: completed by public product baseline `0.1.0`, which defines the root goal, full-product capability coverage, MVP proof journey, and this route.
+- 确认 CoTend 是开发框架而不是示例应用。
+- 确认目标用户、Codex 首发、英文产品表面、Apache-2.0 和独立仓库。
+- 确认完整产品不能静默丢失 19 类治理能力。
 
-### P1 - Extract Clean-Room Behavioral Specifications
+Gate：已完成。根目标和 MVP 成功定义仍然有效。
 
-- Use `BEHAVIOR-SPECIFICATION-STANDARD.md` as the canonical contract and provenance format.
-- Use `BEHAVIOR-SPEC-INDEX.md` to preserve C01-C19 coverage and dependency order.
-- Describe each capability from user need and observable behavior.
-- Record triggers, outputs, state, failure modes, authority, evidence, and tests.
-- Maintain a provenance ledger for concepts, dependencies, licenses, and independent implementation.
-- Exclude private wording, templates, paths, personal defaults, and Trellis artifacts.
-- Freeze approved public behavior specifications before implementation, then use a new implementation context that does not read private upstream or restricted source files.
-- Review implementation for unexplained structural or textual similarity before accepting each slice.
+### P1 - 建立行为覆盖护栏
 
-Gate: every retained capability has a public-safe contract and provenance disposition.
+- 用 C01-C19 描述用户可观察结果、停止边界、证据、恢复和验收。
+- 保持平台与架构中立，使直接改名和后续改进都能验证能力没有丢失。
+- 记录外部来源和受限材料边界。
 
-### P2 - Design The Novice Product Surface
+Gate：行为契约已全部获得用户确认。它们不再被解释为必须独立重写 upstream。
 
-- Define the first-run journey, everyday continuation, interruption, recovery, acceptance, and advanced paths.
-- Use plain English and progressive disclosure.
-- Derive commands, automatic triggers, aliases, and menus from user journeys.
-- Choose interface count, names, and invocation only after journey testing.
-- Compare pinned public reference implementations before architecture selection, while keeping observed patterns separate from product authority.
-- Treat the confirmed semantic catalog and the physical Skill/command/package layout as separate decisions.
+### P2 - 校准并映射产品化母体
 
-Gate: target users can predict what to invoke and understand every stop or outcome without reading code.
+- 固定 dual-ai 候选 release 的 ID、tag、commit、tree 和 manifest。
+- 逐项区分用户原创、许可第三方、外部运行依赖、平台能力、参考和受限/未知材料。
+- 盘点当前 Codex Skills：哪些是用户入口、内部委派、共享治理核心、进阶入口和第三方伴随能力。
+- 为每项能力选择直接采用、改名适配、延后、拒绝或需要用户决定。
+- 修正此前建立在“不够小白”假设上的 PRD、clean-room、旅程、I6、架构和状态结论。
 
-### P3 - Validate The Minimum Architecture
+Gate：所有活动产品文档采用 rename-first/preserve-first 基线，旧候选不再具有实现权威，CoTend adoption 方案可供确认。
 
-- Choose the smallest platform-neutral governance core that satisfies the behavioral specs.
-- Use [`REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md`](REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md) as bounded evidence, not as a template or majority vote.
-- Derive project-owned state from recovery and audit needs.
-- Select runtime, packaging, shared-core, and state-layout boundaries from behavioral evidence.
-- Define adapter boundaries for Codex first without hard-coding Codex into product truth.
-- Decide which semantic destinations need physical top-level Skills, whether hooks are necessary, and which truth must survive disable or uninstall.
-- Validate generated-file ownership, update conflict handling, repair, migration, and removal before choosing an installation channel.
+### P3 - 验证最小产品增量与精确界面
 
-Gate: architecture decisions trace to required behavior and have negative tests and migration boundaries.
+- 先构造“尽量直接改名”的精确映射候选。
+- 区分可见入口和内部 Auto Mode，不把内部分类暴露成用户必须选择的多个入口。
+- 用用户真实 dual-ai 情境验证名称、发现方式、自然语言、菜单和错误恢复。
+- 只有直接改名在发现性、平台能力、来源许可或完整旅程上失败时，才提出合并、拆分或新增入口。
+- 从实际 upstream 结构验证最小打包、共享规则、项目状态和适配器边界。
 
-### P4 - Build One Trustworthy Vertical Slice
+Gate：用户确认精确入口映射和最小架构；每项偏离 upstream 的设计都有明确问题与证据。
 
-- Implement the first proof journey defined in `CAPABILITY-COVERAGE.md`.
-- Use Codex as the first adapter and development channel.
-- Exercise initialization, one delegated slice, a human stop, evidence reporting, acceptance, and cross-session resume.
-- Dogfood CoTend on its own development where that does not contaminate public artifacts.
+### P4 - 构建第一个产品化切片
 
-Gate: the complete journey works on deterministic fixtures and at least one real local downstream project.
+- 从已采用 release 导入最小用户原创/许可文件集。
+- 完成 CoTend 改名、公开清理、来源记录和 Codex 载体适配。
+- 证明初始化/恢复、一个受控开发切片、人类停止、证据、验收和跨会话恢复。
+- 验证行为等价、负向边界和不相关文件保护。
 
-### P5 - Complete The Retained Capability Set
+Gate：确定性 fixtures 和至少一个真实本地项目都完成端到端验证。
 
-- Add diagnosis, deeper review, quality protection, intent and Done Gates, model-role lifecycle, handoff, and release behavior.
-- Keep advanced behavior progressively loaded rather than exposed as mandatory novice process.
-- Do not ship visible placeholder commands.
+### P5 - 完成保留能力与差异改进
 
-Gate: every public promise has positive, blocked, failure, and stop-boundary evidence.
+- 补齐首切片未覆盖的诊断、质量保护、模型角色、handoff、框架学习和发布行为。
+- 保持高级能力按场景出现，不新增只有名称没有完整行为的占位入口。
+- 对每个 upstream 偏离记录原因、验证、回滚和迁移。
 
-### P6 - Productize Installation And Lifecycle
+Gate：每个公开承诺都有 success、blocked、failure 和 stop-boundary 证据。
 
-- Implement install, update, repair, migration, disable, and uninstall.
-- Preserve project truth across product updates or removal.
-- Validate marketplace, prompt-assisted installation, and CLI options against actual platform capabilities and novice usability.
-- Make every write and external download transparent before execution.
+### P6 - 产品化安装与生命周期
 
-Gate: a new user can install and recover safely without prior Git, npm, or repository knowledge on the supported path.
+- 实现安装、启用、更新、修复、迁移、禁用和卸载。
+- 保证项目真相在产品更新和移除后仍可恢复。
+- 根据实际 Codex 能力验证 plugin、Skill 包、提示式安装或其他载体，不预先固定渠道。
+- 在执行前说明下载、写入、权限、保留状态和回滚。
 
-### P7 - Cross-Platform Adaptation
+Gate：目标用户无需先掌握 Git、包管理器或仓库结构即可安全完成支持路径。
 
-- Port the proven core to Claude and later supported tools through adapters.
-- Maintain a semantic conformance suite so adapters do not fork governance behavior.
-- Document unavoidable platform differences honestly.
+### P7 - 跨平台适配
 
-Gate: each adapter passes the same behavior contracts or explicitly declares unsupported capabilities.
+- 在 Codex 路径获得证据后适配 Claude 等平台。
+- 用同一行为合规套件防止平台适配器分叉产品语义。
+- 如实披露平台不可用能力和替代 handoff。
 
-### P8 - Release Hardening And Open-Source Launch
+Gate：每个适配器通过相同行为契约或明确列出不支持项。
 
-- Run license, provenance, privacy, secret, path, terminology, and clean-room audits.
-- Obtain independent review for security-sensitive and license-sensitive claims.
-- Prepare public documentation, examples, contribution policy, support boundaries, and release artifacts.
-- Require explicit user approval before push, publication, marketplace submission, or deployment.
+### P8 - 发布收紧与开源
 
-Gate: release evidence supports every public claim and no private upstream material is distributed.
+- 复核 framework lock、adoption、许可证、NOTICE、来源、隐私、密钥、路径和公开声明。
+- 验证安装包、升级、卸载、状态保留和干净环境行为。
+- 准备用户文档、示例、贡献政策、支持边界和 release artifacts。
+- push、发布和 marketplace 提交前取得用户明确批准。
 
-### P9 - Promotion And Feedback
+Gate：发布证据支持每项公开声明，且没有私人、受限或未采用材料进入产品。
 
-- Lead with the novice problem and demonstrated acceptance journey, not framework internals.
-- Publish a short real-project demonstration and comparison grounded in observable behavior.
-- Collect onboarding failures and target-user interviews.
-- Feed repeated failures into product improvements through a reviewed upstream-learning process.
+### P9 - 推广与证据反馈
 
-Gate: product changes are driven by evidence from target users, not feature-count competition.
+- 用真实项目演示“不读代码也能掌握方向、证据、停止和验收”。
+- 不把内部机制数量作为主要卖点。
+- 收集安装、发现、恢复和验收失败；只有重复或高影响证据才改变默认流程。
+- upstream 新 release 通过同一锁定、比较、adoption 和验证流程进入 CoTend。
 
-## What Remains Directly Confirmed
+Gate：产品变化由用户证据驱动，而不是为了与竞品不同而变化。
 
-- Product and repository name: CoTend.
-- Independent public repository with clean-room separation.
-- Private source material remains outside the repository, implementation context, and release artifacts.
-- CoTend is a development framework loaded into AI coding tools, not a sample application.
-- Target user: a person who builds with AI but does not rely on reading code.
-- Initial public language: English.
-- Initial platform focus: Codex, while core product semantics remain platform-neutral.
-- License: Apache-2.0, subject to dependency and provenance compatibility review before release.
+## 当前已确认
 
-## Unconfirmed Design Questions
+- CoTend 是用户自有 dual-ai 框架的产品化产品。
+- dual-ai 已经足够小白化，直接改名和最小适配是默认起点。
+- 19 类行为能力必须保留，但不要求重写实现。
+- 外部框架只是二级参考。
+- 用户原创和许可允许的 release 内容可按 adoption 记录复用；受限、未知和私人材料必须隔离。
+- Codex 首发、英文产品表面、Apache-2.0 自有内容和独立公开仓库继续有效。
 
-- The physical mapping of the confirmed semantic catalog to Skills, commands, menus, automatic triggers, and packages on each host.
-- Requiring every advanced capability to appear as a first-release visible command.
-- Runtime, packaging, adapter, and shared-core boundaries.
-- The exact project-state storage layout.
-- Installation-channel sequencing.
+## 尚未确认
 
-These candidates may survive revalidation. They are not implementation authority until they trace to the confirmed capability and user-journey baseline.
+- dual-ai 当前 Skills 到 CoTend 的精确命名与可见/内部角色映射。
+- 首个 release 实际导入的文件和第三方伴随 Skill 处置。
+- 物理 Skill 数量、package/plugin 载体、共享规则边界和运行时。
+- 项目状态的最小物理布局。
+- 安装渠道与公开发布顺序。
+
+这些问题只在 P2 adoption 映射和 P3 真实情境验证后确认。

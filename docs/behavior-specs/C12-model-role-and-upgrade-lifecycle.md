@@ -27,6 +27,8 @@ architecture_neutral: true
 source_review_id: SR-C12-001
 source_review_status: verified
 public_safety_review: passed
+upstream_productization_trace: pending
+implementation_mode: pending
 ```
 
 ## 1. User Problem
@@ -288,6 +290,7 @@ provenance:
     - docs/behavior-specs/C13-context-and-handoff-portability.md
     - docs/behavior-specs/C17-adaptive-workflow-depth.md
   source_classes_considered:
+    - user_owned_upstream_release
     - user_owned_original
     - permissive_external
     - copyleft_or_restricted
@@ -304,10 +307,11 @@ provenance:
   public_external_sources: []
   implementation_allowlist:
     - this approved specification
+    - files named by an explicitly adopted and integrity-verified upstream release record
     - active C03, C04, C06, C07, C08, C13, and C17 contracts
     - confirmed public product contracts
   implementation_denylist:
-    - private upstream files
+    - unreleased or private upstream working files
     - restricted-source files
     - raw intake artifacts
     - restricted provenance ledger

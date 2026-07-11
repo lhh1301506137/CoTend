@@ -14,7 +14,7 @@ implementation_allowed: false
 
 ## Purpose
 
-This index assigns every confirmed CoTend capability to one clean-room behavior specification and orders extraction by behavioral dependency. Waves control specification and review order, not public command grouping, runtime architecture, source layout, or release packaging.
+This index assigns every confirmed CoTend capability to one source-audited behavior specification and orders it by behavioral dependency. The specifications protect behavior during direct upstream adaptation as well as independent implementation; waves do not select commands, runtime architecture, source layout, or release packaging.
 
 ## Extraction Rules
 
@@ -24,7 +24,7 @@ This index assigns every confirmed CoTend capability to one clean-room behavior 
 - The first proof journey is fully specified before support, advanced, and distribution waves.
 - Work may run in parallel only when listed dependencies are active and the specifications do not own the same unresolved shared rule.
 - Each wave ends with consistency review and user confirmation of material behavior before dependent implementation may use it.
-- An individual contract remains non-implementable until its status is `active_user_confirmed` and a clean implementation handoff exists.
+- An individual contract remains non-implementable until its status is `active_user_confirmed` and a source-aware handoff plus adoption/input manifest exists.
 
 ## Wave Plan
 
@@ -91,11 +91,11 @@ W4 and W5 remain part of the confirmed full product. They are sequenced later be
 |---|---|
 | Coverage | C01-C19 are unique, complete, and linked to the confirmed capability baseline. |
 | Dependency | No unexplained cycle exists and every dependency has a behavioral reason. |
-| Clean-room | Each spec has a resolvable verified source review, passed public-safety review, public-safe provenance summary, and implementation allowlist. |
+| Source and rights | Each spec has a resolvable source review, passed public-safety review, public-safe provenance summary, and adoption-driven implementation boundary. |
 | Product authority | Material user promises and stop boundaries are user-confirmed by wave. |
 | Architecture neutrality | No contract silently selects an interface count, packaging layers, state layout, or installation channel. |
 | Verification | Each spec defines deterministic normal, negative, stop, interruption, and recovery evidence as applicable. |
 
 ## Current Wave
 
-All C01-C19 behavior contracts are active and user-confirmed. C16 completes the W5 platform delivery lifecycle baseline for safe install, enable, update, repair, migration, disable, uninstall, and recovery behavior without selecting a channel or package design. The next product stage may derive novice journeys and minimum design from these contracts, but product implementation remains blocked until the relevant design decisions are revalidated and a clean implementation handoff exists.
+All C01-C19 behavior contracts are active and user-confirmed. They now act as coverage and acceptance guardrails for rename-first productization. Product implementation remains blocked until the dual-ai release is mapped into a CoTend adoption/input manifest and the minimum interface, carrier, state, and installation differences are confirmed.

@@ -1,8 +1,8 @@
 # CoTend Interface Candidate Evaluation
 
 ```yaml
-status: active_user_confirmed
-authority: derived_from_active_public_journeys_and_official_platform_evidence
+status: reviewed_pending_user_confirmation
+authority: historical_candidate_evidence_pending_rename_first_revalidation
 product_baseline_version: 0.1.0
 phase: P2_design_novice_product_surface
 public_language: en
@@ -10,8 +10,9 @@ launch_platform: Codex
 platform_evidence_date: 2026-07-11
 recommendation_candidate: I6
 recommendation_strategy: layered_common_prefix
-recommendation_status: active_user_confirmed
-interface_design_status: baseline_user_confirmed
+recommendation_status: pending_user_confirmation
+interface_design_status: unconfirmed
+revalidation_reason: existing_dual_ai_surface_was_not_mapped_first
 architecture_design_status: unconfirmed
 project_state_layout_status: unconfirmed
 distribution_design_status: unconfirmed
@@ -34,7 +35,7 @@ This document compares interface strategies for CoTend after the novice journeys
 
 CoTend is the product: a reusable AI development governance framework. Software developed with CoTend remains a downstream project or test fixture. An interface candidate succeeds only when a person can find the right governed behavior, predict the next result, and recognize a user-only stop without reading code or framework internals.
 
-The user has confirmed this recommendation as the P2 interface baseline. It is not an implementation contract.
+The user previously confirmed this recommendation, then reopened it after a real dual-ai initialization flow showed that the evaluation confused a visible entry with internal recovery routing. It is historical candidate evidence, not the current interface baseline or an implementation contract.
 
 ## Evidence Boundary
 
@@ -101,11 +102,11 @@ Candidates that pass the hard gates are compared on these evidence dimensions:
 | I3 | One visible entry for each of the six journey classes | Mirrors the journey model and covers ordinary work. | A generic `Advanced` entry is too broad, while requiring a `Change` entry could make ordinary interruption feel command-gated. | Use the journey map, but split only meaningful advanced paths and keep ordinary interruption available in language. |
 | I4 | A fixed six-entry capability menu | Familiar compact command count. | Capability grouping leaves change, recovery, release, delivery, and learning coverage unclear or overloaded. | Reject as the baseline; individual names may survive only if they pass the journey map. |
 | I5 | Every retained capability as a visible entry | Maximum literal coverage. | Overloads the novice surface, increases description truncation risk, and creates placeholders before later phases are implemented. | Reject. |
-| I6 | Full common-prefixed explicit entries, platform search, tested natural language, and later aliases | Provides searchable discovery, explicit recovery, ordinary-language convenience, and one semantic contract. | Requires routing tests and strict prevention of duplicate alias behavior. | Recommend, user confirmed. |
+| I6 | Full common-prefixed explicit entries, platform search, tested natural language, and later aliases | Provides searchable discovery, explicit recovery, ordinary-language convenience, and one semantic contract. | Requires routing tests and strict prevention of duplicate alias behavior. | Recommend only as a historical candidate pending rename-first revalidation. |
 
-## Confirmed Candidate: Layered Common Prefix
+## Historical Candidate: Layered Common Prefix
 
-The confirmed candidate is `layered_common_prefix`.
+The previously confirmed and now reopened candidate is `layered_common_prefix`.
 
 ### Layer 1: Full Explicit Entries
 
@@ -137,7 +138,7 @@ The confirmed candidate is `layered_common_prefix`.
 
 ## Candidate Entry Catalog
 
-The catalog below is the confirmed P2 interface baseline, not an enabled-command commitment. An adapter may expose an entry only after its complete behavior is implemented. There is no generic `CoTend Advanced` entry because it would hide materially different boundaries.
+The catalog below is the frozen historical I6 catalog, not an active baseline or enabled-command commitment. It remains available for comparison after the current dual-ai surface is mapped. There is no generic `CoTend Advanced` entry in this candidate because it would hide materially different boundaries.
 
 <!-- interface-catalog-start -->
 
@@ -183,7 +184,7 @@ The catalog below is the confirmed P2 interface baseline, not an enabled-command
 4. Require all 24 frozen entry selections and all 24 decision flags to match.
 5. Trial natural-language routing with the same fixtures and no answer key.
 6. Add a short or translated alias only after it passes the same corpus plus collision cases.
-7. Freeze the user-confirmed interface baseline before P3 architecture validation or implementation.
+7. Do not reactivate any interface baseline before comparing the least-change dual-ai rename map against these fixtures and real user flows.
 
 ## Interface Fixture Protocol
 
@@ -261,11 +262,11 @@ The evaluator runs used fresh ephemeral, read-only Codex contexts and received o
 | v4 | Distinguished conflicting confirmed goals from a missing safe checkpoint. | 24/24 | 16/16 | Pass. |
 | v5 | Added boundary-complete descriptions and public-safe evidence after formal review. | 24/24 | 16/16 | Pass. |
 
-The v5 result supported submitting the recommendation for user review. The user has now confirmed the recommendation; this evidence still does not prove runtime routing behavior.
+The v5 result supported the historical recommendation and remains valid for that frozen packet. Later user evidence reopened the recommendation; this evidence does not prove runtime routing behavior or superiority over direct upstream renaming.
 
-## Confirmed Interface Baseline
+## Historical Confirmation And Reopening
 
-The user confirmed this candidate strategy:
+The user previously confirmed this candidate strategy:
 
 1. Use full English canonical entries first.
 2. Give every explicit entry the common `CoTend` display prefix and `cotend-` Codex skill prefix.
@@ -275,7 +276,7 @@ The user confirmed this candidate strategy:
 6. Keep five ordinary entries concise and use specific contextual entries instead of a generic advanced command.
 7. Enable only behavior that is complete; never ship a placeholder entry.
 
-This confirmation activates the catalog and layering strategy as the P2 interface baseline. It does not select runtime architecture, state layout, packaging, installation, implementation, or which entries are enabled in the first implementation slice.
+That historical confirmation is retained for auditability. It was later reopened when a real dual-ai flow showed that one visible initialization entry can route internally across start, update, repair, resume, and conflict handling. The current default is to map and rename the existing surface first; I6 may be reconsidered only if that least-change option fails a named user or platform requirement.
 
 ## Non-Decisions
 

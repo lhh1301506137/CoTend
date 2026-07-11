@@ -2,6 +2,8 @@
 
 ```yaml
 status: executed_public_safe
+authority: historical_candidate_evidence_only
+current_interface_authority: none
 evidence_id: interface_evaluation_v5
 evaluation_date: 2026-07-11
 source_document: docs/INTERFACE-CANDIDATE-EVALUATION.md
