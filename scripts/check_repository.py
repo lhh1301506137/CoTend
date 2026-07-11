@@ -15,6 +15,10 @@ EXPECTED_NOVICE_STATUSES = {
     "reviewed_pending_user_confirmation",
     "active_user_confirmed",
 }
+EXPECTED_INTERFACE_DESIGN_STATUSES = {
+    "unconfirmed",
+    "baseline_user_confirmed",
+}
 EXPECTED_JOURNEY_RESULTS = [
     "success",
     "blocked",
@@ -52,6 +56,9 @@ EXPECTED_NOVICE_FIXTURES = {
 EXPECTED_NOVICE_PROMPT_SHA256 = "6852cad0c78a44e33b7f784e107165e6a59cb7f4afd04a52732d4efc4a3ba0f7"
 EXPECTED_INTERFACE_GATES = [f"H{number}" for number in range(1, 9)]
 EXPECTED_INTERFACE_CANDIDATES = [f"I{number}" for number in range(1, 7)]
+EXPECTED_CONFIRMED_INTERFACE_CATALOG_SHA256 = (
+    "0136eba98238743d9780f428a7acff03a26a8e211ebfb795ee0c68f754a20091"
+)
 EXPECTED_INTERFACE_DESTINATIONS = {
     "start": ("core", ("first", "confirmed", "route")),
     "continue": ("core", ("already current", "failure", "bounded", "verified")),
@@ -90,16 +97,16 @@ EXPECTED_PLATFORM_CLAIMS = [f"P{number:02d}" for number in range(1, 10)]
 # checker-self-scan-allowlist-start
 LOCAL_ONLY_PATHS = {
     "STATUS.md",
-    "REVIEW-LOG.md",
-    "QUALITY-SIGNALS.md",
-    "PROJECT-DECISION-LOG.md",
-    "PROJECT-KNOWLEDGE-CHANGELOG.md",
-    "PROJECT-PLAN-TREE.md",
     "PROJECT-PLAN-NODES",
-    "PROJECT-UNDERSTANDING",
+    "REVIEW-LOG.md",
     "docs/COMMAND-CONTRACTS.md",
+    "QUALITY-SIGNALS.md",
+    "PROJECT-UNDERSTANDING",
+    "PROJECT-DECISION-LOG.md",
     "docs/V1-ARCHITECTURE.md",
+    "PROJECT-KNOWLEDGE-CHANGELOG.md",
     "docs/PROJECT-STATE-CONTRACT.md",
+    "PROJECT-PLAN-TREE.md",
 }
 FORBIDDEN_PUBLIC_PATTERNS = {
     "private upstream identifier": re.compile(r"\bstartskills\b", re.IGNORECASE),
@@ -225,8 +232,14 @@ def novice_journey_errors(journey_text: str) -> list[str]:
         if journey_text.count(f"<!-- {marker} -->") != 1:
             errors.append(f"novice journey marker must appear exactly once: {marker}")
 
+    interface_design_statuses = metadata_values(journey_text, "interface_design_status")
+    if (
+        len(interface_design_statuses) != 1
+        or interface_design_statuses - EXPECTED_INTERFACE_DESIGN_STATUSES
+    ):
+        errors.append("novice journeys interface_design_status is not allowed")
+
     for key in (
-        "interface_design_status",
         "architecture_design_status",
         "project_state_layout_status",
         "distribution_design_status",
@@ -433,8 +446,6 @@ def interface_candidate_errors(
         "phase": {"P2_design_novice_product_surface"},
         "public_language": {"en"},
         "launch_platform": {"Codex"},
-        "recommendation_status": {"pending_user_confirmation"},
-        "interface_design_status": {"unconfirmed"},
         "architecture_design_status": {"unconfirmed"},
         "project_state_layout_status": {"unconfirmed"},
         "distribution_design_status": {"unconfirmed"},
@@ -449,6 +460,63 @@ def interface_candidate_errors(
     for key, expected in exact_metadata.items():
         if metadata_values(interface_text, key) != expected:
             errors.append(f"interface evaluation metadata mismatch: {key}")
+
+    lifecycle = next(iter(statuses), "") if len(statuses) == 1 else ""
+    expected_authority_state = {
+        "draft_for_review": ("pending_user_confirmation", "unconfirmed"),
+        "reviewed_pending_user_confirmation": (
+            "pending_user_confirmation",
+            "unconfirmed",
+        ),
+        "active_user_confirmed": (
+            "active_user_confirmed",
+            "baseline_user_confirmed",
+        ),
+    }.get(lifecycle)
+    if expected_authority_state is not None:
+        recommendation_status, interface_design_status = expected_authority_state
+        if metadata_values(interface_text, "recommendation_status") != {
+            recommendation_status
+        }:
+            errors.append("interface recommendation authority does not match lifecycle")
+        if metadata_values(interface_text, "interface_design_status") != {
+            interface_design_status
+        }:
+            errors.append("interface design authority does not match lifecycle")
+
+    if lifecycle == "active_user_confirmed":
+        if metadata_values(interface_text, "recommendation_candidate") != {"I6"}:
+            errors.append("active interface baseline must preserve confirmed candidate I6")
+        if metadata_values(interface_text, "recommendation_strategy") != {
+            "layered_common_prefix"
+        }:
+            errors.append(
+                "active interface baseline must preserve the confirmed strategy"
+            )
+        if metadata_values(interface_text, "interface_catalog_sha256") != {
+            EXPECTED_CONFIRMED_INTERFACE_CATALOG_SHA256
+        }:
+            errors.append("active interface baseline catalog differs from user confirmation")
+        for required_text in (
+            "The user has confirmed this recommendation as the P2 interface baseline.",
+            "## Confirmed Interface Baseline",
+            "Recommend, user confirmed.",
+        ):
+            if required_text not in interface_text:
+                errors.append(
+                    f"active interface baseline is missing confirmation text: {required_text}"
+                )
+        for stale_text in (
+            "candidate awaiting user confirmation",
+            "Recommend, pending user confirmation.",
+            "subject to user confirmation",
+            "The user is being asked to confirm",
+            "does not activate the recommendation",
+        ):
+            if stale_text in interface_text:
+                errors.append(
+                    f"active interface baseline retains pending text: {stale_text}"
+                )
 
     recommendation_candidates = metadata_values(interface_text, "recommendation_candidate")
     recommendation_strategies = metadata_values(interface_text, "recommendation_strategy")
@@ -618,6 +686,37 @@ def interface_candidate_errors(
     return errors
 
 
+def interface_authority_errors(
+    interface_text: str,
+    journey_text: str,
+    prd_text: str,
+    interface_path: str,
+) -> list[str]:
+    errors: list[str] = []
+    interface_design_status = metadata_values(interface_text, "interface_design_status")
+    for source_path, source_text in (
+        ("docs/NOVICE-JOURNEYS.md", journey_text),
+        ("docs/PRODUCT-PRD.md", prd_text),
+    ):
+        if metadata_values(source_text, "interface_design_status") != (
+            interface_design_status
+        ):
+            errors.append(f"interface design authority drift: {source_path}")
+
+    if interface_design_status == {"baseline_user_confirmed"}:
+        if metadata_values(prd_text, "interface_baseline") != {interface_path}:
+            errors.append("PRD must link the active interface baseline")
+        if metadata_values(prd_text, "stage") != {"novice_product_surface_design"}:
+            errors.append("PRD stage must match the active P2 interface baseline")
+        if re.search(
+            r"公开入口.{0,20}架构.{0,20}状态布局.{0,20}安装渠道.{0,40}另行决定",
+            prd_text,
+        ):
+            errors.append("PRD retains stale unconfirmed-interface prose")
+
+    return errors
+
+
 def checker_self_scan_errors(checker_text: str) -> list[str]:
     errors: list[str] = []
     starts = list(
@@ -726,7 +825,6 @@ def main() -> int:
 
     prd_text = read("docs/PRODUCT-PRD.md")
     for key in (
-        "interface_design_status",
         "architecture_design_status",
         "project_state_layout_status",
         "distribution_design_status",
@@ -764,6 +862,7 @@ def main() -> int:
         errors.extend(novice_journey_errors(journey_text))
 
     interface_path = "docs/INTERFACE-CANDIDATE-EVALUATION.md"
+    interface_text = ""
     if interface_path not in candidates:
         errors.append("interface candidate evaluation is missing or ignored")
     else:
@@ -772,6 +871,16 @@ def main() -> int:
         evidence_path = next(iter(evidence_paths), "") if len(evidence_paths) == 1 else ""
         evidence_text = read(evidence_path) if evidence_path in candidates else None
         errors.extend(interface_candidate_errors(interface_text, journey_text, evidence_text))
+
+    if interface_text:
+        errors.extend(
+            interface_authority_errors(
+                interface_text,
+                journey_text,
+                prd_text,
+                interface_path,
+            )
+        )
 
     status_path = ROOT / "STATUS.md"
     plan_path = ROOT / "PROJECT-PLAN-TREE.md"

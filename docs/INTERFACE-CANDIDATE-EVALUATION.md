@@ -1,7 +1,7 @@
 # CoTend Interface Candidate Evaluation
 
 ```yaml
-status: reviewed_pending_user_confirmation
+status: active_user_confirmed
 authority: derived_from_active_public_journeys_and_official_platform_evidence
 product_baseline_version: 0.1.0
 phase: P2_design_novice_product_surface
@@ -10,8 +10,8 @@ launch_platform: Codex
 platform_evidence_date: 2026-07-11
 recommendation_candidate: I6
 recommendation_strategy: layered_common_prefix
-recommendation_status: pending_user_confirmation
-interface_design_status: unconfirmed
+recommendation_status: active_user_confirmed
+interface_design_status: baseline_user_confirmed
 architecture_design_status: unconfirmed
 project_state_layout_status: unconfirmed
 distribution_design_status: unconfirmed
@@ -34,7 +34,7 @@ This document compares interface strategies for CoTend after the novice journeys
 
 CoTend is the product: a reusable AI development governance framework. Software developed with CoTend remains a downstream project or test fixture. An interface candidate succeeds only when a person can find the right governed behavior, predict the next result, and recognize a user-only stop without reading code or framework internals.
 
-The recommendation in this document is a candidate awaiting user confirmation. It is not an implementation contract.
+The user has confirmed this recommendation as the P2 interface baseline. It is not an implementation contract.
 
 ## Evidence Boundary
 
@@ -101,11 +101,11 @@ Candidates that pass the hard gates are compared on these evidence dimensions:
 | I3 | One visible entry for each of the six journey classes | Mirrors the journey model and covers ordinary work. | A generic `Advanced` entry is too broad, while requiring a `Change` entry could make ordinary interruption feel command-gated. | Use the journey map, but split only meaningful advanced paths and keep ordinary interruption available in language. |
 | I4 | A fixed six-entry capability menu | Familiar compact command count. | Capability grouping leaves change, recovery, release, delivery, and learning coverage unclear or overloaded. | Reject as the baseline; individual names may survive only if they pass the journey map. |
 | I5 | Every retained capability as a visible entry | Maximum literal coverage. | Overloads the novice surface, increases description truncation risk, and creates placeholders before later phases are implemented. | Reject. |
-| I6 | Full common-prefixed explicit entries, platform search, tested natural language, and later aliases | Provides searchable discovery, explicit recovery, ordinary-language convenience, and one semantic contract. | Requires routing tests and strict prevention of duplicate alias behavior. | Recommend, pending user confirmation. |
+| I6 | Full common-prefixed explicit entries, platform search, tested natural language, and later aliases | Provides searchable discovery, explicit recovery, ordinary-language convenience, and one semantic contract. | Requires routing tests and strict prevention of duplicate alias behavior. | Recommend, user confirmed. |
 
-## Recommended Candidate: Layered Common Prefix
+## Confirmed Candidate: Layered Common Prefix
 
-The preferred candidate is `layered_common_prefix`, subject to user confirmation.
+The confirmed candidate is `layered_common_prefix`.
 
 ### Layer 1: Full Explicit Entries
 
@@ -137,7 +137,7 @@ The preferred candidate is `layered_common_prefix`, subject to user confirmation
 
 ## Candidate Entry Catalog
 
-The catalog below is an interface recommendation, not an enabled-command commitment. An adapter may expose an entry only after its complete behavior is implemented. There is no generic `CoTend Advanced` entry because it would hide materially different boundaries.
+The catalog below is the confirmed P2 interface baseline, not an enabled-command commitment. An adapter may expose an entry only after its complete behavior is implemented. There is no generic `CoTend Advanced` entry because it would hide materially different boundaries.
 
 <!-- interface-catalog-start -->
 
@@ -183,7 +183,7 @@ The catalog below is an interface recommendation, not an enabled-command commitm
 4. Require all 24 frozen entry selections and all 24 decision flags to match.
 5. Trial natural-language routing with the same fixtures and no answer key.
 6. Add a short or translated alias only after it passes the same corpus plus collision cases.
-7. Confirm the interface with the user before P3 architecture validation or implementation.
+7. Freeze the user-confirmed interface baseline before P3 architecture validation or implementation.
 
 ## Interface Fixture Protocol
 
@@ -261,11 +261,11 @@ The evaluator runs used fresh ephemeral, read-only Codex contexts and received o
 | v4 | Distinguished conflicting confirmed goals from a missing safe checkpoint. | 24/24 | 16/16 | Pass. |
 | v5 | Added boundary-complete descriptions and public-safe evidence after formal review. | 24/24 | 16/16 | Pass. |
 
-The v5 result supports submitting the recommendation for user review. It does not activate the recommendation or prove runtime routing behavior.
+The v5 result supported submitting the recommendation for user review. The user has now confirmed the recommendation; this evidence still does not prove runtime routing behavior.
 
-## Recommendation Decision Packet
+## Confirmed Interface Baseline
 
-The user is being asked to confirm or revise this candidate strategy:
+The user confirmed this candidate strategy:
 
 1. Use full English canonical entries first.
 2. Give every explicit entry the common `CoTend` display prefix and `cotend-` Codex skill prefix.
@@ -275,13 +275,12 @@ The user is being asked to confirm or revise this candidate strategy:
 6. Keep five ordinary entries concise and use specific contextual entries instead of a generic advanced command.
 7. Enable only behavior that is complete; never ship a placeholder entry.
 
-Confirming the recommendation would authorize an interface contract in a later checkpoint. It would not select runtime architecture, state layout, packaging, installation, or implementation.
+This confirmation activates the catalog and layering strategy as the P2 interface baseline. It does not select runtime architecture, state layout, packaging, installation, implementation, or which entries are enabled in the first implementation slice.
 
 ## Non-Decisions
 
-This evaluation does not confirm:
+This evaluation and the user's interface confirmation do not confirm:
 
-- the recommendation or any entry name;
 - which entries are enabled in the first implementation slice;
 - whether implicit invocation is implemented by one router, several skills, project instructions, or another adapter mechanism;
 - a plugin, shared core, runtime, state schema, package, marketplace, or installation channel;

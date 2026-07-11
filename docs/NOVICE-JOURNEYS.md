@@ -7,7 +7,7 @@ product_baseline_version: 0.1.0
 phase: P2_design_novice_product_surface
 audience: people_who_build_with_ai_without_reading_code
 public_language: en
-interface_design_status: unconfirmed
+interface_design_status: baseline_user_confirmed
 architecture_design_status: unconfirmed
 project_state_layout_status: unconfirmed
 distribution_design_status: unconfirmed
