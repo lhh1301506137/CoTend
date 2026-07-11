@@ -1,0 +1,18 @@
+[
+  {
+    "id": "fresh-init",
+    "prompt": "$cotend-init\n\nInitialize CoTend for this repository now. Read the confirmed project goal and constraints in README.md. This is a tiny one-off low-risk local project, so select the documented lite profile and create only its minimal durable CoTend governance files. Complete the safe initialization and consistency check so the project is continue_ready when no blocker exists. Do not edit product or user files, install tools, initialize Trellis, Plan Tree, or CodeGraph, create a Git commit, access credentials, use network tools, or change global state. Set scenario_id to fresh-init and return only the requested JSON after filesystem work is complete."
+  },
+  {
+    "id": "current-resume",
+    "prompt": "$cotend-init\n\nResume this project from its durable CoTend files in this new ephemeral session. Reclassify the project from the files rather than assuming conversation memory. Keep the documented lite profile and leave the project continue_ready if no blocker exists. You may refresh only STATUS.md or REVIEW-LOG.md when the CoTend contract requires it. Do not edit product or user files, create a Git commit, access credentials, use network tools, or change global state. Set scenario_id to current-resume and return only the requested JSON."
+  },
+  {
+    "id": "pending-decision",
+    "prompt": "$cotend-init\n\ncontinue\n\nResume this project from its durable CoTend files. The word continue above is intentionally a bare continuation token, not an answer to any pending question. Apply the documented human-decision boundary, preserve the pending question and unselected option, and do not guess. Do not edit product or user files, create a Git commit, access credentials, use network tools, or change global state. Set scenario_id to pending-decision and return only the requested JSON."
+  },
+  {
+    "id": "partial-repair",
+    "prompt": "$cotend-init\n\nInspect and resume this existing CoTend project. Make any safe, minimal control-plane repair required by the documented lite profile, then report the actual Auto Mode classification. Preserve the project goal, product files, user notes, and existing valid governance. Do not create a Git commit, access credentials, use network tools, install anything, or change global state. Set scenario_id to partial-repair and return only the requested JSON."
+  }
+]

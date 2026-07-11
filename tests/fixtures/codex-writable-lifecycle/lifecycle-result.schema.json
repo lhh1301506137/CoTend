@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "scenario_id": {
+      "type": "string",
+      "enum": [
+        "fresh-init",
+        "current-resume",
+        "pending-decision",
+        "partial-repair"
+      ]
+    },
+    "invoked_skill": {"type": "string", "enum": ["cotend-init"]},
+    "auto_mode": {
+      "type": "string",
+      "enum": [
+        "fresh_init",
+        "legacy_update",
+        "partial_repair",
+        "current_resume",
+        "blocked_human_decision"
+      ]
+    },
+    "readiness": {
+      "type": "string",
+      "enum": ["continue_ready", "review_pending", "human_needed", "done_gate"]
+    },
+    "adoption_profile": {
+      "type": "string",
+      "enum": ["lite", "standard", "full"]
+    },
+    "durable_files_created": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "durable_files_updated": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "protected_product_files_modified": {"type": "boolean"},
+    "git_commit_created": {"type": "boolean"},
+    "pending_question_id": {"type": ["string", "null"]},
+    "bare_continue_answered_question": {"type": ["boolean", "null"]},
+    "selected_option": {"type": ["string", "null"]},
+    "repair_applied": {"type": ["boolean", "null"]},
+    "summary": {"type": "string"}
+  },
+  "required": [
+    "scenario_id",
+    "invoked_skill",
+    "auto_mode",
+    "readiness",
+    "adoption_profile",
+    "durable_files_created",
+    "durable_files_updated",
+    "protected_product_files_modified",
+    "git_commit_created",
+    "pending_question_id",
+    "bare_continue_answered_question",
+    "selected_option",
+    "repair_applied",
+    "summary"
+  ],
+  "additionalProperties": false
+}

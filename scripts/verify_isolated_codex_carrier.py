@@ -98,8 +98,10 @@ def protected_global_snapshot() -> dict[str, Any]:
     return {
         "user_agent_skills": metadata_snapshot(home / ".agents" / "skills"),
         "codex_skills": metadata_snapshot(codex_home / "skills"),
-        "codex_config": metadata_snapshot(codex_home / "config.toml"),
-        # Stat only: the harness must never open or hash credential contents.
+        # Stat only: the harness must never open or hash config or credential contents.
+        "codex_config_stat": metadata_snapshot(
+            codex_home / "config.toml", contents=False
+        ),
         "codex_auth_stat": metadata_snapshot(codex_home / "auth.json", contents=False),
     }
 
