@@ -1,0 +1,211 @@
+{
+  "schema": "cotend.capability-implementation-map",
+  "schema_version": 1,
+  "status": "adopted_verified",
+  "source_release": "2026.07.11.3",
+  "source_anchor": "dual-ai-share-2026.07.11.3",
+  "target_platform": "Codex",
+  "skill_set_path": "codex-skills/",
+  "capability_count": 19,
+  "capabilities": [
+    {
+      "capability_id": "C01",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "mixed",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-project-init/SKILL.md",
+        "codex-skills/cotend-collaboration/references/idea-to-consensus.md",
+        "codex-skills/grill-me/SKILL.md"
+      ]
+    },
+    {
+      "capability_id": "C02",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-init/SKILL.md",
+        "codex-skills/cotend-project-init/SKILL.md",
+        "codex-skills/cotend-collaboration/SKILL.md"
+      ]
+    },
+    {
+      "capability_id": "C03",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-project-init/SKILL.md",
+        "codex-skills/cotend-collaboration/references/plan-tree.md",
+        "codex-skills/cotend-collaboration/references/templates.md"
+      ]
+    },
+    {
+      "capability_id": "C04",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-collaboration/references/plan-tree.md",
+        "codex-skills/cotend-collaboration/references/goal-completion.md"
+      ]
+    },
+    {
+      "capability_id": "C05",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-collaboration/SKILL.md",
+        "codex-skills/cotend-collaboration/references/continuous-and-unattended.md"
+      ]
+    },
+    {
+      "capability_id": "C06",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-collaboration/references/authority-and-triggers.md",
+        "codex-skills/cotend-collaboration/references/risk-and-approval.md"
+      ]
+    },
+    {
+      "capability_id": "C07",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-collaboration/SKILL.md",
+        "codex-skills/cotend-collaboration/references/acceptance-test-harness.md",
+        "codex-skills/cotend-collaboration/references/templates.md"
+      ]
+    },
+    {
+      "capability_id": "C08",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-collaboration/references/review-and-self-review.md",
+        "codex-skills/cotend-collaboration/references/quality-sentinel.md"
+      ]
+    },
+    {
+      "capability_id": "C09",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-diagnose-only/SKILL.md",
+        "codex-skills/cotend-collaboration/SKILL.md"
+      ]
+    },
+    {
+      "capability_id": "C10",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-collaboration/references/ai-uat.md",
+        "codex-skills/cotend-collaboration/references/acceptance-test-harness.md"
+      ]
+    },
+    {
+      "capability_id": "C11",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-collaboration/references/goal-completion.md",
+        "codex-skills/cotend-collaboration/references/plan-tree.md"
+      ]
+    },
+    {
+      "capability_id": "C12",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-model-upgrade/SKILL.md",
+        "codex-skills/cotend-model-upgrade/references/packet-templates.md",
+        "codex-skills/cotend-collaboration/references/authority-and-triggers.md"
+      ]
+    },
+    {
+      "capability_id": "C13",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-model-upgrade/references/packet-templates.md",
+        "codex-skills/cotend-collaboration/references/templates.md"
+      ]
+    },
+    {
+      "capability_id": "C14",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-collaboration/references/upstream-dependency-review.md",
+        "codex-skills/cotend-collaboration/references/framework-change-evaluation.md"
+      ]
+    },
+    {
+      "capability_id": "C15",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-collaboration/references/release-hardening.md",
+        "codex-skills/cotend-collaboration/references/risk-and-approval.md"
+      ]
+    },
+    {
+      "capability_id": "C16",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "mixed",
+      "coverage_status": "mapped_partial",
+      "owners": [
+        "codex-skills/cotend-init/SKILL.md",
+        "codex-skills/cotend-project-init/SKILL.md",
+        "codex-skills/cotend-collaboration/references/release-hardening.md"
+      ],
+      "deferred_gap": "live install, update, uninstall, rollback, Plugin and Marketplace carriers remain outside L20"
+    },
+    {
+      "capability_id": "C17",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "platform_adaptation",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-collaboration/references/framework-change-evaluation.md",
+        "codex-skills/cotend-collaboration/references/authority-and-triggers.md"
+      ]
+    },
+    {
+      "capability_id": "C18",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "mixed",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/karpathy-guidelines/SKILL.md",
+        "codex-skills/cotend-collaboration/references/skill-authoring-quality-gate.md",
+        "codex-skills/cotend-collaboration/SKILL.md"
+      ]
+    },
+    {
+      "capability_id": "C19",
+      "upstream_productization_trace": "mapped",
+      "implementation_mode": "mixed",
+      "coverage_status": "mapped",
+      "owners": [
+        "codex-skills/cotend-project-init/SKILL.md",
+        "codex-skills/cotend-collaboration/references/code-context-harness.md",
+        "codex-skills/cotend-collaboration/references/templates.md"
+      ]
+    }
+  ]
+}

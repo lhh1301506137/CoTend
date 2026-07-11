@@ -46,6 +46,10 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
     release_anchor = candidate.get("release_anchor")
     if not isinstance(release_anchor, dict):
         return ["candidate release_anchor must be an object"]
+    if candidate.get("status") != "adopted_verified":
+        errors.append("candidate record is not finalized as adopted")
+    if role_map.get("status") != "adopted_verified":
+        errors.append("role map is not finalized as adopted")
     tag = release_anchor.get("tag")
     if not isinstance(tag, str):
         return ["candidate release tag is missing"]
@@ -113,11 +117,15 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
         return errors + ["candidate Skill tree maps are invalid"]
     for platform, trees in (("codex", codex_trees), ("claude", claude_trees)):
         for skill_id, expected_tree in trees.items():
-            actual_tree = git_text(
-                upstream_repo,
-                "rev-parse",
-                f"{tag}:{PACKAGE_ROOT}/{platform}-skills/{skill_id}",
-            )
+            try:
+                actual_tree = git_text(
+                    upstream_repo,
+                    "rev-parse",
+                    f"{tag}:{PACKAGE_ROOT}/{platform}-skills/{skill_id}",
+                )
+            except subprocess.CalledProcessError as exc:
+                errors.append(f"cannot resolve {platform} Skill tree {skill_id}: {exc}")
+                continue
             if actual_tree != expected_tree:
                 errors.append(f"{platform} Skill tree mismatch: {skill_id}")
 
@@ -204,15 +212,46 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
             if marker not in skill_text:
                 errors.append(f"tagged Skill role marker missing: {skill_id}: {marker}")
 
-    if (ROOT / "upstream" / "framework.lock.json").exists():
-        errors.append("final framework lock exists before actual adoption")
+    adoption = candidate.get("adoption")
+    lock_path = ROOT / "upstream" / "framework.lock.json"
+    if not isinstance(adoption, dict) or adoption.get("state") != "adopted":
+        errors.append("candidate adoption state is not adopted")
+    elif not lock_path.is_file():
+        errors.append("adopted candidate is missing the final framework lock")
+    else:
+        try:
+            framework_lock = load_json(lock_path)
+        except (OSError, ValueError) as exc:
+            errors.append(f"cannot load final framework lock: {exc}")
+        else:
+            if framework_lock.get("release_id") != candidate.get("release_id"):
+                errors.append("framework lock release does not match candidate")
+            source_release = framework_lock.get("source_release")
+            if not isinstance(source_release, dict):
+                errors.append("framework lock source release is invalid")
+            else:
+                for key in ("tag", "tag_object", "release_commit", "package_tree"):
+                    if source_release.get(key) != release_anchor.get(key):
+                        errors.append(f"framework lock source release mismatch: {key}")
+            if framework_lock.get("source_skill_trees") != codex_trees:
+                errors.append("framework lock Skill trees do not match candidate")
+            if framework_lock.get("adoption_anchor") != {
+                "type": "containing_commit",
+                "path": "upstream/framework.lock.json",
+            }:
+                errors.append("framework lock containing-commit anchor mismatch")
+            boundaries = framework_lock.get("delivery_boundaries")
+            if not isinstance(boundaries, dict):
+                errors.append("framework lock delivery boundaries are invalid")
+            elif boundaries.get("live_install_performed") is not False:
+                errors.append("framework lock incorrectly claims a live install")
 
     return errors
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Verify CoTend's candidate and role map against tagged upstream Git objects."
+        description="Verify CoTend's adopted release records against tagged upstream Git objects."
     )
     parser.add_argument("--upstream-repo", type=Path, required=True)
     parser.add_argument(

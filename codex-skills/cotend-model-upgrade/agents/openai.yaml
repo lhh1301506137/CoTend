@@ -1,0 +1,4 @@
+interface:
+  display_name: "CoTend Model Upgrade"
+  short_description: "Premium model project handoff"
+  default_prompt: "Use $cotend-model-upgrade v1.7 to prepare an intent-and-consensus-first premium-model packet, include PROJECT-UNDERSTANDING expanded docs, PROJECT-DECISION-LOG user/grill/advisor decisions, and PROJECT-KNOWLEDGE-CHANGELOG audit entries when present, build or refresh takeover-ready baseline context and context manifest, classify model_role_decision for advisor-only, trial, confirmed primary, or rollback/downgrade cases, require off-map evidence and non-mutating verification, handle packet completeness before dependent advice, ask the premium model for an if-I-take-over value proposal, run advisor-guided review or primary takeover, trigger FRAMEWORK-THINNING-REVIEW.md only for user-confirmed takeover-ready new primary models, consolidate guidance back into executable development, and support milestone re-entry with MILESTONE-REPORT.md."

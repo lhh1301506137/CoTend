@@ -1,8 +1,8 @@
 {
   "schema": "cotend.framework-candidate",
   "schema_version": 1,
-  "status": "reviewed_not_adopted",
-  "candidate_only": true,
+  "status": "adopted_verified",
+  "candidate_only": false,
   "verified_at": "2026-07-12",
   "release_id": "2026.07.11.3",
   "previous_release": "2026.07.11.2",
@@ -69,19 +69,83 @@
       "check": "CoTend_tagged_candidate_and_role_verifier",
       "evidence_type": "executed",
       "result": "passed_release_2026.07.11.3_codex_7_claude_3"
+    },
+    {
+      "check": "CoTend_adopted_skill_set_pre_lock_verifier",
+      "evidence_type": "executed",
+      "result": "passed_7_skills_30_files_19_capabilities"
+    },
+    {
+      "check": "official_skill_creator_quick_validate",
+      "evidence_type": "executed",
+      "result": "passed_7_of_7"
+    },
+    {
+      "check": "CoTend_adopted_skill_set_final_precommit_verifier",
+      "evidence_type": "executed",
+      "result": "passed_allow_uncommitted_containing_commit_anchor"
+    },
+    {
+      "check": "CoTend_adopted_skill_set_negative_mutations",
+      "evidence_type": "executed",
+      "result": "passed_11_of_11_mutations_rejected"
+    },
+    {
+      "check": "CoTend_containing_commit_lifecycle_ratchet",
+      "evidence_type": "executed",
+      "result": "passed_initial_and_later_head_lock_only_update_rejected"
+    },
+    {
+      "check": "CoTend_verifier_edge_cases",
+      "evidence_type": "executed",
+      "result": "duplicate_mapping_rejected_missing_tree_reported"
+    },
+    {
+      "check": "CoTend_protected_third_party_blob_and_eol_policy",
+      "evidence_type": "executed",
+      "result": "four_blobs_match_tag_and_text_eol_lf_enforced"
     }
   ],
   "adoption": {
-    "state": "not_adopted",
-    "imported_files": [],
-    "adapted_files": [],
-    "final_framework_lock_exists": false,
-    "required_before_lock": [
-      "reviewed_role_map",
-      "resolved_user_owned_decisions",
-      "approved_file_level_adoption_record",
-      "CoTend_specific_compatibility_evidence",
-      "committed_CoTend_adaptations"
-    ]
+    "state": "adopted",
+    "source_carrier": "codex-skills/",
+    "imported_files": [
+      "codex-skills/grill-me/SKILL.md",
+      "codex-skills/karpathy-guidelines/SKILL.md"
+    ],
+    "adapted_files": [
+      "codex-skills/cotend-collaboration/SKILL.md",
+      "codex-skills/cotend-collaboration/agents/openai.yaml",
+      "codex-skills/cotend-collaboration/references/acceptance-test-harness.md",
+      "codex-skills/cotend-collaboration/references/ai-uat.md",
+      "codex-skills/cotend-collaboration/references/authority-and-triggers.md",
+      "codex-skills/cotend-collaboration/references/code-context-harness.md",
+      "codex-skills/cotend-collaboration/references/continuous-and-unattended.md",
+      "codex-skills/cotend-collaboration/references/decision-log.md",
+      "codex-skills/cotend-collaboration/references/framework-change-evaluation.md",
+      "codex-skills/cotend-collaboration/references/goal-completion.md",
+      "codex-skills/cotend-collaboration/references/idea-to-consensus.md",
+      "codex-skills/cotend-collaboration/references/plan-tree.md",
+      "codex-skills/cotend-collaboration/references/quality-sentinel.md",
+      "codex-skills/cotend-collaboration/references/release-hardening.md",
+      "codex-skills/cotend-collaboration/references/review-and-self-review.md",
+      "codex-skills/cotend-collaboration/references/risk-and-approval.md",
+      "codex-skills/cotend-collaboration/references/skill-authoring-quality-gate.md",
+      "codex-skills/cotend-collaboration/references/templates.md",
+      "codex-skills/cotend-collaboration/references/upstream-dependency-review.md",
+      "codex-skills/cotend-diagnose-only/SKILL.md",
+      "codex-skills/cotend-diagnose-only/agents/openai.yaml",
+      "codex-skills/cotend-init/SKILL.md",
+      "codex-skills/cotend-init/agents/openai.yaml",
+      "codex-skills/cotend-model-upgrade/SKILL.md",
+      "codex-skills/cotend-model-upgrade/agents/openai.yaml",
+      "codex-skills/cotend-model-upgrade/references/packet-templates.md",
+      "codex-skills/cotend-project-init/SKILL.md",
+      "codex-skills/cotend-project-init/agents/openai.yaml"
+    ],
+    "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
+    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption",
+    "final_framework_lock_exists": true,
+    "required_before_lock": []
   }
 }

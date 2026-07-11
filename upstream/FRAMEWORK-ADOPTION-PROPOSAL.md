@@ -1,8 +1,8 @@
-# dual-ai release 2026.07.11.3 产品化采用提案
+# dual-ai release 2026.07.11.3 产品化采用记录
 
 ```yaml
-status: reviewed_pending_user_confirmation
-authority: productization_proposal
+status: adopted_verified
+authority: adopted_productization_record
 candidate_release: 2026.07.11.3
 candidate_record: upstream/FRAMEWORK-CANDIDATE.json
 role_map: upstream/CODEX-SKILL-ROLE-MAP.json
@@ -11,8 +11,8 @@ role_layer_decision: product_owner_confirmed
 user_owned_skill_name_status: user_confirmed
 MIT_companion_bundling_status: user_confirmed
 codex_skill_set_decisions_status: complete
-adoption_state: not_adopted
-final_framework_lock_exists: false
+adoption_state: adopted
+final_framework_lock_exists: true
 analysis_language: zh-CN
 ```
 
@@ -26,7 +26,7 @@ analysis_language: zh-CN
 4. `diagnose-only` 和 `dual-model-upgrade` 是情境/进阶能力。
 5. `grill-me` 和 `karpathy-guidelines` 是 MIT 伴随 Skill，不拥有产品生命周期或项目真相。
 
-用户已确认保留这套分层，确认五个用户原创 Skill 分别命名为 `cotend-init`、`cotend-project-init`、`cotend-collaboration`、`cotend-diagnose-only` 和 `cotend-model-upgrade`，并确认 Codex 首发包直接内置 `grill-me` 与 `karpathy-guidelines`。这不重新建立 I6 十入口目录，也不把内部角色提升为日常入口；实际文件 adoption、适配、安装载体和发布仍需后续授权与验证。
+用户已确认保留这套分层，确认五个用户原创 Skill 分别命名为 `cotend-init`、`cotend-project-init`、`cotend-collaboration`、`cotend-diagnose-only` 和 `cotend-model-upgrade`，并确认 Codex 首发源树直接内置 `grill-me` 与 `karpathy-guidelines`。仓库内 7 个 Skill、30 个文件现已按该决定采用并验证。这不重新建立 I6 十入口目录，也不把内部角色提升为日常入口；live 安装、Plugin/Marketplace、Claude 载体和发布仍需后续授权与验证。
 
 ## 候选 release 证据
 
@@ -42,19 +42,19 @@ analysis_language: zh-CN
 | Package walkthrough | `executed: passed` | 7 Codex、3 Claude、66 来源覆盖文件和 3 个负向来源测试通过。 |
 | 发布者身份 | `not authenticated` | 可证明内容身份，不能证明远端发布者密码学身份。 |
 
-机器可读证据见 [`FRAMEWORK-CANDIDATE.json`](FRAMEWORK-CANDIDATE.json)。它是 candidate record，不是 framework lock。
+机器可读来源证据见 [`FRAMEWORK-CANDIDATE.json`](FRAMEWORK-CANDIDATE.json)，最终采用锚点见 [`framework.lock.json`](framework.lock.json)。
 
 ## Codex Skill 角色映射
 
-| Upstream Skill | 真实角色 | 当前用户可见性 | 提议处置 | CoTend 名称状态 |
+| Upstream Skill | 真实角色 | 当前用户可见性 | 最终处置 | CoTend 名称状态 |
 |---|---|---|---|---|
 | `dual-ai-init` | 统一入口 | 默认入口 | `adapted` + `rename_only` | 已确认 `cotend-init`。 |
 | `dual-ai-project-init` | 内部 Auto Mode 引擎 | 委派为主，显式调用仅作 fallback | `adapted` + `platform_adaptation` | 已确认 `cotend-project-init`。 |
 | `dual-ai-collaboration` | 共享治理核心 | 隐式核心；审查等情境可显式进入 | `adapted` + `platform_adaptation` | 已确认 `cotend-collaboration`。 |
 | `diagnose-only` | 只读诊断 | 自然语言优先的情境入口 | `adapted` + `platform_adaptation` | 已确认 `cotend-diagnose-only`。 |
 | `dual-model-upgrade` | 模型顾问/试用/接手/回退/复诊生命周期 | 进阶显式入口 | `adapted` + `platform_adaptation` | 已确认 `cotend-model-upgrade`。 |
-| `grill-me` | 一次一问的需求澄清伴随 Skill | 内部情境调用，可选显式 | 提议 `adopted` + `direct_adoption` | 已确认随包内置，保留第三方身份与 MIT 归属。 |
-| `karpathy-guidelines` | AI 编码纪律伴随 Skill | 隐式内部规则 | 提议 `adopted` + `direct_adoption` | 已确认随包内置，保留第三方身份与 MIT 归属。 |
+| `grill-me` | 一次一问的需求澄清伴随 Skill | 内部情境调用，可选显式 | `adopted` + `direct_adoption` | 已按原名内置，保留第三方身份与 MIT 归属。 |
+| `karpathy-guidelines` | AI 编码纪律伴随 Skill | 隐式内部规则 | `adopted` + `direct_adoption` | 已按原名内置，保留第三方身份与 MIT 归属。 |
 
 完整机器映射见 [`CODEX-SKILL-ROLE-MAP.json`](CODEX-SKILL-ROLE-MAP.json)。
 
@@ -87,7 +87,7 @@ analysis_language: zh-CN
 - `grill-me` 是 Matt Pocock Skill 的本地改编。
 - `karpathy-guidelines` 与固定 upstream Skill 内容匹配。
 
-按当前固定 commit 的 MIT 声明、包内许可证文本和来源记录，用户已确认两者随 Codex 首发包内置。实施时必须保留各自 MIT 许可证和归属，不能被 CoTend 顶层 Apache-2.0 重新许可。`karpathy-guidelines` 的固定 upstream commit 没有独立 `LICENSE` 文件，当前依据其 Skill frontmatter、README 声明和分享包单独保留的 MIT 文本；首次公开分发前仍需再次复核。该产品决定不等于文件已经复制或 adoption 已完成。
+按当前固定 commit 的 MIT 声明、包内许可证文本和来源记录，两者已随 Codex 仓库源树内置。各自 MIT 许可证和归属已经独立保留，未被 CoTend 顶层 Apache-2.0 重新许可。`karpathy-guidelines` 的固定 upstream commit 没有独立 `LICENSE` 文件，当前依据其 Skill frontmatter、README 声明和分享包单独保留的 MIT 文本；首次公开分发前仍需再次复核。
 
 ### External runtime 与 platform capability
 
@@ -112,7 +112,7 @@ Claude 包只含 3 个 Skill，并明确没有 Codex 的 project-init 引擎。C
 
 这套已确认表面沿用现有框架结构，同时满足统一 `cotend-` 搜索前缀。它不恢复 I6 的十个语义入口，也不把内部恢复分支拆成独立命令。
 
-## Adoption 状态提案
+## Adoption 结果
 
 ```yaml
 candidate_integrity: passed
@@ -123,13 +123,13 @@ user_owned_skill_names: user_confirmed
 MIT_companion_bundling: user_confirmed
 codex_skill_set_decisions: complete
 final_names_confirmed: yes
-proposed_adapted_candidates:
+adapted_skills:
   - dual-ai-init
   - dual-ai-project-init
   - dual-ai-collaboration
   - diagnose-only
   - dual-model-upgrade
-proposed_adopted_candidates:
+adopted_skills:
   - grill-me
   - karpathy-guidelines
 needs_user_decision: []
@@ -138,16 +138,16 @@ deferred:
   - physical package/plugin carrier
   - final project-state layout
 rejected: []
-compatibility_evidence: candidate_integrity_tagged_role_verifier_and_static_mapping_only
-resulting_CoTend_commit: pending
-framework_lock: forbidden_until_adaptation_and_verification_commit
+compatibility_evidence: tagged_integrity_role_mapping_adopted_skill_verifier_and_official_skill_validation
+resulting_CoTend_commit: containing_commit
+framework_lock: upstream/framework.lock.json
 ```
 
-这里的 `final_names_confirmed` 只确认五个用户原创 Skill ID，以及第三方 Skill 如被采用时必须保留原身份。`physical_skill_count_confirmed` 只确认仓库内 Codex 技能源集合固定为 7 个目录；它不确认 live 安装、Plugin/Marketplace 载体、文件导入或 adoption 已完成。
+这里的 `final_names_confirmed` 确认五个用户原创 Skill ID，以及两个第三方 Skill 保留原身份。仓库内 Codex 技能源集合已采用为 7 个目录、30 个文件；它不确认 live 安装或 Plugin/Marketplace 载体。
 
-## 正式 lock 创建门
+## 正式 lock 创建结果
 
-现在不得创建 `upstream/framework.lock.json`。它只能在以下条件同时满足时出现：
+`upstream/framework.lock.json` 已在以下条件同时满足后创建：
 
 1. 所有用户决策已关闭。
 2. 文件级 adoption 清单已批准。
@@ -162,8 +162,8 @@ framework_lock: forbidden_until_adaptation_and_verification_commit
 
 - CoTend 改名后的真实 Codex 触发、委派和菜单发现行为。
 - 干净环境安装、更新、修复、卸载和回滚。
-- MIT Skill 是随包安装还是作为前置/可选依赖更适合目标用户。
+- 两个 MIT Skill 在最终安装载体中的交付与更新体验。
 - Claude 适配的等价性。
 - 远端公开发布位置和发布者身份认证。
 
-这些缺口不会阻止候选映射，但会阻止 actual adoption、final lock 和发布。
+这些缺口不再阻止仓库源树 adoption 与 final lock，但会阻止 live 交付完成和公开发布。

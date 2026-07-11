@@ -1,0 +1,15 @@
+CoTend
+Copyright 2026 CoTend contributors
+
+The Apache License, Version 2.0 in LICENSE applies to CoTend-owned files.
+Bundled third-party files are identified in THIRD-PARTY-SOURCES.json.
+
+The package also contains or adapts third-party MIT-licensed Skills. Those
+files remain under MIT and are not relicensed under Apache-2.0. See
+THIRD-PARTY-NOTICES.md and THIRD-PARTY-LICENSES/ for their source,
+modification, attribution, and license terms.
+
+External runtimes, platform capabilities, and reference-only sources listed
+in UPSTREAM-SOURCES.md are not bundled. Their names identify
+interoperability or provenance only and do not imply endorsement or a grant
+of rights beyond their own licenses or platform terms.

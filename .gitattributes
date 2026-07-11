@@ -1,0 +1,5 @@
+# Preserve byte identity for directly adopted third-party files on every platform.
+/codex-skills/grill-me/SKILL.md text eol=lf
+/codex-skills/karpathy-guidelines/SKILL.md text eol=lf
+/THIRD-PARTY-LICENSES/grill-me-MIT.txt text eol=lf
+/THIRD-PARTY-LICENSES/karpathy-guidelines-MIT.txt text eol=lf

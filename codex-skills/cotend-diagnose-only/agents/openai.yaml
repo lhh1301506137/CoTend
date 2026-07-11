@@ -1,0 +1,4 @@
+interface:
+  display_name: "CoTend Diagnose Only"
+  short_description: "Read-only root-cause analysis"
+  default_prompt: "Use $cotend-diagnose-only when the user asks for root-cause analysis before changes, says 只诊断/先别改代码/先别动/先别修/先定位/先查原因/先告诉我为什么, or expresses doubt while withholding edit authorization. Investigate without modifying files, then report reproduction, feedback loop, hypotheses, evidence, likely root cause, and recommended fix route."

@@ -149,6 +149,25 @@ FORBIDDEN_PUBLIC_PATTERNS = {
     "internal authority label": re.compile(r"\bprimary_ai_(?:auto|observed|proposed)\w*", re.IGNORECASE),
     "absolute Windows path": re.compile(r"\b[A-Z]:[\\/]", re.IGNORECASE),
 }
+FRAMEWORK_SOURCE_ALLOWED_PATTERN_LABELS = {
+    "local decision log reference",
+    "internal authority label",
+}
+FORBIDDEN_SKILL_MAINTAINER_PATTERNS = {
+    "personal maintainer profile": re.compile(r"\bthis user's\b", re.IGNORECASE),
+    "machine-specific instruction": re.compile(
+        r"\bon this machine\b|codegraph-mcp\.ps1", re.IGNORECASE
+    ),
+    "private short decision ID": re.compile(r"\bDEC-\d{3}\b"),
+    "private legacy sync version": re.compile(r"\bv1\.50\b", re.IGNORECASE),
+    "private adapter sync layout": re.compile(
+        r"skills-backup|SKILLS-INDEX|command-backups", re.IGNORECASE
+    ),
+    "forced maintainer language": re.compile(
+        r"report in Chinese|written in Chinese|must be Chinese|^\s*language:\s*zh-CN\s*$",
+        re.IGNORECASE | re.MULTILINE,
+    ),
+}
 FORBIDDEN_UNCONFIRMED_PRD_PATTERNS = {
     "fixed project-state path": re.compile(r"\.cotend[\\/]", re.IGNORECASE),
     "fixed invocation namespace": re.compile(r"\$cotend:|(?<![\w/])\/cot\b", re.IGNORECASE),
@@ -784,10 +803,14 @@ def reference_study_errors(study_text: str, registry_text: str) -> list[str]:
         if metadata_values(study_text, key) != expected:
             errors.append(f"reference study metadata mismatch: {key}")
 
-    if metadata_values(registry_text, "implementation_dependency") != {"none"}:
-        errors.append("upstream registry must not declare an implementation dependency")
-    if metadata_values(registry_text, "source_copying") != {"none"}:
-        errors.append("upstream registry must preserve the no-copying boundary")
+    if metadata_values(registry_text, "implementation_dependency") != {
+        "pinned_dual_ai_release_2026_07_11_3"
+    }:
+        errors.append("upstream registry must pin the adopted primary productization source")
+    if metadata_values(registry_text, "source_copying") != {
+        "scoped_5_adapted_plus_2_byte_identical_skills"
+    }:
+        errors.append("upstream registry must record the scoped primary-source adoption")
 
     blocks = list(
         re.finditer(
@@ -861,6 +884,7 @@ def owner_document_language_errors(
         "UPSTREAM-SOURCES.md",
         "upstream/FRAMEWORK-ADOPTION-PROPOSAL.md",
         "upstream/FRAMEWORK-ADOPTION-PLAN.md",
+        "FRAMEWORK-CHANGE-EVAL.md",
     )
     for path in expected_analysis_paths:
         text = analysis_documents.get(path)
@@ -888,6 +912,7 @@ def productization_truth_errors(
     roadmap_text: str,
     behavior_standard_text: str,
     registry_text: str,
+    capability_map_text: str,
     specs: dict[str, str],
     journey_text: str,
     interface_text: str,
@@ -898,9 +923,10 @@ def productization_truth_errors(
     exact_prd_metadata = {
         "productization_source": {"dual-ai"},
         "productization_default": {"rename_first_preserve_first"},
-        "upstream_adoption_status": {"candidate_reviewed_not_imported"},
+        "upstream_adoption_status": {"adopted_verified_repository_source"},
         "interface_design_status": {"unconfirmed"},
-        "stage": {"productization_truth_reconciliation"},
+        "interface_revalidation_reason": {"live_codex_discovery_not_validated"},
+        "stage": {"codex_skill_source_adopted_live_delivery_pending"},
     }
     for key, expected in exact_prd_metadata.items():
         if metadata_values(prd_text, key) != expected:
@@ -908,10 +934,11 @@ def productization_truth_errors(
 
     for required_text in (
         "默认产品化方法是 `rename-first`、`preserve-first`",
-        "当前没有活动界面基线",
+        "仓库 Codex Skill 的 7 目录分层",
+        "当前没有经 live Codex 验证的活动调用界面基线",
         "用户原创且由已验证 release 以 Apache-2.0 发布的 dual-ai 内容，可以",
-        "/dual-ai-project-init",
-        "/cotend-project-init",
+        "ready_for_repository_source_implementation: yes",
+        "ready_for_live_delivery: no",
     ):
         if required_text not in prd_text:
             errors.append(f"PRD is missing rename-first boundary: {required_text}")
@@ -961,7 +988,7 @@ def productization_truth_errors(
 
     exact_roadmap_metadata = {
         "route_type": {"source_aware_rename_first_productization"},
-        "current_phase": {"P2-reconcile-and-map-upstream-productization"},
+        "current_phase": {"P4-repository-source-slice"},
     }
     for key, expected in exact_roadmap_metadata.items():
         if metadata_values(roadmap_text, key) != expected:
@@ -995,23 +1022,52 @@ def productization_truth_errors(
         "## UP01 dual-ai 分享包",
         "role: primary_productization_source",
         "reviewed_release: 2026.07.11.3",
-        "adoption_status: product_disposition_confirmed_not_imported",
+        "adoption_status: repository_source_adopted_verified",
         "candidate_record: upstream/FRAMEWORK-CANDIDATE.json",
         "codex_role_map: upstream/CODEX-SKILL-ROLE-MAP.json",
         "adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md",
         "adoption_plan: upstream/FRAMEWORK-ADOPTION-PLAN.md",
-        "final_framework_lock: not_created",
+        "capability_map: upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
+        "adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption",
+        "final_framework_lock: upstream/framework.lock.json",
     ):
         if required_text not in registry_text:
             errors.append(f"upstream registry is missing primary source evidence: {required_text}")
 
+    try:
+        capability_map = json.loads(capability_map_text)
+    except json.JSONDecodeError as exc:
+        capability_map = {}
+        errors.append(f"capability implementation map JSON is invalid: {exc}")
+    capability_entries = capability_map.get("capabilities")
+    modes_by_id: dict[str, str] = {}
+    if capability_map.get("status") != "adopted_verified":
+        errors.append("capability implementation map is not finalized")
+    if not isinstance(capability_entries, list):
+        errors.append("capability implementation map entries are invalid")
+    else:
+        for entry in capability_entries:
+            if not isinstance(entry, dict):
+                continue
+            capability_id = entry.get("capability_id")
+            mode = entry.get("implementation_mode")
+            if isinstance(capability_id, str) and isinstance(mode, str):
+                modes_by_id[capability_id] = mode
+        if set(modes_by_id) != EXPECTED_CAPABILITIES:
+            errors.append("capability implementation map must contain C01-C19")
+
     if len(specs) != len(EXPECTED_CAPABILITIES):
         errors.append("productization trace check requires all 19 behavior specs")
     for spec_path, spec_text in specs.items():
-        if metadata_values(spec_text, "upstream_productization_trace") != {"pending"}:
-            errors.append(f"{spec_path}: upstream productization trace must remain pending")
-        if metadata_values(spec_text, "implementation_mode") != {"pending"}:
-            errors.append(f"{spec_path}: implementation mode must remain pending")
+        spec_ids = metadata_values(spec_text, "spec_id")
+        spec_id = next(iter(spec_ids), "") if len(spec_ids) == 1 else ""
+        if metadata_values(spec_text, "upstream_productization_trace") != {"mapped"}:
+            errors.append(f"{spec_path}: upstream productization trace must be mapped")
+        expected_mode = modes_by_id.get(spec_id)
+        if expected_mode is None or metadata_values(spec_text, "implementation_mode") != {
+            expected_mode
+        }:
+            errors.append(f"{spec_path}: implementation mode does not match capability map")
         for required_text in (
             "user_owned_upstream_release",
             "files named by an explicitly adopted and integrity-verified upstream release record",
@@ -1058,11 +1114,14 @@ def productization_truth_errors(
     return errors
 
 
-def upstream_candidate_mapping_errors(
+def upstream_adoption_errors(
     candidate_text: str,
     role_map_text: str,
     proposal_text: str,
     adoption_plan_text: str,
+    capability_map_text: str,
+    adoption_log_text: str,
+    lock_text: str,
     public_candidates: set[str],
 ) -> list[str]:
     errors: list[str] = []
@@ -1074,6 +1133,11 @@ def upstream_candidate_mapping_errors(
         role_map = json.loads(role_map_text)
     except (TypeError, json.JSONDecodeError) as exc:
         return [f"upstream Codex role-map JSON is invalid: {exc}"]
+    try:
+        capability_map = json.loads(capability_map_text)
+        framework_lock = json.loads(lock_text)
+    except (TypeError, json.JSONDecodeError) as exc:
+        return [f"upstream adoption JSON is invalid: {exc}"]
 
     def value(data: dict[str, object], *keys: str) -> object:
         current: object = data
@@ -1086,8 +1150,8 @@ def upstream_candidate_mapping_errors(
     expected_candidate_values = {
         ("schema",): "cotend.framework-candidate",
         ("schema_version",): 1,
-        ("status",): "reviewed_not_adopted",
-        ("candidate_only",): True,
+        ("status",): "adopted_verified",
+        ("candidate_only",): False,
         ("release_id",): "2026.07.11.3",
         ("framework_protocol_version",): "1.52",
         ("dual_model_upgrade_version",): "1.7",
@@ -1107,16 +1171,17 @@ def upstream_candidate_mapping_errors(
         ("integrity", "verification"): "passed",
         ("carriers", "codex", "skill_count"): 7,
         ("carriers", "claude", "skill_count"): 3,
-        ("adoption", "state"): "not_adopted",
-        ("adoption", "final_framework_lock_exists"): False,
+        ("adoption", "state"): "adopted",
+        ("adoption", "source_carrier"): "codex-skills/",
+        ("adoption", "capability_map"): "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
+        ("adoption", "adoption_record"): (
+            "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption"
+        ),
+        ("adoption", "final_framework_lock_exists"): True,
     }
     for keys, expected in expected_candidate_values.items():
         if value(candidate, *keys) != expected:
             errors.append(f"upstream candidate mismatch: {'.'.join(keys)}")
-    for empty_key in ("imported_files", "adapted_files"):
-        if value(candidate, "adoption", empty_key) != []:
-            errors.append(f"upstream candidate must not claim {empty_key}")
-
     expected_skill_trees = {
         "diagnose-only": "88dc2e47dba438720a336c38103308aeae3d635e",
         "dual-ai-collaboration": "b75114a7e0fd2027943ed98217a0f9d581cbdae9",
@@ -1129,14 +1194,51 @@ def upstream_candidate_mapping_errors(
     if value(candidate, "carriers", "codex", "skill_trees") != expected_skill_trees:
         errors.append("upstream candidate Codex Skill tree inventory drift")
 
+    expected_skill_ids = {
+        "cotend-init",
+        "cotend-project-init",
+        "cotend-collaboration",
+        "cotend-diagnose-only",
+        "cotend-model-upgrade",
+        "grill-me",
+        "karpathy-guidelines",
+    }
+    skill_files = {
+        path for path in public_candidates if path.startswith("codex-skills/")
+    }
+    actual_skill_ids = {
+        path.split("/", 2)[1] for path in skill_files if path.count("/") >= 2
+    }
+    if actual_skill_ids != expected_skill_ids:
+        errors.append("adopted Codex Skill directory set must contain exactly seven Skills")
+    if len(skill_files) != 30:
+        errors.append(f"adopted Codex Skill source set must contain 30 files: {len(skill_files)}")
+    adopted_files = value(candidate, "adoption", "imported_files")
+    adapted_files = value(candidate, "adoption", "adapted_files")
+    if not isinstance(adopted_files, list) or not isinstance(adapted_files, list):
+        errors.append("framework candidate file-level adoption inventory is invalid")
+    else:
+        adopted_set = set(adopted_files)
+        adapted_set = set(adapted_files)
+        expected_direct_adoption = {
+            "codex-skills/grill-me/SKILL.md",
+            "codex-skills/karpathy-guidelines/SKILL.md",
+        }
+        if adopted_set != expected_direct_adoption:
+            errors.append("directly adopted Skill file inventory drift")
+        if adopted_set & adapted_set or adopted_set | adapted_set != skill_files:
+            errors.append("candidate adopted/adapted inventory does not equal the 30 Skill files")
+    if value(candidate, "adoption", "required_before_lock") != []:
+        errors.append("framework candidate retains unresolved pre-lock requirements")
+
     if role_map.get("schema") != "cotend.codex-skill-role-map":
         errors.append("Codex role map schema mismatch")
-    if role_map.get("status") != "proposal_not_adopted":
-        errors.append("Codex role map must remain a not-adopted proposal")
+    if role_map.get("status") != "adopted_verified":
+        errors.append("Codex role map is not finalized as adopted")
     if role_map.get("candidate_release") != "2026.07.11.3":
         errors.append("Codex role map release mismatch")
     if role_map.get("public_interface_authority") != (
-        "codex_skill_set_product_decisions_complete_adoption_pending"
+        "codex_skill_source_set_adopted_live_delivery_pending"
     ):
         errors.append("Codex role map role-layer/name authority boundary drift")
     if role_map.get("role_layer_decision") != "product_owner_confirmed":
@@ -1206,14 +1308,14 @@ def upstream_candidate_mapping_errors(
             "internal_clarification_companion",
             "adopted",
             "direct_adoption",
-            None,
+            "grill-me",
         ),
         "karpathy-guidelines": (
             "bundled_third_party",
             "internal_ai_implementation_discipline",
             "adopted",
             "direct_adoption",
-            None,
+            "karpathy-guidelines",
         ),
     }
     for skill_id, expected in expected_roles.items():
@@ -1223,9 +1325,9 @@ def upstream_candidate_mapping_errors(
         actual = (
             entry.get("source_relationship"),
             entry.get("current_role"),
-            entry.get("proposed_adoption_status"),
-            entry.get("proposed_implementation_mode"),
-            entry.get("proposed_cotend_skill_id"),
+            entry.get("adoption_status"),
+            entry.get("implementation_mode"),
+            entry.get("target_skill_id"),
         )
         if actual != expected:
             errors.append(f"Codex role mapping drift: {skill_id}")
@@ -1257,7 +1359,7 @@ def upstream_candidate_mapping_errors(
         errors.append("Codex role map adoption boundary is missing")
     else:
         expected_adoption_boundary = {
-            "state": "not_adopted",
+            "state": "adopted",
             "role_layers_confirmed": True,
             "user_owned_skill_names_confirmed": True,
             "final_names_confirmed": True,
@@ -1269,19 +1371,24 @@ def upstream_candidate_mapping_errors(
             "confirmed_codex_skill_count": 7,
             "third_party_bundling_confirmed": True,
             "codex_skill_set_decisions_complete": True,
-            "actual_adoption_authorized": False,
-            "final_framework_lock_exists": False,
+            "actual_adoption_authorized": True,
+            "repository_source_carrier": "codex-skills/",
+            "repository_source_implemented": True,
+            "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
+            "adoption_record": (
+                "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption"
+            ),
+            "live_install_authorized": False,
+            "live_install_performed": False,
+            "plugin_or_marketplace_carrier": "deferred",
+            "final_framework_lock_exists": True,
         }
         for key, expected in expected_adoption_boundary.items():
             if adoption.get(key) != expected:
                 errors.append(f"Codex role-map adoption boundary mismatch: {key}")
 
-    proposal_statuses = metadata_values(proposal_text, "status")
-    if proposal_statuses not in (
-        {"draft_for_review"},
-        {"reviewed_pending_user_confirmation"},
-    ):
-        errors.append("framework adoption proposal lifecycle status is invalid")
+    if metadata_values(proposal_text, "status") != {"adopted_verified"}:
+        errors.append("framework adoption proposal is not finalized as adopted")
     exact_proposal_metadata = {
         "candidate_release": {"2026.07.11.3"},
         "role_layer_status": {"user_confirmed"},
@@ -1289,8 +1396,8 @@ def upstream_candidate_mapping_errors(
         "user_owned_skill_name_status": {"user_confirmed"},
         "MIT_companion_bundling_status": {"user_confirmed"},
         "codex_skill_set_decisions_status": {"complete"},
-        "adoption_state": {"not_adopted"},
-        "final_framework_lock_exists": {"false"},
+        "adoption_state": {"adopted"},
+        "final_framework_lock_exists": {"true"},
         "analysis_language": {"zh-CN"},
     }
     for key, expected in exact_proposal_metadata.items():
@@ -1302,29 +1409,25 @@ def upstream_candidate_mapping_errors(
         "dual-ai-project-init` 是入口内部的 Auto Mode 引擎",
         "用户已确认保留这套分层",
         "五个用户原创 Skill 分别命名为",
-        "确认 Codex 首发包直接内置 `grill-me` 与 `karpathy-guidelines`",
-        "`final_names_confirmed` 只确认五个用户原创 Skill ID",
-        "现在不得创建 `upstream/framework.lock.json`",
-        "adoption_state: not_adopted",
+        "确认 Codex 首发源树直接内置 `grill-me` 与 `karpathy-guidelines`",
+        "仓库内 Codex 技能源集合已采用为 7 个目录、30 个文件",
+        "`upstream/framework.lock.json` 已在以下条件同时满足后创建",
+        "adoption_state: adopted",
     ):
         if required_text not in proposal_text:
             errors.append(f"framework adoption proposal is missing: {required_text}")
 
-    plan_statuses = metadata_values(adoption_plan_text, "status")
-    if plan_statuses not in (
-        {"draft_for_review"},
-        {"reviewed_pending_user_confirmation"},
-    ):
-        errors.append("framework adoption plan lifecycle status is invalid")
+    if metadata_values(adoption_plan_text, "status") != {"implemented_verified"}:
+        errors.append("framework adoption plan is not finalized as implemented")
     exact_plan_metadata = {
         "candidate_release": {"2026.07.11.3"},
         "target_platform": {"Codex"},
         "target_source_carrier": {"codex-skills/"},
         "live_install_target": {"not_authorized"},
         "plugin_or_marketplace_carrier": {"deferred"},
-        "implementation_authority": {"pending_product_owner_confirmation"},
-        "adoption_state": {"not_adopted"},
-        "final_framework_lock_exists": {"false"},
+        "implementation_authority": {"product_owner_confirmed"},
+        "adoption_state": {"adopted"},
+        "final_framework_lock_exists": {"true"},
         "analysis_language": {"zh-CN"},
     }
     for key, expected in exact_plan_metadata.items():
@@ -1341,27 +1444,119 @@ def upstream_candidate_mapping_errors(
         "codex-skills/karpathy-guidelines/",
         "cotend-collaboration-v1.52",
         "cotend-model-upgrade-v1.7",
-        "mechanism_budget: two_validation_mechanisms_no_new_user_workflow",
+        "mechanism_budget: three_repository_integrity_mechanisms_no_new_user_workflow",
         "不新增命令层、路由层、状态目录或重复内核",
         '"type": "containing_commit"',
         "锁文件只能在采用或升级提交中修改",
         "不安装到用户全局 Codex 目录",
+        "仓库实现叶已经完成",
     ):
         if required_text not in adoption_plan_text:
             errors.append(f"framework adoption plan is missing: {required_text}")
 
-    premature_skill_files = sorted(
-        path for path in public_candidates if path.startswith("codex-skills/")
-    )
-    if premature_skill_files:
-        errors.append(
-            "Codex Skill implementation exists before implementation authority: "
-            + ", ".join(premature_skill_files[:3])
-        )
+    required_artifacts = {
+        ".gitattributes",
+        "NOTICE",
+        "THIRD-PARTY-NOTICES.md",
+        "THIRD-PARTY-SOURCES.json",
+        "THIRD-PARTY-LICENSES/grill-me-MIT.txt",
+        "THIRD-PARTY-LICENSES/karpathy-guidelines-MIT.txt",
+        "scripts/verify_adopted_skill_set.py",
+        "FRAMEWORK-CHANGE-EVAL.md",
+        "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
+        "upstream/FRAMEWORK-ADOPTION-LOG.md",
+        "upstream/framework.lock.json",
+    }
+    missing_artifacts = required_artifacts - public_candidates
+    if missing_artifacts:
+        errors.append(f"adoption artifacts are missing or ignored: {sorted(missing_artifacts)}")
 
-    final_lock_path = "upstream/framework.lock.json"
-    if final_lock_path in public_candidates or (ROOT / final_lock_path).exists():
-        errors.append("final framework lock must not exist before actual adoption")
+    if capability_map.get("schema") != "cotend.capability-implementation-map":
+        errors.append("capability implementation map schema mismatch")
+    if capability_map.get("status") != "adopted_verified":
+        errors.append("capability implementation map status mismatch")
+    if capability_map.get("capability_count") != 19:
+        errors.append("capability implementation map count mismatch")
+
+    expected_lock_values = {
+        ("schema",): "cotend.framework-lock",
+        ("schema_version",): 1,
+        ("status",): "adopted_verified",
+        ("release_id",): "2026.07.11.3",
+        ("framework_protocol",): "cotend-collaboration-v1.52",
+        ("model_upgrade_packet_family",): "cotend-model-upgrade-v1.7",
+        ("source_release", "tag"): "dual-ai-share-2026.07.11.3",
+        ("source_release", "tag_object"): "cef8add414a6d9704d3f58785a128bc56f44b263",
+        ("source_release", "release_commit"): "71e45d9ebeff4d9d61c180711c25267b9fe31549",
+        ("source_release", "package_tree"): "a70231e0445d9795a00212e8e6c53c149bfbc431",
+        ("source_release", "manifest_sha256"): (
+            "919fe34254b51619ddca1d010445281d4f7ceec958ee8cfd1958eaccb02bd006"
+        ),
+        ("target_platform",): "Codex",
+        ("source_carrier",): "codex-skills/",
+        ("skill_count",): 7,
+        ("skill_file_count",): 30,
+        ("capability_map",): "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
+        ("adoption_record",): (
+            "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption"
+        ),
+        ("delivery_boundaries", "repository_source_adopted"): True,
+        ("delivery_boundaries", "live_install_performed"): False,
+        ("delivery_boundaries", "plugin_or_marketplace_carrier"): "deferred",
+        ("delivery_boundaries", "claude_carrier"): "deferred",
+        ("delivery_boundaries", "push_release_or_publish"): "not_performed",
+    }
+    for keys, expected in expected_lock_values.items():
+        if value(framework_lock, *keys) != expected:
+            errors.append(f"framework lock mismatch: {'.'.join(keys)}")
+    if framework_lock.get("source_skill_trees") != expected_skill_trees:
+        errors.append("framework lock source Skill tree inventory drift")
+    if framework_lock.get("adoption_anchor") != {
+        "type": "containing_commit",
+        "path": "upstream/framework.lock.json",
+    }:
+        errors.append("framework lock containing-commit anchor mismatch")
+    for forbidden_key in ("adoption_commit", "resulting_commit", "containing_commit_hash"):
+        if forbidden_key in framework_lock:
+            errors.append(f"framework lock must not embed its own commit hash: {forbidden_key}")
+
+    lock_mappings = framework_lock.get("skill_mapping")
+    if not isinstance(lock_mappings, list):
+        errors.append("framework lock Skill mapping is invalid")
+    else:
+        lock_by_source = {
+            item.get("source"): item for item in lock_mappings if isinstance(item, dict)
+        }
+        for source_id, expected in expected_roles.items():
+            item = lock_by_source.get(source_id)
+            if item is None:
+                errors.append(f"framework lock Skill mapping is missing: {source_id}")
+                continue
+            expected_disposition = expected[2]
+            expected_mode = expected[3]
+            expected_target = expected[4]
+            if (
+                item.get("target"),
+                item.get("disposition"),
+                item.get("implementation_mode"),
+            ) != (expected_target, expected_disposition, expected_mode):
+                errors.append(f"framework lock Skill mapping drift: {source_id}")
+        if (
+            len(lock_mappings) != 7
+            or len(lock_by_source) != 7
+            or set(lock_by_source) != set(expected_roles)
+        ):
+            errors.append("framework lock must map exactly seven source Skills")
+
+    for marker in (
+        "## release-2026-07-11-3-initial-adoption",
+        "status: adopted_verified",
+        "resulting_CoTend_commit: containing_commit",
+        "live_install_performed: false",
+        "7 个 Skill、30 个文件",
+    ):
+        if marker not in adoption_log_text:
+            errors.append(f"framework adoption log is missing: {marker}")
 
     return errors
 
@@ -1372,9 +1567,9 @@ def local_recovery_truth_errors(status_text: str, plan_text: str) -> list[str]:
     exact_status = {
         "productization_default": {"rename_first_preserve_first"},
         "framework_release_candidate": {"dual_ai_share_2026_07_11_3"},
-        "framework_release_adoption": {"not_adopted"},
+        "framework_release_adoption": {"adopted_verified_repository_source"},
         "interface_authority": {
-            "codex_skill_set_product_decisions_complete_adoption_pending"
+            "codex_skill_source_set_adopted_live_delivery_pending"
         },
     }
     for key, expected in exact_status.items():
@@ -1523,8 +1718,17 @@ def main() -> int:
     for relative_path in sorted(text_candidates - {".gitignore", "scripts/check_repository.py"}):
         text = read(relative_path)
         for label, pattern in FORBIDDEN_PUBLIC_PATTERNS.items():
+            if (
+                relative_path.startswith("codex-skills/")
+                and label in FRAMEWORK_SOURCE_ALLOWED_PATTERN_LABELS
+            ):
+                continue
             if pattern.search(text):
                 errors.append(f"{relative_path}: {label}")
+        if relative_path.startswith("codex-skills/"):
+            for label, pattern in FORBIDDEN_SKILL_MAINTAINER_PATTERNS.items():
+                if pattern.search(text):
+                    errors.append(f"{relative_path}: {label}")
     errors.extend(checker_self_scan_errors(read("scripts/check_repository.py")))
 
     reference_study_path = "docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md"
@@ -1533,6 +1737,9 @@ def main() -> int:
     codex_role_map_path = "upstream/CODEX-SKILL-ROLE-MAP.json"
     adoption_proposal_path = "upstream/FRAMEWORK-ADOPTION-PROPOSAL.md"
     adoption_plan_path = "upstream/FRAMEWORK-ADOPTION-PLAN.md"
+    capability_map_path = "upstream/CAPABILITY-IMPLEMENTATION-MAP.json"
+    adoption_log_path = "upstream/FRAMEWORK-ADOPTION-LOG.md"
+    framework_lock_path = "upstream/framework.lock.json"
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
     if upstream_registry_path not in candidates:
@@ -1542,9 +1749,12 @@ def main() -> int:
         codex_role_map_path,
         adoption_proposal_path,
         adoption_plan_path,
+        capability_map_path,
+        adoption_log_path,
+        framework_lock_path,
     ):
         if path not in candidates:
-            errors.append(f"upstream candidate mapping artifact is missing or ignored: {path}")
+            errors.append(f"upstream adoption artifact is missing or ignored: {path}")
     if reference_study_path in candidates and upstream_registry_path in candidates:
         errors.extend(
             reference_study_errors(
@@ -1571,6 +1781,7 @@ def main() -> int:
         upstream_registry_path,
         adoption_proposal_path,
         adoption_plan_path,
+        "FRAMEWORK-CHANGE-EVAL.md",
     )
     errors.extend(
         owner_document_language_errors(
@@ -1578,6 +1789,23 @@ def main() -> int:
             {path: read(path) for path in analysis_paths if path in candidates},
         )
     )
+
+    framework_eval_text = read("FRAMEWORK-CHANGE-EVAL.md")
+    for key, expected in {
+        "change_type": {"workflow_behavior"},
+        "decision": {"watch"},
+    }.items():
+        if metadata_values(framework_eval_text, key) != expected:
+            errors.append(f"framework change evaluation mismatch: {key}")
+    for required_text in (
+        "11_of_11_negative_mutations_rejected",
+        "maintainer_residue_mutation_rejected",
+        "later_head_passed_and_lock_only_update_rejected",
+        "four_protected_blobs_match_and_text_eol_lf_enforced",
+        "first_live_codex_validation",
+    ):
+        if required_text not in framework_eval_text:
+            errors.append(f"framework change evaluation is missing: {required_text}")
 
     for key in (
         "architecture_design_status",
@@ -1646,6 +1874,7 @@ def main() -> int:
             read("docs/PRODUCTIZATION-ROADMAP.md"),
             read("docs/BEHAVIOR-SPECIFICATION-STANDARD.md"),
             read(upstream_registry_path),
+            read(capability_map_path),
             spec_texts,
             journey_text,
             interface_text,
@@ -1653,19 +1882,25 @@ def main() -> int:
         )
     )
 
-    upstream_mapping_paths = {
+    upstream_adoption_paths = {
         framework_candidate_path,
         codex_role_map_path,
         adoption_proposal_path,
         adoption_plan_path,
+        capability_map_path,
+        adoption_log_path,
+        framework_lock_path,
     }
-    if upstream_mapping_paths <= candidates:
+    if upstream_adoption_paths <= candidates:
         errors.extend(
-            upstream_candidate_mapping_errors(
+            upstream_adoption_errors(
                 read(framework_candidate_path),
                 read(codex_role_map_path),
                 read(adoption_proposal_path),
                 read(adoption_plan_path),
+                read(capability_map_path),
+                read(adoption_log_path),
+                read(framework_lock_path),
                 candidates,
             )
         )

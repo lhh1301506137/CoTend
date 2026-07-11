@@ -1,0 +1,36 @@
+{
+  "schema": "cotend.third-party-source-registry",
+  "schema_version": 1,
+  "adopted_source_release": "2026.07.11.3",
+  "release_anchor": "dual-ai-share-2026.07.11.3",
+  "components": [
+    {
+      "component": "grill-me",
+      "target_path": "codex-skills/grill-me/**",
+      "relationship": "adapted_third_party",
+      "source_tree": "70df660726ef12349a40dc0353a681c82414fe95",
+      "upstream_url": "https://github.com/mattpocock/skills/blob/43ea0884b07a3e67a5a07f025ce92aefa983177b/skills/productivity/grilling/SKILL.md",
+      "upstream_commit": "43ea0884b07a3e67a5a07f025ce92aefa983177b",
+      "license": "MIT",
+      "content_policy": "byte_identical_to_tagged_release",
+      "line_ending_policy": "text_eol_lf",
+      "license_path": "THIRD-PARTY-LICENSES/grill-me-MIT.txt",
+      "notice_path": "THIRD-PARTY-NOTICES.md#grill-me",
+      "required_attribution": "Matt Pocock; retain the MIT terms and disclosed one-question/option-1 adaptation"
+    },
+    {
+      "component": "karpathy-guidelines",
+      "target_path": "codex-skills/karpathy-guidelines/**",
+      "relationship": "bundled_third_party",
+      "source_tree": "e119339197d600aa39a24fd7a95c946800c9c949",
+      "upstream_url": "https://github.com/multica-ai/andrej-karpathy-skills/blob/2c606141936f1eeef17fa3043a72095b4765b9c2/skills/karpathy-guidelines/SKILL.md",
+      "upstream_commit": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+      "license": "MIT",
+      "content_policy": "byte_identical_to_tagged_release",
+      "line_ending_policy": "text_eol_lf",
+      "license_path": "THIRD-PARTY-LICENSES/karpathy-guidelines-MIT.txt",
+      "notice_path": "THIRD-PARTY-NOTICES.md#karpathy-guidelines",
+      "required_attribution": "upstream contributors; disclose that the reviewed upstream commit has no standalone LICENSE file"
+    }
+  ]
+}

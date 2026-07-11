@@ -4,14 +4,14 @@
 status: active_productization_and_research_registry
 checked_at: 2026-07-12
 relationship: primary_user_owned_productization_source_plus_secondary_public_references
-implementation_dependency: none
-source_copying: none
+implementation_dependency: pinned_dual_ai_release_2026_07_11_3
+source_copying: scoped_5_adapted_plus_2_byte_identical_skills
 update_policy: manual_pinned_review_before_architecture_adoption_or_release
 ```
 
 本台账同时区分 CoTend 的用户原创产品化母体和外部设计参考。只有 `UP01` 是首要产品化来源；RF01-RF06 仍只是二级比较证据，不能按竞品多数做法改变 CoTend。
 
-当前仓库尚未导入任何 upstream 文件，因此 `implementation_dependency` 和 `source_copying` 仍为 `none`。未来只有完成 CoTend framework lock、adoption 记录、许可证与隐私检查的具体 release 文件，才可成为实现输入。
+当前仓库已从固定 release 采用 7 个 Codex Skill、30 个文件：五个用户原创 Skill 做 CoTend 适配，两个 MIT Skill 按 release 字节复用。采用范围、来源、许可证与更新边界由 adoption log、framework lock 和自动验证共同约束；未列入记录的 upstream 文件仍不得成为实现输入。
 
 ## UP01 dual-ai 分享包
 
@@ -22,18 +22,21 @@ source: public_distribution_location_pending
 reviewed_release: 2026.07.11.3
 release_anchor: dual-ai-share-2026.07.11.3
 declared_license_scope: Apache-2.0_for_user_owned_content_with_separate_MIT_components
-relationship: rename_first_preserve_first_candidate
-adoption_status: product_disposition_confirmed_not_imported
+relationship: rename_first_preserve_first_adopted_source
+adoption_status: repository_source_adopted_verified
 candidate_record: upstream/FRAMEWORK-CANDIDATE.json
 codex_role_map: upstream/CODEX-SKILL-ROLE-MAP.json
 adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md
 adoption_plan: upstream/FRAMEWORK-ADOPTION-PLAN.md
-mapping_status: codex_skill_set_decisions_complete_implementation_pending
-final_framework_lock: not_created
+capability_map: upstream/CAPABILITY-IMPLEMENTATION-MAP.json
+adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption
+adopted_skill_verifier: scripts/verify_adopted_skill_set.py
+mapping_status: codex_skill_source_set_adopted_live_delivery_pending
+final_framework_lock: upstream/framework.lock.json
 automatic_update: forbidden
 ```
 
-审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容直接改名或适配，对两个已确认随包内置的 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。当前已完成 candidate-only 身份、角色、名称和 bundling 产品决定，并形成文件级 adoption 计划；公开分发位置、最终 CoTend framework lock、实际适配和逐文件 adoption 均未完成，因此本条仍不是代码导入授权。
+审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容直接改名或适配，对两个内置 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。仓库源树、逐文件 adoption 和 final lock 已完成；公开分发位置、live 安装、Plugin/Marketplace、Claude 载体和发布者身份认证仍未完成。
 
 ## RF01 Superpowers
 

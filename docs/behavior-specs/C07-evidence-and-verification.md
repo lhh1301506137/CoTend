@@ -38,8 +38,8 @@ architecture_neutral: true
 source_review_id: SR-C07-001
 source_review_status: verified
 public_safety_review: passed
-upstream_productization_trace: pending
-implementation_mode: pending
+upstream_productization_trace: mapped
+implementation_mode: platform_adaptation
 ```
 
 ## 1. User Problem

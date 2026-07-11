@@ -1,11 +1,11 @@
 {
   "schema": "cotend.codex-skill-role-map",
   "schema_version": 1,
-  "status": "proposal_not_adopted",
+  "status": "adopted_verified",
   "candidate_release": "2026.07.11.3",
   "platform": "Codex",
   "launch_adapter": true,
-  "public_interface_authority": "codex_skill_set_product_decisions_complete_adoption_pending",
+  "public_interface_authority": "codex_skill_source_set_adopted_live_delivery_pending",
   "role_layer_decision": "product_owner_confirmed",
   "user_owned_naming_decision": "product_owner_confirmed",
   "third_party_bundling_decision": "product_owner_confirmed",
@@ -34,9 +34,9 @@
         "SKILL.md delegates all detailed behavior to dual-ai-project-init Auto Mode",
         "PROMPTS.md and FRAMEWORK-INTRO.md recommend dual-ai-init for ordinary and long-running projects"
       ],
-      "proposed_adoption_status": "adapted",
-      "proposed_implementation_mode": "rename_only",
-      "proposed_cotend_skill_id": "cotend-init",
+      "adoption_status": "adapted",
+      "implementation_mode": "rename_only",
+      "target_skill_id": "cotend-init",
       "naming_status": "user_confirmed",
       "preserve": [
         "one simple entry",
@@ -64,9 +64,9 @@
         "this Skill owns Auto Mode state classification and project governance setup",
         "its own trigger accepts direct invocation as a fallback rather than requiring users to classify project state"
       ],
-      "proposed_adoption_status": "adapted",
-      "proposed_implementation_mode": "platform_adaptation",
-      "proposed_cotend_skill_id": "cotend-project-init",
+      "adoption_status": "adapted",
+      "implementation_mode": "platform_adaptation",
+      "target_skill_id": "cotend-project-init",
       "naming_status": "user_confirmed",
       "preserve": [
         "Auto Mode",
@@ -92,9 +92,9 @@
         "dual-ai-project-init routes collaboration governance to this Skill",
         "PROMPTS.md uses explicit loading mainly for reviewer-role scenarios"
       ],
-      "proposed_adoption_status": "adapted",
-      "proposed_implementation_mode": "platform_adaptation",
-      "proposed_cotend_skill_id": "cotend-collaboration",
+      "adoption_status": "adapted",
+      "implementation_mode": "platform_adaptation",
+      "target_skill_id": "cotend-collaboration",
       "naming_status": "user_confirmed",
       "preserve": [
         "human-led delegated development",
@@ -117,9 +117,9 @@
         "PROMPTS.md says users do not need to remember the Skill name",
         "dual-ai-collaboration and project-init route diagnosis failures here"
       ],
-      "proposed_adoption_status": "adapted",
-      "proposed_implementation_mode": "platform_adaptation",
-      "proposed_cotend_skill_id": "cotend-diagnose-only",
+      "adoption_status": "adapted",
+      "implementation_mode": "platform_adaptation",
+      "target_skill_id": "cotend-diagnose-only",
       "naming_status": "user_confirmed",
       "preserve": [
         "read-only default",
@@ -144,9 +144,9 @@
         "the Skill owns advisor/trial/takeover/rollback rather than a narrow ask-an-advisor action",
         "it imports non-thinnable authority boundaries from the shared governance core"
       ],
-      "proposed_adoption_status": "adapted",
-      "proposed_implementation_mode": "platform_adaptation",
-      "proposed_cotend_skill_id": "cotend-model-upgrade",
+      "adoption_status": "adapted",
+      "implementation_mode": "platform_adaptation",
+      "target_skill_id": "cotend-model-upgrade",
       "naming_status": "user_confirmed",
       "preserve": [
         "advisor versus takeover distinction",
@@ -168,10 +168,10 @@
         "the packaged adaptation owns one-question-at-a-time and option-1 acceptance behavior",
         "it is not a lifecycle or project-state owner"
       ],
-      "proposed_adoption_status": "adopted",
-      "proposed_implementation_mode": "direct_adoption",
+      "adoption_status": "adopted",
+      "implementation_mode": "direct_adoption",
       "bundling_status": "user_confirmed",
-      "proposed_cotend_skill_id": null,
+      "target_skill_id": "grill-me",
       "naming_status": "preserve_third_party_identity_if_bundled",
       "required_notice": "Retain the Matt Pocock MIT attribution and license text"
     },
@@ -188,10 +188,10 @@
         "the Skill defines simplicity, surgical edits, assumptions and verifiable goals",
         "it does not own project lifecycle, user authority or product state"
       ],
-      "proposed_adoption_status": "adopted",
-      "proposed_implementation_mode": "direct_adoption",
+      "adoption_status": "adopted",
+      "implementation_mode": "direct_adoption",
       "bundling_status": "user_confirmed",
-      "proposed_cotend_skill_id": null,
+      "target_skill_id": "karpathy-guidelines",
       "naming_status": "preserve_third_party_identity_if_bundled",
       "required_notice": "Retain the upstream-contributor MIT attribution and license text"
     }
@@ -205,12 +205,12 @@
         "dual-ai-collaboration",
         "dual-model-upgrade"
       ],
-      "proposed_adoption_status": "deferred",
+      "adoption_status": "deferred",
       "reason": "Codex is the confirmed launch adapter and the Claude carrier intentionally omits the Codex project-init engine"
     }
   ],
   "adoption": {
-    "state": "not_adopted",
+    "state": "adopted",
     "role_layers_confirmed": true,
     "user_owned_skill_names_confirmed": true,
     "final_names_confirmed": true,
@@ -220,7 +220,14 @@
     "confirmed_codex_skill_count": 7,
     "third_party_bundling_confirmed": true,
     "codex_skill_set_decisions_complete": true,
-    "actual_adoption_authorized": false,
-    "final_framework_lock_exists": false
+    "actual_adoption_authorized": true,
+    "repository_source_carrier": "codex-skills/",
+    "repository_source_implemented": true,
+    "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
+    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption",
+    "live_install_authorized": false,
+    "live_install_performed": false,
+    "plugin_or_marketplace_carrier": "deferred",
+    "final_framework_lock_exists": true
   }
 }
