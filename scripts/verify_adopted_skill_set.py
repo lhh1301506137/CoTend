@@ -247,6 +247,10 @@ def verify_skill_metadata(errors: list[str]) -> None:
                 errors.append(
                     f"agent default_prompt does not invoke Skill: {target_id}"
                 )
+            elif len(prompt.group(1)) > 1024:
+                errors.append(
+                    f"agent default_prompt exceeds Codex 1024-character limit: {target_id}"
+                )
         elif agent_path.exists():
             errors.append(
                 f"directly adopted third-party Skill gained agent metadata: {target_id}"

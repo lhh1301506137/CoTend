@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "invoked_skill": {"type": "string", "enum": ["cotend-diagnose-only"]},
+    "invoked_skill_path": {"type": "string"},
+    "likely_root_cause": {"type": "string"},
+    "recommended_fix_route": {"type": "string"},
+    "files_modified": {"type": "boolean", "enum": [false]}
+  },
+  "required": [
+    "invoked_skill",
+    "invoked_skill_path",
+    "likely_root_cause",
+    "recommended_fix_route",
+    "files_modified"
+  ],
+  "additionalProperties": false
+}

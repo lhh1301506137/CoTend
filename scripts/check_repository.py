@@ -126,6 +126,17 @@ EXPECTED_REFERENCE_SOURCES = {
         "MIT",
     ),
 }
+EXPECTED_CODEX_CARRIER_FIXTURE_FILES = {
+    "AGENTS.md",
+    "README.md",
+    "live-scenarios.json",
+    "scenarios/diagnose/calculator.py",
+    "scenarios/fresh/README.md",
+    "scenarios/pending-decision/STATUS.md",
+    "schemas/diagnose-only.schema.json",
+    "schemas/init-delegation.schema.json",
+    "schemas/pending-decision.schema.json",
+}
 
 # checker-self-scan-allowlist-start
 LOCAL_ONLY_PATHS = {
@@ -925,8 +936,10 @@ def productization_truth_errors(
         "productization_default": {"rename_first_preserve_first"},
         "upstream_adoption_status": {"adopted_verified_repository_source"},
         "interface_design_status": {"unconfirmed"},
-        "interface_revalidation_reason": {"live_codex_discovery_not_validated"},
-        "stage": {"codex_skill_source_adopted_live_delivery_pending"},
+        "interface_revalidation_reason": {
+            "desktop_selector_and_implicit_discovery_not_validated"
+        },
+        "stage": {"codex_project_carrier_validated_live_delivery_pending"},
     }
     for key, expected in exact_prd_metadata.items():
         if metadata_values(prd_text, key) != expected:
@@ -935,7 +948,7 @@ def productization_truth_errors(
     for required_text in (
         "默认产品化方法是 `rename-first`、`preserve-first`",
         "仓库 Codex Skill 的 7 目录分层",
-        "当前没有经 live Codex 验证的活动调用界面基线",
+        "项目级 `$skill-name` 显式调用已有真实 Codex 证据",
         "用户原创且由已验证 release 以 Apache-2.0 发布的 dual-ai 内容，可以",
         "ready_for_repository_source_implementation: yes",
         "ready_for_live_delivery: no",
@@ -988,7 +1001,7 @@ def productization_truth_errors(
 
     exact_roadmap_metadata = {
         "route_type": {"source_aware_rename_first_productization"},
-        "current_phase": {"P4-repository-source-slice"},
+        "current_phase": {"P4-isolated-codex-carrier-validation"},
     }
     for key, expected in exact_roadmap_metadata.items():
         if metadata_values(roadmap_text, key) != expected:
@@ -1569,7 +1582,7 @@ def local_recovery_truth_errors(status_text: str, plan_text: str) -> list[str]:
         "framework_release_candidate": {"dual_ai_share_2026_07_11_3"},
         "framework_release_adoption": {"adopted_verified_repository_source"},
         "interface_authority": {
-            "codex_skill_source_set_adopted_live_delivery_pending"
+            "codex_project_carrier_validated_live_delivery_pending"
         },
     }
     for key, expected in exact_status.items():
@@ -1641,6 +1654,94 @@ def local_recovery_truth_errors(status_text: str, plan_text: str) -> list[str]:
     if understanding_leaves and understanding_leaves != plan_leaves:
         errors.append("local current-stage understanding points to a different active leaf")
 
+    return errors
+
+
+def isolated_codex_carrier_errors(
+    evidence_text: str,
+    adoption_log_text: str,
+    framework_eval_text: str,
+    candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    fixture_root = "tests/fixtures/codex-carrier"
+    expected_paths = {
+        f"{fixture_root}/{path}" for path in EXPECTED_CODEX_CARRIER_FIXTURE_FILES
+    }
+    if "scripts/verify_isolated_codex_carrier.py" not in candidates:
+        errors.append("isolated Codex carrier verifier is missing or ignored")
+    missing_paths = expected_paths - candidates
+    if missing_paths:
+        errors.append(
+            f"isolated Codex carrier fixture files are missing: {sorted(missing_paths)}"
+        )
+    actual_paths = {
+        path for path in candidates if path.startswith(f"{fixture_root}/")
+    }
+    if actual_paths != expected_paths:
+        errors.append("isolated Codex carrier fixture inventory drift")
+
+    combined_evidence = evidence_text + adoption_log_text
+    for marker in (
+        "status: passed_with_scope_limitations",
+        "codex_cli: 0.142.0",
+        "project_skill_carrier: .agents/skills",
+        "fixture_skill_count: 7",
+        "fixture_skill_file_count: 30",
+        "live_scenario_count: 3",
+        "negative_mutation_count: 4",
+        "cli_boundary_negative_count: 3",
+        "desktop_skill_selector_verified: false",
+        "implicit_natural_language_trigger_verified: false",
+        "passed_3_of_3",
+        "passed_4_of_4",
+        "passed_7_of_7_with_PYTHONUTF8",
+        "1024",
+    ):
+        if marker not in combined_evidence:
+            errors.append(f"isolated Codex carrier evidence is missing: {marker}")
+
+    scenario_path = ROOT / fixture_root / "live-scenarios.json"
+    if scenario_path.is_file():
+        try:
+            scenarios = json.loads(scenario_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            errors.append(f"isolated Codex live scenarios are invalid JSON: {exc}")
+            scenarios = []
+        scenario_ids = {
+            item.get("id") for item in scenarios if isinstance(item, dict)
+        }
+        if scenario_ids != {"init-delegation", "pending-decision", "diagnose-only"}:
+            errors.append("isolated Codex live scenario set drift")
+        if len(scenarios) != 3:
+            errors.append("isolated Codex carrier must define exactly three live scenarios")
+
+    for skill in (
+        "cotend-init",
+        "cotend-project-init",
+        "cotend-collaboration",
+        "cotend-diagnose-only",
+        "cotend-model-upgrade",
+    ):
+        agent_path = ROOT / "codex-skills" / skill / "agents" / "openai.yaml"
+        if not agent_path.is_file():
+            errors.append(f"Codex agent metadata is missing: {skill}")
+            continue
+        prompt = re.search(
+            r'^\s*default_prompt:\s*"(.+)"\s*$',
+            agent_path.read_text(encoding="utf-8"),
+            re.MULTILINE,
+        )
+        if prompt is None or len(prompt.group(1)) > 1024:
+            errors.append(f"Codex default prompt limit mismatch: {skill}")
+
+    if (
+        "skills_list_7_of_7_and_three_read_only_explicit_scenarios_passed"
+        not in framework_eval_text
+    ):
+        errors.append("framework evaluation lacks isolated Codex carrier result")
+    if "framework_lock_changed: false" not in adoption_log_text:
+        errors.append("adoption log lacks carrier lock boundary")
     return errors
 
 
@@ -1806,6 +1907,19 @@ def main() -> int:
     ):
         if required_text not in framework_eval_text:
             errors.append(f"framework change evaluation is missing: {required_text}")
+
+    carrier_evidence_path = "docs/evidence/ISOLATED-CODEX-CARRIER-VALIDATION.md"
+    if carrier_evidence_path not in candidates:
+        errors.append("isolated Codex carrier evidence is missing or ignored")
+    else:
+        errors.extend(
+            isolated_codex_carrier_errors(
+                read(carrier_evidence_path),
+                read(adoption_log_path),
+                framework_eval_text,
+                candidates,
+            )
+        )
 
     for key in (
         "architecture_design_status",

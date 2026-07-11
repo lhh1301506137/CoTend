@@ -56,3 +56,38 @@ push_release_or_publish: not_performed
 `resulting_CoTend_commit: containing_commit` 表示采用提交由 Git 中最近一次修改 `upstream/framework.lock.json` 的提交解析。lock 不嵌入自身提交哈希。任何后续 adoption 或 upgrade 若修改 lock，必须在同一提交同时修改 `codex-skills/` 和本记录；普通文档提交不得单独移动该锚点。
 
 本记录只确认仓库内 Codex Skill 源树已采用并通过静态与隔离验证，不表示已写入用户全局 Skill 目录，也不授权 push、发布或公开分发。
+
+## release-2026-07-11-3-isolated-codex-carrier-validation
+
+```yaml
+status: project_scoped_carrier_verified
+source_release: 2026.07.11.3
+codex_cli: 0.142.0
+project_carrier: .agents/skills
+skill_count: 7
+skill_file_count: 30
+app_server_discovery: passed_7_of_7_repo_scope
+live_explicit_scenarios: passed_3_of_3
+negative_mutations: passed_4_of_4
+cli_boundary_negatives: passed_3_of_3
+official_quick_validate: passed_7_of_7_with_PYTHONUTF8
+metadata_compatibility_fix: three_default_prompts_reduced_below_1024_characters
+framework_lock_changed: false
+global_install_performed: false
+desktop_skill_selector_verified: false
+implicit_invocation_verified: false
+```
+
+### 载体验证与兼容修正
+
+确定性 harness 把 `codex-skills/` 逐文件复制到 Git 忽略的嵌套项目 `.agents/skills`，并验证 7 个 Skill、30 个文件和逐文件哈希完全一致。Codex `skills/list` 返回七个 fixture Skill 均为 `repo` scope 且 enabled；五个 CoTend Skill 的 interface 元数据可读，两个 MIT companion Skill 不增加 CoTend 元数据。
+
+首次发现时，三条超过当前运行时 1024 字符上限的 `default_prompt` 被 Codex 忽略。已只压缩 `cotend-init`、`cotend-project-init` 和 `cotend-collaboration` 的 UI 启动提示；完整规则仍保留在各自 `SKILL.md`。修复后五条默认提示均由 `skills/list` 返回，验证器也增加同一长度门。
+
+三条 ephemeral、read-only 显式调用场景验证统一入口委派与空项目分类、裸 `continue` 不回答待定用户裁决、只诊断不修改。每条场景前后 fixture、用户/ Codex Skill 目录、全局 config 和凭据文件元数据均不变。
+
+该修改是同一固定 release 的目标平台元数据兼容修正，不改变 upstream 版本、协议、Skill 拓扑、文件数量、第三方字节或 lock 中的 adoption identity，因此 `framework.lock.json` 不移动。完整证据见 [`docs/evidence/ISOLATED-CODEX-CARRIER-VALIDATION.md`](../docs/evidence/ISOLATED-CODEX-CARRIER-VALIDATION.md)。
+
+### 仍未证明
+
+Desktop 技能选择器渲染/排序、自然语言隐式触发、可写真实项目旅程、用户级安装/更新/卸载/回滚、Plugin/Marketplace、Claude 载体和最终用户验收继续 deferred。

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "init-delegation",
+    "cwd": "scenarios/fresh",
+    "schema": "schemas/init-delegation.schema.json",
+    "prompt": "$cotend-init\n\nRun a read-only carrier validation. Do not initialize or change this fixture. Identify the explicitly invoked Skill and its project-local path, follow its documented delegation far enough to identify the Auto Mode Skill and shared governance Skill, classify this intentionally empty project, and return only the requested JSON.",
+    "skill": "cotend-init"
+  },
+  {
+    "id": "pending-decision",
+    "cwd": "scenarios/pending-decision",
+    "schema": "schemas/pending-decision.schema.json",
+    "prompt": "$cotend-init\n\ncontinue\n\nRun a read-only carrier validation against STATUS.md. Do not change the fixture. Apply the CoTend pending-human-question boundary, do not infer or choose an option, and return only the requested JSON.",
+    "skill": "cotend-init"
+  },
+  {
+    "id": "diagnose-only",
+    "cwd": "scenarios/diagnose",
+    "schema": "schemas/diagnose-only.schema.json",
+    "prompt": "$cotend-diagnose-only\n\nDiagnose why calculator.py fails. This is a read-only carrier validation: do not edit or execute the file, do not use network tools, and return only the requested JSON.",
+    "skill": "cotend-diagnose-only"
+  }
+]

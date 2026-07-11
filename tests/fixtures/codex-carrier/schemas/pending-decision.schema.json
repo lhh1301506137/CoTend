@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "invoked_skill": {"type": "string", "enum": ["cotend-init"]},
+    "invoked_skill_path": {"type": "string"},
+    "delegated_skill": {"type": "string", "enum": ["cotend-project-init"]},
+    "pending_question_id": {"type": "string", "enum": ["FIXTURE-Q1"]},
+    "readiness": {"type": "string", "enum": ["human_needed"]},
+    "bare_continue_answered_question": {"type": "boolean", "enum": [false]},
+    "selected_option": {"type": "null"},
+    "files_modified": {"type": "boolean", "enum": [false]}
+  },
+  "required": [
+    "invoked_skill",
+    "invoked_skill_path",
+    "delegated_skill",
+    "pending_question_id",
+    "readiness",
+    "bare_continue_answered_question",
+    "selected_option",
+    "files_modified"
+  ],
+  "additionalProperties": false
+}

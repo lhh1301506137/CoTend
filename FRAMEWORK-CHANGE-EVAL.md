@@ -24,6 +24,7 @@ affected_workflows:
 deviations:
   - 上游未指定项目语言时强制中文；CoTend 改为项目已记录语言，否则默认英文
   - 上游包含维护者本机 CodeGraph helper、内部决策编号和固定 Claude 同步目录；CoTend 删除这些私有绑定，改为公开平台能力检测与单独授权
+  - 当前 Codex 会忽略超过 1024 字符的 default_prompt；三条 UI 启动提示已压缩到限制内，完整行为仍由 SKILL.md 承担
 mechanism_budget:
   added_context_surface: mixed
   ordinary_load_impact: none
@@ -61,10 +62,14 @@ validation_scenarios:
     expected: 七个 Skill 全部通过官方 quick validator
     validation_result_type: executed
     result: 7_of_7_passed
-  - scenario: 真实 Codex 安装、菜单发现、自然语言触发和内部委派
-    expected: 默认入口清晰，内部角色不要求小白手动分类，停止边界保持
+  - scenario: 项目级 Codex 发现、显式触发和内部委派
+    expected: 七 Skill 以 repo scope 可见；默认入口进入项目级 Skill；内部角色不要求用户手动分类；停止边界保持
+    validation_result_type: executed
+    result: skills_list_7_of_7_and_three_read_only_explicit_scenarios_passed
+  - scenario: Desktop 菜单渲染、自然语言隐式触发和用户级安装
+    expected: 目标用户可发现入口，菜单元数据正确，安装与移除有可解释回滚
     validation_result_type: deferred
-    result: 需要单独的隔离或 live 安装授权
+    result: project_scoped_CLI_evidence_does_not_prove_Desktop_or_install_lifecycle
 real_project_validation:
   - scenario: 使用 CoTend 初始化或续接一个真实本地项目
     expected: 完成开始、继续、证据、停止、验收和跨会话恢复闭环
@@ -76,11 +81,12 @@ rollback_triggers:
   - 迁移输入被错误改写为活动旧协议
   - 停止、证据、恢复、只读诊断或模型回退语义发生漂移
   - notices、许可证或固定来源无法在分发物中重建
-review_after: 首次隔离安装与真实项目纵向验证后
+review_after: 首次可写真实项目纵向验证和 Desktop 选择器验证后
 watch_closure:
   - keep_watch
-  - re_review_date: first_live_codex_validation
-  - evidence: repository_source_validation_only
+  - first_live_codex_validation: passed_project_scoped_CLI
+  - re_review_date: first_writable_project_and_Desktop_selector_validation
+  - evidence: repository_source_plus_isolated_project_carrier
 ```
 
-仓库源树 adoption 可以保留，但不能据此宣称 CoTend 已完成安装产品化或真实用户验收。Claude、Plugin/Marketplace 和分享包同步继续延后。
+仓库源树 adoption 和项目级 Codex 载体可以保留，但不能据此宣称 CoTend 已完成 Desktop 界面、安装产品化或真实用户验收。Claude、Plugin/Marketplace 和分享包同步继续延后。

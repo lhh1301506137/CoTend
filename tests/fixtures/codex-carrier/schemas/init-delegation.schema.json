@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "invoked_skill": {"type": "string", "enum": ["cotend-init"]},
+    "invoked_skill_path": {"type": "string"},
+    "delegated_skill": {"type": "string", "enum": ["cotend-project-init"]},
+    "shared_governance_skill": {"type": "string", "enum": ["cotend-collaboration"]},
+    "classification": {"type": "string", "enum": ["fresh_init"]},
+    "files_modified": {"type": "boolean", "enum": [false]}
+  },
+  "required": [
+    "invoked_skill",
+    "invoked_skill_path",
+    "delegated_skill",
+    "shared_governance_skill",
+    "classification",
+    "files_modified"
+  ],
+  "additionalProperties": false
+}
