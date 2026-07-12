@@ -2,19 +2,26 @@
 
 ```yaml
 metadata:
-  status: passed_picker_surface_with_remaining_interaction_gaps
-  evidence_type: user_assisted_execution_plus_screenshot_inspection
+  status: passed_new_task_picker_and_non_sending_chip_with_refresh_boundary
+  evidence_type: controlled_live_lifecycle_plus_fresh_discovery_and_user_screenshot_inspection
   evidence_date: 2026-07-13
   candidate_id: N3-display-led
   candidate_selector: cotend@cotend-desktop-surface-local
   candidate_version: 0.0.0-dev.3+codex.desktop-surface
   desktop_picker_query: /cotend
-  desktop_hot_update_verified: true
+  desktop_hot_update_verified: false
+  desktop_new_task_refresh_verified: true
+  desktop_refresh_contract_candidate: new_task_or_equivalent_skill_snapshot_refresh
+  fresh_app_server_entry_count: 7
   visible_entry_count: 7
   user_owned_friendly_display_names: 5
   companion_platform_prefixed_display_names: 2
-  desktop_interaction_verified: false
+  non_sending_chip_insertion_verified: true
+  chip_display_name: CoTend_Init
+  canonical_chip_visible: false
+  desktop_interaction_verified: partial_picker_and_non_sending_chip
   model_behavior_verified: false
+  candidate_cleanup_verified: true
   production_namespace_confirmed: false
   production_package_authorized: false
   screenshot_tracked: false
@@ -22,21 +29,35 @@ metadata:
 
 ## 结论
 
-用户在候选仍由当前 Codex Desktop 进程加载时使用 `/cotend` 查询，确认选择器支持热更新。截图显示全部 7 个 CoTend Skill 入口，因此先前使用 `$CoTend` 查询得到的“不可见”结果是语法错误造成的假阴性，不能用于证明 Desktop 必须重启。
+Desktop Skill 选择器的正确查询是 `/cotend`；`$skill-name` 是提示词中的显式 Skill 调用语法，两者不能互相替代。N3 候选能在 fresh app-server 中发现全部 7 个 user-scope Skill，并在同一 Desktop 的新空任务中显示和插入 `CoTend Init` 友好 chip，过程中没有发送消息或运行模型。
 
-`/cotend` 是 Desktop Skill 选择器查询；`$skill-name` 是提示词中的显式 Skill 调用语法。两者属于不同交互表面，不能互相替代。
+当前证据**不支持**“已打开任务可靠热更新”。受控链路中，同一已打开任务在候选重新安装后没有显示 `/cotend`，fresh app-server 能发现 7 项，新空任务随后可见。产品安装/更新说明因此必须暂按“打开新任务或执行等价 Skill 快照刷新”设计，不能承诺当前任务实时更新。
 
-本证据只把 N3 的 Desktop 状态从 `not_run` 提升为 **picker 部分通过**。它不确认详情页、其他搜索词和排序、canonical name 的具体位置、点击后的非发送 token 插入、自然语言触发、Skill 间委派或模型行为，也不确认最终 namespace 或 production package。
+N3 仍为 `continue_with_notes`：五个主要入口和编辑器 chip 的友好显示名已获真实 Desktop 证据；两个 MIT companion 的平台前缀、详情页、其他查询/排序、自然语言和模型委派仍待验证。正式 namespace 与 production package 继续未确认。
+
+## 受控刷新链路
+
+| 步骤 | 结果 | 证据分类 |
+|---|---|---|
+| 安装前 candidate 与 Marketplace | 均不存在 | `executed` |
+| 临时 add 后 exact selector/version/source | 安装并启用，身份匹配 | `executed` |
+| 同一已打开任务查询 `/cotend` | 未显示 | `executed_user_assisted` |
+| fresh `skills/list(forceReload=true)` | 发现 7 个 `cotend:*` user-scope Skill，错误为 0 | `executed` |
+| 同一 Desktop 新空任务 | 可见并插入 `CoTend Init` chip | `executed_user_assisted + inspection` |
+| 消息发送与模型调用 | 均未执行 | `not_run` |
+| exact CLI cleanup | candidate 与 Marketplace 均不存在 | `executed` |
+| 无关状态恢复 | 9 个 Plugin、3 个 Marketplace 的 normalized baseline hash 完全匹配 | `executed` |
+
+首次列表截图是在此前 cleanup 之后提供的，因此它能证明七条标题当时仍可见，却不能单独证明 add 后热更新；它同样兼容“已打开任务保留 stale Skill snapshot”。只有上述受控链路用于刷新因果判断。
 
 ## 截图完整性
 
-原始截图只保留在本地证据环境，没有复制到仓库，也不会随公开项目分发。
+两张原始截图只保留在本地证据环境，没有复制到仓库，也不会随公开项目分发。
 
-| 属性 | 值 |
-|---|---|
-| 尺寸 | `1093 x 304` |
-| SHA-256 | `d1d86970344e892d40b60a21a22a9df11f9f6ba4c5004ecd44d63594a4680314` |
-| 仓库状态 | `not_tracked` |
+| 证据 | 尺寸 | SHA-256 | 可支持的断言 |
+|---|---:|---|---|
+| 首次 picker 列表 | `1093 x 304` | `d1d86970344e892d40b60a21a22a9df11f9f6ba4c5004ecd44d63594a4680314` | 七条标题、五个友好名称、两个 companion 平台前缀和可见说明截断；不支持热更新因果。 |
+| 新空任务 composer | `1119 x 136` | `b83b2bccccb3894cd6d5bd09ff6521b9358b0ac4c7b0c9169dad3be88c2af76a` | 未发送编辑器中显示 `CoTend Init` 友好 chip；截图内没有显示 canonical 双前缀。 |
 
 ## 可见入口转录
 
@@ -50,24 +71,12 @@ metadata:
 | 6 | `CoTend Diagnose Only` | `Read-only root-cause analysis` | 用户原创 Skill 的友好显示名生效。 |
 | 7 | `CoTend Model Upgrade` | `Premium model project handoff` | 用户原创 Skill 的友好显示名生效。 |
 
-五个用户原创 Skill 均显示既有 `agents/openai.yaml` 友好名称。两个 MIT companion 显示为平台生成的 `Cotend: ...`，其大小写和前缀一致性可作为后续界面润色证据，但当前不足以触发短 Skill ID 迁移或共享行为修改。
-
-## 热更新纠偏
-
-| 断言 | 结果 | 证据分类 |
-|---|---|---|
-| `/cotend` 能在当前 Desktop 选择器找到候选 | 通过 | `executed_user_assisted` |
-| 当前 Desktop 支持候选热更新 | 用户确认通过 | `user_confirmed` |
-| `$CoTend` 查询不可见 | 无效测试；使用了错误表面语法 | `asserted_by_rule` |
-| 重启是候选可见的必要条件 | 不成立；没有有效因果证据 | `asserted_by_rule` |
-| 重启后的候选可见与 cleanup | 历史执行事实保留，但不证明必须重启 | `executed_user_assisted` |
-| cleanup 后 candidate 与 Marketplace 均不存在 | 通过 | `executed` |
+五个用户原创 Skill 均显示既有 `agents/openai.yaml` 友好名称。两个 MIT companion 显示为平台生成的 `Cotend: ...`；其大小写和前缀一致性是后续界面润色证据，但当前不足以触发短 Skill ID 迁移或共享行为修改。
 
 ## 仍未执行
 
 - 详情页字段和 canonical name 的具体展示位置；
 - `/cotend` 以外的搜索词、排序和模糊匹配；
-- 点击入口后的非发送 token 插入；
 - 自然语言或隐式触发；
 - Plugin 内 Skill 间委派和模型行为；
 - direct user Skills 与 Plugin 的安装、更新、命名、UI 和卸载对比；
@@ -75,4 +84,4 @@ metadata:
 
 ## 候选结论
 
-N3 display-led preserve-first 继续作为 production-package 的候选基线，结果为 `continue_with_notes`：五个主要入口已证明具有适合普通用户识别的友好名称，热更新也可用；两个 companion 的平台前缀和剩余交互仍需后续评估。该结论不授权 production package、共享 Skill 改名、模型调用、公开提交或发布。
+N3 display-led preserve-first 继续作为 production-package 候选基线。真实 Desktop 已证明普通用户主要看到 `CoTend ...` 友好标题，并在新任务的未发送编辑器中插入 `CoTend Init` chip；canonical 双前缀没有出现在该 chip 截图中。安装器必须显式处理新任务刷新，且剩余详情与模型证据仍可否证 N3。本结论不授权 production package、共享 Skill 改名、模型调用、公开提交或发布。

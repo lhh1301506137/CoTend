@@ -1985,9 +1985,11 @@ def plugin_namespace_candidate_errors(
         },
         "subsequent_desktop_picker_evidence": {"passed_partial"},
         "desktop_picker_query": {"/cotend"},
-        "desktop_hot_update_verified": {"true"},
+        "desktop_hot_update_verified": {"false"},
+        "desktop_new_task_refresh_verified": {"true"},
         "desktop_visible_entry_count": {"7"},
-        "desktop_interaction_verified": {"false"},
+        "desktop_non_sending_chip_verified": {"true"},
+        "desktop_interaction_verified": {"partial"},
         "model_behavior_verified": {"false"},
     }.items():
         if metadata_values(evidence_text, key) != expected:
@@ -2009,6 +2011,9 @@ def plugin_namespace_candidate_errors(
         "当时 Desktop 和自然语言行为为 `not_run`",
         "后续 Desktop picker 实证",
         "混用造成的无效假阴性",
+        "同一已打开任务不可见",
+        "fresh app-server 发现 7 项",
+        "b83b2bccccb3894cd6d5bd09ff6521b9358b0ac4c7b0c9169dad3be88c2af76a",
         "最终两个隔离环境中均没有已安装 Plugin",
         "PLUGIN_NAMESPACE_EVALUATION_OK physical_candidates=2",
     ):
@@ -2017,16 +2022,18 @@ def plugin_namespace_candidate_errors(
 
     for key, expected in {
         "status": {
-            "user_confirmed_candidate_baseline_with_partial_desktop_picker_evidence"
+            "user_confirmed_candidate_baseline_with_new_task_picker_and_chip_evidence"
         },
         "recommendation": {"N3_display_led_preserve_first"},
         "candidate_baseline_confirmed": {"true"},
         "production_namespace_confirmed": {"false"},
         "production_package_authorized": {"false"},
-        "desktop_surface_verified": {"partial_picker_only"},
-        "desktop_hot_update_verified": {"true"},
+        "desktop_surface_verified": {"partial_picker_and_non_sending_chip"},
+        "desktop_hot_update_verified": {"false"},
+        "desktop_new_task_refresh_verified": {"true"},
         "desktop_visible_entry_count": {"7"},
-        "desktop_interaction_verified": {"false"},
+        "desktop_non_sending_chip_verified": {"true"},
+        "desktop_interaction_verified": {"partial"},
         "model_behavior_verified": {"false"},
         "shared_behavior_change_authorized": {"false"},
     }.items():
@@ -2037,7 +2044,9 @@ def plugin_namespace_candidate_errors(
         "N3 display-led preserve-first",
         "不是最终 namespace 定案",
         "错误语法造成的假阴性",
-        "当前 Desktop 支持热更新",
+        "当前任务热更新未通过",
+        "打开新任务或执行等价 Skill 快照刷新",
+        "截图内没有出现 canonical 双前缀",
         "上游变更提案",
         "N2 的 validator 与 discovery 通过不能升级为",
         "用户确认后的状态",
@@ -2046,18 +2055,31 @@ def plugin_namespace_candidate_errors(
             errors.append(f"Plugin namespace evaluation is missing: {marker}")
 
     for key, expected in {
-        "status": {"passed_picker_surface_with_remaining_interaction_gaps"},
+        "status": {
+            "passed_new_task_picker_and_non_sending_chip_with_refresh_boundary"
+        },
         "evidence_type": {
-            "user_assisted_execution_plus_screenshot_inspection"
+            "controlled_live_lifecycle_plus_fresh_discovery_and_user_screenshot_inspection"
         },
         "candidate_id": {"N3-display-led"},
         "desktop_picker_query": {"/cotend"},
-        "desktop_hot_update_verified": {"true"},
+        "desktop_hot_update_verified": {"false"},
+        "desktop_new_task_refresh_verified": {"true"},
+        "desktop_refresh_contract_candidate": {
+            "new_task_or_equivalent_skill_snapshot_refresh"
+        },
+        "fresh_app_server_entry_count": {"7"},
         "visible_entry_count": {"7"},
         "user_owned_friendly_display_names": {"5"},
         "companion_platform_prefixed_display_names": {"2"},
-        "desktop_interaction_verified": {"false"},
+        "non_sending_chip_insertion_verified": {"true"},
+        "chip_display_name": {"CoTend_Init"},
+        "canonical_chip_visible": {"false"},
+        "desktop_interaction_verified": {
+            "partial_picker_and_non_sending_chip"
+        },
         "model_behavior_verified": {"false"},
+        "candidate_cleanup_verified": {"true"},
         "production_namespace_confirmed": {"false"},
         "production_package_authorized": {"false"},
         "screenshot_tracked": {"false"},
@@ -2066,10 +2088,14 @@ def plugin_namespace_candidate_errors(
             errors.append(f"Desktop Plugin surface evidence mismatch: {key}")
 
     for marker in (
-        "`/cotend` 是 Desktop Skill 选择器查询",
+        "Desktop Skill 选择器的正确查询是 `/cotend`",
         "`$skill-name` 是提示词中的显式 Skill 调用语法",
-        "不能用于证明 Desktop 必须重启",
+        "当前证据**不支持**“已打开任务可靠热更新”",
+        "同一已打开任务查询 `/cotend`",
+        "fresh `skills/list(forceReload=true)`",
+        "打开新任务或执行等价 Skill 快照刷新",
         "d1d86970344e892d40b60a21a22a9df11f9f6ba4c5004ecd44d63594a4680314",
+        "b83b2bccccb3894cd6d5bd09ff6521b9358b0ac4c7b0c9169dad3be88c2af76a",
         "`Cotend: Grill Me`",
         "`CoTend Init`",
         "`Cotend: Karpathy Guidelines`",
@@ -2077,9 +2103,12 @@ def plugin_namespace_candidate_errors(
         "`CoTend Collaboration`",
         "`CoTend Diagnose Only`",
         "`CoTend Model Upgrade`",
+        "`CoTend Init` 友好 chip",
+        "9 个 Plugin、3 个 Marketplace",
+        "消息发送与模型调用",
         "原始截图只保留在本地证据环境",
         "详情页字段和 canonical name",
-        "N3 display-led preserve-first 继续作为 production-package 的候选基线",
+        "N3 display-led preserve-first 继续作为 production-package 候选基线",
     ):
         if marker not in desktop_text:
             errors.append(f"Desktop Plugin surface evidence is missing: {marker}")
