@@ -73,6 +73,6 @@ python scripts/verify_delivered_codex_runtime.py --discover --live --evidence .p
 
 - 没有写入真实用户项目，也没有运行 fresh/current/pending/repair 的可写模型旅程。
 - 没有安装或修改用户级/全局 Skill、Codex config/auth、Desktop 菜单、Plugin 或 Marketplace。
-- 没有验证自然语言隐式触发、并发交付、进程强制终止恢复、最终小白安装渠道、Claude 载体、公开发布或用户最终验收。
+- 本次 L25 运行时桥本身没有验证自然语言隐式触发、并发交付、进程强制终止恢复、最终小白安装渠道、Claude 载体、公开发布或用户最终验收。后续项目级并发排他和强制终止检测见 `docs/evidence/DELIVERY-CONCURRENCY-AND-INTERRUPTION.md`；它仍不提供自动恢复。
 - 本次诊断的结构化语义通过；recorded-English 对照也通过，但无项目语言记录时在继承/清除父环境两种条件下都返回中文，因此默认英文输出遵循仍是 upstream + target artifact identity 门控的 adapter compliance 缺口。
 - 本结果只把 C16 的 disposable 项目交付与只读 adapter invocation 连通，不关闭 P4/P6 Gate，也不改变两项 upstream-gated 行为的状态。

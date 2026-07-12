@@ -149,13 +149,13 @@ rollback_triggers:
   - checkpoint 或 postcondition 不匹配却仍报告成功
   - CLI 被产品界面误用且导致用户无法理解操作影响
   - 并发或强制终止验证证明当前事务模型无法安全恢复
-review_after: 首次真实项目写入、live 调用和并发或强制终止恢复验证后
+review_after: 首次真实项目写入或显式中断恢复验证后；并发排他与强制终止检测已由后续 L29 记录复审
 watch_closure:
   - keep_watch
   - evidence: deterministic_single_process_project_delivery
 ```
 
-当前实现可作为 P4/P6 的项目级底层继续使用，但不是最终小白安装渠道，也不证明用户级/全局安装、Plugin、Marketplace、真实项目调用、并发写入或强制终止恢复已经完成。此次没有修改七个 CoTend Skill 或上游共享行为，因此不触发 Claude/分享包同步。
+该阶段实现可作为 P4/P6 的项目级底层继续使用，但当时尚未证明并发写入或强制终止检测；后续 L29 已补充项目级排他和保守中断检测，仍未证明自动恢复、用户级/全局安装、Plugin、Marketplace 或真实项目调用。此次没有修改七个 CoTend Skill 或上游共享行为，因此不触发 Claude/分享包同步。
 
 ## 2026-07-12 Codex Target Artifact Identity Schema v2
 
@@ -212,7 +212,7 @@ validation_scenarios:
   - scenario: 真实项目 legacy migration、并发和强制终止
     expected: 不丢失用户文件、receipt 或最后安全 checkpoint
     validation_result_type: deferred
-    result: disposable_single_process_evidence_only
+    result: identity_slice_was_single_process_then_L29_added_disposable_process_evidence
 real_project_validation:
   - scenario: 真实本地项目从 schema v1 receipt 迁移到 schema v2
     expected: 用户可理解 dry-run，Skill payload 和项目真相不变，rollback 可验证
@@ -224,10 +224,75 @@ rollback_triggers:
   - migration 或 rollback 修改任何 Skill payload、用户文件或无关 Skill
   - lower revision 被普通 update 接受
   - schema v1 合法项目无法通过明确迁移或恢复路线继续
-review_after: 首次真实项目 legacy migration 和并发或强制终止恢复验证后
+review_after: 首次真实项目 legacy migration 或显式中断恢复验证后；项目级并发排他与终止检测已由后续 L29 记录复审
 watch_closure:
   - keep_watch
   - evidence: deterministic_disposable_migration_and_delivered_runtime
 ```
 
 该变更不修改七个 Skill、共享治理协议或 upstream framework lock，因此不产生新的 Claude/分享包同步内容；既有上游反馈包的外部审计状态保持不变。target identity 仍处于 `watch`，不能把 disposable 单进程证据表述为真实项目迁移或最终安装产品已完成。
+
+## 2026-07-12 项目级并发排他与强制终止检测
+
+```yaml
+current_framework_version: cotend-collaboration-v1.52
+change_type: workflow_behavior
+change_summary: 为所有项目级 delivery mutation 增加原子排他、持锁后 re-plan、phase/owner 证据和强制终止后的保守阻断
+intent: 防止同一项目被两个交付进程同时修改，并确保进程终止或 rollback 双失败不会伪报稳定或丢失恢复证据
+expected_benefit:
+  - 同项目最多一个 mutation 进入 checkpoint/payload 写入，不同项目互不阻塞
+  - 获取锁后重新规划，避免两个进程基于同一旧快照重复执行
+  - 受控失败恢复后释放本次锁；强制终止和双失败保留锁、checkpoint 与 transition artifacts
+  - inspect 只读报告 active、stale_or_unverifiable 和 recovery_required，不依据 PID 或时间自动清理
+possible_harm:
+  - stale lock 在没有显式恢复工具前会保守阻断合法 repair/rollback
+  - PID liveness 可能因权限、PID 重用或平台差异给出 unknown/保守误阻断
+  - 锁释放失败会让已完成 transition 进入需要人工复核的状态
+affected_workflows:
+  - install_update_repair_and_identity_migration
+  - enable_disable_uninstall_and_rollback
+  - inspect_and_recovery_classification
+  - checkpoint_and_transition_evidence
+mechanism_budget:
+  added_context_surface: script_and_state_metadata
+  ordinary_load_impact: none
+  ceremony_added: low
+  duplication_check: extends_existing_C16_delivery_state
+  cheaper_alternative_considered: 只在写入前检查 lock 文件；因非原子且无法解决 TOCTOU、owner mismatch 和中断证据而拒绝
+  retirement_or_thinning_trigger: 目标平台提供同等项目级原子事务、owner 证据和 crash-recovery 原语后可替换 adapter lock
+  expected_failure_prevented: concurrent_payload_corruption_stale_snapshot_double_write_silent_lock_theft_and_false_stable_after_process_kill
+validation_scenarios:
+  - scenario: unit lock and failure boundaries
+    expected: active/stale/invalid/owner-mismatch/double-failure/re-plan 均按合同处理
+    validation_result_type: executed
+    result: unit_tests_40_of_40_passed
+  - scenario: independent-process contention
+    expected: 同项目第二进程零 checkpoint/payload 写入阻断，不同项目独立成功
+    validation_result_type: executed
+    result: same_project_blocked_and_different_project_passed
+  - scenario: forced termination before checkpoint and before receipt
+    expected: owner phase、非存活证据、checkpoint/staging/lock 被保留，状态 recovery_required
+    validation_result_type: executed
+    result: DELIVERY_CONCURRENCY_OK_cases_6
+  - scenario: explicit stale-lock recovery and power-loss durability
+    expected: 明确选择 checkpoint/forward/rollback 后恢复，且断电不会产生虚假稳定
+    validation_result_type: deferred
+    result: detection_and_blocking_only
+real_project_validation:
+  - scenario: 真实本地项目并发更新与中断恢复
+    expected: 用户文件不变、竞争可解释、恢复路线可由用户确认
+    validation_result_type: deferred
+    result: real_project_boundary_remains_closed
+decision: watch
+rollback_triggers:
+  - 任一竞争失败进程写入 checkpoint、payload 或 receipt
+  - owner mismatch 或 dead PID 导致自动清锁
+  - 强制终止后 inspect 报告 stable 或普通 repair/rollback 越过锁
+  - 锁元数据暴露凭据、绝对项目路径或项目数据
+review_after: 显式 recover_delivery 或首次真实项目并发/中断恢复验证后
+watch_closure:
+  - keep_watch
+  - evidence: disposable_independent_process_contention_and_termination
+```
+
+这次仍未修改七个 Skill、共享治理协议、source framework lock 或 target identity，因此不触发新的上游/外部 reviewer 同步。新增机制只覆盖项目级交付互斥和中断检测；force unlock、自动 recovery、真实项目与最终安装渠道继续保持未完成。

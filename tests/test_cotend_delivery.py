@@ -758,6 +758,226 @@ class DeliveryLifecycleTests(unittest.TestCase):
             manager.execute("install", self.artifact, apply=True)
         self.assertEqual(residue.read_text(encoding="utf-8"), "{}\n")
 
+    def test_active_mutation_lock_blocks_competing_write_without_changes(self) -> None:
+        lease = self.manager._acquire_mutation_lock("install")
+        locked_snapshot = tree_manifest(self.project)
+        try:
+            state = DeliveryManager(self.project).inspect(self.artifact)
+            self.assertEqual(state["transition"], "staged")
+            self.assertEqual(state["mutation_lock"]["state"], "active")
+            self.assertEqual(
+                state["mutation_lock"]["owner"]["process_liveness"],
+                "alive",
+            )
+            with self.assertRaisesRegex(DeliveryError, "mutation_lock_active"):
+                DeliveryManager(self.project).execute(
+                    "install",
+                    self.artifact,
+                    apply=True,
+                )
+            self.assertEqual(tree_manifest(self.project), locked_snapshot)
+        finally:
+            self.manager._update_mutation_phase(lease, "completed")
+            self.manager._release_mutation_lock(lease)
+        self.assertFalse(self.manager.mutation_lock_path.exists())
+        self.assert_protected_unchanged()
+
+    def test_stale_interrupted_lock_is_reported_and_never_auto_removed(self) -> None:
+        lease = self.manager._acquire_mutation_lock("install")
+        metadata = json.loads(
+            self.manager.mutation_owner_path.read_text(encoding="utf-8")
+        )
+        metadata.update({"process_id": 2_147_483_647, "phase": "mutating"})
+        self.manager.mutation_owner_path.write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        lock_before = self.manager.mutation_owner_path.read_bytes()
+
+        state = DeliveryManager(self.project).inspect(self.artifact)
+        self.assertEqual(state["transition"], "recovery_required")
+        self.assertEqual(state["mutation_lock"]["state"], "recovery_required")
+        self.assertTrue(state["mutation_lock"]["interrupted"])
+        self.assertEqual(state["recommended_operation"], "manual_recovery_required")
+        with self.assertRaisesRegex(DeliveryError, "mutation_lock_recovery_required"):
+            DeliveryManager(self.project).execute(
+                "install",
+                self.artifact,
+                apply=True,
+            )
+        self.assertEqual(self.manager.mutation_owner_path.read_bytes(), lock_before)
+        self.assertTrue(self.manager.mutation_lock_path.is_dir())
+        self.assertEqual(metadata["owner_token"], lease.owner_token)
+        self.assert_protected_unchanged()
+
+    def test_invalid_mutation_lock_metadata_blocks_without_cleanup(self) -> None:
+        self.manager.state_root.mkdir(parents=True)
+        self.manager.mutation_lock_path.mkdir()
+        self.manager.mutation_owner_path.write_text("{broken\n", encoding="utf-8")
+        before = tree_manifest(self.project)
+
+        state = self.manager.inspect(self.artifact)
+        self.assertEqual(state["mutation_lock"]["state"], "stale_or_unverifiable")
+        self.assertEqual(state["transition"], "recovery_required")
+        with self.assertRaisesRegex(DeliveryError, "stale_or_unverifiable"):
+            self.manager.execute("install", self.artifact, apply=True)
+        self.assertEqual(tree_manifest(self.project), before)
+        self.assertTrue(self.manager.mutation_lock_path.is_dir())
+
+    def test_transition_and_rollback_failure_retains_recovery_lock(self) -> None:
+        self.install()
+        updated = self.make_updated_artifact()
+        with (
+            mock.patch.object(
+                self.manager,
+                "_write_receipt",
+                side_effect=OSError("injected transition failure"),
+            ),
+            mock.patch.object(
+                self.manager,
+                "_restore_checkpoint",
+                side_effect=OSError("injected rollback failure"),
+            ),
+        ):
+            with self.assertRaisesRegex(DeliveryError, "lock was retained"):
+                self.manager.execute("update", updated, apply=True)
+
+        state = self.manager.inspect(updated)
+        self.assertEqual(state["transition"], "recovery_required")
+        self.assertEqual(state["mutation_lock"]["state"], "recovery_required")
+        self.assertEqual(
+            state["mutation_lock"]["owner"]["phase"],
+            "recovery_required",
+        )
+        self.assertTrue(self.manager.rollback_path.is_dir())
+        self.assertTrue(self.manager.mutation_lock_path.is_dir())
+        self.assert_protected_unchanged()
+
+    def test_restored_rollback_phase_failure_retains_lock_without_false_double_failure(
+        self,
+    ) -> None:
+        self.install()
+        updated = self.make_updated_artifact()
+        original_update_phase = self.manager._update_mutation_phase
+
+        def fail_rolled_back_phase(lease, phase: str) -> None:
+            if phase == "rolled_back":
+                raise OSError("injected rolled-back phase failure")
+            original_update_phase(lease, phase)
+
+        with (
+            mock.patch.object(
+                self.manager,
+                "_write_receipt",
+                side_effect=OSError("injected transition failure"),
+            ),
+            mock.patch.object(
+                self.manager,
+                "_update_mutation_phase",
+                side_effect=fail_rolled_back_phase,
+            ),
+        ):
+            with self.assertRaises(DeliveryError) as caught:
+                self.manager.execute("update", updated, apply=True)
+
+        self.assertEqual(
+            caught.exception.code,
+            "transition_failed_rollback_restored_lock_retained",
+        )
+        state = self.manager.inspect(self.artifact)
+        self.assertEqual(state["installation"], "complete")
+        self.assertEqual(state["artifact_id"], self.artifact.artifact_id)
+        self.assertEqual(state["mutation_lock"]["state"], "recovery_required")
+        self.assertEqual(
+            state["mutation_lock"]["owner"]["phase"],
+            "recovery_required",
+        )
+        self.assertTrue(state["rollback_available"])
+        self.assert_protected_unchanged()
+
+    def test_mutation_lock_owner_mismatch_prevents_release(self) -> None:
+        lease = self.manager._acquire_mutation_lock("install")
+        metadata = json.loads(
+            self.manager.mutation_owner_path.read_text(encoding="utf-8")
+        )
+        metadata["owner_token"] = "0" * 32
+        self.manager.mutation_owner_path.write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(DeliveryError, "another process"):
+            self.manager._release_mutation_lock(lease)
+        self.assertTrue(self.manager.mutation_lock_path.is_dir())
+        self.assertEqual(
+            json.loads(self.manager.mutation_owner_path.read_text(encoding="utf-8"))[
+                "owner_token"
+            ],
+            "0" * 32,
+        )
+        self.assert_protected_unchanged()
+
+    def test_locked_replan_failure_releases_unmutated_lock(self) -> None:
+        original_plan = self.manager.plan
+
+        def fail_locked_replan(
+            operation: str,
+            candidate: Artifact | None = None,
+            *,
+            _owner_token: str | None = None,
+        ) -> dict[str, object]:
+            if _owner_token is not None:
+                raise DeliveryError("injected_replan_failure", "locked replan failed")
+            return original_plan(operation, candidate)
+
+        before = tree_manifest(self.project)
+        with mock.patch.object(
+            self.manager,
+            "plan",
+            side_effect=fail_locked_replan,
+        ):
+            with self.assertRaisesRegex(DeliveryError, "locked replan failed"):
+                self.manager.execute("install", self.artifact, apply=True)
+        self.assertEqual(tree_manifest(self.project), before)
+        self.assertFalse(self.manager.mutation_lock_path.exists())
+        self.assert_protected_unchanged()
+
+    def test_locked_replan_observes_state_changed_before_acquire(self) -> None:
+        self.install()
+        updated = self.make_updated_artifact()
+        original_acquire = self.manager._acquire_mutation_lock
+        competing_manager = DeliveryManager(self.project)
+        advanced = False
+
+        def advance_then_acquire(operation: str):
+            nonlocal advanced
+            if not advanced:
+                advanced = True
+                competing_manager.execute("update", updated, apply=True)
+            return original_acquire(operation)
+
+        with (
+            mock.patch.object(
+                self.manager,
+                "_acquire_mutation_lock",
+                side_effect=advance_then_acquire,
+            ),
+            mock.patch.object(
+                self.manager,
+                "_update_mutation_phase",
+                side_effect=AssertionError("no-change replan must not write a phase"),
+            ),
+        ):
+            result = self.manager.execute("update", updated, apply=True)
+
+        self.assertTrue(advanced)
+        self.assertEqual(result["status"], "current_no_change")
+        self.assertFalse(result["applied"])
+        state = self.manager.inspect(updated)
+        self.assertEqual(state["artifact_id"], updated.artifact_id)
+        self.assertEqual(state["candidate_relation"], "same_as_current")
+        self.assertEqual(state["mutation_lock"]["state"], "none")
+        self.assert_protected_unchanged()
+
 
 if __name__ == "__main__":
     unittest.main()

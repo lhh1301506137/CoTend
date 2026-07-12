@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import shutil
+import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
@@ -23,7 +24,9 @@ EXPECTED_FILE_COUNT = 30
 RECEIPT_SCHEMA = "cotend.delivery-receipt"
 CHECKPOINT_SCHEMA = "cotend.delivery-checkpoint"
 TARGET_LOCK_SCHEMA = "cotend.target-artifact-lock"
+MUTATION_LOCK_SCHEMA = "cotend.delivery-mutation-lock"
 TARGET_LOCK_SCHEMA_VERSION = 1
+MUTATION_LOCK_SCHEMA_VERSION = 1
 RECEIPT_SCHEMA_VERSION = 2
 CHECKPOINT_SCHEMA_VERSION = 2
 LEGACY_SCHEMA_VERSION = 1
@@ -39,6 +42,23 @@ OPERATIONS = {
     "disable",
     "uninstall",
     "rollback",
+}
+MUTATION_PHASES = {
+    "planning",
+    "checkpointing",
+    "mutating",
+    "verifying",
+    "committing",
+    "rolled_back",
+    "completed",
+    "recovery_required",
+}
+INTERRUPTED_MUTATION_PHASES = {
+    "checkpointing",
+    "mutating",
+    "verifying",
+    "committing",
+    "recovery_required",
 }
 
 
@@ -95,6 +115,56 @@ def _is_sha256(value: Any) -> bool:
 
 def _utc_now() -> str:
     return datetime.now(UTC).isoformat()
+
+
+def _process_liveness(process_id: int) -> str:
+    """Return best-effort local evidence without treating PID state as authority."""
+    if process_id == os.getpid():
+        return "alive"
+    if os.name == "nt":
+        try:
+            import ctypes
+            from ctypes import wintypes
+
+            process_query_limited_information = 0x1000
+            error_invalid_parameter = 87
+            still_active = 259
+            kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+            kernel32.OpenProcess.restype = wintypes.HANDLE
+            kernel32.GetExitCodeProcess.argtypes = [
+                wintypes.HANDLE,
+                ctypes.POINTER(wintypes.DWORD),
+            ]
+            kernel32.GetExitCodeProcess.restype = wintypes.BOOL
+            kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+            kernel32.CloseHandle.restype = wintypes.BOOL
+            handle = kernel32.OpenProcess(
+                process_query_limited_information,
+                False,
+                process_id,
+            )
+            if not handle:
+                return (
+                    "not_alive"
+                    if ctypes.get_last_error() == error_invalid_parameter
+                    else "unknown"
+                )
+            exit_code = wintypes.DWORD()
+            queried = kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code))
+            kernel32.CloseHandle(handle)
+            if not queried:
+                return "unknown"
+            return "alive" if exit_code.value == still_active else "not_alive"
+        except (AttributeError, OSError, ValueError):
+            return "unknown"
+    try:
+        os.kill(process_id, 0)
+    except ProcessLookupError:
+        return "not_alive"
+    except (PermissionError, OSError):
+        return "unknown"
+    return "alive"
 
 
 def _is_linklike(path: Path) -> bool:
@@ -171,6 +241,12 @@ class LegacyReceiptMapping:
             and receipt.get("protocol") == self.protocol
             and receipt.get("manifest_sha256") == self.manifest_sha256
         )
+
+
+@dataclass(frozen=True)
+class _MutationLease:
+    owner_token: str
+    operation: str
 
 
 @dataclass(frozen=True)
@@ -459,6 +535,9 @@ class DeliveryManager:
         self.rollback_new_path = self.state_root / "rollback.new"
         self.previous_rollback_path = self.state_root / "rollback.previous"
         self.staging_path = self.state_root / "staging"
+        self.mutation_lock_path = self.state_root / "mutation.lock"
+        self.mutation_owner_path = self.mutation_lock_path / "owner.json"
+        self.mutation_owner_temp_path = self.mutation_lock_path / "owner.json.tmp"
         self._assert_target_boundaries()
 
     def _assert_target_boundaries(self) -> None:
@@ -489,6 +568,338 @@ class DeliveryManager:
                 "invalid_boundary",
                 "Receipt temporary path must be a file when present",
             )
+
+    @staticmethod
+    def _no_mutation_lock() -> dict[str, Any]:
+        return {
+            "present": False,
+            "state": "none",
+            "interrupted": False,
+            "metadata_residue": False,
+            "diagnostics": [],
+            "metadata": None,
+        }
+
+    @staticmethod
+    def _validate_mutation_metadata(value: Any) -> dict[str, Any]:
+        expected_keys = {
+            "schema",
+            "schema_version",
+            "owner_token",
+            "operation",
+            "process_id",
+            "created_at",
+            "updated_at",
+            "phase",
+        }
+        if not isinstance(value, dict) or set(value) != expected_keys:
+            raise DeliveryError(
+                "mutation_lock_invalid",
+                "Mutation lock metadata shape is invalid",
+            )
+        token = value.get("owner_token")
+        process_id = value.get("process_id")
+        if (
+            value.get("schema") != MUTATION_LOCK_SCHEMA
+            or value.get("schema_version") != MUTATION_LOCK_SCHEMA_VERSION
+            or not isinstance(token, str)
+            or len(token) != 32
+            or any(char not in "0123456789abcdef" for char in token)
+            or value.get("operation") not in OPERATIONS - {"inspect"}
+            or isinstance(process_id, bool)
+            or not isinstance(process_id, int)
+            or process_id < 1
+            or not isinstance(value.get("created_at"), str)
+            or not value["created_at"]
+            or not isinstance(value.get("updated_at"), str)
+            or not value["updated_at"]
+            or value.get("phase") not in MUTATION_PHASES
+        ):
+            raise DeliveryError(
+                "mutation_lock_invalid",
+                "Mutation lock metadata is invalid",
+            )
+        return value
+
+    def _load_mutation_metadata_strict(self) -> dict[str, Any]:
+        if _is_linklike(self.mutation_lock_path) or not self.mutation_lock_path.is_dir():
+            raise DeliveryError(
+                "mutation_lock_invalid",
+                "Mutation lock is not a normal directory",
+            )
+        if _is_linklike(self.mutation_owner_path) or not self.mutation_owner_path.is_file():
+            raise DeliveryError(
+                "mutation_lock_invalid",
+                "Mutation lock owner metadata is missing or unsafe",
+            )
+        try:
+            value = json.loads(self.mutation_owner_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise DeliveryError(
+                "mutation_lock_invalid",
+                "Mutation lock owner metadata cannot be parsed",
+            ) from exc
+        return self._validate_mutation_metadata(value)
+
+    def _read_mutation_lock(self) -> dict[str, Any]:
+        if not self.mutation_lock_path.exists() and not _is_linklike(
+            self.mutation_lock_path
+        ):
+            return self._no_mutation_lock()
+        invalid = {
+            "present": True,
+            "state": "stale_or_unverifiable",
+            "interrupted": False,
+            "metadata_residue": False,
+            "diagnostics": ["mutation_lock_unverifiable"],
+            "metadata": None,
+        }
+        if _is_linklike(self.mutation_lock_path) or not self.mutation_lock_path.is_dir():
+            return invalid
+        try:
+            entries = {entry.name for entry in self.mutation_lock_path.iterdir()}
+        except OSError:
+            return invalid
+        metadata_residue = "owner.json.tmp" in entries
+        unexpected = entries - {"owner.json", "owner.json.tmp"}
+        if unexpected:
+            return {
+                **invalid,
+                "metadata_residue": metadata_residue,
+                "diagnostics": [
+                    "mutation_lock_unverifiable",
+                    "mutation_lock_unexpected_entries",
+                ],
+            }
+        try:
+            metadata = self._load_mutation_metadata_strict()
+        except DeliveryError:
+            return {
+                **invalid,
+                "metadata_residue": metadata_residue,
+                "diagnostics": [
+                    "mutation_lock_unverifiable",
+                    *(
+                        ["mutation_lock_metadata_residue"]
+                        if metadata_residue
+                        else []
+                    ),
+                ],
+            }
+
+        liveness = _process_liveness(metadata["process_id"])
+        interrupted = metadata["phase"] in INTERRUPTED_MUTATION_PHASES
+        if metadata["phase"] == "recovery_required" or (
+            interrupted and liveness != "alive"
+        ):
+            state = "recovery_required"
+            diagnostic = "mutation_transition_interrupted"
+        elif liveness == "alive":
+            state = "active"
+            diagnostic = "mutation_lock_active"
+        else:
+            state = "stale_or_unverifiable"
+            diagnostic = "mutation_lock_stale_or_unverifiable"
+        diagnostics = [diagnostic]
+        if metadata_residue:
+            diagnostics.append("mutation_lock_metadata_residue")
+        return {
+            "present": True,
+            "state": state,
+            "interrupted": interrupted,
+            "metadata_residue": metadata_residue,
+            "diagnostics": diagnostics,
+            "metadata": {**metadata, "process_liveness": liveness},
+        }
+
+    @staticmethod
+    def _public_mutation_lock(lock: dict[str, Any]) -> dict[str, Any]:
+        metadata = lock["metadata"]
+        owner = None
+        if metadata is not None:
+            owner = {
+                "owner_id": metadata["owner_token"][:12],
+                "operation": metadata["operation"],
+                "process_id": metadata["process_id"],
+                "process_liveness": metadata["process_liveness"],
+                "phase": metadata["phase"],
+                "created_at": metadata["created_at"],
+                "updated_at": metadata["updated_at"],
+            }
+        return {
+            "present": lock["present"],
+            "state": lock["state"],
+            "interrupted": lock["interrupted"],
+            "metadata_residue": lock["metadata_residue"],
+            "owner": owner,
+        }
+
+    def _apply_mutation_lock_state(
+        self,
+        state: dict[str, Any],
+        lock: dict[str, Any],
+        *,
+        owner_token: str | None,
+    ) -> dict[str, Any]:
+        metadata = lock["metadata"]
+        owned = (
+            metadata is not None
+            and owner_token is not None
+            and metadata["owner_token"] == owner_token
+        )
+        if owned:
+            state["mutation_lock"] = self._public_mutation_lock(
+                self._no_mutation_lock()
+            )
+            return state
+
+        state["mutation_lock"] = self._public_mutation_lock(lock)
+        if not lock["present"]:
+            return state
+        state["diagnostics"] = list(
+            dict.fromkeys([*state.get("diagnostics", []), *lock["diagnostics"]])
+        )
+        if lock["state"] == "active":
+            state["transition"] = "staged"
+            state["recommended_operation"] = "wait_for_active_mutation"
+            state["recovery_guidance"] = (
+                "Wait for the reported owner to finish, then inspect again."
+            )
+        else:
+            state["transition"] = "recovery_required"
+            state["recommended_operation"] = "manual_recovery_required"
+            state["recovery_guidance"] = (
+                "Preserve the lock and transition evidence; verify ownership before "
+                "an explicit recovery or lock-removal procedure."
+            )
+        return state
+
+    def _write_mutation_metadata(self, metadata: dict[str, Any]) -> None:
+        self._validate_mutation_metadata(metadata)
+        if self.mutation_owner_temp_path.exists() or _is_linklike(
+            self.mutation_owner_temp_path
+        ):
+            raise DeliveryError(
+                "mutation_lock_invalid",
+                "Mutation lock metadata temporary path is occupied",
+            )
+        self.mutation_owner_temp_path.write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        os.replace(self.mutation_owner_temp_path, self.mutation_owner_path)
+
+    def _acquire_mutation_lock(self, operation: str) -> _MutationLease:
+        self._assert_target_boundaries()
+        self.state_root.mkdir(parents=True, exist_ok=True)
+        try:
+            os.mkdir(self.mutation_lock_path)
+        except FileExistsError as exc:
+            lock = self._read_mutation_lock()
+            raise DeliveryError(
+                "mutation_locked",
+                "Another mutation owns or left an unverifiable project delivery lock",
+                details={"mutation_lock": self._public_mutation_lock(lock)},
+            ) from exc
+
+        lease = _MutationLease(owner_token=uuid.uuid4().hex, operation=operation)
+        now = _utc_now()
+        metadata = {
+            "schema": MUTATION_LOCK_SCHEMA,
+            "schema_version": MUTATION_LOCK_SCHEMA_VERSION,
+            "owner_token": lease.owner_token,
+            "operation": operation,
+            "process_id": os.getpid(),
+            "created_at": now,
+            "updated_at": now,
+            "phase": "planning",
+        }
+        try:
+            self._write_mutation_metadata(metadata)
+        except Exception:
+            for path in (self.mutation_owner_temp_path, self.mutation_owner_path):
+                if path.is_file() and not _is_linklike(path):
+                    path.unlink()
+            try:
+                self.mutation_lock_path.rmdir()
+            except OSError:
+                pass
+            self._cleanup_empty_lock_parents()
+            raise
+        return lease
+
+    def _update_mutation_phase(self, lease: _MutationLease, phase: str) -> None:
+        if phase not in MUTATION_PHASES:
+            raise DeliveryError("mutation_phase_invalid", f"Unknown mutation phase: {phase}")
+        metadata = self._load_mutation_metadata_strict()
+        if metadata["owner_token"] != lease.owner_token:
+            raise DeliveryError(
+                "mutation_lock_owner_mismatch",
+                "Mutation lock ownership changed during the operation",
+            )
+        self._write_mutation_metadata(
+            {**metadata, "phase": phase, "updated_at": _utc_now()}
+        )
+
+    def _mark_mutation_recovery_required(self, lease: _MutationLease) -> None:
+        try:
+            self._update_mutation_phase(lease, "recovery_required")
+        except (DeliveryError, OSError):
+            pass
+
+    def _release_mutation_lock(self, lease: _MutationLease) -> None:
+        metadata = self._load_mutation_metadata_strict()
+        if metadata["owner_token"] != lease.owner_token:
+            raise DeliveryError(
+                "mutation_lock_owner_mismatch",
+                "Refusing to release a mutation lock owned by another process",
+            )
+        entries = {entry.name for entry in self.mutation_lock_path.iterdir()}
+        unexpected = entries - {"owner.json", "owner.json.tmp"}
+        if unexpected:
+            raise DeliveryError(
+                "mutation_lock_invalid",
+                "Refusing to release a mutation lock with unexpected entries",
+            )
+        if self.mutation_owner_temp_path.exists():
+            if _is_linklike(self.mutation_owner_temp_path) or not (
+                self.mutation_owner_temp_path.is_file()
+            ):
+                raise DeliveryError(
+                    "mutation_lock_invalid",
+                    "Mutation lock metadata residue is unsafe",
+                )
+            self.mutation_owner_temp_path.unlink()
+        self.mutation_owner_path.unlink()
+        self.mutation_lock_path.rmdir()
+        self._cleanup_empty_lock_parents()
+
+    def _cleanup_empty_lock_parents(self) -> None:
+        for path in (self.state_root, self.agents_root):
+            try:
+                path.rmdir()
+            except (FileNotFoundError, OSError):
+                pass
+
+    def _release_terminal_mutation_lock(
+        self,
+        lease: _MutationLease,
+        *,
+        prior_error: Exception | None = None,
+    ) -> None:
+        try:
+            self._release_mutation_lock(lease)
+        except Exception as release_error:
+            self._mark_mutation_recovery_required(lease)
+            raise DeliveryError(
+                "mutation_lock_release_failed",
+                "The delivery transition reached a terminal state but its lock could not be released",
+                details={
+                    "operation": lease.operation,
+                    "prior_error": str(prior_error) if prior_error else None,
+                    "release_error": str(release_error),
+                },
+            ) from release_error
 
     def _receipt_payload(self, artifact: Artifact, *, enabled: bool) -> dict[str, Any]:
         now = _utc_now()
@@ -659,7 +1070,7 @@ class DeliveryManager:
     ) -> list[str]:
         if not self.state_root.is_dir():
             return []
-        allowed = {self.rollback_path}
+        allowed = {self.rollback_path, self.mutation_lock_path}
         if not include_previous_rollback:
             allowed.add(self.previous_rollback_path)
         return sorted(
@@ -690,8 +1101,18 @@ class DeliveryManager:
         candidate: Artifact | None,
         *,
         include_previous_rollback: bool,
+        owner_token: str | None = None,
     ) -> dict[str, Any]:
         self._assert_target_boundaries()
+        mutation_lock = self._read_mutation_lock()
+
+        def finalize(state: dict[str, Any]) -> dict[str, Any]:
+            return self._apply_mutation_lock_state(
+                state,
+                mutation_lock,
+                owner_token=owner_token,
+            )
+
         rollback_available = self.rollback_path.is_dir()
         transition_artifacts = self._transition_artifacts(
             include_previous_rollback=include_previous_rollback
@@ -699,7 +1120,7 @@ class DeliveryManager:
         try:
             receipt = self._load_receipt(required=False)
         except DeliveryError as exc:
-            return {
+            return finalize({
                 "schema": "cotend.delivery-state",
                 "project": str(self.project),
                 "receipt_valid": False,
@@ -718,7 +1139,7 @@ class DeliveryManager:
                 "rollback_available": rollback_available,
                 "recommended_operation": "manual_resolution",
                 "diagnostics": [exc.code],
-            }
+            })
 
         if receipt is None:
             collisions = self._collision_paths_without_receipt()
@@ -731,7 +1152,7 @@ class DeliveryManager:
                     diagnostics.append("unowned_collision")
                 if state_residue:
                     diagnostics.append("unowned_delivery_state")
-                return {
+                return finalize({
                     "schema": "cotend.delivery-state",
                     "project": str(self.project),
                     "receipt_valid": False,
@@ -750,8 +1171,8 @@ class DeliveryManager:
                     "rollback_available": rollback_available,
                     "recommended_operation": "manual_resolution",
                     "diagnostics": diagnostics,
-                }
-            return {
+                })
+            return finalize({
                 "schema": "cotend.delivery-state",
                 "project": str(self.project),
                 "receipt_valid": True,
@@ -770,13 +1191,13 @@ class DeliveryManager:
                 "rollback_available": rollback_available,
                 "recommended_operation": "rollback" if rollback_available else "install",
                 "diagnostics": [],
-            }
+            })
 
         payload_root = self.enabled_root if receipt["enabled"] else self.disabled_root
         try:
             actual = _directory_manifest(payload_root, tuple(receipt["skills"]))
         except DeliveryError as exc:
-            return {
+            return finalize({
                 "schema": "cotend.delivery-state",
                 "project": str(self.project),
                 "receipt_valid": True,
@@ -795,7 +1216,7 @@ class DeliveryManager:
                 "rollback_available": rollback_available,
                 "recommended_operation": "manual_resolution",
                 "diagnostics": [exc.code],
-            }
+            })
 
         expected = receipt["files"]
         missing = sorted(set(expected) - set(actual))
@@ -839,7 +1260,7 @@ class DeliveryManager:
         else:
             recommended = "current_no_change"
 
-        return {
+        return finalize({
             "schema": "cotend.delivery-state",
             "project": str(self.project),
             "receipt_valid": True,
@@ -872,12 +1293,14 @@ class DeliveryManager:
             "rollback_available": rollback_available,
             "recommended_operation": recommended,
             "diagnostics": diagnostics,
-        }
+        })
 
     def plan(
         self,
         operation: str,
         candidate: Artifact | None = None,
+        *,
+        _owner_token: str | None = None,
     ) -> dict[str, Any]:
         if operation not in OPERATIONS:
             raise DeliveryError("operation_unknown", f"Unknown operation: {operation}")
@@ -887,7 +1310,11 @@ class DeliveryManager:
                 f"{operation} requires an exact candidate artifact",
             )
 
-        state = self.inspect(candidate)
+        state = self._inspect(
+            candidate,
+            include_previous_rollback=True,
+            owner_token=_owner_token,
+        )
         if operation == "inspect":
             return {
                 "operation": operation,
@@ -903,7 +1330,9 @@ class DeliveryManager:
         reason = "operation_not_allowed_from_current_state"
         effects: list[str] = []
 
-        if operation == "install":
+        if state["mutation_lock"]["present"]:
+            reason = f"mutation_lock_{state['mutation_lock']['state']}"
+        elif operation == "install":
             if state["installation"] == "absent" and state["transition"] == "stable":
                 allowed = will_mutate = True
                 reason = "install_candidate_into_absent_project_scope"
@@ -1057,20 +1486,64 @@ class DeliveryManager:
                 "state": plan["state"],
             }
 
+        lease = self._acquire_mutation_lock(operation)
+        try:
+            plan = self.plan(operation, candidate, _owner_token=lease.owner_token)
+        except Exception as exc:
+            self._release_terminal_mutation_lock(lease, prior_error=exc)
+            raise
+        if not plan["allowed"]:
+            self._release_terminal_mutation_lock(lease)
+            raise DeliveryError(
+                "operation_blocked",
+                f"{operation} is blocked after lock acquisition: {plan['reason']}",
+                details={"state": plan["state"]},
+            )
+        if not plan["will_mutate"]:
+            self._release_terminal_mutation_lock(lease)
+            return {
+                "status": "current_no_change",
+                "applied": False,
+                "plan": plan,
+                "state": self.inspect(candidate),
+            }
+
         before = plan["state"]
         if operation == "rollback":
-            restored_checkpoint, restored_receipt = self._restore_checkpoint(
-                reinstate_previous=False
-            )
-            self._verify_rollback_postcondition(
-                restored_checkpoint,
-                restored_receipt,
-                candidate,
-            )
+            try:
+                self._update_mutation_phase(lease, "mutating")
+                restored_checkpoint, restored_receipt = self._restore_checkpoint(
+                    reinstate_previous=False
+                )
+                self._update_mutation_phase(lease, "verifying")
+                self._verify_rollback_postcondition(
+                    restored_checkpoint,
+                    restored_receipt,
+                    candidate,
+                    owner_token=lease.owner_token,
+                )
+                self._update_mutation_phase(lease, "completed")
+            except Exception as exc:
+                self._mark_mutation_recovery_required(lease)
+                raise DeliveryError(
+                    "rollback_failed_lock_retained",
+                    "Rollback failed; the mutation lock and recovery evidence were retained",
+                    details={"rollback_error": str(exc)},
+                ) from exc
         else:
-            self._create_checkpoint(operation)
             expected_enabled: bool | None = None
             try:
+                self._update_mutation_phase(lease, "checkpointing")
+                self._create_checkpoint(operation)
+            except Exception as exc:
+                self._mark_mutation_recovery_required(lease)
+                raise DeliveryError(
+                    "checkpoint_failed_lock_retained",
+                    f"{operation} could not establish a checkpoint; recovery evidence was retained",
+                    details={"checkpoint_error": str(exc)},
+                ) from exc
+            try:
+                self._update_mutation_phase(lease, "mutating")
                 if operation in {"install", "update", "repair"}:
                     assert candidate is not None
                     if operation == "install":
@@ -1092,30 +1565,49 @@ class DeliveryManager:
                     self._move_enablement(enabled=True)
                 elif operation == "uninstall":
                     self._uninstall()
+                self._update_mutation_phase(lease, "verifying")
                 self._verify_postcondition(
                     operation,
                     candidate,
                     expected_enabled=expected_enabled,
+                    owner_token=lease.owner_token,
                 )
+                self._update_mutation_phase(lease, "committing")
                 self._commit_checkpoint()
+                self._update_mutation_phase(lease, "completed")
             except Exception as exc:
                 try:
                     self._restore_checkpoint(reinstate_previous=True)
                 except Exception as rollback_exc:
+                    self._mark_mutation_recovery_required(lease)
                     raise DeliveryError(
                         "transition_and_rollback_failed",
-                        f"{operation} failed and rollback also failed",
+                        f"{operation} failed and rollback also failed; the lock was retained",
                         details={
                             "transition_error": str(exc),
                             "rollback_error": str(rollback_exc),
                         },
                     ) from rollback_exc
+                try:
+                    self._update_mutation_phase(lease, "rolled_back")
+                except Exception as phase_exc:
+                    self._mark_mutation_recovery_required(lease)
+                    raise DeliveryError(
+                        "transition_failed_rollback_restored_lock_retained",
+                        f"{operation} failed and the prior checkpoint was restored, but recovery metadata could not be finalized",
+                        details={
+                            "transition_error": str(exc),
+                            "phase_error": str(phase_exc),
+                        },
+                    ) from phase_exc
+                self._release_terminal_mutation_lock(lease, prior_error=exc)
                 raise DeliveryError(
                     "transition_failed_rolled_back",
                     f"{operation} failed; the prior checkpoint was restored",
                     details={"transition_error": str(exc)},
                 ) from exc
 
+        self._release_terminal_mutation_lock(lease)
         after = self.inspect(candidate)
         return {
             "status": "applied",
@@ -1557,8 +2049,13 @@ class DeliveryManager:
         candidate: Artifact | None,
         *,
         expected_enabled: bool | None,
+        owner_token: str | None = None,
     ) -> None:
-        after = self._inspect(candidate, include_previous_rollback=False)
+        after = self._inspect(
+            candidate,
+            include_previous_rollback=False,
+            owner_token=owner_token,
+        )
         if operation in {"install", "update", "repair", "migrate_identity"}:
             if expected_enabled is None:
                 raise DeliveryError(
@@ -1588,8 +2085,14 @@ class DeliveryManager:
         expected_checkpoint: dict[str, Any],
         expected_receipt: dict[str, Any] | None,
         candidate: Artifact | None,
+        *,
+        owner_token: str | None = None,
     ) -> None:
-        after = self.inspect(candidate)
+        after = self._inspect(
+            candidate,
+            include_previous_rollback=True,
+            owner_token=owner_token,
+        )
         if expected_receipt is None:
             valid = (
                 after["installation"] == "absent"

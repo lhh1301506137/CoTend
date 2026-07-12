@@ -177,6 +177,7 @@ EXPECTED_DELIVERY_TESTS = {
     "test_lower_revision_is_not_mislabeled_as_update",
     "test_preserved_migration_checkpoint_rejects_payload_drift",
     "test_protocol_change_is_incompatible_even_at_higher_revision",
+    "test_restored_rollback_phase_failure_retains_lock_without_false_double_failure",
     "test_inspect_reports_current_state_when_repository_is_missing",
     "test_repair_failure_restores_exact_damaged_state",
     "test_repair_rollback_restores_exact_damaged_state",
@@ -190,6 +191,13 @@ EXPECTED_DELIVERY_TESTS = {
     "test_unowned_collision_blocks_install",
     "test_unowned_delivery_state_blocks_install",
     "test_update_and_one_step_rollback",
+    "test_active_mutation_lock_blocks_competing_write_without_changes",
+    "test_invalid_mutation_lock_metadata_blocks_without_cleanup",
+    "test_locked_replan_failure_releases_unmutated_lock",
+    "test_locked_replan_observes_state_changed_before_acquire",
+    "test_mutation_lock_owner_mismatch_prevents_release",
+    "test_stale_interrupted_lock_is_reported_and_never_auto_removed",
+    "test_transition_and_rollback_failure_retains_recovery_lock",
 }
 
 # checker-self-scan-allowlist-start
@@ -1903,6 +1911,11 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             "identity_migration_available",
             "downgrade_candidate",
             "preserve_existing",
+            "MUTATION_LOCK_SCHEMA",
+            'self.mutation_lock_path = self.state_root / "mutation.lock"',
+            "mutation_locked",
+            "mutation_transition_interrupted",
+            "owner_token=lease.owner_token",
         ):
             if marker not in core_text:
                 errors.append(f"delivery core contract marker is missing: {marker}")
@@ -1931,6 +1944,9 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             "transition_failure_atomicity",
             "downgrade_not_update",
             "preserved_checkpoint_payload_drift",
+            "DELIVERY_CONCURRENCY_OK",
+            "same_project_contender_zero_write",
+            "terminated_midmutation_detected",
         ):
             if marker not in harness_text:
                 errors.append(f"delivery lifecycle harness marker is missing: {marker}")
@@ -2025,6 +2041,23 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         ):
             if marker not in evidence:
                 errors.append(f"target artifact identity evidence is missing: {marker}")
+    concurrency_evidence_path = "docs/evidence/DELIVERY-CONCURRENCY-AND-INTERRUPTION.md"
+    if concurrency_evidence_path not in candidates:
+        errors.append("delivery concurrency evidence is missing or ignored")
+    else:
+        evidence = read(concurrency_evidence_path)
+        for marker in (
+            "status: passed_disposable_process_level",
+            "mutation_lock_schema: 1",
+            "same_project_contention: blocked_before_checkpoint_or_payload",
+            "different_projects: independent",
+            "stale_lock_cleanup: never_automatic",
+            "process_liveness_role: diagnostic_only",
+            "automatic_recovery: not_implemented",
+            "DELIVERY_CONCURRENCY_OK cases=6",
+        ):
+            if marker not in evidence:
+                errors.append(f"delivery concurrency evidence is missing: {marker}")
     return errors
 
 

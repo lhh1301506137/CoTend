@@ -76,6 +76,7 @@ Required facts:
 - target-platform compatibility, adapter capabilities, permission needs, network behavior, external data flow, cost, and affected scope;
 - C13 handoff needs for platform migration and C19 standards/context that must remain available;
 - C02 project lifecycle state for each affected project, without treating it as product delivery state;
+- target-scoped mutation ownership, lock phase, best-effort owner-liveness evidence, and any stale, unverifiable, or interrupted lock state;
 - checkpoint, backup, reversibility, rollback authority, forward-recovery capability, and post-transition verification plan;
 - pending user decisions and C06 authority.
 
@@ -91,15 +92,17 @@ If target identity or any source, artifact, compatibility, affected-project, aut
 6. Explain every material download, write, replacement, permission, account effect, data flow, restart or reload, affected project, retained item, removed item, expected result, and recovery option in plain language.
 7. Verify that the transition is compatible with the target adapter and preserves C03 logical truth. For platform migration, require a C13 handoff and recipient inspection, and classify every affected project's C02 readiness without treating product delivery success as project readiness.
 8. Use C06 to confirm or verify existing authority for external download, platform mutation, elevated permissions, account access, data transfer, cost, incompatible change, disablement, uninstall, and any destructive or irreversible effect.
-9. Establish a protected checkpoint and exact rollback trigger, scope, authority, and verification plan before mutation. If rollback would itself cross an unapproved boundary, record it as pending rather than assuming permission.
-10. When a candidate is required, acquire or stage only that exact artifact through the authorized source and scope. Verify identity and integrity before installation or activation, and do not treat a completed download as delivery success. Operations without a candidate skip acquisition rather than inventing one.
-11. Apply only the minimum authorized transition. Preserve unrelated platform configuration, user-created files, project truth, standards, and evidence. Make partial progress and current authority explicit if interrupted.
-12. For update or repair, retain or supersede prior product-owned delivery state according to the checkpoint without silently migrating project meaning. For platform migration, keep sender and recipient states distinguishable. Do not retire any sender scope until C13 recipient readiness and every applicable affected project's C02 readiness are verified. A separately authorized partial cutover may retire only the ready scope and must preserve the sender for blocked projects with an explicit mapping and recovery route.
-13. For disablement, make CoTend unavailable while preserving recoverable product-owned configuration and user project truth unless the exact approved scope says otherwise.
-14. For uninstall, remove only identified product-owned delivery artifacts by default. Preserve user-owned projects, decisions, evidence, and standards; any deletion or conversion of that truth requires a separate explicit decision and verified recovery plan.
-15. Verify the resulting acquisition, installation, enablement, invocation, candidate-relation, and transition facts; the exact artifact identity when installed; the permission boundary; retained project truth; C19 context availability; and idempotent re-entry where promised.
-16. If post-transition verification fails, contain further mutation and execute rollback only when its exact trigger and scope were pre-authorized or newly approved. Otherwise preserve the safest known state with recovery pending.
-17. Report the C16 operation outcome, delivered-target state, adapter capability, affected-project C02 readiness, migration readiness, limitations, and next safe action separately.
+9. Before the first checkpoint, staging, payload, or receipt write, atomically acquire one target-scoped mutation lock and then repeat inspection and operation selection while holding it. A competing, stale, unverifiable, or recovery-required lock blocks all mutation. Process identity and lock age are diagnostic evidence only and never authorize automatic lock removal.
+10. Establish a protected checkpoint and exact rollback trigger, scope, authority, and verification plan before mutation. If rollback would itself cross an unapproved boundary, record it as pending rather than assuming permission.
+11. When a candidate is required, acquire or stage only that exact artifact through the authorized source and scope. Verify identity and integrity before installation or activation, and do not treat a completed download as delivery success. Operations without a candidate skip acquisition rather than inventing one.
+12. Apply only the minimum authorized transition. Preserve unrelated platform configuration, user-created files, project truth, standards, and evidence. Make partial progress and current authority explicit if interrupted.
+13. For update or repair, retain or supersede prior product-owned delivery state according to the checkpoint without silently migrating project meaning. For platform migration, keep sender and recipient states distinguishable. Do not retire any sender scope until C13 recipient readiness and every applicable affected project's C02 readiness are verified. A separately authorized partial cutover may retire only the ready scope and must preserve the sender for blocked projects with an explicit mapping and recovery route.
+14. For disablement, make CoTend unavailable while preserving recoverable product-owned configuration and user project truth unless the exact approved scope says otherwise.
+15. For uninstall, remove only identified product-owned delivery artifacts by default. Preserve user-owned projects, decisions, evidence, and standards; any deletion or conversion of that truth requires a separate explicit decision and verified recovery plan.
+16. Verify the resulting acquisition, installation, enablement, invocation, candidate-relation, and transition facts; the exact artifact identity when installed; the permission boundary; retained project truth; C19 context availability; and idempotent re-entry where promised.
+17. Release a mutation lock only when the same owner token still controls it and the transition either completed successfully or a controlled failure restored the prior checkpoint. Owner mismatch, lock corruption, forced termination, or transition-and-rollback failure retains the lock and recovery evidence.
+18. If post-transition verification fails, contain further mutation and execute rollback only when its exact trigger and scope were pre-authorized or newly approved. Otherwise preserve the safest known state with recovery pending.
+19. Report the C16 operation outcome, delivered-target state, adapter capability, affected-project C02 readiness, migration readiness, limitations, and next safe action separately.
 
 ## 6. Logical State Semantics
 
@@ -111,6 +114,7 @@ Delivery state is an orthogonal vector rather than one overlapping label:
 - invocation: `not_applicable`, `verified`, `failed`, `not_run`, or `unavailable`;
 - candidate relation: `none`, `install_candidate`, `same_as_current`, `identity_migration_available`, `update_available`, `downgrade_candidate`, `incompatible`, or `unknown`;
 - transition: `stable`, `staged`, `interrupted`, or `recovery_required`.
+- mutation exclusion: `none`, `active`, `stale_or_unverifiable`, or `recovery_required`.
 
 The dimensions may coexist. For example, an installed and enabled target can also have an update available, while an interrupted acquisition does not make installation partial unless product-owned installed state was actually changed.
 
@@ -119,6 +123,7 @@ Reads:
 - target platform, user, account, machine, workspace, and affected-project boundaries;
 - C03 active product and project truth, decisions, checkpoints, and recovery readiness;
 - current delivered artifact identity, version or capabilities, acquisition, installation, enablement, invocation, candidate relation, integrity, and transition;
+- current mutation-lock presence, owner operation, execution phase, redacted owner identity, best-effort process liveness, and metadata residue;
 - candidate source, provenance, license, attribution, integrity, compatibility, and C15 applicability when a candidate is required;
 - C06 authority, permission, download, data, account, cost, destructive, and external-action boundaries;
 - C07 evidence for current state, artifact trust, compatibility, transition, invocation, and rollback;
@@ -143,16 +148,18 @@ Durable meaning:
 - current delivered identity, orthogonal delivery-state vector, target boundary, and supported adapter capability;
 - artifact source, provenance, license, attribution, integrity, compatibility, and C15 applicability decision used for a transition that involved a candidate;
 - explicit lifecycle authority, affected scope, checkpoint, transition, rollback, and recovery status;
+- unresolved mutation ownership and interrupted-transition evidence until an explicit recovery path verifies or supersedes it;
 - product-owned artifacts removed or retained and user-owned truth explicitly preserved;
 - migration sender/recipient readiness and affected-project lifecycle limitations;
 - failed, interrupted, incompatible, disabled, uninstalled, or recovery-required delivery state.
 
 Transient meaning:
 
-- temporary downloads, staging paths, progress rendering, replaceable caches, and raw logs that are not unique evidence.
+- temporary downloads, progress rendering, replaceable caches, and raw logs that are not unique evidence. A lock, staging path, or receipt temporary file stops being disposable when it is the only evidence of an interrupted transition.
 
 Legal transition rules:
 
+- every mutating legal transition first acquires the exact target's exclusion lock, repeats its eligibility check while holding that lock, and releases only under the verified terminal conditions above; read-only inspection and dry-run never acquire the lock;
 - `current_no_change` leaves a verified stable vector unchanged, performs no acquisition or mutation, and preserves the explicitly inspected candidate relation: `none`, `same_as_current`, or an `identity_migration_available`, `update_available`, or `downgrade_candidate` result whose transition was explicitly deferred;
 - `install` requires candidate relation `install_candidate`, moves installation from `absent` to `complete` through integrity verification, reaches the exact approved enablement state, verifies invocation when enabled, and ends with candidate relation `same_as_current`;
 - `enable` moves a compatible `complete` installation from `disabled` to `enabled`, requires verified invocation, performs no acquisition, and preserves the inspected candidate relation without recalculating or clearing an available update;
@@ -173,10 +180,14 @@ Invariants:
 - a C15 applicability result is required only when a candidate is introduced or a C15 release action is handed to C16; release-triggering delivery requires `approved_for_exact_action`, while C15 never grants C06 delivery authority;
 - disablement and uninstall remain distinct, and neither deletes user project truth by default;
 - every mutation is tied to an exact target, current artifact identity, candidate identity when applicable, authority scope, checkpoint, legal transition, and post-transition check;
+- at most one mutation owner may enter a target scope; losing contenders perform no checkpoint, staging, payload, receipt, rollback, or cleanup write, and a different target scope remains independent;
+- lock owner tokens, process IDs, timestamps, and liveness probes are evidence rather than authority. No elapsed-time threshold, dead PID, or unknown PID permits automatic cleanup or recovery;
+- internal verification may ignore only the exact lock token held by that same operation. It never ignores another, stale, malformed, or unverifiable lock;
 - candidate relation is recomputed or explicitly preserved at every legal transition and never carries a stale pre-transition `update_available` value into a completed update, repair, migration, recovery, or uninstall;
 - source release, target platform and lineage, target revision, protocol compatibility, and manifest integrity remain separate identity dimensions; a higher source release alone is not an update, a lower target revision is not an update, and the same target revision with conflicting identity or bytes is incompatible;
 - legacy identity migration is available only through an explicit mapping of receipt schema, legacy artifact ID, protocol, manifest, target artifact ID, and target revision; an unmapped legacy identity remains incompatible;
 - an interrupted or failed transition never becomes current merely because some files were written;
+- forced process termination preserves the mutation lock and any checkpoint, staging, payload, or receipt-temporary evidence, reports recovery-required, and blocks repair, rollback, or another mutation until an explicit recovery decision establishes ownership and safe postconditions;
 - update, repair, migration, disablement, uninstall, and rollback preserve unrelated user work;
 - platform authentication, marketplace access, write permission, or cached credentials never imply consent;
 - no secret, credential, payment detail, private payload, or unnecessary raw project data is stored in delivery truth or evidence.

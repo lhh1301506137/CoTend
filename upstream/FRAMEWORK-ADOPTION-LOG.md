@@ -49,7 +49,7 @@ push_release_or_publish: not_performed
 - `executed`：四个受保护第三方文件的 staged blob 与固定 tag blob 哈希一致；跨平台 checkout 使用 LF 属性。
 - `executed`：主仓库检查与固定上游来源复验通过。
 - `inspection`：活动 CoTend 名称、协议、agent 元数据、委派引用、第三方 notices 和许可证已逐项检查。
-- `executed`：后续项目级交付核心已在 disposable fixture 中完成 install、update、repair、identity migration、enable、disable、uninstall 和 rollback；32 项核心单元测试、11 步常规生命周期、5 步 legacy identity migration 及 8 类负向/故障恢复场景通过。
+- `executed`：后续项目级交付核心已在 disposable fixture 中完成 install、update、repair、identity migration、enable、disable、uninstall 和 rollback；40 项单元测试、11 步常规生命周期、5 步 legacy identity migration、8 类负向/故障恢复及 6 项独立进程并发/强制终止场景通过。
 - `executed`：每一步都对非 CoTend 所有路径做快照比较，用户项目文件和无关 Skill 保持不变；修改操作默认 dry-run，必须显式 `--apply`。
 - `executed`：由交付核心实际安装的 disposable carrier 已被 Codex 发现，并完成一条只读显式 Diagnose Only 场景；receipt、用户文件、无关 Skill、Git HEAD、仓库与全局保护状态不变。
 - `deferred`：真实项目写入、可写模型旅程、Desktop 菜单发现、自然语言触发、用户/全局安装、最终小白安装渠道、Plugin/Marketplace 和 Claude 载体。
@@ -64,7 +64,7 @@ push_release_or_publish: not_performed
 
 `src/cotend_delivery/` 现在提供渠道中立的项目级交付底层，目标载体为 `.agents/skills/`，adapter 自有 receipt 与回滚状态位于 `.agents/.cotend-delivery/`。该状态只描述产品文件所有权与交付事务，不取代 C03 项目真相。
 
-当前 `scripts/cotend_delivery.py` 是单进程开发和预览适配器，不是最终用户安装体验。它不联网、不选择 Plugin 或 Marketplace、不修改全局 Skills，也没有在真实项目执行；并发写入与进程被强制终止后的自动恢复尚未验证。这些边界仍由后续 P4/P6 验证关闭。
+当前 `scripts/cotend_delivery.py` 是开发和预览适配器，不是最终用户安装体验。它不联网、不选择 Plugin 或 Marketplace、不修改全局 Skills，也没有在真实项目执行。项目级原子 mutation lock、持锁后 re-plan、独立进程竞争阻断和强制终止后的保守检测已通过 disposable 验证；显式 stale-lock recovery、force unlock、断电持久性和真实项目恢复仍未实现或验证。这些边界仍由后续 P4/P6 验证关闭。
 
 ## release-2026-07-11-3-delivered-codex-runtime-validation
 

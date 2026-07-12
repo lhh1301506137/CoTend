@@ -6,6 +6,7 @@ import json
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any
 from unittest import mock
@@ -721,6 +722,266 @@ def verify_negative_guards(
     return {"status": "pass", "cases": passed, "count": len(passed)}
 
 
+def run_concurrency_worker(
+    *,
+    mode: str,
+    project: Path,
+    source: Path,
+    event: Path,
+) -> int:
+    project = guarded_fixture(project)
+    source = guarded_fixture(source)
+    event = guarded_fixture(event)
+    baseline = Artifact.from_repository(ROOT)
+    candidate = Artifact.from_directory(
+        source,
+        source_release_id=baseline.source_release_id,
+        artifact_id="cotend-codex-r000002",
+        revision=2,
+        protocol=baseline.protocol,
+    )
+    manager = DeliveryManager(project)
+
+    def signal_and_wait() -> None:
+        event.parent.mkdir(parents=True, exist_ok=True)
+        event.write_text("ready\n", encoding="utf-8")
+        time.sleep(60)
+
+    if mode == "before_checkpoint":
+        original_checkpoint = manager._create_checkpoint
+
+        def held_checkpoint(operation: str) -> None:
+            signal_and_wait()
+            original_checkpoint(operation)
+
+        manager._create_checkpoint = held_checkpoint  # type: ignore[method-assign]
+    elif mode == "before_receipt":
+        original_receipt = manager._write_receipt
+
+        def held_receipt(receipt: dict[str, Any]) -> None:
+            signal_and_wait()
+            original_receipt(receipt)
+
+        manager._write_receipt = held_receipt  # type: ignore[method-assign]
+    else:
+        raise LifecycleError(f"unknown worker mode: {mode}")
+
+    manager.execute("update", candidate, apply=True)
+    return 0
+
+
+def start_concurrency_worker(
+    *,
+    mode: str,
+    project: Path,
+    source: Path,
+    event: Path,
+) -> subprocess.Popen[str]:
+    return subprocess.Popen(
+        [
+            sys.executable,
+            str(Path(__file__).resolve()),
+            "--worker-mode",
+            mode,
+            "--worker-project",
+            str(project),
+            "--worker-source",
+            str(source),
+            "--worker-event",
+            str(event),
+        ],
+        cwd=ROOT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+
+
+def wait_for_worker_event(
+    worker: subprocess.Popen[str],
+    event: Path,
+    *,
+    timeout: float = 20,
+) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if event.is_file():
+            return
+        if worker.poll() is not None:
+            stdout, stderr = worker.communicate()
+            raise LifecycleError(
+                "concurrency worker exited before its hold point: "
+                f"stdout={stdout.strip()} stderr={stderr.strip()}"
+            )
+        time.sleep(0.05)
+    raise LifecycleError("concurrency worker did not reach its hold point")
+
+
+def terminate_worker(worker: subprocess.Popen[str]) -> None:
+    if worker.poll() is None:
+        worker.terminate()
+        try:
+            worker.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            worker.kill()
+            worker.wait(timeout=10)
+    worker.communicate(timeout=5)
+
+
+def verify_concurrent_transitions(
+    fixture: Path,
+    baseline: Artifact,
+    updated: Artifact,
+) -> dict[str, Any]:
+    skills = set(baseline.skills)
+    passed: list[str] = []
+    events = fixture / "events"
+
+    contention_project = prepare_project(
+        fixture / "projects" / "concurrent-contention"
+    )
+    contention_protected = tree_snapshot(
+        contention_project,
+        managed_skills=skills,
+    )
+    run_cli("install", contention_project, apply=True)
+    contention_event = events / "contention-ready.txt"
+    worker = start_concurrency_worker(
+        mode="before_checkpoint",
+        project=contention_project,
+        source=updated.root,
+        event=contention_event,
+    )
+    try:
+        wait_for_worker_event(worker, contention_event)
+        state = DeliveryManager(contention_project).inspect(updated)
+        if (
+            state["mutation_lock"]["state"] != "active"
+            or state["transition"] != "staged"
+        ):
+            raise LifecycleError("live contention lock was not reported as active")
+        before_contender = tree_snapshot(contention_project)
+        run_cli(
+            "update",
+            contention_project,
+            apply=True,
+            artifact=updated,
+            expect_error="operation_blocked",
+        )
+        if tree_snapshot(contention_project) != before_contender:
+            raise LifecycleError("blocked competing process changed the project")
+        passed.append("same_project_contender_zero_write")
+
+        independent_project = prepare_project(
+            fixture / "projects" / "concurrent-independent"
+        )
+        independent_protected = tree_snapshot(
+            independent_project,
+            managed_skills=skills,
+        )
+        run_cli("install", independent_project, apply=True)
+        require_state(
+            DeliveryManager(independent_project),
+            baseline,
+            installation="complete",
+            enablement="enabled",
+            artifact_id=baseline.artifact_id,
+        )
+        assert_protected_unchanged(
+            independent_project,
+            skills,
+            independent_protected,
+        )
+        passed.append("different_projects_are_independent")
+    finally:
+        terminate_worker(worker)
+
+    contention_after_kill = DeliveryManager(contention_project).inspect(updated)
+    contention_owner = contention_after_kill["mutation_lock"]["owner"]
+    if (
+        contention_after_kill["mutation_lock"]["state"] != "recovery_required"
+        or not contention_after_kill["mutation_lock"]["interrupted"]
+        or contention_owner is None
+        or contention_owner["phase"] != "checkpointing"
+        or contention_owner["process_liveness"] == "alive"
+    ):
+        raise LifecycleError("terminated pre-checkpoint owner was not preserved")
+    assert_protected_unchanged(
+        contention_project,
+        skills,
+        contention_protected,
+    )
+    passed.append("terminated_precheckpoint_detected")
+
+    interrupted_project = prepare_project(
+        fixture / "projects" / "concurrent-interrupted"
+    )
+    interrupted_protected = tree_snapshot(
+        interrupted_project,
+        managed_skills=skills,
+    )
+    run_cli("install", interrupted_project, apply=True)
+    interrupted_event = events / "interrupted-ready.txt"
+    worker = start_concurrency_worker(
+        mode="before_receipt",
+        project=interrupted_project,
+        source=updated.root,
+        event=interrupted_event,
+    )
+    try:
+        wait_for_worker_event(worker, interrupted_event)
+    finally:
+        terminate_worker(worker)
+
+    interrupted_manager = DeliveryManager(interrupted_project)
+    before_inspect = tree_snapshot(interrupted_project)
+    interrupted = interrupted_manager.inspect(updated)
+    if tree_snapshot(interrupted_project) != before_inspect:
+        raise LifecycleError("inspect mutated an interrupted project")
+    owner = interrupted["mutation_lock"]["owner"]
+    if (
+        interrupted["transition"] != "recovery_required"
+        or interrupted["mutation_lock"]["state"] != "recovery_required"
+        or not interrupted["mutation_lock"]["interrupted"]
+        or owner is None
+        or owner["phase"] != "mutating"
+        or owner["process_liveness"] == "alive"
+        or interrupted["rollback_available"] is not True
+        or not interrupted["transition_artifacts"]
+        or interrupted["recommended_operation"] != "manual_recovery_required"
+    ):
+        raise LifecycleError("mid-mutation termination was not classified safely")
+    passed.append("terminated_midmutation_detected")
+    passed.append("interrupted_inspect_is_read_only")
+
+    blocked_snapshot = tree_snapshot(interrupted_project)
+    run_cli(
+        "rollback",
+        interrupted_project,
+        apply=True,
+        expect_error="operation_blocked",
+    )
+    run_cli(
+        "repair",
+        interrupted_project,
+        apply=True,
+        artifact=updated,
+        expect_error="operation_blocked",
+    )
+    if tree_snapshot(interrupted_project) != blocked_snapshot:
+        raise LifecycleError("stale-lock recovery commands changed the project")
+    assert_protected_unchanged(
+        interrupted_project,
+        skills,
+        interrupted_protected,
+    )
+    passed.append("stale_lock_blocks_recovery_mutations")
+
+    return {"status": "pass", "cases": passed, "count": len(passed)}
+
+
 def write_evidence(path: Path, evidence: dict[str, Any]) -> None:
     target = guarded_fixture(path)
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -751,6 +1012,19 @@ def parse_args() -> argparse.Namespace:
         help="run deterministic failure and recovery cases",
     )
     parser.add_argument(
+        "--concurrency",
+        action="store_true",
+        help="run independent-process contention and termination cases",
+    )
+    parser.add_argument(
+        "--worker-mode",
+        choices=("before_checkpoint", "before_receipt"),
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument("--worker-project", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--worker-source", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--worker-event", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument(
         "--evidence",
         type=Path,
         help="write JSON evidence under the fixture (default: evidence.json)",
@@ -761,6 +1035,15 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     try:
+        if args.worker_mode is not None:
+            if not args.worker_project or not args.worker_source or not args.worker_event:
+                raise LifecycleError("worker mode requires project, source, and event")
+            return run_concurrency_worker(
+                mode=args.worker_mode,
+                project=args.worker_project,
+                source=args.worker_source,
+                event=args.worker_event,
+            )
         fixture = reset_fixture(args.fixture) if args.prepare else guarded_fixture(args.fixture)
         if not fixture.is_dir():
             raise LifecycleError("fixture is missing; run with --prepare")
@@ -790,6 +1073,16 @@ def main() -> int:
             print(
                 "DELIVERY_LIFECYCLE_NEGATIVE_OK "
                 f"cases={evidence['negative']['count']}"
+            )
+        if args.concurrency:
+            evidence["concurrency"] = verify_concurrent_transitions(
+                fixture,
+                baseline,
+                updated,
+            )
+            print(
+                "DELIVERY_CONCURRENCY_OK "
+                f"cases={evidence['concurrency']['count']}"
             )
         evidence_path = args.evidence or fixture / "evidence.json"
         write_evidence(evidence_path, evidence)
