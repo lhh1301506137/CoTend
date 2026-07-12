@@ -84,7 +84,7 @@ negative_bridge_cases: passed_7_of_7
 real_project_or_global_install: false
 ```
 
-L25 不直接复制 `codex-skills/`：它先通过项目级交付 API 生成 receipt-owned carrier，再复用 L21 的 Codex `skills/list` 和只读模型运行器。结果证明已交付字节可被 Codex 使用，并证明无关 Skill 可以共存；L21 默认严格模式仍保持精确七 Skill，宽容模式只有组合验证器显式启用。诊断语义通过但自由文本未遵守无项目语言时默认英文的契约，该 adapter compliance 缺口继续待修复/复验。
+L25 不直接复制 `codex-skills/`：它先通过项目级交付 API 生成 receipt-owned carrier，再复用 L21 的 Codex `skills/list` 和只读模型运行器。结果证明已交付字节可被 Codex 使用，并证明无关 Skill 可以共存；L21 默认严格模式仍保持精确七 Skill，宽容模式只有组合验证器显式启用。L26 后续对照证明 recorded-English 路径通过，但无记录默认英文在清除父任务环境后仍失败。当前 Skill 与 lock 保持不变：沿用 release ID 修改字节会触发 `artifact_identity_conflict`，因此语言修复必须先经过 upstream 通用语义审计和 CoTend target artifact revision 决策。
 
 完整证据见 [`docs/evidence/DELIVERED-CODEX-RUNTIME-VALIDATION.md`](../docs/evidence/DELIVERED-CODEX-RUNTIME-VALIDATION.md)。该结果不等于真实项目写入、最终安装渠道、Desktop/自然语言触发或用户验收。
 
