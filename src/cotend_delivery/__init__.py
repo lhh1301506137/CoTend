@@ -1,5 +1,12 @@
-"""CoTend project-scoped delivery lifecycle."""
+"""CoTend project and isolated user-scope delivery lifecycle."""
 
-from .core import Artifact, DeliveryError, DeliveryManager
+from .core import Artifact, DeliveryError, DeliveryLayout, DeliveryManager
+from .user_scope import IsolatedUserSkillDeliveryManager
 
-__all__ = ["Artifact", "DeliveryError", "DeliveryManager"]
+__all__ = [
+    "Artifact",
+    "DeliveryError",
+    "DeliveryLayout",
+    "DeliveryManager",
+    "IsolatedUserSkillDeliveryManager",
+]

@@ -158,6 +158,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         self.assertEqual(receipt["source_release_id"], self.artifact.source_release_id)
         self.assertEqual(receipt["artifact_lineage"], self.artifact.lineage)
         self.assertEqual(receipt["target_revision"], self.artifact.revision)
+        self.assertNotIn("owned_skills", receipt)
+        self.assertNotIn("components", receipt)
 
         repeated = self.manager.execute("install", self.artifact, apply=True)
         self.assertEqual(repeated["status"], "current_no_change")

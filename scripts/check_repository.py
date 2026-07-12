@@ -171,11 +171,15 @@ EXPECTED_DELIVERY_PRODUCT_FILES = {
     "delivery/codex-artifact.lock.json",
     "scripts/cotend_delivery.py",
     "scripts/verify_delivery_lifecycle.py",
+    "scripts/verify_user_skill_delivery.py",
     "src/cotend_delivery/__init__.py",
     "src/cotend_delivery/__main__.py",
     "src/cotend_delivery/cli.py",
     "src/cotend_delivery/core.py",
+    "src/cotend_delivery/user_scope.py",
     "tests/test_cotend_delivery.py",
+    "tests/test_user_skill_delivery.py",
+    "docs/evidence/ISOLATED-USER-SKILL-DELIVERY.md",
 }
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
@@ -236,6 +240,27 @@ EXPECTED_DELIVERY_TESTS = {
     "test_recovery_blocks_corrupt_checkpoint_and_unexpected_managed_content",
     "test_recovery_verification_failure_retains_checkpoint_and_both_locks",
     "test_active_recovery_lock_blocks_second_recovery_and_normal_mutation",
+}
+EXPECTED_USER_DELIVERY_TESTS = {
+    "test_absent_companions_are_owned_through_full_lifecycle",
+    "test_compatible_existing_companions_are_external_and_preserved",
+    "test_mixed_owned_and_external_companions_are_recorded_per_component",
+    "test_portable_bom_and_crlf_companion_is_compatible",
+    "test_compatible_duplicate_warns_without_creating_third_copy",
+    "test_incompatible_companion_blocks_before_any_write",
+    "test_extra_companion_file_blocks_before_any_write",
+    "test_first_party_collision_in_compatibility_root_blocks",
+    "test_external_shared_disappearance_blocks_mutation_without_takeover",
+    "test_external_shared_candidate_version_drift_blocks_update",
+    "test_failed_repair_rolls_back_owned_payload_and_preserves_external",
+    "test_mutation_lock_blocks_second_user_scope_writer",
+    "test_recovery_restores_interrupted_user_update_without_touching_external",
+    "test_recovery_blocks_external_drift_before_owned_payload_write",
+    "test_user_receipt_ownership_tamper_is_rejected",
+    "test_layout_rejects_escape_and_live_home",
+    "test_layout_rejects_linked_user_root",
+    "test_layout_rejects_state_and_skill_root_overlap",
+    "test_linked_companion_is_rejected_when_platform_allows_link_creation",
 }
 
 # checker-self-scan-allowlist-start
@@ -2209,8 +2234,12 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             errors.append(f"delivery operation inventory drift: {sorted(actual_operations)}")
         for marker in (
             "EXPECTED_FILE_COUNT = 30",
-            'self.enabled_root = self.agents_root / "skills"',
-            'self.state_root = self.agents_root / ".cotend-delivery"',
+            "class DeliveryLayout:",
+            "USER_RECEIPT_SCHEMA_VERSION = 3",
+            "FIRST_PARTY_SKILLS = EXPECTED_SKILLS[:5]",
+            "SHAREABLE_COMPANION_SKILLS = EXPECTED_SKILLS[5:]",
+            '"external_shared"',
+            "_receipt_owned_skills",
             "include_previous_rollback=False",
             "transition_failed_rolled_back",
             "receipt_invalid",
@@ -2270,6 +2299,19 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             if marker not in harness_text:
                 errors.append(f"delivery lifecycle harness marker is missing: {marker}")
 
+    user_harness_path = "scripts/verify_user_skill_delivery.py"
+    if user_harness_path in candidates:
+        user_harness_text = read(user_harness_path)
+        for marker in (
+            "stat_only_snapshot",
+            "canonical_user_skills",
+            "compatibility_user_skills",
+            "USER_SKILL_DELIVERY_OK",
+            "unchanged=true",
+        ):
+            if marker not in user_harness_text:
+                errors.append(f"user delivery harness marker is missing: {marker}")
+
     tests_path = "tests/test_cotend_delivery.py"
     if tests_path in candidates:
         actual_tests = set(
@@ -2278,6 +2320,45 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         missing_tests = EXPECTED_DELIVERY_TESTS - actual_tests
         if missing_tests:
             errors.append(f"required delivery unit tests are missing: {sorted(missing_tests)}")
+
+    user_tests_path = "tests/test_user_skill_delivery.py"
+    if user_tests_path in candidates:
+        actual_user_tests = set(
+            re.findall(
+                r"^    def (test_[a-z0-9_]+)\(",
+                read(user_tests_path),
+                re.MULTILINE,
+            )
+        )
+        missing_user_tests = EXPECTED_USER_DELIVERY_TESTS - actual_user_tests
+        if missing_user_tests:
+            errors.append(
+                f"required user delivery tests are missing: {sorted(missing_user_tests)}"
+            )
+
+    user_scope_path = "src/cotend_delivery/user_scope.py"
+    if user_scope_path in candidates:
+        user_scope_text = read(user_scope_path)
+        for marker in (
+            "class IsolatedUserSkillDeliveryManager",
+            "DeliveryLayout.isolated_user",
+            "_default_candidate=artifact",
+        ):
+            if marker not in user_scope_text:
+                errors.append(f"user delivery adapter marker is missing: {marker}")
+
+    user_evidence_path = "docs/evidence/ISOLATED-USER-SKILL-DELIVERY.md"
+    if user_evidence_path in candidates:
+        user_evidence = read(user_evidence_path)
+        for marker in (
+            "status: passed_isolated_only",
+            "user_receipt_schema: 3_component_ownership",
+            "USER_SKILL_DELIVERY_OK tests=19 skipped=0 protected_boundaries=6 unchanged=true",
+            "real_user_scope_write: false",
+            "production_state_root: unresolved",
+        ):
+            if marker not in user_evidence:
+                errors.append(f"user delivery evidence is missing: {marker}")
 
     target_lock_path = ROOT / "delivery" / "codex-artifact.lock.json"
     framework_lock_path = ROOT / "upstream" / "framework.lock.json"

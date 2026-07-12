@@ -20,6 +20,8 @@ EXPECTED_SKILLS = (
     "grill-me",
     "karpathy-guidelines",
 )
+FIRST_PARTY_SKILLS = EXPECTED_SKILLS[:5]
+SHAREABLE_COMPANION_SKILLS = EXPECTED_SKILLS[5:]
 EXPECTED_FILE_COUNT = 30
 RECEIPT_SCHEMA = "cotend.delivery-receipt"
 CHECKPOINT_SCHEMA = "cotend.delivery-checkpoint"
@@ -30,6 +32,7 @@ TARGET_LOCK_SCHEMA_VERSION = 1
 MUTATION_LOCK_SCHEMA_VERSION = 1
 RECOVERY_LOCK_SCHEMA_VERSION = 1
 RECEIPT_SCHEMA_VERSION = 2
+USER_RECEIPT_SCHEMA_VERSION = 3
 CHECKPOINT_SCHEMA_VERSION = 2
 LEGACY_SCHEMA_VERSION = 1
 TARGET_PLATFORM = "Codex"
@@ -250,6 +253,21 @@ def _directory_manifest(root: Path, skills: tuple[str, ...]) -> dict[str, str]:
     return manifest
 
 
+def _portable_text_digest(path: Path) -> str:
+    data = path.read_bytes()
+    if data.startswith(b"\xef\xbb\xbf"):
+        data = data[3:]
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise DeliveryError(
+            "portable_compatibility_unsupported",
+            f"Portable compatibility requires UTF-8 text: {path.name}",
+        ) from exc
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+
 @dataclass(frozen=True)
 class LegacyReceiptMapping:
     receipt_schema_version: int
@@ -266,6 +284,134 @@ class LegacyReceiptMapping:
             and receipt.get("protocol") == self.protocol
             and receipt.get("manifest_sha256") == self.manifest_sha256
         )
+
+
+@dataclass(frozen=True)
+class DeliveryLayout:
+    scope: str
+    anchor_root: Path
+    agents_root: Path
+    enabled_root: Path
+    state_root: Path
+    skill_roots: tuple[tuple[str, Path], ...]
+    default_owned_skills: tuple[str, ...]
+    receipt_schema_version: int
+    isolated: bool
+
+    @classmethod
+    def project(cls, project: Path | str) -> "DeliveryLayout":
+        raw = Path(project)
+        if _is_linklike(raw):
+            raise DeliveryError("symlink_boundary", "Project root cannot be a symlink")
+        root = raw.resolve()
+        if not root.is_dir():
+            raise DeliveryError(
+                "project_missing",
+                f"Target project directory is missing: {root}",
+            )
+        agents_root = root / ".agents"
+        enabled_root = agents_root / "skills"
+        return cls(
+            scope="project",
+            anchor_root=root,
+            agents_root=agents_root,
+            enabled_root=enabled_root,
+            state_root=agents_root / ".cotend-delivery",
+            skill_roots=(("project", enabled_root),),
+            default_owned_skills=EXPECTED_SKILLS,
+            receipt_schema_version=RECEIPT_SCHEMA_VERSION,
+            isolated=False,
+        )
+
+    @classmethod
+    def isolated_user(
+        cls,
+        *,
+        isolation_root: Path | str,
+        home: Path | str,
+        codex_home: Path | str,
+        state_root: Path | str,
+    ) -> "DeliveryLayout":
+        raw_isolation = Path(isolation_root)
+        raw_home = Path(home)
+        raw_codex_home = Path(codex_home)
+        raw_state_root = Path(state_root)
+        if any(
+            _is_linklike(path)
+            for path in (raw_isolation, raw_home, raw_codex_home, raw_state_root)
+        ):
+            raise DeliveryError(
+                "symlink_boundary",
+                "User delivery roots cannot be links",
+            )
+        anchor = raw_isolation.resolve()
+        home_root = raw_home.resolve()
+        codex_root = raw_codex_home.resolve()
+        delivery_state = raw_state_root.resolve()
+        if not anchor.is_dir() or not home_root.is_dir() or not codex_root.is_dir():
+            raise DeliveryError(
+                "user_scope_missing",
+                "Isolated user delivery roots must exist before planning",
+            )
+        live_home = Path.home().resolve()
+        live_codex = Path(os.environ.get("CODEX_HOME", live_home / ".codex")).resolve()
+        if home_root == live_home or codex_root == live_codex:
+            raise DeliveryError(
+                "live_user_scope_forbidden",
+                "This adapter accepts isolated user roots only",
+            )
+        guarded = {
+            "home": home_root,
+            "codex_home": codex_root,
+            "state_root": delivery_state,
+        }
+        for label, path in guarded.items():
+            if not path.is_relative_to(anchor):
+                raise DeliveryError(
+                    "user_scope_escape",
+                    f"{label} is outside the explicit isolation root",
+                )
+        agents_root = home_root / ".agents"
+        enabled_root = agents_root / "skills"
+        roots: list[tuple[str, Path]] = [("canonical", enabled_root)]
+        compatibility_root = codex_root / "skills"
+        if compatibility_root != enabled_root:
+            roots.append(("compatibility", compatibility_root))
+        for index, (label, root) in enumerate(roots):
+            if (
+                delivery_state == root
+                or delivery_state.is_relative_to(root)
+                or root.is_relative_to(delivery_state)
+            ):
+                raise DeliveryError(
+                    "user_scope_overlap",
+                    f"Delivery state overlaps the {label} Skill root",
+                )
+            for other_label, other_root in roots[index + 1 :]:
+                if root.is_relative_to(other_root) or other_root.is_relative_to(root):
+                    raise DeliveryError(
+                        "user_scope_overlap",
+                        f"{label} and {other_label} Skill roots overlap",
+                    )
+        return cls(
+            scope="user",
+            anchor_root=anchor,
+            agents_root=agents_root,
+            enabled_root=enabled_root,
+            state_root=delivery_state,
+            skill_roots=tuple(roots),
+            default_owned_skills=FIRST_PARTY_SKILLS,
+            receipt_schema_version=USER_RECEIPT_SCHEMA_VERSION,
+            isolated=True,
+        )
+
+
+@dataclass(frozen=True)
+class _ComponentPlan:
+    owned_skills: tuple[str, ...]
+    owned_files: dict[str, str]
+    components: dict[str, dict[str, Any]]
+    warnings: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -547,19 +693,33 @@ class Artifact:
 
 
 class DeliveryManager:
-    def __init__(self, project: Path | str) -> None:
-        raw = Path(project)
-        if _is_linklike(raw):
-            raise DeliveryError("symlink_boundary", "Project root cannot be a symlink")
-        self.project = raw.resolve()
-        if not self.project.is_dir():
-            raise DeliveryError(
-                "project_missing",
-                f"Target project directory is missing: {self.project}",
-            )
-        self.agents_root = self.project / ".agents"
-        self.enabled_root = self.agents_root / "skills"
-        self.state_root = self.agents_root / ".cotend-delivery"
+    def __init__(
+        self,
+        project: Path | str | None = None,
+        *,
+        _layout: DeliveryLayout | None = None,
+        _default_candidate: Artifact | None = None,
+    ) -> None:
+        if _layout is None:
+            if project is None:
+                raise DeliveryError("project_missing", "Target project is required")
+            layout = DeliveryLayout.project(project)
+        else:
+            if project is not None:
+                raise DeliveryError(
+                    "layout_invalid",
+                    "A delivery layout cannot be combined with a project argument",
+                )
+            layout = _layout
+        self.layout = layout
+        self.scope = layout.scope
+        self.project = layout.anchor_root
+        self.agents_root = layout.agents_root
+        self.enabled_root = layout.enabled_root
+        self.state_root = layout.state_root
+        self.skill_roots = layout.skill_roots
+        self._default_candidate = _default_candidate
+        self._active_owned_skills: set[str] = set()
         self.disabled_root = self.state_root / "disabled-skills"
         self.receipt_path = self.state_root / "receipt.json"
         self.receipt_temp_path = self.state_root / "receipt.json.tmp"
@@ -603,6 +763,234 @@ class DeliveryManager:
                 "invalid_boundary",
                 "Receipt temporary path must be a file when present",
             )
+
+        for label, root in self.skill_roots:
+            if _is_linklike(root):
+                raise DeliveryError(
+                    "symlink_boundary",
+                    f"{label} Skill root cannot be a symlink",
+                )
+            if root.exists() and not root.is_dir():
+                raise DeliveryError(
+                    "invalid_boundary",
+                    f"{label} Skill root must be a directory when present",
+                )
+
+    def _display_path(self, path: Path) -> str:
+        try:
+            return path.relative_to(self.project).as_posix()
+        except ValueError:
+            return str(path)
+
+    def _effective_candidate(self, candidate: Artifact | None) -> Artifact | None:
+        return candidate if candidate is not None else self._default_candidate
+
+    @staticmethod
+    def _files_for_skills(
+        files: dict[str, str],
+        skills: tuple[str, ...],
+    ) -> dict[str, str]:
+        prefixes = tuple(f"{skill}/" for skill in skills)
+        return {
+            relative: digest
+            for relative, digest in files.items()
+            if relative.startswith(prefixes)
+        }
+
+    @staticmethod
+    def _receipt_owned_skills(receipt: dict[str, Any]) -> tuple[str, ...]:
+        if receipt.get("scope") == "user":
+            return tuple(receipt["owned_skills"])
+        return tuple(receipt["skills"])
+
+    @staticmethod
+    def _receipt_owned_files(receipt: dict[str, Any]) -> dict[str, str]:
+        if receipt.get("scope") == "user":
+            return receipt["owned_files"]
+        return receipt["files"]
+
+    def _portable_candidate_digest(self, artifact: Artifact, skill: str) -> str:
+        skill_files = sorted(
+            relative
+            for relative in artifact.files
+            if relative.startswith(f"{skill}/")
+        )
+        if skill_files != [f"{skill}/SKILL.md"]:
+            raise DeliveryError(
+                "portable_compatibility_unsupported",
+                f"Portable companion compatibility is unsupported for {skill}",
+            )
+        return _portable_text_digest(artifact.root / skill / "SKILL.md")
+
+    def _portable_root_digest(
+        self,
+        root: Path,
+        skill: str,
+        *,
+        label: str,
+    ) -> str | None:
+        skill_root = root / skill
+        if _is_linklike(skill_root):
+            raise DeliveryError(
+                "symlink_boundary",
+                f"{label} companion path cannot be a link: {skill}",
+            )
+        if not skill_root.exists():
+            return None
+        if not skill_root.is_dir():
+            raise DeliveryError(
+                "invalid_payload",
+                f"{label} companion path is not a directory: {skill}",
+            )
+        _assert_no_symlinks(skill_root, label=f"{label} companion {skill}")
+        files = [
+            path.relative_to(skill_root).as_posix()
+            for path in sorted(skill_root.rglob("*"))
+            if path.is_file()
+        ]
+        if files != ["SKILL.md"]:
+            raise DeliveryError(
+                "companion_inventory_incompatible",
+                f"{label} companion has unsupported files: {skill}",
+                details={"root": label, "skill": skill, "files": files},
+            )
+        return _portable_text_digest(skill_root / "SKILL.md")
+
+    def _scan_companion(
+        self,
+        skill: str,
+        expected_digest: str,
+    ) -> tuple[list[str], list[str]]:
+        locations: list[str] = []
+        for label, root in self.skill_roots:
+            actual = self._portable_root_digest(root, skill, label=label)
+            if actual is None:
+                continue
+            if actual != expected_digest:
+                raise DeliveryError(
+                    "companion_content_incompatible",
+                    f"Existing companion is incompatible: {skill}",
+                    details={"root": label, "skill": skill},
+                )
+            locations.append(label)
+        warnings = (
+            [f"compatible_duplicate:{skill}"] if len(locations) > 1 else []
+        )
+        return locations, warnings
+
+    def _component_plan_for_install(self, artifact: Artifact) -> _ComponentPlan:
+        if self.scope == "project":
+            components = {
+                skill: {"disposition": "owned"} for skill in artifact.skills
+            }
+            return _ComponentPlan(
+                owned_skills=artifact.skills,
+                owned_files=artifact.files,
+                components=components,
+                warnings=(),
+            )
+
+        collisions: list[str] = []
+        for skill in FIRST_PARTY_SKILLS:
+            for label, root in self.skill_roots:
+                path = root / skill
+                if path.exists() or _is_linklike(path):
+                    collisions.append(f"{label}:{skill}")
+        if collisions:
+            raise DeliveryError(
+                "unowned_collision",
+                "CoTend-owned Skill names already exist in user scope",
+                details={"paths": sorted(collisions)},
+            )
+
+        owned = list(FIRST_PARTY_SKILLS)
+        components: dict[str, dict[str, Any]] = {
+            skill: {"disposition": "owned"} for skill in FIRST_PARTY_SKILLS
+        }
+        warnings: list[str] = []
+        for skill in SHAREABLE_COMPANION_SKILLS:
+            portable_digest = self._portable_candidate_digest(artifact, skill)
+            locations, duplicate_warnings = self._scan_companion(
+                skill,
+                portable_digest,
+            )
+            warnings.extend(duplicate_warnings)
+            if locations:
+                components[skill] = {
+                    "disposition": "external_shared",
+                    "portable_manifest_sha256": portable_digest,
+                    "observed_roots": locations,
+                }
+            else:
+                owned.append(skill)
+                components[skill] = {"disposition": "owned"}
+        owned_skills = tuple(skill for skill in EXPECTED_SKILLS if skill in owned)
+        return _ComponentPlan(
+            owned_skills=owned_skills,
+            owned_files=self._files_for_skills(artifact.files, owned_skills),
+            components=components,
+            warnings=tuple(sorted(warnings)),
+        )
+
+    def _component_plan_from_receipt(self, receipt: dict[str, Any]) -> _ComponentPlan:
+        owned_skills = self._receipt_owned_skills(receipt)
+        components = receipt.get("components") or {
+            skill: {"disposition": "owned"} for skill in receipt["skills"]
+        }
+        return _ComponentPlan(
+            owned_skills=owned_skills,
+            owned_files=self._receipt_owned_files(receipt),
+            components=components,
+            warnings=(),
+        )
+
+    def _user_component_state(
+        self,
+        receipt: dict[str, Any],
+    ) -> tuple[list[str], list[str], dict[str, dict[str, Any]]]:
+        if self.scope != "user":
+            return [], [], {}
+        issues: list[str] = []
+        warnings: list[str] = []
+        current: dict[str, dict[str, Any]] = {}
+        for skill in EXPECTED_SKILLS:
+            component = receipt["components"][skill]
+            disposition = component["disposition"]
+            if disposition == "owned":
+                collisions = []
+                for label, root in self.skill_roots:
+                    if label == "canonical":
+                        continue
+                    path = root / skill
+                    if path.exists() or _is_linklike(path):
+                        collisions.append(label)
+                if collisions:
+                    issues.append(f"owned_duplicate:{skill}")
+                current[skill] = {
+                    "disposition": "owned",
+                    "unexpected_roots": collisions,
+                }
+                continue
+
+            expected_digest = component["portable_manifest_sha256"]
+            try:
+                locations, duplicate_warnings = self._scan_companion(
+                    skill,
+                    expected_digest,
+                )
+            except DeliveryError as exc:
+                issues.append(f"{exc.code}:{skill}")
+                locations = []
+                duplicate_warnings = []
+            if not locations:
+                issues.append(f"external_shared_missing:{skill}")
+            warnings.extend(duplicate_warnings)
+            current[skill] = {
+                "disposition": "external_shared",
+                "roots": locations,
+                "portable_manifest_sha256": expected_digest,
+            }
+        return sorted(set(issues)), sorted(set(warnings)), current
 
     @staticmethod
     def _no_mutation_lock() -> dict[str, Any]:
@@ -1261,15 +1649,21 @@ class DeliveryManager:
                 },
             ) from release_error
 
-    def _receipt_payload(self, artifact: Artifact, *, enabled: bool) -> dict[str, Any]:
+    def _receipt_payload(
+        self,
+        artifact: Artifact,
+        *,
+        enabled: bool,
+        component_plan: _ComponentPlan | None = None,
+    ) -> dict[str, Any]:
         now = _utc_now()
         previous = self._load_receipt(required=False)
         installed_at = previous.get("installed_at", now) if previous else now
-        return {
+        payload = {
             "schema": RECEIPT_SCHEMA,
-            "schema_version": RECEIPT_SCHEMA_VERSION,
+            "schema_version": self.layout.receipt_schema_version,
             "platform": artifact.platform,
-            "scope": "project",
+            "scope": self.scope,
             "source_release_id": artifact.source_release_id,
             "artifact_lineage": artifact.lineage,
             "artifact_id": artifact.artifact_id,
@@ -1282,17 +1676,39 @@ class DeliveryManager:
             "installed_at": installed_at,
             "updated_at": now,
         }
+        if self.scope == "user":
+            plan = component_plan
+            if plan is None:
+                plan = (
+                    self._component_plan_from_receipt(previous)
+                    if previous
+                    else self._component_plan_for_install(artifact)
+                )
+            payload.update(
+                {
+                    "owned_skills": list(plan.owned_skills),
+                    "owned_files": plan.owned_files,
+                    "components": plan.components,
+                }
+            )
+        return payload
 
     def _validate_receipt(self, value: Any) -> dict[str, Any]:
         if not isinstance(value, dict):
             raise DeliveryError("receipt_invalid", "Delivery receipt is not an object")
         schema_version = value.get("schema_version")
-        if (
-            value.get("schema") != RECEIPT_SCHEMA
-            or schema_version not in {LEGACY_SCHEMA_VERSION, RECEIPT_SCHEMA_VERSION}
-        ):
+        scope = value.get("scope")
+        if value.get("schema") != RECEIPT_SCHEMA:
             raise DeliveryError("receipt_invalid", "Unsupported delivery receipt schema")
-        if value.get("platform") != TARGET_PLATFORM or value.get("scope") != "project":
+        if scope == "project":
+            valid_versions = {LEGACY_SCHEMA_VERSION, RECEIPT_SCHEMA_VERSION}
+        elif scope == "user":
+            valid_versions = {USER_RECEIPT_SCHEMA_VERSION}
+        else:
+            valid_versions = set()
+        if schema_version not in valid_versions or scope != self.scope:
+            raise DeliveryError("receipt_invalid", "Unsupported delivery receipt schema")
+        if value.get("platform") != TARGET_PLATFORM:
             raise DeliveryError("receipt_invalid", "Receipt target boundary is invalid")
         skills = value.get("skills")
         files = value.get("files")
@@ -1323,7 +1739,7 @@ class DeliveryManager:
                 "receipt_invalid",
                 "Legacy receipt contains schema v2 identity fields",
             )
-        if schema_version == RECEIPT_SCHEMA_VERSION:
+        if schema_version in {RECEIPT_SCHEMA_VERSION, USER_RECEIPT_SCHEMA_VERSION}:
             revision = value.get("target_revision")
             lineage = value.get("artifact_lineage")
             if (
@@ -1338,6 +1754,80 @@ class DeliveryManager:
                 raise DeliveryError(
                     "receipt_invalid",
                     "Receipt source or target revision identity is invalid",
+                )
+        if scope == "user":
+            owned_skills = value.get("owned_skills")
+            owned_files = value.get("owned_files")
+            components = value.get("components")
+            if (
+                not isinstance(owned_skills, list)
+                or len(owned_skills) != len(set(owned_skills))
+                or any(skill not in EXPECTED_SKILLS for skill in owned_skills)
+                or not set(FIRST_PARTY_SKILLS).issubset(set(owned_skills))
+                or owned_skills
+                != [skill for skill in EXPECTED_SKILLS if skill in set(owned_skills)]
+            ):
+                raise DeliveryError(
+                    "receipt_invalid",
+                    "User receipt owned Skill inventory is invalid",
+                )
+            expected_owned_files = self._files_for_skills(files, tuple(owned_skills))
+            if owned_files != expected_owned_files:
+                raise DeliveryError(
+                    "receipt_invalid",
+                    "User receipt owned file inventory is invalid",
+                )
+            if not isinstance(components, dict) or set(components) != set(EXPECTED_SKILLS):
+                raise DeliveryError(
+                    "receipt_invalid",
+                    "User receipt component inventory is invalid",
+                )
+            component_owned: list[str] = []
+            root_labels = {label for label, _ in self.skill_roots}
+            for skill in EXPECTED_SKILLS:
+                component = components[skill]
+                if not isinstance(component, dict):
+                    raise DeliveryError(
+                        "receipt_invalid",
+                        f"User receipt component is invalid: {skill}",
+                    )
+                disposition = component.get("disposition")
+                if disposition == "owned":
+                    if set(component) != {"disposition"}:
+                        raise DeliveryError(
+                            "receipt_invalid",
+                            f"Owned component metadata is invalid: {skill}",
+                        )
+                    component_owned.append(skill)
+                elif disposition == "external_shared":
+                    roots = component.get("observed_roots")
+                    if (
+                        skill not in SHAREABLE_COMPANION_SKILLS
+                        or not _is_sha256(component.get("portable_manifest_sha256"))
+                        or not isinstance(roots, list)
+                        or not roots
+                        or len(roots) != len(set(roots))
+                        or not set(roots).issubset(root_labels)
+                        or set(component)
+                        != {
+                            "disposition",
+                            "portable_manifest_sha256",
+                            "observed_roots",
+                        }
+                    ):
+                        raise DeliveryError(
+                            "receipt_invalid",
+                            f"External component metadata is invalid: {skill}",
+                        )
+                else:
+                    raise DeliveryError(
+                        "receipt_invalid",
+                        f"Unknown component disposition: {skill}",
+                    )
+            if component_owned != owned_skills:
+                raise DeliveryError(
+                    "receipt_invalid",
+                    "User receipt ownership fields disagree",
                 )
         if not isinstance(value.get("enabled"), bool):
             raise DeliveryError("receipt_invalid", "Receipt enablement is invalid")
@@ -1390,6 +1880,20 @@ class DeliveryManager:
                 return "identity_migration_available", []
             return "incompatible", ["legacy_identity_unmapped"]
 
+        if self.scope == "user":
+            for skill in SHAREABLE_COMPANION_SKILLS:
+                component = receipt["components"][skill]
+                if component["disposition"] != "external_shared":
+                    continue
+                try:
+                    candidate_digest = self._portable_candidate_digest(candidate, skill)
+                except DeliveryError as exc:
+                    return "incompatible", [exc.code]
+                if candidate_digest != component["portable_manifest_sha256"]:
+                    return "incompatible", [
+                        f"external_shared_candidate_incompatible:{skill}"
+                    ]
+
         exact_identity = (
             receipt["platform"] == candidate.platform
             and receipt["source_release_id"] == candidate.source_release_id
@@ -1414,14 +1918,34 @@ class DeliveryManager:
             return "update_available", []
         return "downgrade_candidate", ["downgrade_requires_explicit_operation"]
 
-    def _collision_paths_without_receipt(self) -> list[str]:
+    def _collision_paths_without_receipt(
+        self,
+        candidate: Artifact | None,
+    ) -> tuple[list[str], _ComponentPlan | None, list[str]]:
+        if self.scope == "user":
+            if candidate is None:
+                return ["candidate_required_for_user_preflight"], None, [
+                    "candidate_required"
+                ]
+            try:
+                component_plan = self._component_plan_for_install(candidate)
+            except DeliveryError as exc:
+                paths = exc.details.get("paths")
+                collisions = (
+                    [str(path) for path in paths]
+                    if isinstance(paths, list) and paths
+                    else [exc.code]
+                )
+                return collisions, None, [exc.code]
+            return [], component_plan, []
+
         collisions: list[str] = []
         for root in (self.enabled_root, self.disabled_root):
             for skill in EXPECTED_SKILLS:
                 path = root / skill
                 if path.exists() or _is_linklike(path):
-                    collisions.append(path.relative_to(self.project).as_posix())
-        return sorted(collisions)
+                    collisions.append(self._display_path(path))
+        return sorted(collisions), None, []
 
     def _state_residue_without_receipt(
         self,
@@ -1438,16 +1962,22 @@ class DeliveryManager:
         if not include_previous_rollback:
             allowed.add(self.previous_rollback_path)
         return sorted(
-            path.relative_to(self.project).as_posix()
+            self._display_path(path)
             for path in self.state_root.iterdir()
             if path not in allowed
         )
 
-    def _shadow_payload_paths(self, *, enabled: bool) -> list[str]:
+    def _shadow_payload_paths(
+        self,
+        *,
+        enabled: bool,
+        skills: tuple[str, ...] | None = None,
+    ) -> list[str]:
         opposite_root = self.disabled_root if enabled else self.enabled_root
+        managed_skills = skills or self.layout.default_owned_skills
         return sorted(
-            path.relative_to(self.project).as_posix()
-            for skill in EXPECTED_SKILLS
+            self._display_path(path)
+            for skill in managed_skills
             if (path := opposite_root / skill).exists() or _is_linklike(path)
         )
 
@@ -1468,11 +1998,20 @@ class DeliveryManager:
         owner_token: str | None = None,
         recovery_owner_token: str | None = None,
     ) -> dict[str, Any]:
+        candidate = self._effective_candidate(candidate)
         self._assert_target_boundaries()
         mutation_lock = self._read_mutation_lock()
         recovery_lock = self._read_recovery_lock()
 
         def finalize(state: dict[str, Any]) -> dict[str, Any]:
+            if self.scope == "user":
+                state.pop("project", None)
+                state.update(
+                    {
+                        "scope": "user",
+                        "target_root": str(self.enabled_root),
+                    }
+                )
             state = self._apply_mutation_lock_state(
                 state,
                 mutation_lock,
@@ -1513,12 +2052,14 @@ class DeliveryManager:
             })
 
         if receipt is None:
-            collisions = self._collision_paths_without_receipt()
+            collisions, component_plan, preflight_diagnostics = (
+                self._collision_paths_without_receipt(candidate)
+            )
             state_residue = self._state_residue_without_receipt(
                 include_previous_rollback=include_previous_rollback
             )
             if collisions or state_residue or transition_artifacts:
-                diagnostics = []
+                diagnostics = list(preflight_diagnostics)
                 if collisions:
                     diagnostics.append("unowned_collision")
                 if state_residue:
@@ -1543,7 +2084,7 @@ class DeliveryManager:
                     "recommended_operation": "manual_resolution",
                     "diagnostics": diagnostics,
                 })
-            return finalize({
+            absent_state = {
                 "schema": "cotend.delivery-state",
                 "project": str(self.project),
                 "receipt_valid": True,
@@ -1562,11 +2103,17 @@ class DeliveryManager:
                 "rollback_available": rollback_available,
                 "recommended_operation": "rollback" if rollback_available else "install",
                 "diagnostics": [],
-            })
+            }
+            if component_plan is not None:
+                absent_state["components"] = component_plan.components
+                absent_state["warnings"] = list(component_plan.warnings)
+            return finalize(absent_state)
 
         payload_root = self.enabled_root if receipt["enabled"] else self.disabled_root
+        owned_skills = self._receipt_owned_skills(receipt)
+        owned_files = self._receipt_owned_files(receipt)
         try:
-            actual = _directory_manifest(payload_root, tuple(receipt["skills"]))
+            actual = _directory_manifest(payload_root, owned_skills)
         except DeliveryError as exc:
             return finalize({
                 "schema": "cotend.delivery-state",
@@ -1589,11 +2136,20 @@ class DeliveryManager:
                 "diagnostics": [exc.code],
             })
 
-        expected = receipt["files"]
+        expected = owned_files
+        component_issues, component_warnings, component_state = (
+            self._user_component_state(receipt)
+        )
         missing = sorted(set(expected) - set(actual))
         unexpected = sorted(
             set(actual) - set(expected)
-            | set(self._shadow_payload_paths(enabled=receipt["enabled"]))
+            | set(
+                self._shadow_payload_paths(
+                    enabled=receipt["enabled"],
+                    skills=owned_skills,
+                )
+            )
+            | set(component_issues)
         )
         modified = sorted(
             path for path in set(expected) & set(actual) if expected[path] != actual[path]
@@ -1631,7 +2187,7 @@ class DeliveryManager:
         else:
             recommended = "current_no_change"
 
-        return finalize({
+        complete_state = {
             "schema": "cotend.delivery-state",
             "project": str(self.project),
             "receipt_valid": True,
@@ -1655,7 +2211,7 @@ class DeliveryManager:
             "candidate_id": candidate.artifact_id if candidate else None,
             "candidate_revision": candidate.revision if candidate else None,
             "candidate_manifest_sha256": candidate.manifest_sha256 if candidate else None,
-            "managed_skills": list(receipt["skills"]),
+            "managed_skills": list(owned_skills),
             "managed_files": len(expected),
             "missing": missing,
             "modified": modified,
@@ -1664,7 +2220,11 @@ class DeliveryManager:
             "rollback_available": rollback_available,
             "recommended_operation": recommended,
             "diagnostics": diagnostics,
-        })
+        }
+        if self.scope == "user":
+            complete_state["components"] = component_state
+            complete_state["warnings"] = component_warnings
+        return finalize(complete_state)
 
     def _snapshot_owned_path(
         self,
@@ -1701,11 +2261,18 @@ class DeliveryManager:
         )
         for path, label in owned_paths:
             self._snapshot_owned_path(path, label, entries)
+        managed_skills = set(self.layout.default_owned_skills) | self._active_owned_skills
+        try:
+            receipt = self._load_receipt(required=False)
+        except DeliveryError:
+            receipt = None
+        if receipt:
+            managed_skills.update(self._receipt_owned_skills(receipt))
         for carrier, root in (
             ("enabled-skills", self.enabled_root),
             ("disabled-skills", self.disabled_root),
         ):
-            for skill in EXPECTED_SKILLS:
+            for skill in sorted(managed_skills):
                 self._snapshot_owned_path(
                     root / skill,
                     f"{carrier}/{skill}",
@@ -1753,7 +2320,7 @@ class DeliveryManager:
         def walk(current: Path) -> None:
             for child in sorted(current.iterdir(), key=lambda item: item.name):
                 relative = child.relative_to(inventory_root).as_posix()
-                display = child.relative_to(self.project).as_posix()
+                display = self._display_path(child)
                 if _is_linklike(child):
                     unexpected.append(display)
                 elif child.is_file():
@@ -1787,18 +2354,27 @@ class DeliveryManager:
         }
         if self.state_root.is_dir():
             unexpected.extend(
-                entry.relative_to(self.project).as_posix()
+                self._display_path(entry)
                 for entry in self.state_root.iterdir()
                 if entry.name not in allowed_state_entries
             )
         if self.disabled_root.is_dir():
             unexpected.extend(
-                entry.relative_to(self.project).as_posix()
+                self._display_path(entry)
                 for entry in self.disabled_root.iterdir()
                 if entry.name not in EXPECTED_SKILLS
             )
 
-        allowed_files = set(checkpoint_receipt["files"]) if checkpoint_receipt else set()
+        managed_skills = (
+            self._receipt_owned_skills(checkpoint_receipt)
+            if checkpoint_receipt
+            else self.layout.default_owned_skills
+        )
+        allowed_files = (
+            set(self._receipt_owned_files(checkpoint_receipt))
+            if checkpoint_receipt
+            else set()
+        )
         allowed_directories = {
             PurePosixPath(relative).parent.as_posix()
             for relative in allowed_files
@@ -1810,15 +2386,15 @@ class DeliveryManager:
             if parent.as_posix() != "."
         )
         for root in (self.enabled_root, self.disabled_root):
-            for skill in EXPECTED_SKILLS:
+            for skill in managed_skills:
                 skill_root = root / skill
                 if _is_linklike(skill_root) or (
                     skill_root.exists() and not skill_root.is_dir()
                 ):
-                    unexpected.append(skill_root.relative_to(self.project).as_posix())
+                    unexpected.append(self._display_path(skill_root))
                 elif skill_root.is_dir():
                     if skill not in allowed_directories:
-                        unexpected.append(skill_root.relative_to(self.project).as_posix())
+                        unexpected.append(self._display_path(skill_root))
                     unexpected.extend(
                         self._walk_recovery_managed_path(
                             skill_root,
@@ -1830,12 +2406,12 @@ class DeliveryManager:
 
         if self.staging_path.exists():
             if _is_linklike(self.staging_path) or not self.staging_path.is_dir():
-                unexpected.append(self.staging_path.relative_to(self.project).as_posix())
+                unexpected.append(self._display_path(self.staging_path))
             else:
                 staging_entries = {entry.name for entry in self.staging_path.iterdir()}
                 staged = self.staging_path / "skills"
                 if staging_entries != {"skills"} or _is_linklike(staged) or not staged.is_dir():
-                    unexpected.append(self.staging_path.relative_to(self.project).as_posix())
+                    unexpected.append(self._display_path(self.staging_path))
                 else:
                     unexpected.extend(
                         self._walk_recovery_managed_path(
@@ -1846,7 +2422,7 @@ class DeliveryManager:
                         )
                     )
         if self.rollback_new_path.exists() or _is_linklike(self.rollback_new_path):
-            unexpected.append(self.rollback_new_path.relative_to(self.project).as_posix())
+            unexpected.append(self._display_path(self.rollback_new_path))
         return sorted(set(unexpected))
 
     @staticmethod
@@ -1966,6 +2542,15 @@ class DeliveryManager:
             except DeliveryError as exc:
                 checkpoint_error = exc.code
                 checkpoint_relation = "invalid"
+        if checkpoint_receipt is not None and self.scope == "user":
+            component_issues, _, _ = self._user_component_state(checkpoint_receipt)
+            if component_issues:
+                return self._blocked_recovery_plan(
+                    visible_state,
+                    reason="external_shared_state_changed",
+                    recommendation="explicit_repair_or_migration_decision",
+                    diagnostics=["external_shared_state_changed", *component_issues],
+                )
 
         phase = mutation["phase"]
         if phase == "planning":
@@ -2039,10 +2624,15 @@ class DeliveryManager:
                 "preserve project files and unrelated Skill directories",
             ]
             affected_paths = [
-                ".agents/.cotend-delivery/recovery.lock",
-                ".agents/.cotend-delivery/mutation.lock",
+                self._display_path(self.recovery_lock_path),
+                self._display_path(self.mutation_lock_path),
             ]
         else:
+            recovery_skills = (
+                self._receipt_owned_skills(checkpoint_receipt)
+                if checkpoint_receipt
+                else self.layout.default_owned_skills
+            )
             effects = [
                 "create a temporary recovery.lock and retain it if recovery fails",
                 "restore the exact verified current checkpoint",
@@ -2052,19 +2642,19 @@ class DeliveryManager:
                 "preserve project files and unrelated Skill directories",
             ]
             affected_paths = [
-                ".agents/.cotend-delivery/recovery.lock",
-                *(f".agents/skills/{skill}" for skill in EXPECTED_SKILLS),
+                self._display_path(self.recovery_lock_path),
+                *(self._display_path(self.enabled_root / skill) for skill in recovery_skills),
                 *(
-                    f".agents/.cotend-delivery/disabled-skills/{skill}"
-                    for skill in EXPECTED_SKILLS
+                    self._display_path(self.disabled_root / skill)
+                    for skill in recovery_skills
                 ),
-                ".agents/.cotend-delivery/receipt.json",
-                ".agents/.cotend-delivery/rollback",
-                ".agents/.cotend-delivery/rollback.new",
-                ".agents/.cotend-delivery/rollback.previous",
-                ".agents/.cotend-delivery/staging",
-                ".agents/.cotend-delivery/receipt.json.tmp",
-                ".agents/.cotend-delivery/mutation.lock",
+                self._display_path(self.receipt_path),
+                self._display_path(self.rollback_path),
+                self._display_path(self.rollback_new_path),
+                self._display_path(self.previous_rollback_path),
+                self._display_path(self.staging_path),
+                self._display_path(self.receipt_temp_path),
+                self._display_path(self.mutation_lock_path),
             ]
         return {
             "operation": "recover",
@@ -2106,6 +2696,7 @@ class DeliveryManager:
             raise DeliveryError("operation_unknown", f"Unknown operation: {operation}")
         if operation == "recover":
             return self._plan_recovery()
+        candidate = self._effective_candidate(candidate)
         if operation in {"install", "update", "repair", "migrate_identity"} and candidate is None:
             raise DeliveryError(
                 "candidate_required",
@@ -2139,7 +2730,7 @@ class DeliveryManager:
         elif operation == "install":
             if state["installation"] == "absent" and state["transition"] == "stable":
                 allowed = will_mutate = True
-                reason = "install_candidate_into_absent_project_scope"
+                reason = f"install_candidate_into_absent_{self.scope}_scope"
             elif (
                 state["installation"] == "complete"
                 and state["candidate_relation"] == "same_as_current"
@@ -2235,9 +2826,15 @@ class DeliveryManager:
         checkpoint = "replace the previous one-step rollback checkpoint"
         if operation in {"install", "update", "repair"}:
             assert candidate is not None
+            if state["installation"] == "absent":
+                component_plan = self._component_plan_for_install(candidate)
+            else:
+                receipt = self._load_receipt(required=True)
+                assert receipt is not None
+                component_plan = self._component_plan_from_receipt(receipt)
             return [
                 checkpoint,
-                f"write {len(candidate.skills)} managed Skill directories and {len(candidate.files)} files",
+                f"write {len(component_plan.owned_skills)} managed Skill directories and {len(component_plan.owned_files)} files",
                 "write the adapter-owned delivery receipt",
                 f"preserve current enablement: {state.get('enablement', 'enabled')}",
             ]
@@ -2252,7 +2849,7 @@ class DeliveryManager:
         if operation in {"enable", "disable"}:
             return [
                 checkpoint,
-                f"move only the {len(EXPECTED_SKILLS)} managed Skill directories inside .agents",
+                f"move only the {len(state.get('managed_skills', []))} receipt-owned Skill directories",
                 "update the adapter-owned delivery receipt",
             ]
         if operation == "uninstall":
@@ -2430,6 +3027,7 @@ class DeliveryManager:
         apply: bool = False,
         confirm_recovery_plan_id: str | None = None,
     ) -> dict[str, Any]:
+        candidate = self._effective_candidate(candidate)
         if operation == "recover":
             return self._execute_recovery(
                 apply=apply,
@@ -2557,6 +3155,7 @@ class DeliveryManager:
                             "rollback_error": str(rollback_exc),
                         },
                     ) from rollback_exc
+                self._active_owned_skills.clear()
                 try:
                     self._update_mutation_phase(lease, "rolled_back")
                 except Exception as phase_exc:
@@ -2577,6 +3176,13 @@ class DeliveryManager:
                 ) from exc
 
         self._release_terminal_mutation_lock(lease)
+        self._active_owned_skills.clear()
+        if (
+            self.scope == "user"
+            and candidate is not None
+            and operation in {"install", "update", "repair", "migrate_identity"}
+        ):
+            self._default_candidate = candidate
         after = self.inspect(candidate)
         return {
             "status": "applied",
@@ -2604,17 +3210,18 @@ class DeliveryManager:
             payload_files: dict[str, str] = {}
             payload_skills: list[str] = []
             if receipt:
+                owned_skills = self._receipt_owned_skills(receipt)
                 shutil.copy2(self.receipt_path, temp / "receipt.json")
                 source_root = (
                     self.enabled_root if receipt["enabled"] else self.disabled_root
                 )
                 payload_files = _directory_manifest(
                     source_root,
-                    tuple(receipt["skills"]),
+                    owned_skills,
                 )
                 payload_skills = [
                     skill
-                    for skill in receipt["skills"]
+                    for skill in owned_skills
                     if (source_root / skill).is_dir()
                 ]
                 if payload_mode == "snapshot":
@@ -2627,7 +3234,7 @@ class DeliveryManager:
                         shutil.copytree(source, payload / skill)
                     copied_files = _directory_manifest(
                         payload,
-                        tuple(receipt["skills"]),
+                        owned_skills,
                     )
                     if copied_files != payload_files:
                         raise DeliveryError(
@@ -2641,7 +3248,7 @@ class DeliveryManager:
                 "created_at": _utc_now(),
                 "receipt_present": receipt is not None,
                 "payload_mode": payload_mode,
-                "skills": list(receipt["skills"]) if receipt else [],
+                "skills": list(self._receipt_owned_skills(receipt)) if receipt else [],
                 "enabled": receipt["enabled"] if receipt else None,
                 "payload_skills": payload_skills,
                 "payload_files": payload_files,
@@ -2761,10 +3368,14 @@ class DeliveryManager:
             except (OSError, json.JSONDecodeError) as exc:
                 raise DeliveryError("checkpoint_invalid", "Checkpoint receipt is invalid") from exc
             if (
-                value["skills"] != checkpoint_receipt["skills"]
+                value["skills"] != list(self._receipt_owned_skills(checkpoint_receipt))
                 or value.get("enabled") != checkpoint_receipt["enabled"]
-                or not set(payload_skills).issubset(set(checkpoint_receipt["skills"]))
-                or not set(payload_files).issubset(set(checkpoint_receipt["files"]))
+                or not set(payload_skills).issubset(
+                    set(self._receipt_owned_skills(checkpoint_receipt))
+                )
+                or not set(payload_files).issubset(
+                    set(self._receipt_owned_files(checkpoint_receipt))
+                )
             ):
                 raise DeliveryError(
                     "checkpoint_invalid",
@@ -2790,7 +3401,7 @@ class DeliveryManager:
                     )
                 actual = _directory_manifest(
                     payload,
-                    tuple(checkpoint_receipt["skills"]),
+                    self._receipt_owned_skills(checkpoint_receipt),
                 )
                 if actual != payload_files:
                     raise DeliveryError(
@@ -2806,17 +3417,20 @@ class DeliveryManager:
                 )
                 present_skills = {
                     skill
-                    for skill in checkpoint_receipt["skills"]
+                    for skill in self._receipt_owned_skills(checkpoint_receipt)
                     if (live_root / skill).is_dir()
                 }
                 actual = _directory_manifest(
                     live_root,
-                    tuple(checkpoint_receipt["skills"]),
+                    self._receipt_owned_skills(checkpoint_receipt),
                 )
                 if (
                     actual != payload_files
                     or present_skills != set(payload_skills)
-                    or self._shadow_payload_paths(enabled=checkpoint_receipt["enabled"])
+                    or self._shadow_payload_paths(
+                        enabled=checkpoint_receipt["enabled"],
+                        skills=self._receipt_owned_skills(checkpoint_receipt),
+                    )
                 ):
                     raise DeliveryError(
                         "checkpoint_invalid",
@@ -2843,13 +3457,13 @@ class DeliveryManager:
         return value, checkpoint_receipt
 
     def _managed_skills_for_cleanup(self, checkpoint: dict[str, Any] | None = None) -> set[str]:
-        skills = set(EXPECTED_SKILLS)
+        skills = set(self.layout.default_owned_skills) | self._active_owned_skills
         try:
             receipt = self._load_receipt(required=False)
         except DeliveryError:
             receipt = None
         if receipt:
-            skills.update(receipt["skills"])
+            skills.update(self._receipt_owned_skills(receipt))
         if checkpoint:
             skills.update(checkpoint.get("skills", []))
         return skills
@@ -2974,17 +3588,54 @@ class DeliveryManager:
             )
         staged = self.staging_path / "skills"
         staged.mkdir(parents=True)
-        for skill in artifact.skills:
+        previous = self._load_receipt(required=False)
+        if previous:
+            previous_plan = self._component_plan_from_receipt(previous)
+            component_plan = _ComponentPlan(
+                owned_skills=previous_plan.owned_skills,
+                owned_files=self._files_for_skills(
+                    artifact.files,
+                    previous_plan.owned_skills,
+                ),
+                components=previous_plan.components,
+                warnings=previous_plan.warnings,
+            )
+        else:
+            component_plan = self._component_plan_for_install(artifact)
+        if previous and self.scope == "user":
+            issues, _, _ = self._user_component_state(previous)
+            if issues:
+                raise DeliveryError(
+                    "external_shared_state_changed",
+                    "External shared components changed before mutation",
+                    details={"issues": issues},
+                )
+        self._active_owned_skills = set(component_plan.owned_skills)
+        for skill in component_plan.owned_skills:
             shutil.copytree(artifact.root / skill, staged / skill)
-        if _directory_manifest(staged, artifact.skills) != artifact.files:
+        if (
+            _directory_manifest(staged, component_plan.owned_skills)
+            != component_plan.owned_files
+        ):
             raise DeliveryError("staging_integrity", "Staged artifact integrity failed")
 
-        self._remove_managed_payload(set(EXPECTED_SKILLS))
+        removal_skills = (
+            set(self._receipt_owned_skills(previous))
+            if previous
+            else set(component_plan.owned_skills)
+        )
+        self._remove_managed_payload(removal_skills)
         destination = self.enabled_root if enabled else self.disabled_root
         destination.mkdir(parents=True, exist_ok=True)
-        for skill in artifact.skills:
+        for skill in component_plan.owned_skills:
             os.replace(staged / skill, destination / skill)
-        self._write_receipt(self._receipt_payload(artifact, enabled=enabled))
+        self._write_receipt(
+            self._receipt_payload(
+                artifact,
+                enabled=enabled,
+                component_plan=component_plan,
+            )
+        )
         shutil.rmtree(self.staging_path)
 
     def _migrate_identity(self, artifact: Artifact, *, enabled: bool) -> None:
@@ -2999,7 +3650,11 @@ class DeliveryManager:
                 "Current receipt is not an explicitly mapped legacy identity",
             )
         payload_root = self.enabled_root if enabled else self.disabled_root
-        if _directory_manifest(payload_root, artifact.skills) != artifact.files:
+        owned_skills = self._receipt_owned_skills(receipt)
+        if (
+            _directory_manifest(payload_root, owned_skills)
+            != self._receipt_owned_files(receipt)
+        ):
             raise DeliveryError(
                 "identity_migration_invalid",
                 "Legacy payload does not exactly match the target artifact",
@@ -3026,7 +3681,7 @@ class DeliveryManager:
         source = self.disabled_root if enabled else self.enabled_root
         destination = self.enabled_root if enabled else self.disabled_root
         destination.mkdir(parents=True, exist_ok=True)
-        for skill in receipt["skills"]:
+        for skill in self._receipt_owned_skills(receipt):
             source_path = source / skill
             destination_path = destination / skill
             if destination_path.exists() or _is_linklike(destination_path):
@@ -3042,7 +3697,7 @@ class DeliveryManager:
     def _uninstall(self) -> None:
         receipt = self._load_receipt(required=True)
         assert receipt is not None
-        self._remove_managed_payload(set(receipt["skills"]))
+        self._remove_managed_payload(set(self._receipt_owned_skills(receipt)))
         self.receipt_path.unlink()
         self._cleanup_empty_state()
 
@@ -3108,10 +3763,12 @@ class DeliveryManager:
                 if expected_receipt["enabled"]
                 else self.disabled_root
             )
+            expected_owned_skills = self._receipt_owned_skills(expected_receipt)
+            component_issues, _, _ = self._user_component_state(expected_receipt)
             try:
                 actual_payload = _directory_manifest(
                     payload_root,
-                    tuple(expected_receipt["skills"]),
+                    expected_owned_skills,
                 )
                 actual_receipt = self._load_receipt(required=True)
             except DeliveryError:
@@ -3119,14 +3776,18 @@ class DeliveryManager:
                 actual_receipt = None
             present_skills = {
                 skill
-                for skill in expected_receipt["skills"]
+                for skill in expected_owned_skills
                 if (payload_root / skill).is_dir()
             }
             valid = (
                 actual_receipt == expected_receipt
                 and actual_payload == expected_checkpoint["payload_files"]
                 and present_skills == set(expected_checkpoint["payload_skills"])
-                and not self._shadow_payload_paths(enabled=expected_receipt["enabled"])
+                and not component_issues
+                and not self._shadow_payload_paths(
+                    enabled=expected_receipt["enabled"],
+                    skills=expected_owned_skills,
+                )
                 and not after["transition_artifacts"]
                 and after["rollback_available"] is False
             )
@@ -3158,10 +3819,13 @@ class DeliveryManager:
                 actual_receipt = self._load_receipt(required=False)
             except DeliveryError:
                 actual_receipt = {"invalid": True}
+            recovery_managed_skills = (
+                set(self.layout.default_owned_skills) | self._active_owned_skills
+            )
             managed_present = any(
                 (root / skill).exists() or _is_linklike(root / skill)
                 for root in (self.enabled_root, self.disabled_root)
-                for skill in EXPECTED_SKILLS
+                for skill in recovery_managed_skills
             )
             valid = actual_receipt is None and not managed_present
         else:
@@ -3170,10 +3834,12 @@ class DeliveryManager:
                 if expected_receipt["enabled"]
                 else self.disabled_root
             )
+            expected_owned_skills = self._receipt_owned_skills(expected_receipt)
+            component_issues, _, _ = self._user_component_state(expected_receipt)
             try:
                 actual_payload = _directory_manifest(
                     payload_root,
-                    tuple(expected_receipt["skills"]),
+                    expected_owned_skills,
                 )
                 actual_receipt = self._load_receipt(required=True)
             except DeliveryError:
@@ -3181,14 +3847,18 @@ class DeliveryManager:
                 actual_receipt = None
             present_skills = {
                 skill
-                for skill in expected_receipt["skills"]
+                for skill in expected_owned_skills
                 if (payload_root / skill).is_dir()
             }
             valid = (
                 actual_receipt == expected_receipt
                 and actual_payload == expected_checkpoint["payload_files"]
                 and present_skills == set(expected_checkpoint["payload_skills"])
-                and not self._shadow_payload_paths(enabled=expected_receipt["enabled"])
+                and not component_issues
+                and not self._shadow_payload_paths(
+                    enabled=expected_receipt["enabled"],
+                    skills=expected_owned_skills,
+                )
             )
         if not valid:
             raise DeliveryError(
