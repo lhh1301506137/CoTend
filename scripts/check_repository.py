@@ -138,6 +138,7 @@ EXPECTED_CODEX_CARRIER_FIXTURE_FILES = {
     "schemas/pending-decision.schema.json",
 }
 EXPECTED_DELIVERY_PRODUCT_FILES = {
+    "delivery/codex-artifact.lock.json",
     "scripts/cotend_delivery.py",
     "scripts/verify_delivery_lifecycle.py",
     "src/cotend_delivery/__init__.py",
@@ -151,6 +152,7 @@ EXPECTED_DELIVERY_OPERATIONS = {
     "install",
     "update",
     "repair",
+    "migrate_identity",
     "enable",
     "disable",
     "uninstall",
@@ -162,19 +164,29 @@ EXPECTED_DELIVERY_TESTS = {
     "test_commit_cleanup_failure_restores_prior_state",
     "test_candidate_free_operations_ignore_missing_repository",
     "test_corrupt_checkpoint_is_rejected_before_mutation",
+    "test_damaged_mapped_legacy_receipt_repairs_and_migrates",
     "test_disable_enable_preserves_unrelated_project_content",
     "test_disabled_lifecycle_preserves_enablement",
     "test_failed_update_restores_prior_state_and_prior_rollback",
     "test_invalid_disabled_carrier_boundary_is_rejected",
     "test_invalid_receipt_blocks_mutation_but_allows_rollback",
+    "test_legacy_identity_migration_is_receipt_only_and_reversible",
+    "test_legacy_checkpoint_rejects_schema_v2_operation",
+    "test_legacy_receipt_rejects_schema_v2_identity_fields",
+    "test_legacy_snapshot_checkpoint_remains_readable",
+    "test_lower_revision_is_not_mislabeled_as_update",
+    "test_preserved_migration_checkpoint_rejects_payload_drift",
+    "test_protocol_change_is_incompatible_even_at_higher_revision",
     "test_inspect_reports_current_state_when_repository_is_missing",
     "test_repair_failure_restores_exact_damaged_state",
     "test_repair_rollback_restores_exact_damaged_state",
     "test_repair_restores_modified_and_missing_owned_files",
     "test_same_artifact_id_with_different_bytes_is_blocked",
+    "test_schema_v2_checkpoint_requires_explicit_payload_mode",
     "test_shadow_payload_blocks_mutation",
     "test_unexpected_file_blocks_repair_and_uninstall",
     "test_uninstall_removes_only_owned_files_and_can_rollback",
+    "test_unmapped_legacy_identity_cannot_migrate_or_repair",
     "test_unowned_collision_blocks_install",
     "test_unowned_delivery_state_blocks_install",
     "test_update_and_one_step_rollback",
@@ -1888,6 +1900,9 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             "receipt_invalid",
             "unowned_collision",
             "symlink_boundary",
+            "identity_migration_available",
+            "downgrade_candidate",
+            "preserve_existing",
         ):
             if marker not in core_text:
                 errors.append(f"delivery core contract marker is missing: {marker}")
@@ -1898,6 +1913,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         for marker in (
             '"--project"',
             '"--apply"',
+            '"--source-release-id"',
+            '"--revision"',
             "Mutation commands are dry-run unless --apply is provided.",
         ):
             if marker not in cli_text:
@@ -1910,7 +1927,10 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             "guarded_fixture",
             "DELIVERY_LIFECYCLE_OK",
             "DELIVERY_LIFECYCLE_NEGATIVE_OK",
+            "DELIVERY_IDENTITY_MIGRATION_OK",
             "transition_failure_atomicity",
+            "downgrade_not_update",
+            "preserved_checkpoint_payload_drift",
         ):
             if marker not in harness_text:
                 errors.append(f"delivery lifecycle harness marker is missing: {marker}")
@@ -1923,6 +1943,88 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         missing_tests = EXPECTED_DELIVERY_TESTS - actual_tests
         if missing_tests:
             errors.append(f"required delivery unit tests are missing: {sorted(missing_tests)}")
+
+    target_lock_path = ROOT / "delivery" / "codex-artifact.lock.json"
+    framework_lock_path = ROOT / "upstream" / "framework.lock.json"
+    try:
+        target_lock = json.loads(target_lock_path.read_text(encoding="utf-8"))
+        framework_lock = json.loads(framework_lock_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"delivery target lock is invalid: {exc}")
+        return errors
+    source = target_lock.get("source")
+    target = target_lock.get("target")
+    product = target_lock.get("product")
+    if (
+        target_lock.get("schema") != "cotend.target-artifact-lock"
+        or target_lock.get("schema_version") != 1
+        or target_lock.get("status") != "verified"
+        or source
+        != {
+            "framework_lock": "upstream/framework.lock.json",
+            "release_id": framework_lock.get("release_id"),
+            "carrier": framework_lock.get("source_carrier"),
+            "framework_protocol": framework_lock.get("framework_protocol"),
+        }
+        or product != {"version": None}
+        or target_lock.get("skill_count") != 7
+        or target_lock.get("skill_file_count") != 30
+    ):
+        errors.append("delivery target lock source or envelope mismatch")
+    expected_target = {
+        "platform": "Codex",
+        "lineage": "cotend-codex",
+        "artifact_id": "cotend-codex-r000001",
+        "revision": 1,
+    }
+    if not isinstance(target, dict) or any(
+        target.get(key) != expected for key, expected in expected_target.items()
+    ):
+        errors.append("delivery target lock identity mismatch")
+    carrier_files = {
+        path.relative_to(ROOT / "codex-skills").as_posix(): hashlib.sha256(
+            path.read_bytes()
+        ).hexdigest()
+        for path in sorted((ROOT / "codex-skills").rglob("*"))
+        if path.is_file()
+    }
+    carrier_manifest = hashlib.sha256(
+        json.dumps(
+            carrier_files,
+            ensure_ascii=True,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+    ).hexdigest()
+    if not isinstance(target, dict) or target.get("manifest_sha256") != carrier_manifest:
+        errors.append("delivery target lock manifest mismatch")
+    expected_legacy_mapping = {
+        "receipt_schema_version": 1,
+        "artifact_id": framework_lock.get("release_id"),
+        "protocol": framework_lock.get("framework_protocol"),
+        "manifest_sha256": carrier_manifest,
+        "target_artifact_id": "cotend-codex-r000001",
+        "target_revision": 1,
+    }
+    if target_lock.get("legacy_receipt_mappings") != [expected_legacy_mapping]:
+        errors.append("delivery target lock legacy mapping mismatch")
+    identity_evidence_path = "docs/evidence/TARGET-ARTIFACT-IDENTITY-SCHEMA-V2.md"
+    if identity_evidence_path not in candidates:
+        errors.append("target artifact identity evidence is missing or ignored")
+    else:
+        evidence = read(identity_evidence_path)
+        for marker in (
+            "target_artifact_id: cotend-codex-r000001",
+            "target_revision: 1",
+            "source_framework_lock_changed: false",
+            "receipt_schema: 2_with_schema_1_read_and_migration",
+            "checkpoint_schema: 2_with_schema_1_snapshot_read",
+            "identity_migration_available",
+            "downgrade_candidate",
+            "preserve_existing",
+        ):
+            if marker not in evidence:
+                errors.append(f"target artifact identity evidence is missing: {marker}")
     return errors
 
 

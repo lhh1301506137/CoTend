@@ -49,7 +49,7 @@ push_release_or_publish: not_performed
 - `executed`：四个受保护第三方文件的 staged blob 与固定 tag blob 哈希一致；跨平台 checkout 使用 LF 属性。
 - `executed`：主仓库检查与固定上游来源复验通过。
 - `inspection`：活动 CoTend 名称、协议、agent 元数据、委派引用、第三方 notices 和许可证已逐项检查。
-- `executed`：后续项目级交付核心已在 disposable fixture 中完成 install、update、repair、enable、disable、uninstall 和 rollback；单元测试套件、11 步正向生命周期及 6 类负向/故障恢复场景通过。
+- `executed`：后续项目级交付核心已在 disposable fixture 中完成 install、update、repair、identity migration、enable、disable、uninstall 和 rollback；32 项核心单元测试、11 步常规生命周期、5 步 legacy identity migration 及 8 类负向/故障恢复场景通过。
 - `executed`：每一步都对非 CoTend 所有路径做快照比较，用户项目文件和无关 Skill 保持不变；修改操作默认 dry-run，必须显式 `--apply`。
 - `executed`：由交付核心实际安装的 disposable carrier 已被 Codex 发现，并完成一条只读显式 Diagnose Only 场景；receipt、用户文件、无关 Skill、Git HEAD、仓库与全局保护状态不变。
 - `deferred`：真实项目写入、可写模型旅程、Desktop 菜单发现、自然语言触发、用户/全局安装、最终小白安装渠道、Plugin/Marketplace 和 Claude 载体。
@@ -75,6 +75,11 @@ codex_cli: 0.144.1
 project_carrier: .agents/skills
 delivery_source: Artifact.from_repository_plus_DeliveryManager
 receipt_identity: passed
+source_release_id: 2026.07.11.3
+target_artifact_id: cotend-codex-r000001
+target_revision: 1
+target_artifact_lock: delivery/codex-artifact.lock.json
+receipt_schema: 2_with_schema_1_migration
 managed_skills: 7
 managed_skill_files: 30
 unrelated_repo_skills_preserved: 1
@@ -84,9 +89,28 @@ negative_bridge_cases: passed_7_of_7
 real_project_or_global_install: false
 ```
 
-L25 不直接复制 `codex-skills/`：它先通过项目级交付 API 生成 receipt-owned carrier，再复用 L21 的 Codex `skills/list` 和只读模型运行器。结果证明已交付字节可被 Codex 使用，并证明无关 Skill 可以共存；L21 默认严格模式仍保持精确七 Skill，宽容模式只有组合验证器显式启用。L26 后续对照证明 recorded-English 路径通过，但无记录默认英文在清除父任务环境后仍失败。当前 Skill 与 lock 保持不变：沿用 release ID 修改字节会触发 `artifact_identity_conflict`，因此语言修复必须先经过 upstream 通用语义审计和 CoTend target artifact revision 决策。
+L25 不直接复制 `codex-skills/`：它先通过项目级交付 API 生成 receipt-owned carrier，再复用 L21 的 Codex `skills/list` 和只读模型运行器。结果证明已交付字节可被 Codex 使用，并证明无关 Skill 可以共存；L21 默认严格模式仍保持精确七 Skill，宽容模式只有组合验证器显式启用。L26 后续对照证明 recorded-English 路径通过，但无记录默认英文在清除父任务环境后仍失败。L28 已把原先复用 source release ID 的交付身份迁移为独立 `cotend-codex-r000001` / revision `1`：`upstream/framework.lock.json` 继续只锚定来源采用，`delivery/codex-artifact.lock.json` 单独锚定目标字节和 legacy receipt mapping。Skill 字节与 upstream framework lock 均未改变。
 
 完整证据见 [`docs/evidence/DELIVERED-CODEX-RUNTIME-VALIDATION.md`](../docs/evidence/DELIVERED-CODEX-RUNTIME-VALIDATION.md)。该结果不等于真实项目写入、最终安装渠道、Desktop/自然语言触发或用户验收。
+
+## codex-target-artifact-r000001-identity-schema-v2
+
+```yaml
+status: verified_with_scope_limitations
+source_release_id: 2026.07.11.3
+source_framework_lock_changed: false
+target_artifact_id: cotend-codex-r000001
+target_revision: 1
+target_artifact_lock: delivery/codex-artifact.lock.json
+receipt_schema: 2_with_schema_1_migration
+checkpoint_schema: 2_with_schema_1_snapshot_compatibility
+unit_tests: passed_35_of_35
+delivery_lifecycle: passed_11_regular_5_migration_8_negative
+delivered_runtime: passed_7_negative_7_plus_1_discovery_1_read_only_live
+real_project_or_global_write: false
+```
+
+target identity 不再复用 upstream release ID。来源采用仍由原 framework lock 和 containing commit 固定，Codex 目标字节由独立 target lock 固定；两个锁由交付核心、仓库检查器和采用验证器交叉复核。完整证据见 [`docs/evidence/TARGET-ARTIFACT-IDENTITY-SCHEMA-V2.md`](../docs/evidence/TARGET-ARTIFACT-IDENTITY-SCHEMA-V2.md)。
 
 ## release-2026-07-11-3-isolated-codex-carrier-validation
 

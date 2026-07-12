@@ -22,12 +22,19 @@ EXPECTED_SKILLS = (
 EXPECTED_FILE_COUNT = 30
 RECEIPT_SCHEMA = "cotend.delivery-receipt"
 CHECKPOINT_SCHEMA = "cotend.delivery-checkpoint"
-SCHEMA_VERSION = 1
+TARGET_LOCK_SCHEMA = "cotend.target-artifact-lock"
+TARGET_LOCK_SCHEMA_VERSION = 1
+RECEIPT_SCHEMA_VERSION = 2
+CHECKPOINT_SCHEMA_VERSION = 2
+LEGACY_SCHEMA_VERSION = 1
+TARGET_PLATFORM = "Codex"
+TARGET_LINEAGE = "cotend-codex"
 OPERATIONS = {
     "inspect",
     "install",
     "update",
     "repair",
+    "migrate_identity",
     "enable",
     "disable",
     "uninstall",
@@ -72,6 +79,18 @@ def _manifest_digest(files: dict[str, str]) -> str:
         sort_keys=True,
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _target_artifact_id(lineage: str, revision: int) -> str:
+    return f"{lineage}-r{revision:06d}"
+
+
+def _is_sha256(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(char in "0123456789abcdef" for char in value)
+    )
 
 
 def _utc_now() -> str:
@@ -137,26 +156,76 @@ def _directory_manifest(root: Path, skills: tuple[str, ...]) -> dict[str, str]:
 
 
 @dataclass(frozen=True)
-class Artifact:
+class LegacyReceiptMapping:
+    receipt_schema_version: int
     artifact_id: str
+    protocol: str
+    manifest_sha256: str
+    target_artifact_id: str
+    target_revision: int
+
+    def matches(self, receipt: dict[str, Any]) -> bool:
+        return (
+            receipt.get("schema_version") == self.receipt_schema_version
+            and receipt.get("artifact_id") == self.artifact_id
+            and receipt.get("protocol") == self.protocol
+            and receipt.get("manifest_sha256") == self.manifest_sha256
+        )
+
+
+@dataclass(frozen=True)
+class Artifact:
+    source_release_id: str
+    platform: str
+    lineage: str
+    artifact_id: str
+    revision: int
     protocol: str
     root: Path
     skills: tuple[str, ...]
     files: dict[str, str]
     manifest_sha256: str
+    legacy_receipt_mappings: tuple[LegacyReceiptMapping, ...]
 
     @classmethod
     def from_directory(
         cls,
         root: Path | str,
         *,
+        source_release_id: str,
         artifact_id: str,
+        revision: int,
         protocol: str,
+        platform: str = TARGET_PLATFORM,
+        lineage: str = TARGET_LINEAGE,
+        legacy_receipt_mappings: tuple[LegacyReceiptMapping, ...] = (),
     ) -> "Artifact":
-        if not artifact_id.strip() or not protocol.strip():
+        string_identity = (
+            source_release_id,
+            platform,
+            lineage,
+            artifact_id,
+            protocol,
+        )
+        if not all(isinstance(value, str) and value.strip() for value in string_identity):
             raise DeliveryError(
                 "artifact_identity_invalid",
-                "Artifact ID and protocol must be non-empty",
+                "Artifact source, target identity, and protocol must be non-empty",
+            )
+        if platform != TARGET_PLATFORM or lineage != TARGET_LINEAGE:
+            raise DeliveryError(
+                "artifact_identity_invalid",
+                "Artifact platform or lineage is not supported",
+            )
+        if isinstance(revision, bool) or not isinstance(revision, int) or revision < 1:
+            raise DeliveryError(
+                "artifact_identity_invalid",
+                "Artifact revision must be a positive integer",
+            )
+        if artifact_id != _target_artifact_id(lineage, revision):
+            raise DeliveryError(
+                "artifact_identity_invalid",
+                "Artifact ID does not match its lineage and revision",
             )
         source = Path(root)
         if _is_linklike(source):
@@ -190,25 +259,62 @@ class Artifact:
                 "artifact_file_inventory",
                 f"Expected {EXPECTED_FILE_COUNT} artifact files, found {len(files)}",
             )
+        manifest_sha256 = _manifest_digest(files)
+        legacy_keys: set[tuple[int, str, str, str]] = set()
+        for mapping in legacy_receipt_mappings:
+            if not isinstance(mapping, LegacyReceiptMapping):
+                raise DeliveryError(
+                    "artifact_identity_invalid",
+                    "Legacy receipt mapping has an invalid type",
+                )
+            key = (
+                mapping.receipt_schema_version,
+                mapping.artifact_id,
+                mapping.protocol,
+                mapping.manifest_sha256,
+            )
+            if (
+                mapping.receipt_schema_version != LEGACY_SCHEMA_VERSION
+                or not mapping.artifact_id
+                or not mapping.protocol
+                or not _is_sha256(mapping.manifest_sha256)
+                or mapping.target_artifact_id != artifact_id
+                or mapping.target_revision != revision
+                or mapping.protocol != protocol
+                or mapping.manifest_sha256 != manifest_sha256
+                or key in legacy_keys
+            ):
+                raise DeliveryError(
+                    "artifact_identity_invalid",
+                    "Legacy receipt mapping does not match the target artifact",
+                )
+            legacy_keys.add(key)
         return cls(
+            source_release_id=source_release_id,
+            platform=platform,
+            lineage=lineage,
             artifact_id=artifact_id,
+            revision=revision,
             protocol=protocol,
             root=source,
             skills=EXPECTED_SKILLS,
             files=files,
-            manifest_sha256=_manifest_digest(files),
+            manifest_sha256=manifest_sha256,
+            legacy_receipt_mappings=legacy_receipt_mappings,
         )
 
     @classmethod
     def from_repository(cls, repository: Path | str) -> "Artifact":
         root = Path(repository).resolve()
         lock_path = root / "upstream" / "framework.lock.json"
+        target_lock_path = root / "delivery" / "codex-artifact.lock.json"
         try:
             lock = json.loads(lock_path.read_text(encoding="utf-8"))
+            target_lock = json.loads(target_lock_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
             raise DeliveryError(
                 "framework_lock_invalid",
-                f"Cannot read the adopted framework lock: {lock_path}",
+                "Cannot read the adopted framework lock and target artifact lock",
             ) from exc
         if (
             lock.get("schema") != "cotend.framework-lock"
@@ -220,6 +326,16 @@ class Artifact:
                 "framework_lock_untrusted",
                 "Framework lock identity or adoption status is not trusted",
             )
+        if (
+            not isinstance(target_lock, dict)
+            or target_lock.get("schema") != TARGET_LOCK_SCHEMA
+            or target_lock.get("schema_version") != TARGET_LOCK_SCHEMA_VERSION
+            or target_lock.get("status") != "verified"
+        ):
+            raise DeliveryError(
+                "target_lock_untrusted",
+                "Target artifact lock identity or status is not trusted",
+            )
         carrier = PurePosixPath(str(lock.get("source_carrier", "")))
         if (
             carrier != PurePosixPath("codex-skills")
@@ -227,15 +343,85 @@ class Artifact:
             or ".." in carrier.parts
         ):
             raise DeliveryError("framework_lock_invalid", "Unsafe source carrier path")
+        source_identity = target_lock.get("source")
+        target_identity = target_lock.get("target")
+        product_identity = target_lock.get("product")
+        if not all(
+            isinstance(value, dict)
+            for value in (source_identity, target_identity, product_identity)
+        ):
+            raise DeliveryError("target_lock_invalid", "Target lock sections are invalid")
+        assert isinstance(source_identity, dict)
+        assert isinstance(target_identity, dict)
+        assert isinstance(product_identity, dict)
+        if source_identity != {
+            "framework_lock": "upstream/framework.lock.json",
+            "release_id": lock.get("release_id"),
+            "carrier": lock.get("source_carrier"),
+            "framework_protocol": lock.get("framework_protocol"),
+        }:
+            raise DeliveryError(
+                "target_lock_mismatch",
+                "Target artifact source identity differs from the adopted framework lock",
+            )
+        if product_identity != {"version": None}:
+            raise DeliveryError(
+                "target_lock_invalid",
+                "Target lock product version must remain undecided",
+            )
+        mappings_value = target_lock.get("legacy_receipt_mappings")
+        if not isinstance(mappings_value, list):
+            raise DeliveryError(
+                "target_lock_invalid",
+                "Legacy receipt mappings are not a list",
+            )
+        mappings: list[LegacyReceiptMapping] = []
+        for value in mappings_value:
+            if not isinstance(value, dict):
+                raise DeliveryError(
+                    "target_lock_invalid",
+                    "Legacy receipt mapping is not an object",
+                )
+            try:
+                mappings.append(
+                    LegacyReceiptMapping(
+                        receipt_schema_version=value["receipt_schema_version"],
+                        artifact_id=value["artifact_id"],
+                        protocol=value["protocol"],
+                        manifest_sha256=value["manifest_sha256"],
+                        target_artifact_id=value["target_artifact_id"],
+                        target_revision=value["target_revision"],
+                    )
+                )
+            except KeyError as exc:
+                raise DeliveryError(
+                    "target_lock_invalid",
+                    "Legacy receipt mapping is missing an identity field",
+                ) from exc
         artifact = cls.from_directory(
             root.joinpath(*carrier.parts),
-            artifact_id=str(lock.get("release_id", "")),
+            source_release_id=str(source_identity.get("release_id", "")),
+            platform=str(target_identity.get("platform", "")),
+            lineage=str(target_identity.get("lineage", "")),
+            artifact_id=str(target_identity.get("artifact_id", "")),
+            revision=target_identity.get("revision"),
             protocol=str(lock.get("framework_protocol", "")),
+            legacy_receipt_mappings=tuple(mappings),
         )
         if lock.get("skill_count") != len(artifact.skills):
             raise DeliveryError("framework_lock_mismatch", "Skill count differs from lock")
         if lock.get("skill_file_count") != len(artifact.files):
             raise DeliveryError("framework_lock_mismatch", "File count differs from lock")
+        if (
+            target_lock.get("skill_count") != len(artifact.skills)
+            or target_lock.get("skill_file_count") != len(artifact.files)
+            or target_identity.get("manifest_sha256") != artifact.manifest_sha256
+            or lock.get("target_platform") != artifact.platform
+        ):
+            raise DeliveryError(
+                "target_lock_mismatch",
+                "Target artifact inventory or manifest differs from the repository carrier",
+            )
         mapping = lock.get("skill_mapping", [])
         if not isinstance(mapping, list):
             raise DeliveryError("framework_lock_mismatch", "Skill mapping is not a list")
@@ -310,10 +496,13 @@ class DeliveryManager:
         installed_at = previous.get("installed_at", now) if previous else now
         return {
             "schema": RECEIPT_SCHEMA,
-            "schema_version": SCHEMA_VERSION,
-            "platform": "Codex",
+            "schema_version": RECEIPT_SCHEMA_VERSION,
+            "platform": artifact.platform,
             "scope": "project",
+            "source_release_id": artifact.source_release_id,
+            "artifact_lineage": artifact.lineage,
             "artifact_id": artifact.artifact_id,
+            "target_revision": artifact.revision,
             "protocol": artifact.protocol,
             "manifest_sha256": artifact.manifest_sha256,
             "skills": list(artifact.skills),
@@ -326,9 +515,13 @@ class DeliveryManager:
     def _validate_receipt(self, value: Any) -> dict[str, Any]:
         if not isinstance(value, dict):
             raise DeliveryError("receipt_invalid", "Delivery receipt is not an object")
-        if value.get("schema") != RECEIPT_SCHEMA or value.get("schema_version") != 1:
+        schema_version = value.get("schema_version")
+        if (
+            value.get("schema") != RECEIPT_SCHEMA
+            or schema_version not in {LEGACY_SCHEMA_VERSION, RECEIPT_SCHEMA_VERSION}
+        ):
             raise DeliveryError("receipt_invalid", "Unsupported delivery receipt schema")
-        if value.get("platform") != "Codex" or value.get("scope") != "project":
+        if value.get("platform") != TARGET_PLATFORM or value.get("scope") != "project":
             raise DeliveryError("receipt_invalid", "Receipt target boundary is invalid")
         skills = value.get("skills")
         files = value.get("files")
@@ -341,7 +534,7 @@ class DeliveryManager:
             if not isinstance(path, str) or not isinstance(digest, str):
                 raise DeliveryError("receipt_invalid", "Receipt file entry is invalid")
             _validate_relative_file(path, skill_set)
-            if len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest):
+            if not _is_sha256(digest):
                 raise DeliveryError("receipt_invalid", "Receipt file hash is invalid")
         if value.get("manifest_sha256") != _manifest_digest(files):
             raise DeliveryError("receipt_invalid", "Receipt manifest digest is invalid")
@@ -351,6 +544,30 @@ class DeliveryManager:
             raise DeliveryError("receipt_invalid", "Receipt artifact identity is missing")
         if not isinstance(value.get("protocol"), str) or not value["protocol"]:
             raise DeliveryError("receipt_invalid", "Receipt protocol is missing")
+        if schema_version == LEGACY_SCHEMA_VERSION and any(
+            key in value
+            for key in ("source_release_id", "artifact_lineage", "target_revision")
+        ):
+            raise DeliveryError(
+                "receipt_invalid",
+                "Legacy receipt contains schema v2 identity fields",
+            )
+        if schema_version == RECEIPT_SCHEMA_VERSION:
+            revision = value.get("target_revision")
+            lineage = value.get("artifact_lineage")
+            if (
+                not isinstance(value.get("source_release_id"), str)
+                or not value["source_release_id"]
+                or lineage != TARGET_LINEAGE
+                or isinstance(revision, bool)
+                or not isinstance(revision, int)
+                or revision < 1
+                or value["artifact_id"] != _target_artifact_id(lineage, revision)
+            ):
+                raise DeliveryError(
+                    "receipt_invalid",
+                    "Receipt source or target revision identity is invalid",
+                )
         if not isinstance(value.get("enabled"), bool):
             raise DeliveryError("receipt_invalid", "Receipt enablement is invalid")
         if not all(
@@ -372,6 +589,59 @@ class DeliveryManager:
         except (OSError, json.JSONDecodeError) as exc:
             raise DeliveryError("receipt_invalid", "Delivery receipt cannot be parsed") from exc
         return self._validate_receipt(value)
+
+    @staticmethod
+    def _legacy_mapping(
+        receipt: dict[str, Any],
+        candidate: Artifact,
+    ) -> LegacyReceiptMapping | None:
+        return next(
+            (
+                mapping
+                for mapping in candidate.legacy_receipt_mappings
+                if mapping.matches(receipt)
+            ),
+            None,
+        )
+
+    def _candidate_relation(
+        self,
+        receipt: dict[str, Any],
+        candidate: Artifact | None,
+    ) -> tuple[str, list[str]]:
+        if candidate is None:
+            return "none", []
+        if receipt["schema_version"] == LEGACY_SCHEMA_VERSION:
+            if (
+                self._legacy_mapping(receipt, candidate) is not None
+                and receipt["files"] == candidate.files
+            ):
+                return "identity_migration_available", []
+            return "incompatible", ["legacy_identity_unmapped"]
+
+        exact_identity = (
+            receipt["platform"] == candidate.platform
+            and receipt["source_release_id"] == candidate.source_release_id
+            and receipt["artifact_lineage"] == candidate.lineage
+            and receipt["artifact_id"] == candidate.artifact_id
+            and receipt["target_revision"] == candidate.revision
+            and receipt["protocol"] == candidate.protocol
+            and receipt["manifest_sha256"] == candidate.manifest_sha256
+        )
+        if exact_identity:
+            return "same_as_current", []
+        if (
+            receipt["platform"] != candidate.platform
+            or receipt["artifact_lineage"] != candidate.lineage
+        ):
+            return "incompatible", ["artifact_lineage_conflict"]
+        if receipt["protocol"] != candidate.protocol:
+            return "incompatible", ["protocol_incompatible"]
+        if receipt["target_revision"] == candidate.revision:
+            return "incompatible", ["artifact_identity_conflict"]
+        if candidate.revision > receipt["target_revision"]:
+            return "update_available", []
+        return "downgrade_candidate", ["downgrade_requires_explicit_operation"]
 
     def _collision_paths_without_receipt(self) -> list[str]:
         collisions: list[str] = []
@@ -543,20 +813,7 @@ class DeliveryManager:
         else:
             installation = "complete"
 
-        diagnostics: list[str] = []
-        if candidate is None:
-            relation = "none"
-        elif (
-            receipt["artifact_id"] == candidate.artifact_id
-            and receipt["protocol"] == candidate.protocol
-            and receipt["manifest_sha256"] == candidate.manifest_sha256
-        ):
-            relation = "same_as_current"
-        elif receipt["artifact_id"] == candidate.artifact_id:
-            relation = "incompatible"
-            diagnostics.append("artifact_identity_conflict")
-        else:
-            relation = "update_available"
+        relation, diagnostics = self._candidate_relation(receipt, candidate)
 
         complete = installation == "complete" and not transition_artifacts
         if complete:
@@ -568,10 +825,15 @@ class DeliveryManager:
             invocation = "failed" if receipt["enabled"] else "unavailable"
             transition = "recovery_required"
 
-        if transition_artifacts or unexpected or relation == "incompatible":
+        if transition_artifacts or unexpected or relation in {
+            "incompatible",
+            "downgrade_candidate",
+        }:
             recommended = "manual_resolution"
         elif installation != "complete":
             recommended = "repair"
+        elif relation == "identity_migration_available":
+            recommended = "migrate_identity"
         elif relation == "update_available":
             recommended = "update"
         else:
@@ -587,10 +849,19 @@ class DeliveryManager:
             "invocation": invocation,
             "candidate_relation": relation,
             "transition": transition,
+            "receipt_schema_version": receipt["schema_version"],
+            "source_release_id": receipt.get("source_release_id"),
+            "artifact_lineage": receipt.get("artifact_lineage"),
             "artifact_id": receipt["artifact_id"],
+            "target_revision": receipt.get("target_revision"),
             "protocol": receipt["protocol"],
             "manifest_sha256": receipt["manifest_sha256"],
+            "candidate_source_release_id": (
+                candidate.source_release_id if candidate else None
+            ),
+            "candidate_lineage": candidate.lineage if candidate else None,
             "candidate_id": candidate.artifact_id if candidate else None,
+            "candidate_revision": candidate.revision if candidate else None,
             "candidate_manifest_sha256": candidate.manifest_sha256 if candidate else None,
             "managed_skills": list(receipt["skills"]),
             "managed_files": len(expected),
@@ -610,7 +881,7 @@ class DeliveryManager:
     ) -> dict[str, Any]:
         if operation not in OPERATIONS:
             raise DeliveryError("operation_unknown", f"Unknown operation: {operation}")
-        if operation in {"install", "update", "repair"} and candidate is None:
+        if operation in {"install", "update", "repair", "migrate_identity"} and candidate is None:
             raise DeliveryError(
                 "candidate_required",
                 f"{operation} requires an exact candidate artifact",
@@ -660,15 +931,15 @@ class DeliveryManager:
             if state["unexpected"] or state["transition_artifacts"]:
                 reason = "repair_refuses_unowned_or_interrupted_state"
             elif state["installation"] in {"partial", "damaged"}:
-                receipt = self._load_receipt(required=True)
-                assert receipt is not None and candidate is not None
-                if (
-                    receipt["artifact_id"] == candidate.artifact_id
-                    and receipt["protocol"] == candidate.protocol
-                    and receipt["manifest_sha256"] == candidate.manifest_sha256
-                ):
+                assert candidate is not None
+                relation = state["candidate_relation"]
+                if relation in {"same_as_current", "identity_migration_available"}:
                     allowed = will_mutate = True
-                    reason = "reconstruct_owned_files_from_same_artifact"
+                    reason = (
+                        "reconstruct_legacy_owned_files_and_migrate_identity"
+                        if relation == "identity_migration_available"
+                        else "reconstruct_owned_files_from_same_artifact"
+                    )
                 else:
                     reason = "repair_candidate_does_not_match_receipt"
             elif (
@@ -677,6 +948,14 @@ class DeliveryManager:
             ):
                 allowed = True
                 reason = "current_no_change"
+        elif operation == "migrate_identity":
+            if (
+                state["installation"] == "complete"
+                and state["transition"] == "stable"
+                and state["candidate_relation"] == "identity_migration_available"
+            ):
+                allowed = will_mutate = True
+                reason = "rebind_verified_legacy_receipt_to_target_identity"
         elif operation == "disable":
             if state["installation"] == "complete" and state["enablement"] == "enabled":
                 allowed = will_mutate = True
@@ -728,6 +1007,14 @@ class DeliveryManager:
                 f"write {len(candidate.skills)} managed Skill directories and {len(candidate.files)} files",
                 "write the adapter-owned delivery receipt",
                 f"preserve current enablement: {state.get('enablement', 'enabled')}",
+            ]
+        if operation == "migrate_identity":
+            assert candidate is not None
+            return [
+                checkpoint,
+                "preserve the verified managed payload without copying or replacing it",
+                "rewrite only the adapter-owned receipt with schema v2 target identity",
+                f"bind legacy identity to {candidate.artifact_id}",
             ]
         if operation in {"enable", "disable"}:
             return [
@@ -793,6 +1080,12 @@ class DeliveryManager:
                         assert receipt is not None
                         expected_enabled = receipt["enabled"]
                     self._replace_with_artifact(candidate, enabled=expected_enabled)
+                elif operation == "migrate_identity":
+                    assert candidate is not None
+                    receipt = self._load_receipt(required=True)
+                    assert receipt is not None
+                    expected_enabled = receipt["enabled"]
+                    self._migrate_identity(candidate, enabled=expected_enabled)
                 elif operation == "disable":
                     self._move_enablement(enabled=False)
                 elif operation == "enable":
@@ -836,6 +1129,7 @@ class DeliveryManager:
     def _create_checkpoint(self, operation: str) -> None:
         self._assert_target_boundaries()
         receipt = self._load_receipt(required=False)
+        payload_mode = "preserve_existing" if operation == "migrate_identity" else "snapshot"
         self.state_root.mkdir(parents=True, exist_ok=True)
         temp = self.rollback_new_path
         if temp.exists() or _is_linklike(temp):
@@ -862,28 +1156,30 @@ class DeliveryManager:
                     for skill in receipt["skills"]
                     if (source_root / skill).is_dir()
                 ]
-                payload = temp / (
-                    "enabled-skills" if receipt["enabled"] else "disabled-skills"
-                )
-                payload.mkdir()
-                for skill in payload_skills:
-                    source = source_root / skill
-                    shutil.copytree(source, payload / skill)
-                copied_files = _directory_manifest(
-                    payload,
-                    tuple(receipt["skills"]),
-                )
-                if copied_files != payload_files:
-                    raise DeliveryError(
-                        "checkpoint_invalid",
-                        "Checkpoint copy differs from the current managed payload",
+                if payload_mode == "snapshot":
+                    payload = temp / (
+                        "enabled-skills" if receipt["enabled"] else "disabled-skills"
                     )
+                    payload.mkdir()
+                    for skill in payload_skills:
+                        source = source_root / skill
+                        shutil.copytree(source, payload / skill)
+                    copied_files = _directory_manifest(
+                        payload,
+                        tuple(receipt["skills"]),
+                    )
+                    if copied_files != payload_files:
+                        raise DeliveryError(
+                            "checkpoint_invalid",
+                            "Checkpoint copy differs from the current managed payload",
+                        )
             metadata = {
                 "schema": CHECKPOINT_SCHEMA,
-                "schema_version": SCHEMA_VERSION,
+                "schema_version": CHECKPOINT_SCHEMA_VERSION,
                 "operation": operation,
                 "created_at": _utc_now(),
                 "receipt_present": receipt is not None,
+                "payload_mode": payload_mode,
                 "skills": list(receipt["skills"]) if receipt else [],
                 "enabled": receipt["enabled"] if receipt else None,
                 "payload_skills": payload_skills,
@@ -925,9 +1221,15 @@ class DeliveryManager:
             value = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
             raise DeliveryError("checkpoint_invalid", "Rollback checkpoint cannot be parsed") from exc
+        schema_version = value.get("schema_version")
+        payload_mode = (
+            value.get("payload_mode", "snapshot")
+            if schema_version == CHECKPOINT_SCHEMA_VERSION
+            else "snapshot"
+        )
         if (
             value.get("schema") != CHECKPOINT_SCHEMA
-            or value.get("schema_version") != SCHEMA_VERSION
+            or schema_version not in {LEGACY_SCHEMA_VERSION, CHECKPOINT_SCHEMA_VERSION}
             or value.get("operation") not in OPERATIONS - {"inspect", "rollback"}
             or not isinstance(value.get("created_at"), str)
             or not value["created_at"]
@@ -936,6 +1238,26 @@ class DeliveryManager:
             or not isinstance(value.get("payload_skills"), list)
             or not isinstance(value.get("payload_files"), dict)
             or not isinstance(value.get("payload_manifest_sha256"), str)
+            or payload_mode not in {"snapshot", "preserve_existing"}
+            or (
+                schema_version == CHECKPOINT_SCHEMA_VERSION
+                and "payload_mode" not in value
+            )
+            or (
+                schema_version == LEGACY_SCHEMA_VERSION
+                and (
+                    "payload_mode" in value
+                    or value.get("operation") == "migrate_identity"
+                )
+            )
+            or (
+                payload_mode == "preserve_existing"
+                and (
+                    schema_version != CHECKPOINT_SCHEMA_VERSION
+                    or value.get("operation") != "migrate_identity"
+                    or value.get("receipt_present") is not True
+                )
+            )
         ):
             raise DeliveryError("checkpoint_invalid", "Rollback checkpoint metadata is invalid")
         payload_skills = value["payload_skills"]
@@ -955,9 +1277,7 @@ class DeliveryManager:
                     "Checkpoint payload file inventory is invalid",
                 )
             _validate_relative_file(relative, set(EXPECTED_SKILLS))
-            if len(digest) != 64 or any(
-                char not in "0123456789abcdef" for char in digest
-            ):
+            if not _is_sha256(digest):
                 raise DeliveryError(
                     "checkpoint_invalid",
                     "Checkpoint payload file hash is invalid",
@@ -989,33 +1309,59 @@ class DeliveryManager:
                     "checkpoint_invalid",
                     "Checkpoint metadata does not match its receipt",
                 )
-            payload_name = (
-                "enabled-skills"
-                if checkpoint_receipt["enabled"]
-                else "disabled-skills"
-            )
-            payload = self.rollback_path / payload_name
-            if _is_linklike(payload) or not payload.is_dir():
-                raise DeliveryError(
-                    "checkpoint_invalid",
-                    "Checkpoint payload is missing or unsafe",
+            if payload_mode == "snapshot":
+                payload_name = (
+                    "enabled-skills"
+                    if checkpoint_receipt["enabled"]
+                    else "disabled-skills"
                 )
-            payload_entries = {entry.name for entry in payload.iterdir()}
-            if payload_entries != set(payload_skills):
-                raise DeliveryError(
-                    "checkpoint_invalid",
-                    "Checkpoint payload Skill inventory is invalid",
+                payload = self.rollback_path / payload_name
+                if _is_linklike(payload) or not payload.is_dir():
+                    raise DeliveryError(
+                        "checkpoint_invalid",
+                        "Checkpoint payload is missing or unsafe",
+                    )
+                payload_entries = {entry.name for entry in payload.iterdir()}
+                if payload_entries != set(payload_skills):
+                    raise DeliveryError(
+                        "checkpoint_invalid",
+                        "Checkpoint payload Skill inventory is invalid",
+                    )
+                actual = _directory_manifest(
+                    payload,
+                    tuple(checkpoint_receipt["skills"]),
                 )
-            actual = _directory_manifest(
-                payload,
-                tuple(checkpoint_receipt["skills"]),
-            )
-            if actual != payload_files:
-                raise DeliveryError(
-                    "checkpoint_invalid",
-                    "Checkpoint payload integrity verification failed",
+                if actual != payload_files:
+                    raise DeliveryError(
+                        "checkpoint_invalid",
+                        "Checkpoint payload integrity verification failed",
+                    )
+                expected_entries.update({"receipt.json", payload_name})
+            else:
+                live_root = (
+                    self.enabled_root
+                    if checkpoint_receipt["enabled"]
+                    else self.disabled_root
                 )
-            expected_entries.update({"receipt.json", payload_name})
+                present_skills = {
+                    skill
+                    for skill in checkpoint_receipt["skills"]
+                    if (live_root / skill).is_dir()
+                }
+                actual = _directory_manifest(
+                    live_root,
+                    tuple(checkpoint_receipt["skills"]),
+                )
+                if (
+                    actual != payload_files
+                    or present_skills != set(payload_skills)
+                    or self._shadow_payload_paths(enabled=checkpoint_receipt["enabled"])
+                ):
+                    raise DeliveryError(
+                        "checkpoint_invalid",
+                        "Preserved checkpoint payload no longer matches the migration state",
+                    )
+                expected_entries.add("receipt.json")
         elif (
             value["skills"]
             or value.get("enabled") is not None
@@ -1070,13 +1416,15 @@ class DeliveryManager:
         reinstate_previous: bool,
     ) -> tuple[dict[str, Any], dict[str, Any] | None]:
         checkpoint, checkpoint_receipt = self._load_checkpoint_metadata()
-        self._remove_managed_payload(self._managed_skills_for_cleanup(checkpoint))
+        payload_mode = checkpoint.get("payload_mode", "snapshot")
+        if payload_mode == "snapshot":
+            self._remove_managed_payload(self._managed_skills_for_cleanup(checkpoint))
         if self.receipt_path.exists():
             if _is_linklike(self.receipt_path) or not self.receipt_path.is_file():
                 raise DeliveryError("receipt_invalid", "Cannot safely replace receipt")
             self.receipt_path.unlink()
 
-        if checkpoint["receipt_present"]:
+        if checkpoint["receipt_present"] and payload_mode == "snapshot":
             source_name = "enabled-skills" if checkpoint["enabled"] else "disabled-skills"
             destination = self.enabled_root if checkpoint["enabled"] else self.disabled_root
             source = self.rollback_path / source_name
@@ -1084,6 +1432,7 @@ class DeliveryManager:
             for skill in checkpoint["payload_skills"]:
                 skill_source = source / skill
                 shutil.copytree(skill_source, destination / skill)
+        if checkpoint["receipt_present"]:
             shutil.copy2(self.rollback_path / "receipt.json", self.receipt_path)
 
         shutil.rmtree(self.rollback_path)
@@ -1143,6 +1492,25 @@ class DeliveryManager:
         self._write_receipt(self._receipt_payload(artifact, enabled=enabled))
         shutil.rmtree(self.staging_path)
 
+    def _migrate_identity(self, artifact: Artifact, *, enabled: bool) -> None:
+        receipt = self._load_receipt(required=True)
+        assert receipt is not None
+        if (
+            receipt["schema_version"] != LEGACY_SCHEMA_VERSION
+            or self._legacy_mapping(receipt, artifact) is None
+        ):
+            raise DeliveryError(
+                "identity_migration_invalid",
+                "Current receipt is not an explicitly mapped legacy identity",
+            )
+        payload_root = self.enabled_root if enabled else self.disabled_root
+        if _directory_manifest(payload_root, artifact.skills) != artifact.files:
+            raise DeliveryError(
+                "identity_migration_invalid",
+                "Legacy payload does not exactly match the target artifact",
+            )
+        self._write_receipt(self._receipt_payload(artifact, enabled=enabled))
+
     def _write_receipt(self, receipt: dict[str, Any]) -> None:
         self.state_root.mkdir(parents=True, exist_ok=True)
         temp = self.receipt_temp_path
@@ -1191,7 +1559,7 @@ class DeliveryManager:
         expected_enabled: bool | None,
     ) -> None:
         after = self._inspect(candidate, include_previous_rollback=False)
-        if operation in {"install", "update", "repair"}:
+        if operation in {"install", "update", "repair", "migrate_identity"}:
             if expected_enabled is None:
                 raise DeliveryError(
                     "postcondition_failed",

@@ -193,7 +193,10 @@ def validate_delivery_state(
         "enablement": "enabled",
         "candidate_relation": "same_as_current",
         "transition": "stable",
+        "source_release_id": artifact.source_release_id,
+        "artifact_lineage": artifact.lineage,
         "artifact_id": artifact.artifact_id,
+        "target_revision": artifact.revision,
         "protocol": artifact.protocol,
         "manifest_sha256": artifact.manifest_sha256,
         "managed_files": len(artifact.files),
@@ -218,10 +221,13 @@ def validate_delivery_state(
         raise BridgeError("delivery receipt is missing or unreadable") from exc
     receipt_expected = {
         "schema": "cotend.delivery-receipt",
-        "schema_version": 1,
+        "schema_version": 2,
         "platform": "Codex",
         "scope": "project",
+        "source_release_id": artifact.source_release_id,
+        "artifact_lineage": artifact.lineage,
         "artifact_id": artifact.artifact_id,
+        "target_revision": artifact.revision,
         "protocol": artifact.protocol,
         "manifest_sha256": artifact.manifest_sha256,
         "skills": list(artifact.skills),
@@ -236,7 +242,9 @@ def validate_delivery_state(
     if receipt_mismatches:
         raise BridgeError(f"delivery receipt provenance mismatch: {receipt_mismatches}")
     return {
+        "source_release_id": state["source_release_id"],
         "artifact_id": state["artifact_id"],
+        "target_revision": state["target_revision"],
         "protocol": state["protocol"],
         "manifest_sha256": state["manifest_sha256"],
         "installation": state["installation"],
@@ -644,7 +652,9 @@ def main() -> int:
     try:
         artifact = Artifact.from_repository(ROOT)
         evidence["artifact"] = {
+            "source_release_id": artifact.source_release_id,
             "artifact_id": artifact.artifact_id,
+            "target_revision": artifact.revision,
             "protocol": artifact.protocol,
             "manifest_sha256": artifact.manifest_sha256,
             "skills": len(artifact.skills),

@@ -108,9 +108,39 @@ def make_updated_artifact(fixture: Path, baseline: Artifact) -> Artifact:
     )
     return Artifact.from_directory(
         source,
-        artifact_id="2026.07.12.integration-v2",
+        source_release_id=baseline.source_release_id,
+        artifact_id="cotend-codex-r000002",
+        revision=2,
         protocol=baseline.protocol,
     )
+
+
+def write_legacy_receipt(
+    manager: DeliveryManager,
+    artifact: Artifact,
+    *,
+    artifact_id: str | None = None,
+) -> dict[str, Any]:
+    mapping = artifact.legacy_receipt_mappings[0]
+    receipt = json.loads(manager.receipt_path.read_text(encoding="utf-8"))
+    legacy = {
+        key: value
+        for key, value in receipt.items()
+        if key not in {"source_release_id", "artifact_lineage", "target_revision"}
+    }
+    legacy.update(
+        {
+            "schema_version": 1,
+            "artifact_id": artifact_id or mapping.artifact_id,
+            "protocol": mapping.protocol,
+            "manifest_sha256": mapping.manifest_sha256,
+        }
+    )
+    manager.receipt_path.write_text(
+        json.dumps(legacy, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return legacy
 
 
 def cli_command(
@@ -132,8 +162,12 @@ def cli_command(
             [
                 "--source",
                 str(artifact.root),
+                "--source-release-id",
+                artifact.source_release_id,
                 "--artifact-id",
                 artifact.artifact_id,
+                "--revision",
+                str(artifact.revision),
                 "--protocol",
                 artifact.protocol,
             ]
@@ -389,6 +423,92 @@ def verify_positive_lifecycle(
     }
 
 
+def verify_identity_migration_lifecycle(
+    fixture: Path,
+    baseline: Artifact,
+) -> dict[str, Any]:
+    project = prepare_project(fixture / "projects" / "identity-migration")
+    manager = DeliveryManager(project)
+    skills = set(baseline.skills)
+    protected = tree_snapshot(project, managed_skills=skills)
+    steps: list[str] = []
+
+    run_cli("install", project, apply=True)
+    legacy_receipt = write_legacy_receipt(manager, baseline)
+    payload_before = tree_snapshot(manager.enabled_root)
+    before_preview = tree_snapshot(project)
+    state = manager.inspect(baseline)
+    if state["candidate_relation"] != "identity_migration_available":
+        raise LifecycleError("mapped legacy receipt was not offered identity migration")
+    steps.append("legacy_detected")
+
+    preview = run_cli("migrate_identity", project)
+    if preview.get("status") != "planned" or preview.get("applied") is not False:
+        raise LifecycleError("identity migration did not default to dry-run")
+    if tree_snapshot(project) != before_preview:
+        raise LifecycleError("identity migration dry-run changed the project")
+    steps.append("migration_dry_run")
+
+    run_cli("migrate_identity", project, apply=True)
+    migrated = require_state(
+        manager,
+        baseline,
+        installation="complete",
+        enablement="enabled",
+        artifact_id=baseline.artifact_id,
+    )
+    receipt = json.loads(manager.receipt_path.read_text(encoding="utf-8"))
+    checkpoint = json.loads(
+        (manager.rollback_path / "checkpoint.json").read_text(encoding="utf-8")
+    )
+    if (
+        migrated["candidate_relation"] != "same_as_current"
+        or receipt.get("schema_version") != 2
+        or checkpoint.get("payload_mode") != "preserve_existing"
+        or (manager.rollback_path / "enabled-skills").exists()
+        or tree_snapshot(manager.enabled_root) != payload_before
+    ):
+        raise LifecycleError("identity migration did not preserve exact payload semantics")
+    assert_protected_unchanged(project, skills, protected)
+    steps.append("migration")
+
+    run_cli("rollback", project, apply=True)
+    restored = manager.inspect(baseline)
+    if (
+        restored["candidate_relation"] != "identity_migration_available"
+        or json.loads(manager.receipt_path.read_text(encoding="utf-8")) != legacy_receipt
+        or tree_snapshot(manager.enabled_root) != payload_before
+    ):
+        raise LifecycleError("identity migration rollback did not restore legacy identity")
+    assert_protected_unchanged(project, skills, protected)
+    steps.append("migration_rollback")
+
+    managed = manager.enabled_root / "cotend-init" / "SKILL.md"
+    managed.write_text("damaged mapped legacy payload\n", encoding="utf-8")
+    run_cli("repair", project, apply=True)
+    repaired = manager.inspect(baseline)
+    if (
+        repaired["installation"] != "complete"
+        or repaired["candidate_relation"] != "same_as_current"
+        or json.loads(manager.receipt_path.read_text(encoding="utf-8")).get(
+            "schema_version"
+        )
+        != 2
+    ):
+        raise LifecycleError("mapped legacy repair did not migrate to schema v2")
+    assert_payload(project, baseline, enabled=True)
+    assert_protected_unchanged(project, skills, protected)
+    steps.append("damaged_repair_and_migration")
+
+    return {
+        "status": "pass",
+        "steps": steps,
+        "payload_mode": "preserve_existing",
+        "legacy_schema": 1,
+        "current_schema": 2,
+    }
+
+
 def expect_guard_failure(action: Any, label: str) -> None:
     try:
         action()
@@ -551,6 +671,53 @@ def verify_negative_guards(
     assert_protected_unchanged(fault_project, skills, fault_protected)
     passed.append("transition_failure_atomicity")
 
+    downgrade_project = prepare_project(fixture / "projects" / "downgrade")
+    downgrade_protected = tree_snapshot(downgrade_project, managed_skills=skills)
+    run_cli("install", downgrade_project, apply=True)
+    run_cli("update", downgrade_project, apply=True, artifact=updated)
+    before_downgrade = tree_snapshot(downgrade_project)
+    run_cli(
+        "update",
+        downgrade_project,
+        apply=True,
+        artifact=baseline,
+        expect_error="operation_blocked",
+    )
+    state = DeliveryManager(downgrade_project).inspect(baseline)
+    if (
+        state["candidate_relation"] != "downgrade_candidate"
+        or tree_snapshot(downgrade_project) != before_downgrade
+    ):
+        raise LifecycleError("blocked downgrade changed state or lost its relation")
+    assert_protected_unchanged(downgrade_project, skills, downgrade_protected)
+    passed.append("downgrade_not_update")
+
+    preserved_project = prepare_project(
+        fixture / "projects" / "preserved-checkpoint-drift"
+    )
+    preserved_protected = tree_snapshot(preserved_project, managed_skills=skills)
+    preserved_manager = DeliveryManager(preserved_project)
+    run_cli("install", preserved_project, apply=True)
+    write_legacy_receipt(preserved_manager, baseline)
+    run_cli("migrate_identity", preserved_project, apply=True)
+    preserved_receipt = preserved_manager.receipt_path.read_bytes()
+    managed = preserved_manager.enabled_root / "cotend-init" / "SKILL.md"
+    managed.write_text("payload drift after identity migration\n", encoding="utf-8")
+    run_cli(
+        "rollback",
+        preserved_project,
+        apply=True,
+        expect_error="checkpoint_invalid",
+    )
+    if (
+        preserved_manager.receipt_path.read_bytes() != preserved_receipt
+        or managed.read_text(encoding="utf-8")
+        != "payload drift after identity migration\n"
+    ):
+        raise LifecycleError("blocked preserved checkpoint rollback changed the project")
+    assert_protected_unchanged(preserved_project, skills, preserved_protected)
+    passed.append("preserved_checkpoint_payload_drift")
+
     return {"status": "pass", "cases": passed, "count": len(passed)}
 
 
@@ -604,11 +771,19 @@ def main() -> int:
             "baseline_artifact": baseline.artifact_id,
             "protocol": baseline.protocol,
             "positive": verify_positive_lifecycle(fixture, baseline, updated),
+            "identity_migration": verify_identity_migration_lifecycle(
+                fixture,
+                baseline,
+            ),
         }
         print(
             "DELIVERY_LIFECYCLE_OK "
             f"steps={len(evidence['positive']['steps'])} "
             f"skills={len(baseline.skills)} files={len(baseline.files)}"
+        )
+        print(
+            "DELIVERY_IDENTITY_MIGRATION_OK "
+            f"steps={len(evidence['identity_migration']['steps'])}"
         )
         if args.negative_mutations:
             evidence["negative"] = verify_negative_guards(fixture, baseline, updated)

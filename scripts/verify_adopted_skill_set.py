@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -467,6 +468,7 @@ def verify_capability_map(errors: list[str], final: bool) -> None:
 def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> None:
     try:
         lock = load_json(ROOT / "upstream" / "framework.lock.json")
+        target_lock = load_json(ROOT / "delivery" / "codex-artifact.lock.json")
         candidate = load_json(ROOT / "upstream" / "FRAMEWORK-CANDIDATE.json")
         role_map = load_json(ROOT / "upstream" / "CODEX-SKILL-ROLE-MAP.json")
     except (OSError, ValueError, json.JSONDecodeError) as exc:
@@ -508,6 +510,54 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
     expected_trees = {source_id: record["tree"] for source_id, record in SKILLS.items()}
     if lock.get("source_skill_trees") != expected_trees:
         errors.append("framework lock source Skill tree inventory drift")
+    carrier_files = {
+        path.relative_to(ROOT / "codex-skills").as_posix(): hashlib.sha256(
+            path.read_bytes()
+        ).hexdigest()
+        for path in sorted((ROOT / "codex-skills").rglob("*"))
+        if path.is_file()
+    }
+    carrier_manifest = hashlib.sha256(
+        json.dumps(
+            carrier_files,
+            ensure_ascii=True,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+    ).hexdigest()
+    expected_target_lock = {
+        "schema": "cotend.target-artifact-lock",
+        "schema_version": 1,
+        "status": "verified",
+        "source": {
+            "framework_lock": "upstream/framework.lock.json",
+            "release_id": lock.get("release_id"),
+            "carrier": lock.get("source_carrier"),
+            "framework_protocol": lock.get("framework_protocol"),
+        },
+        "target": {
+            "platform": "Codex",
+            "lineage": "cotend-codex",
+            "artifact_id": "cotend-codex-r000001",
+            "revision": 1,
+            "manifest_sha256": carrier_manifest,
+        },
+        "product": {"version": None},
+        "skill_count": 7,
+        "skill_file_count": 30,
+        "legacy_receipt_mappings": [
+            {
+                "receipt_schema_version": 1,
+                "artifact_id": lock.get("release_id"),
+                "protocol": lock.get("framework_protocol"),
+                "manifest_sha256": carrier_manifest,
+                "target_artifact_id": "cotend-codex-r000001",
+                "target_revision": 1,
+            }
+        ],
+    }
+    if target_lock != expected_target_lock:
+        errors.append("Codex target artifact lock drift")
     mappings = lock.get("skill_mapping")
     if not isinstance(mappings, list):
         errors.append("framework lock Skill mapping is invalid")

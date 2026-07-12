@@ -156,3 +156,78 @@ watch_closure:
 ```
 
 当前实现可作为 P4/P6 的项目级底层继续使用，但不是最终小白安装渠道，也不证明用户级/全局安装、Plugin、Marketplace、真实项目调用、并发写入或强制终止恢复已经完成。此次没有修改七个 CoTend Skill 或上游共享行为，因此不触发 Claude/分享包同步。
+
+## 2026-07-12 Codex Target Artifact Identity Schema v2
+
+```yaml
+current_framework_version: cotend-collaboration-v1.52
+change_type: workflow_behavior
+change_summary: 将 Codex target artifact 从 upstream release ID 中拆出，新增全局单调 revision、schema v2 receipt/checkpoint、显式 legacy identity migration 和 downgrade 分类
+intent: 允许 CoTend 目标适配安全演进，同时保持 upstream 来源采用、目标字节身份、协议和未来公开版本各自独立
+expected_benefit:
+  - 同一 target ID 不同字节继续停止，但更高 revision、降级候选和未映射 legacy identity 不再混为同一状态
+  - schema v1 项目可先 dry-run，再通过 receipt-only migration 迁移身份，不复制 Skill payload
+  - source framework lock 不随 target-only revision 移动，来源采用锚点保持稳定
+  - damaged legacy payload 只有精确 mapping 和 expected manifest 同时成立时才允许 repair+migration
+possible_harm:
+  - 双锁交叉校验若漂移，会让合法 artifact 被拒绝或错误绑定来源
+  - preserve-existing checkpoint 若未先验证现场 payload，rollback 可能恢复错误 receipt
+  - 内部 revision 可能被误当成公开产品版本或被用于未经授权的 downgrade
+affected_workflows:
+  - artifact_loading_and_integrity
+  - install_update_repair_and_identity_migration
+  - downgrade_classification
+  - checkpoint_and_rollback
+deviations:
+  - 初步方案考虑升级 upstream framework lock；计划审查发现其 containing-commit 只应锚定来源采用，因此改用独立 delivery/codex-artifact.lock.json，身份模型和 revision 顺序不变
+mechanism_budget:
+  added_context_surface: script
+  ordinary_load_impact: none
+  ceremony_added: low
+  duplication_check: replaces_existing
+  cheaper_alternative_considered: 继续用 source release ID 并在字节改变时手动换任意字符串；因无法确定 update/downgrade 顺序和 legacy migration 而拒绝
+  retirement_or_thinning_trigger: 平台提供能同时证明不可变字节、全序 revision、legacy migration 和 rollback 的原生 artifact identity 后，可收缩自建 target lock 与 receipt migration
+  expected_failure_prevented: 同 ID 重发字节、降级冒充更新、未知 legacy identity 自动迁移、identity-only 迁移复制 payload 和 source adoption 锚点漂移
+validation_scenarios:
+  - scenario: 新安装与既有生命周期
+    expected: schema v2 receipt 精确记录 source/target/revision/protocol/manifest，原操作不回归
+    validation_result_type: executed
+    result: unit_tests_35_of_35_passed
+  - scenario: mapped schema v1 identity migration
+    expected: dry-run 零写入；apply 只改 receipt/checkpoint；rollback 恢复 v1 receipt 和原 payload
+    validation_result_type: executed
+    result: DELIVERY_IDENTITY_MIGRATION_OK_steps_5
+  - scenario: 常规、迁移与负向 CLI 生命周期
+    expected: 11 步常规、5 步迁移和 8 类负向均保持用户文件不变
+    validation_result_type: executed
+    result: DELIVERY_LIFECYCLE_OK_11_migration_5_negative_8
+  - scenario: 降级、协议冲突、未映射 legacy 和 preserve checkpoint 漂移
+    expected: 全部在 mutation 前停止并保留当前状态
+    validation_result_type: executed
+    result: all_identity_boundary_mutations_rejected
+  - scenario: delivered carrier discovery 与只读调用
+    expected: schema v2 交付后仍发现 7 个受管 Skill 和 1 个无关 Skill，并完成只读 Diagnose Only
+    validation_result_type: executed
+    result: delivered_runtime_7_plus_1_discovery_and_read_only_live_passed
+  - scenario: 真实项目 legacy migration、并发和强制终止
+    expected: 不丢失用户文件、receipt 或最后安全 checkpoint
+    validation_result_type: deferred
+    result: disposable_single_process_evidence_only
+real_project_validation:
+  - scenario: 真实本地项目从 schema v1 receipt 迁移到 schema v2
+    expected: 用户可理解 dry-run，Skill payload 和项目真相不变，rollback 可验证
+    validation_result_type: deferred
+    result: real_project_boundary_remains_closed
+decision: watch
+rollback_triggers:
+  - target lock 无法与固定 source lock 和 carrier manifest 确定性交叉复核
+  - migration 或 rollback 修改任何 Skill payload、用户文件或无关 Skill
+  - lower revision 被普通 update 接受
+  - schema v1 合法项目无法通过明确迁移或恢复路线继续
+review_after: 首次真实项目 legacy migration 和并发或强制终止恢复验证后
+watch_closure:
+  - keep_watch
+  - evidence: deterministic_disposable_migration_and_delivered_runtime
+```
+
+该变更不修改七个 Skill、共享治理协议或 upstream framework lock，因此不产生新的 Claude/分享包同步内容；既有上游反馈包的外部审计状态保持不变。target identity 仍处于 `watch`，不能把 disposable 单进程证据表述为真实项目迁移或最终安装产品已完成。
