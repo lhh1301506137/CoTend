@@ -1,13 +1,13 @@
 # Codex 安装与分发渠道复验
 
 ```yaml
-status: reviewed_pending_user_confirmation
+status: active_user_confirmed
 authority: research_evidence_only
 checked_at: 2026-07-12
 local_codex_cli: 0.144.1
 target_product: CoTend
 target_user: novice_AI_developer
-channel_decision: pending_product_owner_confirmation
+channel_decision: user_confirmed_option_1
 plugin_created: false
 installation_performed: false
 marketplace_modified: false
@@ -24,7 +24,7 @@ public_submission_performed: false
 2. **技术预览层**：把同一组 Skills 装入一个 skills-only Plugin，通过本地或 Git Marketplace 验证桌面安装、命名空间、更新、禁用和卸载；该层仍可能要求维护者或测试者理解仓库、路径或 CLI。
 3. **最终用户层**：通过公开 Plugins Directory 提供一个 CoTend Plugin。用户可以在桌面图形界面搜索并点击安装，不需要先学习 Git、npm、终端或 Skill 文件布局。
 
-这仍是**待用户确认的渠道建议**，不是发布批准。CoTend 当前能够进入 Plugin 载体验证，但还不能宣称已经具备稳定公开 Plugin：Plugin 命名空间适配、公开版本、真实桌面生命周期、默认英文缺口、提交材料和审核均未完成。
+用户已确认这套三层渠道职责，但该决定不是 Plugin 实施或发布批准。CoTend 当前能够进入 Plugin 载体验证，但还不能宣称已经具备稳定公开 Plugin：Plugin 命名空间适配、公开版本、真实桌面生命周期、默认英文缺口、提交材料和审核均未完成。
 
 ## 官方能力事实
 
@@ -113,8 +113,10 @@ public_submission_performed: false
 
 该叶仍不得发布、提交审核、写入真实项目或修改用户级 Marketplace。若 namespace 需要改变共享 Skill 名称或行为，必须先走既定的 `CoTend 提案 -> 用户自有上游审计与实现 -> 新 release -> CoTend 复审适配` 上游门。
 
-## 待用户裁决
+## 用户决定
 
-1. **推荐**：确认三层渠道路线，并允许下一叶设计隔离 skills-only Plugin fixture；任何实际创建或安装仍在独立实施门处理。
+用户已选择方案 1：确认三层渠道路线，并允许下一叶设计隔离 skills-only Plugin fixture。任何实际创建、安装或 Marketplace 修改继续由独立实施门控制。
+
+1. **已选择**：确认三层渠道路线，并允许下一叶设计隔离 skills-only Plugin fixture；任何实际创建或安装仍在独立实施门处理。
 2. 只确认 Public Plugins Directory 为长期目标，暂不进入 Plugin fixture，继续等待 L22/upstream。
 3. 保持 standalone Skills 为正式渠道，延期 Plugin 产品化；这会保留当前调用名，但无法满足已确认的零 Git/npm/终端最终用户目标。
