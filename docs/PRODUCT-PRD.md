@@ -70,7 +70,7 @@ source_state: user_owned_upstream_productization_reconciled
 
 release 角色盘点和用户确认已经确定仓库源树分层：`cotend-init` 是统一可见入口，`cotend-project-init` 是内部 Auto Mode 引擎，`cotend-collaboration` 是共享治理核心，诊断与模型升级保持情境/进阶入口，两个 MIT Skill 保持内部伴随角色。五个用户原创 Skill 使用统一 `cotend-` 前缀。项目级 `.agents/skills` 发现、`$cotend-init`/`$cotend-diagnose-only` 显式调用、内部委派和关键停止边界已经通过隔离 Codex 验证；这仍不等于 Desktop 菜单排序或自然语言发现效果已经确认。
 
-仓库内 `codex-skills/` 源码载体已经采用，项目级 `.agents/skills` 载体也已通过当前 Codex 的发现与只读显式调用验证。渠道职责已确认：项目 Skills 服务开发回归，Marketplace 服务技术预览，Public Plugins Directory 是最终用户发布目标；运行时与打包架构、Plugin manifest、项目状态物理布局、用户级 live 安装和 Desktop 选择器仍未确认。它们继续从已采用 release 的实际结构和最小产品化增量出发，再用行为契约、真实用户情境和平台能力验证；[`docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md`](REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md) 只提供二级参考，不构成运行时、状态布局或安装方案的实现权威。
+仓库内 `codex-skills/` 源码载体已经采用，项目级 `.agents/skills` 载体也已通过当前 Codex 的发现与只读显式调用验证。渠道职责已确认：项目 Skills 服务开发回归，Marketplace 服务技术预览，Public Plugins Directory 是最终用户发布目标。一个不可发布的 skills-only Plugin fixture 已在全隔离进程环境通过 local Marketplace add/list、Plugin install/list/remove/reinstall、app-server discovery、standalone 共存和 12 类负向验证；实际安装入口为 `cotend:<skill>`，详见 [`docs/evidence/ISOLATED-CODEX-PLUGIN-FIXTURE.md`](evidence/ISOLATED-CODEX-PLUGIN-FIXTURE.md)。这不确认正式 Plugin manifest、公开版本、最终 namespace、项目状态物理布局、用户级 live 安装或 Desktop 选择器。它们继续从已采用 release 的实际结构和最小产品化增量出发，再用行为契约、真实用户情境和平台能力验证；[`docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md`](REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md) 只提供二级参考，不构成运行时、状态布局或安装方案的实现权威。
 
 已确认的约束仅包括：核心行为保持平台中立；项目真相必须可恢复且不得保存密钥；共享规则不能在多个入口中复制；安装、更新、修复、迁移、禁用和卸载需要作为完整生命周期设计。
 

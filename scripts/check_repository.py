@@ -137,6 +137,19 @@ EXPECTED_CODEX_CARRIER_FIXTURE_FILES = {
     "schemas/init-delegation.schema.json",
     "schemas/pending-decision.schema.json",
 }
+EXPECTED_PLUGIN_FIXTURE_FILES = {
+    "docs/evidence/ISOLATED-CODEX-PLUGIN-FIXTURE.md",
+    "scripts/verify_isolated_codex_plugin.py",
+    "tests/test_isolated_codex_plugin.py",
+}
+EXPECTED_PLUGIN_FIXTURE_TESTS = {
+    "test_fixture_guard_rejects_private_root_and_escape",
+    "test_fixture_manifest_is_skills_only_and_non_release",
+    "test_isolated_environment_redirects_every_write_root",
+    "test_plugin_list_contract_requires_exact_install_state",
+    "test_stat_only_snapshot_never_contains_content_digest",
+    "test_static_fixture_and_twelve_negative_mutations",
+}
 EXPECTED_DELIVERY_PRODUCT_FILES = {
     "delivery/codex-artifact.lock.json",
     "scripts/cotend_delivery.py",
@@ -1815,6 +1828,86 @@ def isolated_codex_carrier_errors(
     return errors
 
 
+def isolated_codex_plugin_fixture_errors(
+    evidence_text: str,
+    candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    missing = EXPECTED_PLUGIN_FIXTURE_FILES - candidates
+    if missing:
+        errors.append(f"isolated Codex Plugin artifacts are missing: {sorted(missing)}")
+        return errors
+
+    verifier_text = read("scripts/verify_isolated_codex_plugin.py")
+    for marker in (
+        'PLUGIN_VERSION = "0.0.0-dev.1+codex.fixture"',
+        "EXPECTED_FILE_COUNT = 30",
+        '"--phase-a"',
+        '"--negative-mutations"',
+        '"remote_plugin"',
+        "protected_user_snapshot",
+        "validate_isolated_env",
+        "validate_plugin_list_payload",
+        "run_negative_mutations",
+    ):
+        if marker not in verifier_text:
+            errors.append(f"isolated Codex Plugin verifier is missing: {marker}")
+
+    test_text = read("tests/test_isolated_codex_plugin.py")
+    actual_tests = set(re.findall(r"^\s+def (test_[a-z0-9_]+)\(", test_text, re.MULTILINE))
+    missing_tests = EXPECTED_PLUGIN_FIXTURE_TESTS - actual_tests
+    if missing_tests:
+        errors.append(
+            f"isolated Codex Plugin tests are missing: {sorted(missing_tests)}"
+        )
+
+    for key, expected in {
+        "status": {"passed_isolated_fixture_phase_a"},
+        "evidence_type": {"executed"},
+        "codex_version": {"codex-cli_0.144.1"},
+        "fixture_version": {"0.0.0-dev.1+codex.fixture"},
+        "plugin_identity_authority": {"fixture_only_not_release"},
+        "phase_a_steps": {"17"},
+        "negative_cases": {"12"},
+        "adopted_skills": {"7"},
+        "adopted_skill_files": {"30"},
+        "package_files": {"36"},
+        "protected_user_metadata": {"unchanged_stat_only"},
+        "tracked_production_plugin": {"none"},
+    }.items():
+        if metadata_values(evidence_text, key) != expected:
+            errors.append(f"isolated Codex Plugin evidence mismatch: {key}")
+
+    for marker in (
+        "15 个写入根全部解析到 ignored fixture",
+        "官方 Plugin validator：`passed`",
+        "Plugin package：36 个文件",
+        "实际执行并通过以下 17 步",
+        "cotend:cotend-init",
+        "Plugin 入口的实际 scope 为 `user`",
+        "7 个原名 `repo` scope 入口同时可见",
+        "以下 12 类变异全部",
+        "local cachebuster update",
+        "Public Plugins Directory submission",
+        "ISOLATED_CODEX_PLUGIN_PHASE_A_OK steps=17",
+    ):
+        if marker not in evidence_text:
+            errors.append(f"isolated Codex Plugin evidence is missing: {marker}")
+
+    tracked_plugin_manifests = sorted(
+        path
+        for path in candidates
+        if path.endswith("/.codex-plugin/plugin.json")
+        or path == ".codex-plugin/plugin.json"
+    )
+    if tracked_plugin_manifests:
+        errors.append(
+            "fixture-only validation must not track a production Plugin manifest: "
+            f"{tracked_plugin_manifests}"
+        )
+    return errors
+
+
 def contract_relationship_errors(index_text: str, specs: dict[str, str]) -> list[str]:
     errors: list[str] = []
     dependencies = index_dependencies(index_text)
@@ -2213,6 +2306,19 @@ def main() -> int:
                 read(carrier_evidence_path),
                 read(adoption_log_path),
                 framework_eval_text,
+                candidates,
+            )
+        )
+
+    plugin_fixture_evidence_path = (
+        "docs/evidence/ISOLATED-CODEX-PLUGIN-FIXTURE.md"
+    )
+    if plugin_fixture_evidence_path not in candidates:
+        errors.append("isolated Codex Plugin fixture evidence is missing or ignored")
+    else:
+        errors.extend(
+            isolated_codex_plugin_fixture_errors(
+                read(plugin_fixture_evidence_path),
                 candidates,
             )
         )

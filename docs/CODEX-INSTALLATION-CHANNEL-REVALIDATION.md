@@ -8,9 +8,11 @@ local_codex_cli: 0.144.1
 target_product: CoTend
 target_user: novice_AI_developer
 channel_decision: user_confirmed_option_1
-plugin_created: false
-installation_performed: false
-marketplace_modified: false
+research_round_plugin_created: false
+subsequent_fixture_plugin_created: true_ignored_disposable_only
+subsequent_fixture_installation: passed_isolated_only
+subsequent_fixture_marketplace: added_and_removed_isolated_only
+production_plugin_created: false
 public_submission_performed: false
 ```
 
@@ -55,7 +57,7 @@ public_submission_performed: false
 | `skills/list` | 已安装 Plugin 的 Skill 以 `plugin-name:skill-name` 形式出现，例如 `sites:sites-building`。 | `executed_current_installation` |
 | 多 Skill Plugin fixture | 当前缓存中的官方测试 fixture 以一个 manifest 的 `skills: "./skills/"` 暴露两个 Skills。 | `inspection_current_installation` |
 
-本轮没有执行 `plugin add`、`plugin remove`、`marketplace add/upgrade/remove`，没有创建 Plugin，没有修改 Marketplace，也没有进行公开提交。
+本渠道研究轮次本身没有执行 `plugin add`、`plugin remove`、`marketplace add/upgrade/remove`，没有创建 Plugin，也没有修改 Marketplace。后续在独立授权和全隔离边界内完成了不可发布 fixture Phase A；结果见 [`docs/evidence/ISOLATED-CODEX-PLUGIN-FIXTURE.md`](evidence/ISOLATED-CODEX-PLUGIN-FIXTURE.md)。
 
 ## 渠道比较
 
@@ -113,10 +115,10 @@ public_submission_performed: false
 
 该叶仍不得发布、提交审核、写入真实项目或修改用户级 Marketplace。若 namespace 需要改变共享 Skill 名称或行为，必须先走既定的 `CoTend 提案 -> 用户自有上游审计与实现 -> 新 release -> CoTend 复审适配` 上游门。
 
-## 用户决定
+## 用户决定与后续状态
 
-用户已选择方案 1：确认三层渠道路线，并允许下一叶设计隔离 skills-only Plugin fixture。任何实际创建、安装或 Marketplace 修改继续由独立实施门控制。
+用户已选择方案 1：确认三层渠道路线，并允许下一叶设计隔离 skills-only Plugin fixture。后续独立实施门也已确认并完成：只在 ignored fixture 和全重定向子进程环境执行 static、17 步 Phase A 和 12 类负向矩阵。候选 `cotend` ID、fixture 版本和观察到的 `cotend:<skill>` namespace 仍不构成正式产品定案；tracked production Plugin、真实用户安装、公开提交和发布继续关闭。
 
-1. **已选择**：确认三层渠道路线，并允许下一叶设计隔离 skills-only Plugin fixture；任何实际创建或安装仍在独立实施门处理。
+1. **已选择并完成隔离验证**：确认三层渠道路线，设计并执行不可发布 skills-only Plugin fixture；正式 Plugin 与公开操作仍需后续门。
 2. 只确认 Public Plugins Directory 为长期目标，暂不进入 Plugin fixture，继续等待 L22/upstream。
 3. 保持 standalone Skills 为正式渠道，延期 Plugin 产品化；这会保留当前调用名，但无法满足已确认的零 Git/npm/终端最终用户目标。
