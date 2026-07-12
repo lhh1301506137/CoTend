@@ -17,6 +17,12 @@ metadata:
   package_files_per_candidate: 36
   tracked_production_plugin: none
   final_namespace_authority: candidate_baseline_confirmed_final_namespace_pending
+  subsequent_desktop_picker_evidence: passed_partial
+  desktop_picker_query: /cotend
+  desktop_hot_update_verified: true
+  desktop_visible_entry_count: 7
+  desktop_interaction_verified: false
+  model_behavior_verified: false
 ```
 
 ## 结论
@@ -25,7 +31,7 @@ metadata:
 
 - `N1-preserve` 保留当前 Skill ID，运行时入口为 `cotend:cotend-init` 等名称；30 个 Skill 文件与仓库源逐字节一致。
 - `N2-short` 在 disposable package copy 中把五个用户原创 Skill 改为短名，运行时入口为 `cotend:init` 等名称；它通过结构和发现验证，但没有证明行为等价。
-- `N3-display-led` 不是第三份物理包，而是复用 N1 字节、利用显示元数据改善用户表面的分析层。它只证明元数据存在并被 app-server 返回，没有证明 Desktop 实际搜索、排序、截断或渲染行为。
+- `N3-display-led` 不是第三份物理包，而是复用 N1 字节、利用显示元数据改善用户表面的分析层。物理候选执行首先证明元数据存在并被 app-server 返回；后续用户协助的 Desktop picker 实证又证明 `/cotend` 可热更新显示全部 7 个入口，其中五个用户原创 Skill 使用友好显示名。详情、其他查询/排序、canonical placement、token 插入和模型行为仍未证明。
 
 本证据不确认正式 Plugin ID、版本、namespace 或发布包，也没有修改 `codex-skills/`、来源/交付 lock 或真实用户 Plugin 状态。
 
@@ -114,7 +120,15 @@ app-server 为五个用户原创 Skill 实际返回了 5 个唯一且以 `CoTend
 
 对应的 short description 与 default prompt 也存在；fixture manifest 同时具有 Plugin display name、short description 和 default prompt。该候选增加的 package bytes 为 0，但 canonical 双前缀仍然存在。
 
-证据分类必须保持以下边界：canonical names 与 Skill interface metadata 为 `executed`；Plugin manifest 字段和 display-led 可用性判断为 `inspection`；Desktop 和自然语言行为为 `not_run`。
+物理候选执行时的证据分类必须保持以下边界：canonical names 与 Skill interface metadata 为 `executed`；Plugin manifest 字段和 display-led 可用性判断为 `inspection`；当时 Desktop 和自然语言行为为 `not_run`。后续 Desktop picker 实证单独记录如下，不回写或伪装成原脚本执行结果。
+
+## 后续 Desktop picker 实证
+
+用户在当前 Desktop 选择器中输入 `/cotend`，确认候选支持热更新；截图显示 7 条入口。五个用户原创 Skill 显示 `CoTend Init`、`CoTend Project Init`、`CoTend Collaboration`、`CoTend Diagnose Only` 和 `CoTend Model Upgrade`。两个 MIT companion 显示为 `Cotend: Grill Me` 与 `Cotend: Karpathy Guidelines`，其长说明在列表中出现省略。
+
+先前 `$CoTend` 查询不可见是把提示词显式 Skill 调用语法与 Desktop picker 查询混用造成的无效假阴性，不能证明当前 Desktop 不热更新；重启后的可见性只作为历史佐证，不能证明重启是必要条件。
+
+原始截图未进入仓库。公开证据仅保存 `1093 x 304` 尺寸、SHA-256 `d1d86970344e892d40b60a21a22a9df11f9f6ba4c5004ecd44d63594a4680314` 和界面转录，详见 [`CODEX-DESKTOP-PLUGIN-SURFACE.md`](CODEX-DESKTOP-PLUGIN-SURFACE.md)。
 
 ## 每个候选的 10 步生命周期
 
@@ -131,7 +145,7 @@ app-server 为五个用户原创 Skill 实际返回了 5 个唯一且以 `CoTend
 
 ## 未执行范围
 
-以下 7 项保持 `not_run`：Desktop search/render/sort/truncation、自然语言或隐式调用、模型介导的 Skill 间委派、真实用户或真实项目安装、cachebuster/update/enable/disable/new-task refresh、正式 identity/version/namespace/package，以及公开 submission/release/publish。
+原始物理候选执行中的 7 项当时保持 `not_run`：Desktop search/render/sort/truncation、自然语言或隐式调用、模型介导的 Skill 间委派、真实用户或真实项目安装、cachebuster/update/enable/disable/new-task refresh、正式 identity/version/namespace/package，以及公开 submission/release/publish。后续证据只把 `/cotend` picker 搜索、七条列表标题、可见说明截断和热更新提升为已观察；详情、其他查询/排序、canonical placement、token 插入、自然语言与模型行为仍为 `not_run`。
 
 ## 复现
 

@@ -152,6 +152,7 @@ EXPECTED_PLUGIN_FIXTURE_TESTS = {
 }
 EXPECTED_PLUGIN_NAMESPACE_FILES = {
     "docs/CODEX-PLUGIN-NAMESPACE-EVALUATION.md",
+    "docs/evidence/CODEX-DESKTOP-PLUGIN-SURFACE.md",
     "docs/evidence/CODEX-PLUGIN-NAMESPACE-CANDIDATES.md",
     "scripts/evaluate_plugin_namespace_candidates.py",
     "tests/test_plugin_namespace_candidates.py",
@@ -1927,6 +1928,7 @@ def isolated_codex_plugin_fixture_errors(
 def plugin_namespace_candidate_errors(
     evidence_text: str,
     evaluation_text: str,
+    desktop_text: str,
     candidates: set[str],
 ) -> list[str]:
     errors: list[str] = []
@@ -1981,6 +1983,12 @@ def plugin_namespace_candidate_errors(
         "final_namespace_authority": {
             "candidate_baseline_confirmed_final_namespace_pending"
         },
+        "subsequent_desktop_picker_evidence": {"passed_partial"},
+        "desktop_picker_query": {"/cotend"},
+        "desktop_hot_update_verified": {"true"},
+        "desktop_visible_entry_count": {"7"},
+        "desktop_interaction_verified": {"false"},
+        "model_behavior_verified": {"false"},
     }.items():
         if metadata_values(evidence_text, key) != expected:
             errors.append(f"Plugin namespace evidence mismatch: {key}")
@@ -1998,7 +2006,9 @@ def plugin_namespace_candidate_errors(
         "仍有 60 处需要语义复核",
         "N3-display-led",
         "增加的 package bytes 为 0",
-        "Desktop 和自然语言行为为 `not_run`",
+        "当时 Desktop 和自然语言行为为 `not_run`",
+        "后续 Desktop picker 实证",
+        "混用造成的无效假阴性",
         "最终两个隔离环境中均没有已安装 Plugin",
         "PLUGIN_NAMESPACE_EVALUATION_OK physical_candidates=2",
     ):
@@ -2006,12 +2016,18 @@ def plugin_namespace_candidate_errors(
             errors.append(f"Plugin namespace evidence is missing: {marker}")
 
     for key, expected in {
-        "status": {"user_confirmed_candidate_baseline"},
+        "status": {
+            "user_confirmed_candidate_baseline_with_partial_desktop_picker_evidence"
+        },
         "recommendation": {"N3_display_led_preserve_first"},
         "candidate_baseline_confirmed": {"true"},
         "production_namespace_confirmed": {"false"},
         "production_package_authorized": {"false"},
-        "desktop_surface_verified": {"false"},
+        "desktop_surface_verified": {"partial_picker_only"},
+        "desktop_hot_update_verified": {"true"},
+        "desktop_visible_entry_count": {"7"},
+        "desktop_interaction_verified": {"false"},
+        "model_behavior_verified": {"false"},
         "shared_behavior_change_authorized": {"false"},
     }.items():
         if metadata_values(evaluation_text, key) != expected:
@@ -2020,13 +2036,53 @@ def plugin_namespace_candidate_errors(
     for marker in (
         "N3 display-led preserve-first",
         "不是最终 namespace 定案",
-        "必须用 Desktop 实际验证",
+        "错误语法造成的假阴性",
+        "当前 Desktop 支持热更新",
         "上游变更提案",
         "N2 的 validator 与 discovery 通过不能升级为",
         "用户确认后的状态",
     ):
         if marker not in evaluation_text:
             errors.append(f"Plugin namespace evaluation is missing: {marker}")
+
+    for key, expected in {
+        "status": {"passed_picker_surface_with_remaining_interaction_gaps"},
+        "evidence_type": {
+            "user_assisted_execution_plus_screenshot_inspection"
+        },
+        "candidate_id": {"N3-display-led"},
+        "desktop_picker_query": {"/cotend"},
+        "desktop_hot_update_verified": {"true"},
+        "visible_entry_count": {"7"},
+        "user_owned_friendly_display_names": {"5"},
+        "companion_platform_prefixed_display_names": {"2"},
+        "desktop_interaction_verified": {"false"},
+        "model_behavior_verified": {"false"},
+        "production_namespace_confirmed": {"false"},
+        "production_package_authorized": {"false"},
+        "screenshot_tracked": {"false"},
+    }.items():
+        if metadata_values(desktop_text, key) != expected:
+            errors.append(f"Desktop Plugin surface evidence mismatch: {key}")
+
+    for marker in (
+        "`/cotend` 是 Desktop Skill 选择器查询",
+        "`$skill-name` 是提示词中的显式 Skill 调用语法",
+        "不能用于证明 Desktop 必须重启",
+        "d1d86970344e892d40b60a21a22a9df11f9f6ba4c5004ecd44d63594a4680314",
+        "`Cotend: Grill Me`",
+        "`CoTend Init`",
+        "`Cotend: Karpathy Guidelines`",
+        "`CoTend Project Init`",
+        "`CoTend Collaboration`",
+        "`CoTend Diagnose Only`",
+        "`CoTend Model Upgrade`",
+        "原始截图只保留在本地证据环境",
+        "详情页字段和 canonical name",
+        "N3 display-led preserve-first 继续作为 production-package 的候选基线",
+    ):
+        if marker not in desktop_text:
+            errors.append(f"Desktop Plugin surface evidence is missing: {marker}")
     return errors
 
 
@@ -2451,9 +2507,13 @@ def main() -> int:
     plugin_namespace_evaluation_path = (
         "docs/CODEX-PLUGIN-NAMESPACE-EVALUATION.md"
     )
+    desktop_plugin_surface_path = (
+        "docs/evidence/CODEX-DESKTOP-PLUGIN-SURFACE.md"
+    )
     if (
         plugin_namespace_evidence_path not in candidates
         or plugin_namespace_evaluation_path not in candidates
+        or desktop_plugin_surface_path not in candidates
     ):
         errors.append("Plugin namespace candidate evidence is missing or ignored")
     else:
@@ -2461,6 +2521,7 @@ def main() -> int:
             plugin_namespace_candidate_errors(
                 read(plugin_namespace_evidence_path),
                 read(plugin_namespace_evaluation_path),
+                read(desktop_plugin_surface_path),
                 candidates,
             )
         )
