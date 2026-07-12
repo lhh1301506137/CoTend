@@ -174,9 +174,11 @@
         "codex-skills/cotend-collaboration/references/release-hardening.md",
         "src/cotend_delivery/core.py",
         "src/cotend_delivery/cli.py",
-        "scripts/verify_delivery_lifecycle.py"
+        "scripts/verify_delivery_lifecycle.py",
+        "scripts/verify_delivered_codex_runtime.py",
+        "docs/evidence/DELIVERED-CODEX-RUNTIME-VALIDATION.md"
       ],
-      "deferred_gap": "the deterministic single-process project-scoped lifecycle is implemented; real-project writes, live model invocation, concurrent writers, hard-process interruption recovery, user/global scope, platform migration, the final novice installation channel, Plugin, and Marketplace carriers remain unverified"
+      "deferred_gap": "the deterministic single-process project-scoped lifecycle and its disposable read-only Codex invocation bridge are implemented; real-project writes, writable model journeys, concurrent writers, hard-process interruption recovery, user/global scope, platform migration, the final novice installation channel, Plugin, and Marketplace carriers remain unverified"
     },
     {
       "capability_id": "C17",

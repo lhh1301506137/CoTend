@@ -192,18 +192,39 @@ def validate_interface_values(skill: str, values: dict[str, str]) -> None:
         raise CarrierError(f"default prompt exceeds Codex limit: {skill}")
 
 
-def verify_static(fixture: Path) -> dict[str, Any]:
+def verify_static(
+    fixture: Path,
+    *,
+    allow_unrelated_skills: bool = False,
+) -> dict[str, Any]:
     fixture = guarded_fixture(fixture)
     source_manifest = file_manifest(SOURCE_ROOT)
     target_root = fixture / ".agents" / "skills"
     target_manifest = file_manifest(target_root)
-    if source_manifest != target_manifest:
-        raise CarrierError("installed Skill files differ from repository source")
-    if len(target_manifest) != 30:
-        raise CarrierError(f"expected 30 Skill files, found {len(target_manifest)}")
+    invalid_root_entries = sorted(
+        path.name
+        for path in target_root.iterdir()
+        if path.is_symlink() or not path.is_dir()
+    )
+    if invalid_root_entries:
+        raise CarrierError(
+            f"installed Skill root contains invalid entries: {invalid_root_entries}"
+        )
     target_skills = {path.name for path in target_root.iterdir() if path.is_dir()}
-    if target_skills != EXPECTED_SKILLS:
+    missing_skills = EXPECTED_SKILLS - target_skills
+    unrelated_skills = target_skills - EXPECTED_SKILLS
+    if missing_skills or (unrelated_skills and not allow_unrelated_skills):
         raise CarrierError(f"unexpected installed Skill set: {sorted(target_skills)}")
+
+    managed_manifest = {
+        path: digest
+        for path, digest in target_manifest.items()
+        if path.split("/", 1)[0] in EXPECTED_SKILLS
+    }
+    if source_manifest != managed_manifest:
+        raise CarrierError("installed Skill files differ from repository source")
+    if len(managed_manifest) != 30:
+        raise CarrierError(f"expected 30 managed Skill files, found {len(managed_manifest)}")
 
     for skill in sorted(EXPECTED_SKILLS):
         skill_file = target_root / skill / "SKILL.md"
@@ -219,6 +240,12 @@ def verify_static(fixture: Path) -> dict[str, Any]:
                 f"companion Skill unexpectedly has OpenAI metadata: {skill}"
             )
 
+    for skill in sorted(unrelated_skills):
+        skill_file = target_root / skill / "SKILL.md"
+        if not skill_file.is_file() or frontmatter_name(skill_file) != skill:
+            raise CarrierError(f"unrelated fixture Skill is invalid: {skill}")
+        frontmatter_description(skill_file)
+
     git_root = subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],
         cwd=fixture,
@@ -229,9 +256,12 @@ def verify_static(fixture: Path) -> dict[str, Any]:
     if Path(git_root).resolve() != fixture:
         raise CarrierError("fixture is not an isolated nested Git repository")
     return {
-        "skills": len(target_skills),
-        "files": len(target_manifest),
+        "skills": len(EXPECTED_SKILLS),
+        "files": len(managed_manifest),
         "interfaces": len(EXPECTED_INTERFACES),
+        "fixture_skills": len(target_skills),
+        "fixture_files": len(target_manifest),
+        "unrelated_skills": sorted(unrelated_skills),
     }
 
 
@@ -370,7 +400,11 @@ def app_server_request(fixture: Path, request: dict[str, Any]) -> dict[str, Any]
     return response["result"]
 
 
-def discover_skills(fixture: Path) -> dict[str, Any]:
+def discover_skills(
+    fixture: Path,
+    *,
+    allow_unrelated_skills: bool = False,
+) -> dict[str, Any]:
     scenario_cwd = (fixture / "scenarios" / "fresh").resolve()
     result = app_server_request(
         fixture,
@@ -398,15 +432,22 @@ def discover_skills(fixture: Path) -> dict[str, Any]:
         if item["name"] in discovered:
             raise CarrierError(f"duplicate fixture Skill discovered: {item['name']}")
         discovered[item["name"]] = item
-    if set(discovered) != EXPECTED_SKILLS:
+    discovered_names = set(discovered)
+    missing_skills = EXPECTED_SKILLS - discovered_names
+    unrelated_skills = discovered_names - EXPECTED_SKILLS
+    if missing_skills or (unrelated_skills and not allow_unrelated_skills):
         raise CarrierError(f"Codex discovery mismatch: {sorted(discovered)}")
 
     redacted_skills: list[dict[str, Any]] = []
+    redacted_unrelated_skills: list[dict[str, Any]] = []
     for name in sorted(discovered):
         item = discovered[name]
         if item.get("scope") != "repo" or item.get("enabled") is not True:
             raise CarrierError(f"Codex scope/enabled mismatch: {name}")
-        source_description = frontmatter_description(SOURCE_ROOT / name / "SKILL.md")
+        installed_skill_file = installed_root / name / "SKILL.md"
+        if frontmatter_name(installed_skill_file) != name:
+            raise CarrierError(f"Codex discovered invalid fixture Skill: {name}")
+        source_description = frontmatter_description(installed_skill_file)
         if item.get("description") != source_description:
             raise CarrierError(f"Codex description mismatch: {name}")
         interface = item.get("interface")
@@ -420,20 +461,24 @@ def discover_skills(fixture: Path) -> dict[str, Any]:
                 raise CarrierError(f"Codex shortDescription mismatch: {name}")
             if not interface.get("defaultPrompt", "").startswith(f"Use ${name}"):
                 raise CarrierError(f"Codex defaultPrompt mismatch: {name}")
-        elif interface is not None:
+        elif name in EXPECTED_SKILLS and interface is not None:
             raise CarrierError(f"companion interface should be null: {name}")
-        redacted_skills.append(
-            {
-                "name": name,
-                "path": Path(item["path"]).resolve().relative_to(fixture).as_posix(),
-                "scope": item["scope"],
-                "enabled": item["enabled"],
-                "interface": interface,
-            }
-        )
+        redacted = {
+            "name": name,
+            "path": Path(item["path"]).resolve().relative_to(fixture).as_posix(),
+            "scope": item["scope"],
+            "enabled": item["enabled"],
+            "interface": interface,
+        }
+        if name in EXPECTED_SKILLS:
+            redacted_skills.append(redacted)
+        else:
+            redacted_unrelated_skills.append(redacted)
     return {
         "fixture_skills": redacted_skills,
         "fixture_skill_count": len(redacted_skills),
+        "unrelated_fixture_skills": redacted_unrelated_skills,
+        "unrelated_fixture_skill_count": len(redacted_unrelated_skills),
         "all_visible_skill_count": len(entry.get("skills", [])),
     }
 

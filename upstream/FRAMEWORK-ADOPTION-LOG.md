@@ -51,7 +51,8 @@ push_release_or_publish: not_performed
 - `inspection`：活动 CoTend 名称、协议、agent 元数据、委派引用、第三方 notices 和许可证已逐项检查。
 - `executed`：后续项目级交付核心已在 disposable fixture 中完成 install、update、repair、enable、disable、uninstall 和 rollback；单元测试套件、11 步正向生命周期及 6 类负向/故障恢复场景通过。
 - `executed`：每一步都对非 CoTend 所有路径做快照比较，用户项目文件和无关 Skill 保持不变；修改操作默认 dry-run，必须显式 `--apply`。
-- `deferred`：真实项目写入、live 模型调用、Desktop 菜单发现、自然语言触发、用户/全局安装、最终小白安装渠道、Plugin/Marketplace 和 Claude 载体。
+- `executed`：由交付核心实际安装的 disposable carrier 已被 Codex 发现，并完成一条只读显式 Diagnose Only 场景；receipt、用户文件、无关 Skill、Git HEAD、仓库与全局保护状态不变。
+- `deferred`：真实项目写入、可写模型旅程、Desktop 菜单发现、自然语言触发、用户/全局安装、最终小白安装渠道、Plugin/Marketplace 和 Claude 载体。
 
 ### 锚点与更新规则
 
@@ -64,6 +65,28 @@ push_release_or_publish: not_performed
 `src/cotend_delivery/` 现在提供渠道中立的项目级交付底层，目标载体为 `.agents/skills/`，adapter 自有 receipt 与回滚状态位于 `.agents/.cotend-delivery/`。该状态只描述产品文件所有权与交付事务，不取代 C03 项目真相。
 
 当前 `scripts/cotend_delivery.py` 是单进程开发和预览适配器，不是最终用户安装体验。它不联网、不选择 Plugin 或 Marketplace、不修改全局 Skills，也没有在真实项目执行；并发写入与进程被强制终止后的自动恢复尚未验证。这些边界仍由后续 P4/P6 验证关闭。
+
+## release-2026-07-11-3-delivered-codex-runtime-validation
+
+```yaml
+status: disposable_delivered_carrier_runtime_verified
+source_release: 2026.07.11.3
+codex_cli: 0.144.1
+project_carrier: .agents/skills
+delivery_source: Artifact.from_repository_plus_DeliveryManager
+receipt_identity: passed
+managed_skills: 7
+managed_skill_files: 30
+unrelated_repo_skills_preserved: 1
+app_server_discovery: passed_7_managed_plus_1_unrelated
+live_explicit_scenario: passed_cotend-diagnose-only_read_only
+negative_bridge_cases: passed_7_of_7
+real_project_or_global_install: false
+```
+
+L25 不直接复制 `codex-skills/`：它先通过项目级交付 API 生成 receipt-owned carrier，再复用 L21 的 Codex `skills/list` 和只读模型运行器。结果证明已交付字节可被 Codex 使用，并证明无关 Skill 可以共存；L21 默认严格模式仍保持精确七 Skill，宽容模式只有组合验证器显式启用。诊断语义通过但自由文本未遵守无项目语言时默认英文的契约，该 adapter compliance 缺口继续待修复/复验。
+
+完整证据见 [`docs/evidence/DELIVERED-CODEX-RUNTIME-VALIDATION.md`](../docs/evidence/DELIVERED-CODEX-RUNTIME-VALIDATION.md)。该结果不等于真实项目写入、最终安装渠道、Desktop/自然语言触发或用户验收。
 
 ## release-2026-07-11-3-isolated-codex-carrier-validation
 
