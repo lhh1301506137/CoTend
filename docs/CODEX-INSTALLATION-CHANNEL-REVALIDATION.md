@@ -165,4 +165,64 @@ public_submission_performed: false
 2. 只确认 Public Plugins Directory 为长期目标，暂不进入 Plugin fixture，继续等待 L22/upstream。
 3. 保持 standalone Skills 为正式渠道，延期 Plugin 产品化；这会保留当前调用名，但无法满足已确认的零 Git/npm/终端最终用户目标。
 
-当前只读复验已形成新的渠道角色建议并等待用户决定。既有三层基线仍证明 Plugin/Directory 的长期职责，但不再单独回答 direct user Skills 应否成为受支持 Early Access 渠道。
+用户已确认 direct user Skills 作为 Early Access、本地/离线、修复和迁移次级渠道，Public Plugin 继续作为 novice 主渠道。该决定只激活 user-scope adapter 的设计与隔离验证，不授权真实用户目录写入或公开发布。
+
+## User-Scope Adapter 设计收敛
+
+```yaml
+status: companion_ownership_pending_user_confirmation
+implementation_started: false
+real_user_scope_write: false
+transaction_engine_strategy: one_shared_core
+```
+
+### 不复制第二套生命周期核心
+
+现有 project-scope 交付核心已经包含 receipt、target identity、更新、修复、禁用、卸载、rollback、并发锁和中断恢复。User-scope adapter 不应复制这些逻辑。推荐先引入可注入的 `DeliveryLayout`：
+
+- `scope`：`project | user`；
+- `anchor_root`：所有 owned path 的共同安全边界；
+- `enabled_root`、`state_root`、`disabled_root`：由 layout 提供；
+- `display_prefix`：只用于计划和证据中的相对路径；
+- project facade 继续把项目根映射到 `.agents/skills` 与 `.agents/.cotend-delivery`，保持现有 CLI 和 receipt 行为；
+- user preflight 同时扫描 canonical `$HOME/.agents/skills` 与 compatibility `$CODEX_HOME/skills`，但 production state root 在后续平台 resolver 决定前保持显式注入；
+- transaction、checkpoint、lock、recovery 和 postcondition 仍由同一个核心执行。
+
+所有隔离测试必须重定向 home、Codex home、payload root 和 state root，并对真实用户两个 Skill 根、config、auth、Plugin cache 与 Marketplace 做前后保护快照。任何真实路径写入仍需独立明确授权。
+
+### 已观察到的 Companion 冲突
+
+CoTend 已确认首发包内置原名 `grill-me` 与 `karpathy-guidelines`。Direct user Skills 使用全局 canonical 名称，因此它们可能在安装 CoTend 前已经存在：
+
+| Companion | Canonical user root | Compatibility root | 与 CoTend package 的关系 |
+|---|---|---|---|
+| `grill-me` | 存在 | 存在 | 两份现有内容彼此相同；LF 规范化后与 package 相同，原始字节因换行不同而不相同。 |
+| `karpathy-guidelines` | 不存在 | 存在 | 与 package 原始字节相同。 |
+
+这项只读证据说明，简单要求“7 个名称在两个根全部不存在”虽然最保守，却会阻塞已经拥有兼容 companion 的用户；静默覆盖或删除现有目录又违反所有权和项目安全边界。
+
+### Companion 所有权候选
+
+#### 方案 1：兼容内容复用（推荐）
+
+- 五个 `cotend-*` Skill 始终由 CoTend receipt 精确拥有；
+- companion 不存在时，从内置 package 安装并由 CoTend 拥有；
+- companion 已存在且通过固定来源的 portable compatibility manifest 时，记录为 `external_shared`，不覆盖、不移动、不删除；
+- 两个根存在多份兼容副本时，报告重复 warning，但不制造第三份；实际 UI 重复保持显式债务；
+- 任一副本内容不兼容、包含额外文件或符号链接时停止；
+- 共享 companion 缺失或候选版本变化时，不静默接管所有权，进入显式 repair/migration 决策；
+- portable equivalence 首轮只适用于当前两个纯文本 `SKILL.md`，只规范化 UTF-8 BOM 与 CRLF/LF。未来出现脚本、二进制或额外文件时恢复精确字节要求并重新审查。
+
+该方案保持“首发包内置 companion”：package 仍携带固定字节，用户无需另行寻找依赖；adapter 只在已经存在兼容副本时复用它。
+
+#### 方案 2：七项严格独占
+
+CoTend 只在七个名称于两个根全部不存在时安装，并精确拥有全部七项。任何既有 companion 都阻塞，用户必须先单独处理。该方案最容易复用现有 receipt，但对已有 Skill 用户不友好，也无法直接通过当前只读环境基线。
+
+#### 方案 3：为 Companion 改名
+
+把两个 companion 改成 CoTend 私有名称以避免全局冲突。它会推翻已确认的原名 bundling、修改内部调用与上游映射，因此不应在平台 adapter 中直接实施；若选择，必须先走上游提案和新 release。
+
+### 实现前停止门
+
+Companion ownership 会改变 receipt schema、更新/修复/卸载结果和小白迁移体验，不能作为普通实现细节自动决定。用户确认前只保留设计与只读证据，不修改 `src/cotend_delivery/`、CLI、Skill、lock 或真实用户状态。
