@@ -1,13 +1,15 @@
 # Codex 安装与分发渠道复验
 
 ```yaml
-status: active_user_confirmed
+status: active_channel_role_revalidation_pending
 authority: research_evidence_only
-checked_at: 2026-07-12
+checked_at: 2026-07-13
 local_codex_cli: 0.144.1
 target_product: CoTend
 target_user: novice_AI_developer
-channel_decision: user_confirmed_option_1
+channel_decision: three_layer_baseline_confirmed
+latest_revalidation: direct_user_Skills_vs_Plugin_reviewed_pending_user_confirmation
+direct_user_install_performed: false
 research_round_plugin_created: false
 subsequent_fixture_plugin_created: true_ignored_disposable_only
 subsequent_fixture_installation: passed_isolated_only
@@ -26,7 +28,44 @@ public_submission_performed: false
 2. **技术预览层**：把同一组 Skills 装入一个 skills-only Plugin，通过本地或 Git Marketplace 验证桌面安装、命名空间、更新、禁用和卸载；该层仍可能要求维护者或测试者理解仓库、路径或 CLI。
 3. **最终用户层**：通过公开 Plugins Directory 提供一个 CoTend Plugin。用户可以在桌面图形界面搜索并点击安装，不需要先学习 Git、npm、终端或 Skill 文件布局。
 
-用户已确认这套三层渠道职责，但该决定不是 Plugin 实施或发布批准。CoTend 当前能够进入 Plugin 载体验证，但还不能宣称已经具备稳定公开 Plugin：Plugin 命名空间适配、公开版本、真实桌面生命周期、默认英文缺口、提交材料和审核均未完成。
+用户已确认这套三层渠道职责，但该决定不是 Plugin 实施或发布批准。Desktop 复验后的只读研究进一步证明，direct user Skills 不是单纯的源码位置：它是当前可工作的个人安装载体；与此同时，官方仍把 Skills 定义为编写与本地发现格式，把 Plugin 定义为可安装分发单元。因此，三层基线不被推翻，但“技术预览是否只由 Marketplace 承担”已经重新开放，等待用户决定。
+
+## Direct User Skills 与 Plugin 的只读复验
+
+本轮没有安装 CoTend、没有写入任何用户 Skill 或 Marketplace，也没有修改 Plugin 状态。证据来自当前官方文档、本机 Codex 0.144.1 的只读 CLI、`skills/list(forceReload=true)` 和随 Codex 提供的系统 Skill 说明。
+
+“由 AI 调用 installer 可以降低手工目录知识”是基于当前系统 Skill 能力的产品推断，不是已执行的普通用户安装证据；在真实 user-scope lifecycle 通过前不得写成已验证体验。
+
+| 比较项 | Direct user Skills | Plugin / Plugins Directory |
+|---|---|---|
+| 官方定位 | 工作流编写、本地发现、个人或仓库使用；可用 `$skill-installer` 做本地安装与实验。 | 跨用户/团队安装分发单元；可打包多个 Skills、MCP、Apps、hooks 和展示资源。 |
+| 当前个人路径 | 最新公开文档写 `$HOME/.agents/skills`；本机系统 `skill-creator`/`skill-installer` 仍写 `$CODEX_HOME/skills`。 | Personal Marketplace 为 `~/.agents/plugins/marketplace.json`；安装副本进入 Codex Plugin cache。 |
+| 本机发现 | 两个用户根都被发现；同名 Skill 不合并，可能同时出现在选择器。 | 由 Marketplace/Directory、Plugin identity、version、cache 和 enabled 状态管理。 |
+| CoTend 名称 | 可保留 `cotend-init` 等 canonical ID，不产生 Plugin namespace 前缀。 | 当前 fixture 观察到 `cotend:cotend-*`，但友好 display name 可隐藏大部分复杂度。 |
+| 更新与卸载 | 文件变更可自动检测，失败时重启；整套 7 Skill 的原子更新、receipt、去重和卸载需 CoTend 自己实现。 | 平台提供 install/enable/disable/remove 与版本化缓存；本地开发更新仍需 cachebuster、reinstall 和新任务。 |
+| 小白前置知识 | 手工复制目录不合格；由 AI 调用 installer 可降低门槛，但仍是本地 setup/实验语义。 | 公共 Directory 支持桌面搜索、详情和点击安装，是当前最明确的公开 novice 路径。 |
+| 当前完成度 | 尚无 user-scope CoTend delivery adapter；现有 delivery core 只拥有目标项目的 `.agents/skills`。 | 隔离 fixture、真实临时 add/remove 和部分 Desktop 表面已验证；production manifest/version/submission 仍未完成。 |
+
+### 路径冲突的产品含义
+
+公开文档与当前随安装工具对个人 Skill 根的表述不一致，而当前运行时会同时扫描两者。CoTend 不应在 README 中硬编码复制到任意一个目录后宣称完成。若提供 direct user Skills 渠道，适配器至少必须：
+
+1. 优先遵循当前官方用户根，同时探测兼容根；
+2. 在两个根发现相同 canonical Skill 时停止并报告，不静默复制第二份；
+3. 把 7 个 Skill 当成一个受 receipt 约束的产品 Artifact，支持整套检查、更新、修复和卸载；
+4. 保留项目真相，不把产品卸载和项目删除绑定；
+5. 验证新任务发现与显式调用，不能只证明文件复制成功。
+
+### 当前推荐（待用户确认）
+
+推荐把已确认三层路线细化为四种职责，而不是四套产品实现：
+
+1. `codex-skills/` 与项目 `.agents/skills`：源码、项目交付和回归；
+2. direct user Skills：Early Access、本地/离线、修复与 legacy migration 的支持渠道；
+3. local/Repo/Git Marketplace：Plugin 开发、QA 与技术预览运输层；
+4. Public Plugins Directory：公开 novice 主渠道。
+
+这意味着“Skill-first、Plugin-distributed”：同一组 7 Skills 继续是语义源，direct 与 Plugin 只是不同交付适配器。该建议不确认 production manifest、公开版本、最终 namespace、真实用户安装或发布；只有用户确认当前渠道角色建议后才可进入下一实现/验证叶。
 
 ## 官方能力事实
 
@@ -64,6 +103,7 @@ public_submission_performed: false
 | 渠道 | 目标角色 | 普通用户前置知识 | 可验证更新/卸载 | 公开可发现 | 当前判断 |
 |---|---|---|---|---|---|
 | 项目 `.agents/skills` | CoTend 开发与确定性回归 | 需要先拥有正确项目文件 | CoTend 自有交付核心已覆盖项目级生命周期 | 否 | 保留为开发载体，不作为发布渠道 |
+| Direct user Skills | 个人 Early Access、本地/离线与修复 | 若由 AI installer 执行可不要求手工目录知识；手工复制仍不合格 | 平台只提供 Skill 发现与启停配置，CoTend 整套生命周期尚未实现 | 仅个人 | 推荐作为受支持的次级渠道候选，待用户确认 |
 | Repo 本地 Marketplace | 单仓库开发测试 | 路径、文件复制、重启 | 可以测试 Desktop 安装副本和开关 | 否 | 推荐作为首个 Plugin fixture 入口 |
 | Git Marketplace + CLI | 外部技术预览者 | Git 仓库概念和终端命令 | CLI 有 add/list/upgrade/remove | 否 | 可选技术预览，不是 novice 主路径 |
 | Personal Marketplace | 维护者个人测试 | 本地路径、文件复制、重启 | Desktop 可安装、启用、禁用、卸载 | 仅个人 | 可用于维护者日常验证 |
@@ -101,6 +141,8 @@ public_submission_performed: false
 - Git Marketplace 只作为可选技术预览；
 - Public Plugins Directory 是最终 novice 发布目标。
 
+最新只读结论对该架构增加一个待确认修正：direct user Skills 可作为 Early Access、本地/离线、修复和迁移渠道；Marketplace 更准确地属于 Plugin QA/技术运输层，而不是唯一技术预览入口。Public Plugins Directory 的长期目标不变。
+
 这一路线没有引入第二套业务语义，也没有要求重写 19 类能力。Plugin 是平台交付适配器，不取代 CoTend 的项目真相、交付证据和 recovery 合同。
 
 ### 用户确认后才可进入的下一叶
@@ -122,3 +164,5 @@ public_submission_performed: false
 1. **已选择并完成隔离验证**：确认三层渠道路线，设计并执行不可发布 skills-only Plugin fixture；正式 Plugin 与公开操作仍需后续门。
 2. 只确认 Public Plugins Directory 为长期目标，暂不进入 Plugin fixture，继续等待 L22/upstream。
 3. 保持 standalone Skills 为正式渠道，延期 Plugin 产品化；这会保留当前调用名，但无法满足已确认的零 Git/npm/终端最终用户目标。
+
+当前只读复验已形成新的渠道角色建议并等待用户决定。既有三层基线仍证明 Plugin/Directory 的长期职责，但不再单独回答 direct user Skills 应否成为受支持 Early Access 渠道。
