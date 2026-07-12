@@ -1055,7 +1055,7 @@ def productization_truth_errors(
 
     exact_roadmap_metadata = {
         "route_type": {"source_aware_rename_first_productization"},
-        "current_phase": {"P4-codex-project-delivery-core"},
+        "current_phase": {"P4-codex-target-identity-lifecycle"},
     }
     for key, expected in exact_roadmap_metadata.items():
         if metadata_values(roadmap_text, key) != expected:
