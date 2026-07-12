@@ -68,7 +68,7 @@ python scripts/verify_adopted_skill_set.py --upstream-repo <path-to-pinned-upstr
 ## 尚未证明
 
 - 未在真实用户项目或用户级/全局 Skill 目录执行 schema v1 到 v2 迁移。
-- 本次 L28 身份迁移本身未验证并发；后续 `docs/evidence/DELIVERY-CONCURRENCY-AND-INTERRUPTION.md` 已证明项目级多进程排他和强制终止检测，但仍未实现自动 stale-lock recovery、force unlock 或断电恢复。
+- 本次 L28 身份迁移本身未验证并发；后续 `docs/evidence/DELIVERY-CONCURRENCY-AND-INTERRUPTION.md` 已证明项目级多进程排他和强制终止检测，L30 又在 disposable fixture 中证明每次精确确认的遗留锁释放与 checkpoint 回滚。自动 unattended recovery、通用 force unlock、断电恢复和真实项目恢复仍未实现。
 - 未实现或授权自动 downgrade。
 - 未选择最终 Plugin、Marketplace、安装器或公开产品版本。
 - 本次只解决 target identity 和 delivery migration；默认英文运行时缺口仍等待 upstream 通用语义审查，不因新 artifact identity 自动关闭。

@@ -25,8 +25,10 @@ RECEIPT_SCHEMA = "cotend.delivery-receipt"
 CHECKPOINT_SCHEMA = "cotend.delivery-checkpoint"
 TARGET_LOCK_SCHEMA = "cotend.target-artifact-lock"
 MUTATION_LOCK_SCHEMA = "cotend.delivery-mutation-lock"
+RECOVERY_LOCK_SCHEMA = "cotend.delivery-recovery-lock"
 TARGET_LOCK_SCHEMA_VERSION = 1
 MUTATION_LOCK_SCHEMA_VERSION = 1
+RECOVERY_LOCK_SCHEMA_VERSION = 1
 RECEIPT_SCHEMA_VERSION = 2
 CHECKPOINT_SCHEMA_VERSION = 2
 LEGACY_SCHEMA_VERSION = 1
@@ -42,7 +44,9 @@ OPERATIONS = {
     "disable",
     "uninstall",
     "rollback",
+    "recover",
 }
+MUTATION_OPERATIONS = OPERATIONS - {"inspect", "recover"}
 MUTATION_PHASES = {
     "planning",
     "checkpointing",
@@ -59,6 +63,17 @@ INTERRUPTED_MUTATION_PHASES = {
     "verifying",
     "committing",
     "recovery_required",
+}
+RECOVERY_PHASES = {
+    "planning",
+    "recovering",
+    "verifying",
+    "completed",
+    "recovery_required",
+}
+RECOVERY_BRANCHES = {
+    "release_abandoned_lock",
+    "rollback_interrupted_transition",
 }
 
 
@@ -94,6 +109,16 @@ def _sha256(path: Path) -> str:
 def _manifest_digest(files: dict[str, str]) -> str:
     encoded = json.dumps(
         files,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _canonical_digest(value: Any) -> str:
+    encoded = json.dumps(
+        value,
         ensure_ascii=True,
         separators=(",", ":"),
         sort_keys=True,
@@ -247,6 +272,13 @@ class LegacyReceiptMapping:
 class _MutationLease:
     owner_token: str
     operation: str
+
+
+@dataclass(frozen=True)
+class _RecoveryLease:
+    owner_token: str
+    recovery_plan_id: str
+    branch: str
 
 
 @dataclass(frozen=True)
@@ -538,6 +570,9 @@ class DeliveryManager:
         self.mutation_lock_path = self.state_root / "mutation.lock"
         self.mutation_owner_path = self.mutation_lock_path / "owner.json"
         self.mutation_owner_temp_path = self.mutation_lock_path / "owner.json.tmp"
+        self.recovery_lock_path = self.state_root / "recovery.lock"
+        self.recovery_owner_path = self.recovery_lock_path / "owner.json"
+        self.recovery_owner_temp_path = self.recovery_lock_path / "owner.json.tmp"
         self._assert_target_boundaries()
 
     def _assert_target_boundaries(self) -> None:
@@ -605,7 +640,7 @@ class DeliveryManager:
             or not isinstance(token, str)
             or len(token) != 32
             or any(char not in "0123456789abcdef" for char in token)
-            or value.get("operation") not in OPERATIONS - {"inspect"}
+            or value.get("operation") not in MUTATION_OPERATIONS
             or isinstance(process_id, bool)
             or not isinstance(process_id, int)
             or process_id < 1
@@ -733,6 +768,205 @@ class DeliveryManager:
             "metadata_residue": lock["metadata_residue"],
             "owner": owner,
         }
+
+    @staticmethod
+    def _no_recovery_lock() -> dict[str, Any]:
+        return {
+            "present": False,
+            "state": "none",
+            "metadata_residue": False,
+            "diagnostics": [],
+            "metadata": None,
+        }
+
+    @staticmethod
+    def _validate_recovery_metadata(value: Any) -> dict[str, Any]:
+        expected_keys = {
+            "schema",
+            "schema_version",
+            "owner_token",
+            "process_id",
+            "created_at",
+            "updated_at",
+            "phase",
+            "recovery_plan_id",
+            "branch",
+        }
+        if not isinstance(value, dict) or set(value) != expected_keys:
+            raise DeliveryError(
+                "recovery_lock_invalid",
+                "Recovery lock metadata shape is invalid",
+            )
+        token = value.get("owner_token")
+        process_id = value.get("process_id")
+        if (
+            value.get("schema") != RECOVERY_LOCK_SCHEMA
+            or value.get("schema_version") != RECOVERY_LOCK_SCHEMA_VERSION
+            or not isinstance(token, str)
+            or len(token) != 32
+            or any(char not in "0123456789abcdef" for char in token)
+            or isinstance(process_id, bool)
+            or not isinstance(process_id, int)
+            or process_id < 1
+            or not isinstance(value.get("created_at"), str)
+            or not value["created_at"]
+            or not isinstance(value.get("updated_at"), str)
+            or not value["updated_at"]
+            or value.get("phase") not in RECOVERY_PHASES
+            or not _is_sha256(value.get("recovery_plan_id"))
+            or value.get("branch") not in RECOVERY_BRANCHES
+        ):
+            raise DeliveryError(
+                "recovery_lock_invalid",
+                "Recovery lock metadata is invalid",
+            )
+        return value
+
+    def _load_recovery_metadata_strict(self) -> dict[str, Any]:
+        if _is_linklike(self.recovery_lock_path) or not self.recovery_lock_path.is_dir():
+            raise DeliveryError(
+                "recovery_lock_invalid",
+                "Recovery lock is not a normal directory",
+            )
+        if _is_linklike(self.recovery_owner_path) or not self.recovery_owner_path.is_file():
+            raise DeliveryError(
+                "recovery_lock_invalid",
+                "Recovery lock owner metadata is missing or unsafe",
+            )
+        try:
+            value = json.loads(self.recovery_owner_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise DeliveryError(
+                "recovery_lock_invalid",
+                "Recovery lock owner metadata cannot be parsed",
+            ) from exc
+        return self._validate_recovery_metadata(value)
+
+    def _read_recovery_lock(self) -> dict[str, Any]:
+        if not self.recovery_lock_path.exists() and not _is_linklike(
+            self.recovery_lock_path
+        ):
+            return self._no_recovery_lock()
+        invalid = {
+            "present": True,
+            "state": "stale_or_unverifiable",
+            "metadata_residue": False,
+            "diagnostics": ["recovery_lock_unverifiable"],
+            "metadata": None,
+        }
+        if _is_linklike(self.recovery_lock_path) or not self.recovery_lock_path.is_dir():
+            return invalid
+        try:
+            entries = {entry.name for entry in self.recovery_lock_path.iterdir()}
+        except OSError:
+            return invalid
+        metadata_residue = "owner.json.tmp" in entries
+        unexpected = entries - {"owner.json", "owner.json.tmp"}
+        if unexpected:
+            return {
+                **invalid,
+                "metadata_residue": metadata_residue,
+                "diagnostics": [
+                    "recovery_lock_unverifiable",
+                    "recovery_lock_unexpected_entries",
+                ],
+            }
+        try:
+            metadata = self._load_recovery_metadata_strict()
+        except DeliveryError:
+            return {
+                **invalid,
+                "metadata_residue": metadata_residue,
+                "diagnostics": [
+                    "recovery_lock_unverifiable",
+                    *(
+                        ["recovery_lock_metadata_residue"]
+                        if metadata_residue
+                        else []
+                    ),
+                ],
+            }
+        liveness = _process_liveness(metadata["process_id"])
+        if metadata["phase"] == "recovery_required":
+            state = "recovery_required"
+            diagnostic = "recovery_execution_failed"
+        elif liveness == "alive":
+            state = "active"
+            diagnostic = "recovery_lock_active"
+        else:
+            state = "recovery_required"
+            diagnostic = "recovery_lock_stale_or_unverifiable"
+        diagnostics = [diagnostic]
+        if metadata_residue:
+            diagnostics.append("recovery_lock_metadata_residue")
+        return {
+            "present": True,
+            "state": state,
+            "metadata_residue": metadata_residue,
+            "diagnostics": diagnostics,
+            "metadata": {**metadata, "process_liveness": liveness},
+        }
+
+    @staticmethod
+    def _public_recovery_lock(lock: dict[str, Any]) -> dict[str, Any]:
+        metadata = lock["metadata"]
+        owner = None
+        if metadata is not None:
+            owner = {
+                "owner_id": metadata["owner_token"][:12],
+                "process_id": metadata["process_id"],
+                "process_liveness": metadata["process_liveness"],
+                "phase": metadata["phase"],
+                "branch": metadata["branch"],
+                "recovery_plan_id": metadata["recovery_plan_id"],
+                "created_at": metadata["created_at"],
+                "updated_at": metadata["updated_at"],
+            }
+        return {
+            "present": lock["present"],
+            "state": lock["state"],
+            "metadata_residue": lock["metadata_residue"],
+            "owner": owner,
+        }
+
+    def _apply_recovery_lock_state(
+        self,
+        state: dict[str, Any],
+        lock: dict[str, Any],
+        *,
+        owner_token: str | None,
+    ) -> dict[str, Any]:
+        metadata = lock["metadata"]
+        owned = (
+            metadata is not None
+            and owner_token is not None
+            and metadata["owner_token"] == owner_token
+        )
+        if owned:
+            state["recovery_lock"] = self._public_recovery_lock(
+                self._no_recovery_lock()
+            )
+            return state
+        state["recovery_lock"] = self._public_recovery_lock(lock)
+        if not lock["present"]:
+            return state
+        state["diagnostics"] = list(
+            dict.fromkeys([*state.get("diagnostics", []), *lock["diagnostics"]])
+        )
+        state["transition"] = (
+            "staged" if lock["state"] == "active" else "recovery_required"
+        )
+        state["recommended_operation"] = (
+            "wait_for_active_recovery"
+            if lock["state"] == "active"
+            else "manual_recovery_required"
+        )
+        state["recovery_guidance"] = (
+            "Wait for the reported recovery owner to finish, then inspect again."
+            if lock["state"] == "active"
+            else "Preserve both recovery and mutation evidence for manual resolution."
+        )
+        return state
 
     def _apply_mutation_lock_state(
         self,
@@ -896,6 +1130,132 @@ class DeliveryManager:
                 "The delivery transition reached a terminal state but its lock could not be released",
                 details={
                     "operation": lease.operation,
+                    "prior_error": str(prior_error) if prior_error else None,
+                    "release_error": str(release_error),
+                },
+            ) from release_error
+
+    def _write_recovery_metadata(self, metadata: dict[str, Any]) -> None:
+        self._validate_recovery_metadata(metadata)
+        if self.recovery_owner_temp_path.exists() or _is_linklike(
+            self.recovery_owner_temp_path
+        ):
+            raise DeliveryError(
+                "recovery_lock_invalid",
+                "Recovery lock metadata temporary path is occupied",
+            )
+        self.recovery_owner_temp_path.write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        os.replace(self.recovery_owner_temp_path, self.recovery_owner_path)
+
+    def _acquire_recovery_lock(self, plan: dict[str, Any]) -> _RecoveryLease:
+        recovery = plan["recovery"]
+        self._assert_target_boundaries()
+        self.state_root.mkdir(parents=True, exist_ok=True)
+        try:
+            os.mkdir(self.recovery_lock_path)
+        except FileExistsError as exc:
+            lock = self._read_recovery_lock()
+            raise DeliveryError(
+                "recovery_locked",
+                "Another recovery owns or left an unverifiable project recovery lock",
+                details={"recovery_lock": self._public_recovery_lock(lock)},
+            ) from exc
+
+        lease = _RecoveryLease(
+            owner_token=uuid.uuid4().hex,
+            recovery_plan_id=recovery["recovery_plan_id"],
+            branch=recovery["branch"],
+        )
+        now = _utc_now()
+        metadata = {
+            "schema": RECOVERY_LOCK_SCHEMA,
+            "schema_version": RECOVERY_LOCK_SCHEMA_VERSION,
+            "owner_token": lease.owner_token,
+            "process_id": os.getpid(),
+            "created_at": now,
+            "updated_at": now,
+            "phase": "planning",
+            "recovery_plan_id": lease.recovery_plan_id,
+            "branch": lease.branch,
+        }
+        try:
+            self._write_recovery_metadata(metadata)
+        except Exception:
+            for path in (self.recovery_owner_temp_path, self.recovery_owner_path):
+                if path.is_file() and not _is_linklike(path):
+                    path.unlink()
+            try:
+                self.recovery_lock_path.rmdir()
+            except OSError:
+                pass
+            self._cleanup_empty_lock_parents()
+            raise
+        return lease
+
+    def _update_recovery_phase(self, lease: _RecoveryLease, phase: str) -> None:
+        if phase not in RECOVERY_PHASES:
+            raise DeliveryError("recovery_phase_invalid", f"Unknown recovery phase: {phase}")
+        metadata = self._load_recovery_metadata_strict()
+        if metadata["owner_token"] != lease.owner_token:
+            raise DeliveryError(
+                "recovery_lock_owner_mismatch",
+                "Recovery lock ownership changed during the operation",
+            )
+        self._write_recovery_metadata(
+            {**metadata, "phase": phase, "updated_at": _utc_now()}
+        )
+
+    def _mark_recovery_required(self, lease: _RecoveryLease) -> None:
+        try:
+            self._update_recovery_phase(lease, "recovery_required")
+        except (DeliveryError, OSError):
+            pass
+
+    def _release_recovery_lock(self, lease: _RecoveryLease) -> None:
+        metadata = self._load_recovery_metadata_strict()
+        if metadata["owner_token"] != lease.owner_token:
+            raise DeliveryError(
+                "recovery_lock_owner_mismatch",
+                "Refusing to release a recovery lock owned by another process",
+            )
+        entries = {entry.name for entry in self.recovery_lock_path.iterdir()}
+        unexpected = entries - {"owner.json", "owner.json.tmp"}
+        if unexpected:
+            raise DeliveryError(
+                "recovery_lock_invalid",
+                "Refusing to release a recovery lock with unexpected entries",
+            )
+        if self.recovery_owner_temp_path.exists():
+            if _is_linklike(self.recovery_owner_temp_path) or not (
+                self.recovery_owner_temp_path.is_file()
+            ):
+                raise DeliveryError(
+                    "recovery_lock_invalid",
+                    "Recovery lock metadata residue is unsafe",
+                )
+            self.recovery_owner_temp_path.unlink()
+        self.recovery_owner_path.unlink()
+        self.recovery_lock_path.rmdir()
+        self._cleanup_empty_lock_parents()
+
+    def _release_terminal_recovery_lock(
+        self,
+        lease: _RecoveryLease,
+        *,
+        prior_error: Exception | None = None,
+    ) -> None:
+        try:
+            self._release_recovery_lock(lease)
+        except Exception as release_error:
+            self._mark_recovery_required(lease)
+            raise DeliveryError(
+                "recovery_lock_release_failed",
+                "Recovery reached a terminal state but its lock could not be released",
+                details={
+                    "recovery_plan_id": lease.recovery_plan_id,
                     "prior_error": str(prior_error) if prior_error else None,
                     "release_error": str(release_error),
                 },
@@ -1070,7 +1430,11 @@ class DeliveryManager:
     ) -> list[str]:
         if not self.state_root.is_dir():
             return []
-        allowed = {self.rollback_path, self.mutation_lock_path}
+        allowed = {
+            self.rollback_path,
+            self.mutation_lock_path,
+            self.recovery_lock_path,
+        }
         if not include_previous_rollback:
             allowed.add(self.previous_rollback_path)
         return sorted(
@@ -1102,15 +1466,22 @@ class DeliveryManager:
         *,
         include_previous_rollback: bool,
         owner_token: str | None = None,
+        recovery_owner_token: str | None = None,
     ) -> dict[str, Any]:
         self._assert_target_boundaries()
         mutation_lock = self._read_mutation_lock()
+        recovery_lock = self._read_recovery_lock()
 
         def finalize(state: dict[str, Any]) -> dict[str, Any]:
-            return self._apply_mutation_lock_state(
+            state = self._apply_mutation_lock_state(
                 state,
                 mutation_lock,
                 owner_token=owner_token,
+            )
+            return self._apply_recovery_lock_state(
+                state,
+                recovery_lock,
+                owner_token=recovery_owner_token,
             )
 
         rollback_available = self.rollback_path.is_dir()
@@ -1295,6 +1666,435 @@ class DeliveryManager:
             "diagnostics": diagnostics,
         })
 
+    def _snapshot_owned_path(
+        self,
+        path: Path,
+        label: str,
+        entries: dict[str, dict[str, str]],
+    ) -> None:
+        if _is_linklike(path):
+            entries[label] = {"kind": "link"}
+            return
+        if not path.exists():
+            entries[label] = {"kind": "missing"}
+            return
+        if path.is_file():
+            entries[label] = {"kind": "file", "sha256": _sha256(path)}
+            return
+        if not path.is_dir():
+            entries[label] = {"kind": "special"}
+            return
+        entries[label] = {"kind": "directory"}
+        for child in sorted(path.iterdir(), key=lambda item: item.name):
+            self._snapshot_owned_path(child, f"{label}/{child.name}", entries)
+
+    def _recovery_snapshot(self) -> dict[str, Any]:
+        entries: dict[str, dict[str, str]] = {}
+        owned_paths = (
+            (self.mutation_lock_path, "mutation.lock"),
+            (self.receipt_path, "receipt.json"),
+            (self.receipt_temp_path, "receipt.json.tmp"),
+            (self.rollback_path, "rollback"),
+            (self.rollback_new_path, "rollback.new"),
+            (self.previous_rollback_path, "rollback.previous"),
+            (self.staging_path, "staging"),
+        )
+        for path, label in owned_paths:
+            self._snapshot_owned_path(path, label, entries)
+        for carrier, root in (
+            ("enabled-skills", self.enabled_root),
+            ("disabled-skills", self.disabled_root),
+        ):
+            for skill in EXPECTED_SKILLS:
+                self._snapshot_owned_path(
+                    root / skill,
+                    f"{carrier}/{skill}",
+                    entries,
+                )
+        payload = {
+            "schema": "cotend.delivery-recovery-snapshot",
+            "schema_version": 1,
+            "entries": entries,
+        }
+        return {**payload, "sha256": _canonical_digest(payload)}
+
+    @staticmethod
+    def _timestamp(value: str) -> datetime | None:
+        try:
+            parsed = datetime.fromisoformat(value)
+        except ValueError:
+            return None
+        return parsed if parsed.tzinfo is not None else None
+
+    def _checkpoint_relation(
+        self,
+        checkpoint: dict[str, Any],
+        mutation: dict[str, Any],
+    ) -> str:
+        checkpoint_time = self._timestamp(checkpoint["created_at"])
+        mutation_time = self._timestamp(mutation["created_at"])
+        if checkpoint_time is None or mutation_time is None:
+            return "unverifiable"
+        if checkpoint_time < mutation_time:
+            return "predates_mutation"
+        if checkpoint["operation"] != mutation["operation"]:
+            return "operation_mismatch"
+        return "belongs_to_mutation"
+
+    def _walk_recovery_managed_path(
+        self,
+        path: Path,
+        inventory_root: Path,
+        allowed_files: set[str],
+        allowed_directories: set[str],
+    ) -> list[str]:
+        unexpected: list[str] = []
+
+        def walk(current: Path) -> None:
+            for child in sorted(current.iterdir(), key=lambda item: item.name):
+                relative = child.relative_to(inventory_root).as_posix()
+                display = child.relative_to(self.project).as_posix()
+                if _is_linklike(child):
+                    unexpected.append(display)
+                elif child.is_file():
+                    if relative not in allowed_files:
+                        unexpected.append(display)
+                elif child.is_dir():
+                    if relative not in allowed_directories:
+                        unexpected.append(display)
+                    walk(child)
+                else:
+                    unexpected.append(display)
+
+        walk(path)
+        return unexpected
+
+    def _recovery_unexpected_owned_paths(
+        self,
+        checkpoint_receipt: dict[str, Any] | None,
+    ) -> list[str]:
+        unexpected: list[str] = []
+        allowed_state_entries = {
+            self.disabled_root.name,
+            self.receipt_path.name,
+            self.receipt_temp_path.name,
+            self.rollback_path.name,
+            self.rollback_new_path.name,
+            self.previous_rollback_path.name,
+            self.staging_path.name,
+            self.mutation_lock_path.name,
+            self.recovery_lock_path.name,
+        }
+        if self.state_root.is_dir():
+            unexpected.extend(
+                entry.relative_to(self.project).as_posix()
+                for entry in self.state_root.iterdir()
+                if entry.name not in allowed_state_entries
+            )
+        if self.disabled_root.is_dir():
+            unexpected.extend(
+                entry.relative_to(self.project).as_posix()
+                for entry in self.disabled_root.iterdir()
+                if entry.name not in EXPECTED_SKILLS
+            )
+
+        allowed_files = set(checkpoint_receipt["files"]) if checkpoint_receipt else set()
+        allowed_directories = {
+            PurePosixPath(relative).parent.as_posix()
+            for relative in allowed_files
+        }
+        allowed_directories.update(
+            parent.as_posix()
+            for relative in allowed_files
+            for parent in PurePosixPath(relative).parents
+            if parent.as_posix() != "."
+        )
+        for root in (self.enabled_root, self.disabled_root):
+            for skill in EXPECTED_SKILLS:
+                skill_root = root / skill
+                if _is_linklike(skill_root) or (
+                    skill_root.exists() and not skill_root.is_dir()
+                ):
+                    unexpected.append(skill_root.relative_to(self.project).as_posix())
+                elif skill_root.is_dir():
+                    if skill not in allowed_directories:
+                        unexpected.append(skill_root.relative_to(self.project).as_posix())
+                    unexpected.extend(
+                        self._walk_recovery_managed_path(
+                            skill_root,
+                            root,
+                            allowed_files,
+                            allowed_directories,
+                        )
+                    )
+
+        if self.staging_path.exists():
+            if _is_linklike(self.staging_path) or not self.staging_path.is_dir():
+                unexpected.append(self.staging_path.relative_to(self.project).as_posix())
+            else:
+                staging_entries = {entry.name for entry in self.staging_path.iterdir()}
+                staged = self.staging_path / "skills"
+                if staging_entries != {"skills"} or _is_linklike(staged) or not staged.is_dir():
+                    unexpected.append(self.staging_path.relative_to(self.project).as_posix())
+                else:
+                    unexpected.extend(
+                        self._walk_recovery_managed_path(
+                            staged,
+                            staged,
+                            allowed_files,
+                            allowed_directories,
+                        )
+                    )
+        if self.rollback_new_path.exists() or _is_linklike(self.rollback_new_path):
+            unexpected.append(self.rollback_new_path.relative_to(self.project).as_posix())
+        return sorted(set(unexpected))
+
+    @staticmethod
+    def _blocked_recovery_plan(
+        state: dict[str, Any],
+        *,
+        reason: str,
+        recommendation: str,
+        diagnostics: list[str],
+    ) -> dict[str, Any]:
+        return {
+            "operation": "recover",
+            "allowed": False,
+            "will_mutate": False,
+            "reason": reason,
+            "state": state,
+            "effects": [],
+            "recovery": {
+                "status": "blocked",
+                "recommendation": recommendation,
+                "branch": None,
+                "recovery_plan_id": None,
+                "snapshot_sha256": None,
+                "requires_confirmation": False,
+                "diagnostics": diagnostics,
+            },
+        }
+
+    def _plan_recovery(
+        self,
+        *,
+        _recovery_owner_token: str | None = None,
+    ) -> dict[str, Any]:
+        visible_state = self._inspect(
+            None,
+            include_previous_rollback=True,
+            recovery_owner_token=_recovery_owner_token,
+        )
+        recovery_lock = self._read_recovery_lock()
+        recovery_metadata = recovery_lock["metadata"]
+        recovery_owned = (
+            recovery_metadata is not None
+            and _recovery_owner_token is not None
+            and recovery_metadata["owner_token"] == _recovery_owner_token
+        )
+        if recovery_lock["present"] and not recovery_owned:
+            recommendation = (
+                "wait_for_active_recovery"
+                if recovery_lock["state"] == "active"
+                else "manual_resolution"
+            )
+            return self._blocked_recovery_plan(
+                visible_state,
+                reason=f"recovery_lock_{recovery_lock['state']}",
+                recommendation=recommendation,
+                diagnostics=recovery_lock["diagnostics"],
+            )
+
+        mutation_lock = self._read_mutation_lock()
+        mutation = mutation_lock["metadata"]
+        if not mutation_lock["present"]:
+            return self._blocked_recovery_plan(
+                visible_state,
+                reason="no_interrupted_mutation_lock",
+                recommendation="inspect_or_continue_normal_delivery",
+                diagnostics=[],
+            )
+        if mutation is None or mutation_lock["metadata_residue"]:
+            return self._blocked_recovery_plan(
+                visible_state,
+                reason="mutation_lock_unverifiable",
+                recommendation="manual_resolution",
+                diagnostics=mutation_lock["diagnostics"],
+            )
+        if mutation["process_liveness"] == "alive":
+            return self._blocked_recovery_plan(
+                visible_state,
+                reason="mutation_owner_active",
+                recommendation="wait_for_active_owner",
+                diagnostics=mutation_lock["diagnostics"],
+            )
+        if mutation["process_liveness"] != "not_alive":
+            return self._blocked_recovery_plan(
+                visible_state,
+                reason="mutation_owner_liveness_unverifiable",
+                recommendation="manual_resolution",
+                diagnostics=mutation_lock["diagnostics"],
+            )
+        if mutation["operation"] == "rollback":
+            return self._blocked_recovery_plan(
+                visible_state,
+                reason="interrupted_rollback_requires_manual_resolution",
+                recommendation="manual_resolution",
+                diagnostics=["rollback_checkpoint_intent_unverifiable"],
+            )
+
+        raw_state = self._inspect(
+            None,
+            include_previous_rollback=True,
+            owner_token=mutation["owner_token"],
+            recovery_owner_token=_recovery_owner_token,
+        )
+        stable_without_transition = (
+            raw_state["transition"] == "stable"
+            and not raw_state["transition_artifacts"]
+            and not raw_state["unexpected"]
+        )
+        branch: str | None = None
+        checkpoint: dict[str, Any] | None = None
+        checkpoint_receipt: dict[str, Any] | None = None
+        checkpoint_relation = "absent"
+        checkpoint_error: str | None = None
+        if self.rollback_path.exists() or _is_linklike(self.rollback_path):
+            try:
+                checkpoint, checkpoint_receipt = self._load_checkpoint_metadata()
+                checkpoint_relation = self._checkpoint_relation(checkpoint, mutation)
+            except DeliveryError as exc:
+                checkpoint_error = exc.code
+                checkpoint_relation = "invalid"
+
+        phase = mutation["phase"]
+        if phase == "planning":
+            if stable_without_transition and checkpoint_relation in {
+                "absent",
+                "predates_mutation",
+            }:
+                branch = "release_abandoned_lock"
+        elif phase == "completed":
+            if stable_without_transition:
+                branch = "release_abandoned_lock"
+        elif phase == "rolled_back":
+            if stable_without_transition and checkpoint_relation in {
+                "absent",
+                "predates_mutation",
+            }:
+                branch = "release_abandoned_lock"
+        elif phase == "checkpointing":
+            if stable_without_transition and checkpoint_relation in {
+                "absent",
+                "predates_mutation",
+            }:
+                branch = "release_abandoned_lock"
+            elif checkpoint_relation == "belongs_to_mutation":
+                branch = "rollback_interrupted_transition"
+        elif checkpoint_relation == "belongs_to_mutation":
+            branch = "rollback_interrupted_transition"
+
+        unexpected_owned: list[str] = []
+        if branch == "rollback_interrupted_transition":
+            unexpected_owned = self._recovery_unexpected_owned_paths(
+                checkpoint_receipt
+            )
+            if unexpected_owned:
+                branch = None
+
+        if branch is None:
+            diagnostics = ["recovery_evidence_insufficient"]
+            if checkpoint_error:
+                diagnostics.append(checkpoint_error)
+            if checkpoint_relation != "absent":
+                diagnostics.append(f"checkpoint_{checkpoint_relation}")
+            if unexpected_owned:
+                diagnostics.append("unexpected_owned_content")
+            blocked = self._blocked_recovery_plan(
+                visible_state,
+                reason="recovery_requires_manual_resolution",
+                recommendation="manual_resolution",
+                diagnostics=diagnostics,
+            )
+            blocked["recovery"]["unexpected_owned_paths"] = unexpected_owned
+            return blocked
+
+        snapshot = self._recovery_snapshot()
+        plan_identity = {
+            "schema": "cotend.delivery-recovery-plan-identity",
+            "schema_version": 1,
+            "project": str(self.project),
+            "snapshot_sha256": snapshot["sha256"],
+            "branch": branch,
+            "mutation_owner_id": mutation["owner_token"][:12],
+            "mutation_operation": mutation["operation"],
+            "mutation_phase": mutation["phase"],
+        }
+        recovery_plan_id = _canonical_digest(plan_identity)
+        if branch == "release_abandoned_lock":
+            effects = [
+                "create a temporary recovery.lock and retain it if recovery fails",
+                "remove only the exact abandoned mutation.lock after snapshot revalidation",
+                "preserve receipt, managed payload, rollback checkpoints, and transition state",
+                "preserve project files and unrelated Skill directories",
+            ]
+            affected_paths = [
+                ".agents/.cotend-delivery/recovery.lock",
+                ".agents/.cotend-delivery/mutation.lock",
+            ]
+        else:
+            effects = [
+                "create a temporary recovery.lock and retain it if recovery fails",
+                "restore the exact verified current checkpoint",
+                "reinstate the previous one-step rollback topology when present",
+                "clean only adapter-owned staging and receipt temporary residue",
+                "remove the exact abandoned mutation.lock only after restored-state verification",
+                "preserve project files and unrelated Skill directories",
+            ]
+            affected_paths = [
+                ".agents/.cotend-delivery/recovery.lock",
+                *(f".agents/skills/{skill}" for skill in EXPECTED_SKILLS),
+                *(
+                    f".agents/.cotend-delivery/disabled-skills/{skill}"
+                    for skill in EXPECTED_SKILLS
+                ),
+                ".agents/.cotend-delivery/receipt.json",
+                ".agents/.cotend-delivery/rollback",
+                ".agents/.cotend-delivery/rollback.new",
+                ".agents/.cotend-delivery/rollback.previous",
+                ".agents/.cotend-delivery/staging",
+                ".agents/.cotend-delivery/receipt.json.tmp",
+                ".agents/.cotend-delivery/mutation.lock",
+            ]
+        return {
+            "operation": "recover",
+            "allowed": True,
+            "will_mutate": True,
+            "reason": f"{branch}_requires_exact_confirmation",
+            "state": visible_state,
+            "effects": effects,
+            "recovery": {
+                "status": "confirmation_required",
+                "recommendation": branch,
+                "branch": branch,
+                "recovery_plan_id": recovery_plan_id,
+                "snapshot_sha256": snapshot["sha256"],
+                "requires_confirmation": True,
+                "confirmation_scope": "one_exact_snapshot_bound_recovery_apply",
+                "mutation_owner": {
+                    "owner_id": mutation["owner_token"][:12],
+                    "operation": mutation["operation"],
+                    "phase": mutation["phase"],
+                    "process_liveness": mutation["process_liveness"],
+                },
+                "checkpoint_relation": checkpoint_relation,
+                "affected_paths": affected_paths,
+                "unrelated_project_content": "preserved",
+                "forward_finalize": "not_available_without_intended_target_evidence",
+                "diagnostics": [],
+            },
+        }
+
     def plan(
         self,
         operation: str,
@@ -1304,6 +2104,8 @@ class DeliveryManager:
     ) -> dict[str, Any]:
         if operation not in OPERATIONS:
             raise DeliveryError("operation_unknown", f"Unknown operation: {operation}")
+        if operation == "recover":
+            return self._plan_recovery()
         if operation in {"install", "update", "repair", "migrate_identity"} and candidate is None:
             raise DeliveryError(
                 "candidate_required",
@@ -1330,7 +2132,9 @@ class DeliveryManager:
         reason = "operation_not_allowed_from_current_state"
         effects: list[str] = []
 
-        if state["mutation_lock"]["present"]:
+        if state["recovery_lock"]["present"]:
+            reason = f"recovery_lock_{state['recovery_lock']['state']}"
+        elif state["mutation_lock"]["present"]:
             reason = f"mutation_lock_{state['mutation_lock']['state']}"
         elif operation == "install":
             if state["installation"] == "absent" and state["transition"] == "stable":
@@ -1464,13 +2268,178 @@ class DeliveryManager:
             ]
         return []
 
+    def _execute_recovery(
+        self,
+        *,
+        apply: bool,
+        confirm_recovery_plan_id: str | None,
+    ) -> dict[str, Any]:
+        plan = self._plan_recovery()
+        if not plan["allowed"]:
+            raise DeliveryError(
+                "operation_blocked",
+                f"recover is blocked: {plan['reason']}",
+                details={"state": plan["state"], "recovery": plan["recovery"]},
+            )
+        if not apply:
+            return {
+                "status": "planned",
+                "applied": False,
+                "plan": plan,
+                "state": plan["state"],
+            }
+
+        recovery_plan_id = plan["recovery"]["recovery_plan_id"]
+        if confirm_recovery_plan_id is None:
+            raise DeliveryError(
+                "recovery_confirmation_required",
+                "Recovery apply requires the exact previewed recovery_plan_id",
+                details={"recovery_plan_id": recovery_plan_id, "plan": plan},
+            )
+        if confirm_recovery_plan_id != recovery_plan_id:
+            raise DeliveryError(
+                "recovery_plan_mismatch",
+                "Recovery confirmation does not match the current recovery plan",
+                details={"recovery_plan_id": recovery_plan_id, "plan": plan},
+            )
+
+        lease = self._acquire_recovery_lock(plan)
+        try:
+            locked_plan = self._plan_recovery(
+                _recovery_owner_token=lease.owner_token
+            )
+        except Exception as exc:
+            self._release_terminal_recovery_lock(lease, prior_error=exc)
+            raise
+        if (
+            not locked_plan["allowed"]
+            or locked_plan["recovery"]["recovery_plan_id"] != recovery_plan_id
+        ):
+            changed = DeliveryError(
+                "recovery_plan_changed",
+                "Recovery evidence changed before exclusive recovery ownership",
+                details={"locked_plan": locked_plan},
+            )
+            self._release_terminal_recovery_lock(lease, prior_error=changed)
+            raise changed
+
+        try:
+            mutation = self._load_mutation_metadata_strict()
+        except Exception as exc:
+            changed = DeliveryError(
+                "recovery_plan_changed",
+                "Mutation ownership changed before recovery execution",
+            )
+            self._release_terminal_recovery_lock(lease, prior_error=exc)
+            raise changed from exc
+        mutation_lease = _MutationLease(
+            owner_token=mutation["owner_token"],
+            operation=mutation["operation"],
+        )
+        branch = locked_plan["recovery"]["branch"]
+        before = locked_plan["state"]
+        try:
+            self._update_recovery_phase(lease, "recovering")
+            if (
+                self._recovery_snapshot()["sha256"]
+                != locked_plan["recovery"]["snapshot_sha256"]
+            ):
+                raise DeliveryError(
+                    "recovery_snapshot_changed",
+                    "Recovery evidence changed immediately before mutation",
+                )
+            if branch == "rollback_interrupted_transition":
+                checkpoint, checkpoint_receipt = self._load_checkpoint_metadata()
+                if self._checkpoint_relation(checkpoint, mutation) != "belongs_to_mutation":
+                    raise DeliveryError(
+                        "recovery_checkpoint_changed",
+                        "The checkpoint no longer belongs to the interrupted mutation",
+                    )
+                if (
+                    self._recovery_snapshot()["sha256"]
+                    != locked_plan["recovery"]["snapshot_sha256"]
+                ):
+                    raise DeliveryError(
+                        "recovery_snapshot_changed",
+                        "Recovery evidence changed while validating the checkpoint",
+                    )
+                self._stage_recovery_checkpoint_restore(checkpoint)
+                self._update_recovery_phase(lease, "verifying")
+                self._verify_recovery_rollback_postcondition(
+                    checkpoint,
+                    checkpoint_receipt,
+                    mutation_owner_token=mutation["owner_token"],
+                    recovery_owner_token=lease.owner_token,
+                )
+                self._commit_recovery_checkpoint_restore()
+                self._release_mutation_lock(mutation_lease)
+            elif branch == "release_abandoned_lock":
+                self._release_mutation_lock(mutation_lease)
+                self._update_recovery_phase(lease, "verifying")
+                after_release = self._inspect(
+                    None,
+                    include_previous_rollback=True,
+                    recovery_owner_token=lease.owner_token,
+                )
+                if (
+                    after_release["transition"] != "stable"
+                    or after_release["transition_artifacts"]
+                    or after_release["unexpected"]
+                ):
+                    raise DeliveryError(
+                        "recovery_release_verification_failed",
+                        "Abandoned lock release did not leave a stable delivery state",
+                        details={"state": after_release},
+                    )
+            else:
+                raise DeliveryError(
+                    "recovery_branch_invalid",
+                    f"Unsupported recovery branch: {branch}",
+                )
+            self._update_recovery_phase(lease, "completed")
+        except Exception as exc:
+            self._mark_recovery_required(lease)
+            raise DeliveryError(
+                "recovery_failed_lock_retained",
+                "Recovery failed; available lock and checkpoint evidence was retained",
+                details={
+                    "recovery_plan_id": recovery_plan_id,
+                    "branch": branch,
+                    "recovery_error": str(exc),
+                },
+            ) from exc
+
+        self._release_terminal_recovery_lock(lease)
+        after = self.inspect(None)
+        return {
+            "status": "applied",
+            "applied": True,
+            "operation": "recover",
+            "recovery_plan_id": recovery_plan_id,
+            "branch": branch,
+            "plan": locked_plan,
+            "state_before": before,
+            "state_after": after,
+        }
+
     def execute(
         self,
         operation: str,
         candidate: Artifact | None = None,
         *,
         apply: bool = False,
+        confirm_recovery_plan_id: str | None = None,
     ) -> dict[str, Any]:
+        if operation == "recover":
+            return self._execute_recovery(
+                apply=apply,
+                confirm_recovery_plan_id=confirm_recovery_plan_id,
+            )
+        if confirm_recovery_plan_id is not None:
+            raise DeliveryError(
+                "recovery_confirmation_operation_invalid",
+                "A recovery plan confirmation can only be used with recover",
+            )
         plan = self.plan(operation, candidate)
         if not plan["allowed"]:
             raise DeliveryError(
@@ -1722,7 +2691,7 @@ class DeliveryManager:
         if (
             value.get("schema") != CHECKPOINT_SCHEMA
             or schema_version not in {LEGACY_SCHEMA_VERSION, CHECKPOINT_SCHEMA_VERSION}
-            or value.get("operation") not in OPERATIONS - {"inspect", "rollback"}
+            or value.get("operation") not in MUTATION_OPERATIONS - {"rollback"}
             or not isinstance(value.get("created_at"), str)
             or not value["created_at"]
             or not isinstance(value.get("receipt_present"), bool)
@@ -1902,12 +2871,7 @@ class DeliveryManager:
                         f"Managed path is not a directory: {path}",
                     )
 
-    def _restore_checkpoint(
-        self,
-        *,
-        reinstate_previous: bool,
-    ) -> tuple[dict[str, Any], dict[str, Any] | None]:
-        checkpoint, checkpoint_receipt = self._load_checkpoint_metadata()
+    def _restore_checkpoint_payload(self, checkpoint: dict[str, Any]) -> None:
         payload_mode = checkpoint.get("payload_mode", "snapshot")
         if payload_mode == "snapshot":
             self._remove_managed_payload(self._managed_skills_for_cleanup(checkpoint))
@@ -1927,6 +2891,14 @@ class DeliveryManager:
         if checkpoint["receipt_present"]:
             shutil.copy2(self.rollback_path / "receipt.json", self.receipt_path)
 
+    def _restore_checkpoint(
+        self,
+        *,
+        reinstate_previous: bool,
+    ) -> tuple[dict[str, Any], dict[str, Any] | None]:
+        checkpoint, checkpoint_receipt = self._load_checkpoint_metadata()
+        self._restore_checkpoint_payload(checkpoint)
+
         shutil.rmtree(self.rollback_path)
         if reinstate_previous and self.previous_rollback_path.exists():
             os.replace(self.previous_rollback_path, self.rollback_path)
@@ -1935,6 +2907,37 @@ class DeliveryManager:
         self._cleanup_transition_artifacts()
         self._cleanup_empty_state()
         return checkpoint, checkpoint_receipt
+
+    def _stage_recovery_checkpoint_restore(
+        self,
+        checkpoint: dict[str, Any],
+    ) -> None:
+        self._restore_checkpoint_payload(checkpoint)
+        self._cleanup_transition_artifacts()
+        self._cleanup_empty_state()
+
+    def _commit_recovery_checkpoint_restore(self) -> None:
+        self._assert_target_boundaries()
+        if self.rollback_new_path.exists() or _is_linklike(self.rollback_new_path):
+            raise DeliveryError(
+                "transition_artifact_collision",
+                "Recovery checkpoint retirement path is occupied",
+            )
+        if _is_linklike(self.rollback_path) or not self.rollback_path.is_dir():
+            raise DeliveryError(
+                "checkpoint_invalid",
+                "Recovery checkpoint disappeared before retirement",
+            )
+        os.replace(self.rollback_path, self.rollback_new_path)
+        try:
+            if self.previous_rollback_path.exists():
+                os.replace(self.previous_rollback_path, self.rollback_path)
+            shutil.rmtree(self.rollback_new_path)
+        except Exception:
+            if not self.rollback_path.exists() and self.rollback_new_path.exists():
+                os.replace(self.rollback_new_path, self.rollback_path)
+            raise
+        self._cleanup_empty_state()
 
     def _commit_checkpoint(self) -> None:
         if self.previous_rollback_path.exists():
@@ -2131,6 +3134,66 @@ class DeliveryManager:
             raise DeliveryError(
                 "rollback_verification_failed",
                 "Rollback completed but the restored state failed verification",
+                details={"state": after},
+            )
+
+    def _verify_recovery_rollback_postcondition(
+        self,
+        expected_checkpoint: dict[str, Any],
+        expected_receipt: dict[str, Any] | None,
+        *,
+        mutation_owner_token: str,
+        recovery_owner_token: str,
+    ) -> None:
+        after = self._inspect(
+            None,
+            include_previous_rollback=False,
+            owner_token=mutation_owner_token,
+            recovery_owner_token=recovery_owner_token,
+        )
+        if after["transition_artifacts"]:
+            valid = False
+        elif expected_receipt is None:
+            try:
+                actual_receipt = self._load_receipt(required=False)
+            except DeliveryError:
+                actual_receipt = {"invalid": True}
+            managed_present = any(
+                (root / skill).exists() or _is_linklike(root / skill)
+                for root in (self.enabled_root, self.disabled_root)
+                for skill in EXPECTED_SKILLS
+            )
+            valid = actual_receipt is None and not managed_present
+        else:
+            payload_root = (
+                self.enabled_root
+                if expected_receipt["enabled"]
+                else self.disabled_root
+            )
+            try:
+                actual_payload = _directory_manifest(
+                    payload_root,
+                    tuple(expected_receipt["skills"]),
+                )
+                actual_receipt = self._load_receipt(required=True)
+            except DeliveryError:
+                actual_payload = {}
+                actual_receipt = None
+            present_skills = {
+                skill
+                for skill in expected_receipt["skills"]
+                if (payload_root / skill).is_dir()
+            }
+            valid = (
+                actual_receipt == expected_receipt
+                and actual_payload == expected_checkpoint["payload_files"]
+                and present_skills == set(expected_checkpoint["payload_skills"])
+                and not self._shadow_payload_paths(enabled=expected_receipt["enabled"])
+            )
+        if not valid:
+            raise DeliveryError(
+                "recovery_rollback_verification_failed",
+                "Recovery restored a checkpoint but the exact prior state failed verification",
                 details={"state": after},
             )
 

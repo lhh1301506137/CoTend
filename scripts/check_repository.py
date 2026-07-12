@@ -157,6 +157,7 @@ EXPECTED_DELIVERY_OPERATIONS = {
     "disable",
     "uninstall",
     "rollback",
+    "recover",
 }
 EXPECTED_DELIVERY_TESTS = {
     "test_artifact_identity_dry_run_and_idempotent_install",
@@ -198,6 +199,13 @@ EXPECTED_DELIVERY_TESTS = {
     "test_mutation_lock_owner_mismatch_prevents_release",
     "test_stale_interrupted_lock_is_reported_and_never_auto_removed",
     "test_transition_and_rollback_failure_retains_recovery_lock",
+    "test_recovery_preview_requires_exact_confirmation_before_any_write",
+    "test_recovery_never_overrides_active_or_unknown_owner",
+    "test_recovery_rolls_back_interrupted_update_and_reinstates_prior_checkpoint",
+    "test_stale_recovery_plan_is_rejected_without_recovery_lock_write",
+    "test_recovery_blocks_corrupt_checkpoint_and_unexpected_managed_content",
+    "test_recovery_verification_failure_retains_checkpoint_and_both_locks",
+    "test_active_recovery_lock_blocks_second_recovery_and_normal_mutation",
 }
 
 # checker-self-scan-allowlist-start
@@ -1916,6 +1924,12 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             "mutation_locked",
             "mutation_transition_interrupted",
             "owner_token=lease.owner_token",
+            "RECOVERY_LOCK_SCHEMA",
+            'self.recovery_lock_path = self.state_root / "recovery.lock"',
+            "recovery_plan_id",
+            "release_abandoned_lock",
+            "rollback_interrupted_transition",
+            "forward_finalize",
         ):
             if marker not in core_text:
                 errors.append(f"delivery core contract marker is missing: {marker}")
@@ -1928,6 +1942,7 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             '"--apply"',
             '"--source-release-id"',
             '"--revision"',
+            '"--confirm-recovery-plan-id"',
             "Mutation commands are dry-run unless --apply is provided.",
         ):
             if marker not in cli_text:
@@ -1947,6 +1962,10 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             "DELIVERY_CONCURRENCY_OK",
             "same_project_contender_zero_write",
             "terminated_midmutation_detected",
+            "DELIVERY_RECOVERY_OK",
+            "confirmation_gate_zero_write",
+            "stale_plan_toctou_zero_write",
+            "terminated_recovery_retains_dual_evidence",
         ):
             if marker not in harness_text:
                 errors.append(f"delivery lifecycle harness marker is missing: {marker}")
@@ -2058,6 +2077,25 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         ):
             if marker not in evidence:
                 errors.append(f"delivery concurrency evidence is missing: {marker}")
+    recovery_evidence_path = "docs/evidence/DELIVERY-INTERRUPTED-RECOVERY.md"
+    if recovery_evidence_path not in candidates:
+        errors.append("delivery interrupted-recovery evidence is missing or ignored")
+    else:
+        evidence = read(recovery_evidence_path)
+        for marker in (
+            "status: passed_disposable_process_level",
+            "recovery_lock_schema: 1",
+            "confirmation: one_exact_snapshot_bound_recovery_plan_id",
+            "release_abandoned_lock",
+            "rollback_interrupted_transition",
+            "forward_finalize: blocked_without_intended_target_evidence",
+            "DELIVERY_RECOVERY_OK cases=8",
+            "real_or_shared_project_apply: not_run",
+        ):
+            if marker not in evidence:
+                errors.append(
+                    f"delivery interrupted-recovery evidence is missing: {marker}"
+                )
     return errors
 
 

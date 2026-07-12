@@ -179,9 +179,10 @@
         "scripts/verify_delivered_codex_runtime.py",
         "docs/evidence/DELIVERED-CODEX-RUNTIME-VALIDATION.md",
         "docs/evidence/TARGET-ARTIFACT-IDENTITY-SCHEMA-V2.md",
-        "docs/evidence/DELIVERY-CONCURRENCY-AND-INTERRUPTION.md"
+        "docs/evidence/DELIVERY-CONCURRENCY-AND-INTERRUPTION.md",
+        "docs/evidence/DELIVERY-INTERRUPTED-RECOVERY.md"
       ],
-      "deferred_gap": "the deterministic project-scoped lifecycle, monotonic target identity, schema v1 receipt migration, downgrade classification, project-level mutation exclusion, conservative hard-process interruption detection, and disposable read-only Codex invocation bridge are implemented; explicit stale-lock recovery, real-project writes, writable model journeys, power-loss durability, user/global scope, platform migration, the final novice installation channel, Plugin, and Marketplace carriers remain unverified"
+      "deferred_gap": "the deterministic project-scoped lifecycle, monotonic target identity, schema v1 receipt migration, downgrade classification, project-level mutation and recovery exclusion, conservative hard-process interruption detection, snapshot-bound abandoned-lock release and checkpoint rollback in disposable fixtures, and a disposable read-only Codex invocation bridge are implemented; active or unverifiable owner takeover, invalid-evidence force unlock, forward completion without intended-target evidence, real-project writes and recovery, writable model journeys, power-loss durability, shared or network filesystem recovery, user/global scope, platform migration, the final novice installation channel, Plugin, and Marketplace carriers remain unverified"
     },
     {
       "capability_id": "C17",

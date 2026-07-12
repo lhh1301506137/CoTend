@@ -18,6 +18,8 @@ global_install_or_config_write: false
 push_release_or_publish: false
 ```
 
+本文件记录 L29 当时的检测与阻断基线，因此保留 `automatic_recovery: not_implemented` 作为历史证据。后续 L30 已在 disposable fixture 中实现每次精确确认的 `release_abandoned_lock` 与 `rollback_interrupted_transition`；边界与结果见 [`DELIVERY-INTERRUPTED-RECOVERY.md`](DELIVERY-INTERRUPTED-RECOVERY.md)。通用 force unlock、unattended recovery 和真实项目恢复仍未开放。
+
 ## 结论
 
 CoTend 的项目级交付核心现在为所有 apply mutation 使用同一个 adapter-owned 排他合同。`install`、`update`、`repair`、`migrate_identity`、`enable`、`disable`、`uninstall` 和 `rollback` 在 checkpoint、staging、payload 或 receipt 写入前原子获取项目级锁，并在持锁后重新规划。只读 `inspect`、dry-run 和幂等 no-change 不获取锁。

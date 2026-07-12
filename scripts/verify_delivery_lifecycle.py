@@ -150,6 +150,7 @@ def cli_command(
     *,
     apply: bool,
     artifact: Artifact | None = None,
+    confirm_recovery_plan_id: str | None = None,
 ) -> list[str]:
     command = [
         sys.executable,
@@ -175,6 +176,10 @@ def cli_command(
         )
     if apply:
         command.append("--apply")
+    if confirm_recovery_plan_id is not None:
+        command.extend(
+            ["--confirm-recovery-plan-id", confirm_recovery_plan_id]
+        )
     return command
 
 
@@ -184,10 +189,17 @@ def run_cli(
     *,
     apply: bool = False,
     artifact: Artifact | None = None,
+    confirm_recovery_plan_id: str | None = None,
     expect_error: str | None = None,
 ) -> dict[str, Any]:
     completed = subprocess.run(
-        cli_command(operation, project, apply=apply, artifact=artifact),
+        cli_command(
+            operation,
+            project,
+            apply=apply,
+            artifact=artifact,
+            confirm_recovery_plan_id=confirm_recovery_plan_id,
+        ),
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -728,6 +740,7 @@ def run_concurrency_worker(
     project: Path,
     source: Path,
     event: Path,
+    recovery_plan_id: str | None = None,
 ) -> int:
     project = guarded_fixture(project)
     source = guarded_fixture(source)
@@ -747,6 +760,23 @@ def run_concurrency_worker(
         event.write_text("ready\n", encoding="utf-8")
         time.sleep(60)
 
+    if mode == "recovery_hold":
+        if recovery_plan_id is None:
+            raise LifecycleError("recovery worker requires a recovery plan id")
+        original_recovery_phase = manager._update_recovery_phase
+
+        def held_recovery_phase(lease: Any, phase: str) -> None:
+            if phase == "recovering":
+                signal_and_wait()
+            original_recovery_phase(lease, phase)
+
+        manager._update_recovery_phase = held_recovery_phase  # type: ignore[method-assign]
+        manager.execute(
+            "recover",
+            apply=True,
+            confirm_recovery_plan_id=recovery_plan_id,
+        )
+        return 0
     if mode == "before_checkpoint":
         original_checkpoint = manager._create_checkpoint
 
@@ -776,20 +806,24 @@ def start_concurrency_worker(
     project: Path,
     source: Path,
     event: Path,
+    recovery_plan_id: str | None = None,
 ) -> subprocess.Popen[str]:
+    command = [
+        sys.executable,
+        str(Path(__file__).resolve()),
+        "--worker-mode",
+        mode,
+        "--worker-project",
+        str(project),
+        "--worker-source",
+        str(source),
+        "--worker-event",
+        str(event),
+    ]
+    if recovery_plan_id is not None:
+        command.extend(["--worker-recovery-plan-id", recovery_plan_id])
     return subprocess.Popen(
-        [
-            sys.executable,
-            str(Path(__file__).resolve()),
-            "--worker-mode",
-            mode,
-            "--worker-project",
-            str(project),
-            "--worker-source",
-            str(source),
-            "--worker-event",
-            str(event),
-        ],
+        command,
         cwd=ROOT,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -982,6 +1016,243 @@ def verify_concurrent_transitions(
     return {"status": "pass", "cases": passed, "count": len(passed)}
 
 
+def verify_interrupted_recovery(
+    fixture: Path,
+    baseline: Artifact,
+    updated: Artifact,
+) -> dict[str, Any]:
+    skills = set(baseline.skills)
+    passed: list[str] = []
+    events = fixture / "events"
+
+    release_project = prepare_project(
+        fixture / "projects" / "recovery-precheckpoint-release"
+    )
+    release_protected = tree_snapshot(release_project, managed_skills=skills)
+    run_cli("install", release_project, apply=True)
+    release_event = events / "recovery-precheckpoint-ready.txt"
+    worker = start_concurrency_worker(
+        mode="before_checkpoint",
+        project=release_project,
+        source=updated.root,
+        event=release_event,
+    )
+    try:
+        wait_for_worker_event(worker, release_event)
+    finally:
+        terminate_worker(worker)
+    release_preview = run_cli("recover", release_project)
+    release_plan = release_preview["plan"]["recovery"]
+    if release_plan["branch"] != "release_abandoned_lock":
+        raise LifecycleError("pre-checkpoint recovery did not select safe release")
+    before_confirmation = tree_snapshot(release_project)
+    run_cli(
+        "recover",
+        release_project,
+        apply=True,
+        expect_error="recovery_confirmation_required",
+    )
+    run_cli(
+        "recover",
+        release_project,
+        apply=True,
+        confirm_recovery_plan_id="0" * 64,
+        expect_error="recovery_plan_mismatch",
+    )
+    if tree_snapshot(release_project) != before_confirmation:
+        raise LifecycleError("missing or wrong recovery confirmation changed the project")
+    passed.append("confirmation_gate_zero_write")
+    run_cli(
+        "recover",
+        release_project,
+        apply=True,
+        confirm_recovery_plan_id=release_plan["recovery_plan_id"],
+    )
+    release_state = require_state(
+        DeliveryManager(release_project),
+        baseline,
+        installation="complete",
+        enablement="enabled",
+        artifact_id=baseline.artifact_id,
+    )
+    if release_state["mutation_lock"]["present"] or release_state["recovery_lock"][
+        "present"
+    ]:
+        raise LifecycleError("safe release left a delivery lock")
+    assert_protected_unchanged(release_project, skills, release_protected)
+    passed.append("precheckpoint_abandoned_lock_release")
+
+    rollback_project = prepare_project(
+        fixture / "projects" / "recovery-midmutation-rollback"
+    )
+    rollback_protected = tree_snapshot(rollback_project, managed_skills=skills)
+    run_cli("install", rollback_project, apply=True)
+    baseline_receipt = DeliveryManager(rollback_project).receipt_path.read_bytes()
+    rollback_event = events / "recovery-midmutation-ready.txt"
+    worker = start_concurrency_worker(
+        mode="before_receipt",
+        project=rollback_project,
+        source=updated.root,
+        event=rollback_event,
+    )
+    try:
+        wait_for_worker_event(worker, rollback_event)
+    finally:
+        terminate_worker(worker)
+    rollback_preview = run_cli("recover", rollback_project)
+    rollback_plan = rollback_preview["plan"]["recovery"]
+    if rollback_plan["branch"] != "rollback_interrupted_transition":
+        raise LifecycleError("mid-mutation recovery did not select checkpoint rollback")
+    run_cli(
+        "recover",
+        rollback_project,
+        apply=True,
+        confirm_recovery_plan_id=rollback_plan["recovery_plan_id"],
+    )
+    rollback_manager = DeliveryManager(rollback_project)
+    rollback_state = require_state(
+        rollback_manager,
+        baseline,
+        installation="complete",
+        enablement="enabled",
+        artifact_id=baseline.artifact_id,
+    )
+    if rollback_manager.receipt_path.read_bytes() != baseline_receipt:
+        raise LifecycleError("checkpoint recovery did not restore the baseline receipt")
+    if not rollback_state["rollback_available"]:
+        raise LifecycleError("checkpoint recovery did not reinstate prior rollback topology")
+    assert_protected_unchanged(rollback_project, skills, rollback_protected)
+    passed.append("midmutation_checkpoint_rollback")
+    passed.append("prior_rollback_topology_reinstated")
+
+    stale_project = prepare_project(fixture / "projects" / "recovery-stale-plan")
+    stale_protected = tree_snapshot(stale_project, managed_skills=skills)
+    stale_manager = DeliveryManager(stale_project)
+    stale_manager._acquire_mutation_lock("install")
+    stale_metadata = json.loads(
+        stale_manager.mutation_owner_path.read_text(encoding="utf-8")
+    )
+    stale_metadata["process_id"] = 2_147_483_647
+    stale_manager.mutation_owner_path.write_text(
+        json.dumps(stale_metadata, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    stale_preview = run_cli("recover", stale_project)
+    stale_plan_id = stale_preview["plan"]["recovery"]["recovery_plan_id"]
+    stale_metadata["updated_at"] = "2099-01-01T00:00:00+00:00"
+    stale_manager.mutation_owner_path.write_text(
+        json.dumps(stale_metadata, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    stale_before = tree_snapshot(stale_project)
+    run_cli(
+        "recover",
+        stale_project,
+        apply=True,
+        confirm_recovery_plan_id=stale_plan_id,
+        expect_error="recovery_plan_mismatch",
+    )
+    if tree_snapshot(stale_project) != stale_before:
+        raise LifecycleError("stale recovery plan changed the project")
+    if stale_manager.recovery_lock_path.exists():
+        raise LifecycleError("stale recovery plan created a recovery lock")
+    assert_protected_unchanged(stale_project, skills, stale_protected)
+    passed.append("stale_plan_toctou_zero_write")
+
+    contention_project = prepare_project(
+        fixture / "projects" / "recovery-contention"
+    )
+    contention_protected = tree_snapshot(contention_project, managed_skills=skills)
+    run_cli("install", contention_project, apply=True)
+    mutation_event = events / "recovery-contention-mutation-ready.txt"
+    worker = start_concurrency_worker(
+        mode="before_checkpoint",
+        project=contention_project,
+        source=updated.root,
+        event=mutation_event,
+    )
+    try:
+        wait_for_worker_event(worker, mutation_event)
+    finally:
+        terminate_worker(worker)
+    contention_preview = run_cli("recover", contention_project)
+    contention_plan_id = contention_preview["plan"]["recovery"][
+        "recovery_plan_id"
+    ]
+    recovery_event = events / "recovery-contention-owner-ready.txt"
+    worker = start_concurrency_worker(
+        mode="recovery_hold",
+        project=contention_project,
+        source=updated.root,
+        event=recovery_event,
+        recovery_plan_id=contention_plan_id,
+    )
+    try:
+        wait_for_worker_event(worker, recovery_event)
+        held_snapshot = tree_snapshot(contention_project)
+        run_cli(
+            "recover",
+            contention_project,
+            apply=True,
+            confirm_recovery_plan_id=contention_plan_id,
+            expect_error="operation_blocked",
+        )
+        if tree_snapshot(contention_project) != held_snapshot:
+            raise LifecycleError("competing recovery changed the held recovery state")
+        held_state = DeliveryManager(contention_project).inspect(updated)
+        if (
+            held_state["recovery_lock"]["state"] != "active"
+            or not held_state["mutation_lock"]["present"]
+        ):
+            raise LifecycleError("recovery exclusion did not preserve both owners")
+        passed.append("second_recovery_zero_write")
+    finally:
+        terminate_worker(worker)
+    terminated_state = DeliveryManager(contention_project).inspect(updated)
+    if (
+        terminated_state["recovery_lock"]["state"] != "recovery_required"
+        or not terminated_state["mutation_lock"]["present"]
+        or terminated_state["recovery_lock"]["owner"] is None
+        or terminated_state["recovery_lock"]["owner"]["process_liveness"] == "alive"
+    ):
+        raise LifecycleError("terminated recovery did not retain dual lock evidence")
+    assert_protected_unchanged(contention_project, skills, contention_protected)
+    passed.append("terminated_recovery_retains_dual_evidence")
+
+    corrupt_project = prepare_project(
+        fixture / "projects" / "recovery-corrupt-checkpoint"
+    )
+    corrupt_protected = tree_snapshot(corrupt_project, managed_skills=skills)
+    run_cli("install", corrupt_project, apply=True)
+    corrupt_event = events / "recovery-corrupt-ready.txt"
+    worker = start_concurrency_worker(
+        mode="before_receipt",
+        project=corrupt_project,
+        source=updated.root,
+        event=corrupt_event,
+    )
+    try:
+        wait_for_worker_event(worker, corrupt_event)
+    finally:
+        terminate_worker(worker)
+    corrupt_manager = DeliveryManager(corrupt_project)
+    checkpoint = corrupt_manager.rollback_path / "checkpoint.json"
+    checkpoint.write_text("{broken\n", encoding="utf-8")
+    corrupt_before = tree_snapshot(corrupt_project)
+    run_cli(
+        "recover",
+        corrupt_project,
+        apply=True,
+        expect_error="operation_blocked",
+    )
+    if tree_snapshot(corrupt_project) != corrupt_before:
+        raise LifecycleError("corrupt checkpoint recovery changed the project")
+    assert_protected_unchanged(corrupt_project, skills, corrupt_protected)
+    passed.append("corrupt_checkpoint_stops_recovery")
+
+    return {"status": "pass", "cases": passed, "count": len(passed)}
+
+
 def write_evidence(path: Path, evidence: dict[str, Any]) -> None:
     target = guarded_fixture(path)
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -1017,13 +1288,19 @@ def parse_args() -> argparse.Namespace:
         help="run independent-process contention and termination cases",
     )
     parser.add_argument(
+        "--recovery",
+        action="store_true",
+        help="run confirmed interrupted-recovery and recovery-contention cases",
+    )
+    parser.add_argument(
         "--worker-mode",
-        choices=("before_checkpoint", "before_receipt"),
+        choices=("before_checkpoint", "before_receipt", "recovery_hold"),
         help=argparse.SUPPRESS,
     )
     parser.add_argument("--worker-project", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--worker-source", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--worker-event", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--worker-recovery-plan-id", help=argparse.SUPPRESS)
     parser.add_argument(
         "--evidence",
         type=Path,
@@ -1043,6 +1320,7 @@ def main() -> int:
                 project=args.worker_project,
                 source=args.worker_source,
                 event=args.worker_event,
+                recovery_plan_id=args.worker_recovery_plan_id,
             )
         fixture = reset_fixture(args.fixture) if args.prepare else guarded_fixture(args.fixture)
         if not fixture.is_dir():
@@ -1083,6 +1361,16 @@ def main() -> int:
             print(
                 "DELIVERY_CONCURRENCY_OK "
                 f"cases={evidence['concurrency']['count']}"
+            )
+        if args.recovery:
+            evidence["recovery"] = verify_interrupted_recovery(
+                fixture,
+                baseline,
+                updated,
+            )
+            print(
+                "DELIVERY_RECOVERY_OK "
+                f"cases={evidence['recovery']['count']}"
             )
         evidence_path = args.evidence or fixture / "evidence.json"
         write_evidence(evidence_path, evidence)

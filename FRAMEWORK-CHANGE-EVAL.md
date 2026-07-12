@@ -296,3 +296,70 @@ watch_closure:
 ```
 
 这次仍未修改七个 Skill、共享治理协议、source framework lock 或 target identity，因此不触发新的上游/外部 reviewer 同步。新增机制只覆盖项目级交付互斥和中断检测；force unlock、自动 recovery、真实项目与最终安装渠道继续保持未完成。
+
+## 2026-07-12 snapshot-bound 中断交付恢复
+
+```yaml
+current_framework_version: cotend-collaboration-v1.52
+change_type: workflow_behavior
+change_summary: 为项目级 interrupted delivery 增加只读恢复规划、独立 recovery exclusion、一次性精确确认和两个保守恢复分支
+intent: 在不把 dead PID 或旧 plan 当成授权的前提下，让用户可以理解并确认一个可证明的遗留锁释放或 checkpoint 回滚
+expected_benefit:
+  - AI 自动诊断并只推荐证据支持的唯一分支，用户不需要判断内部文件
+  - recovery_plan_id 绑定 mutation lock、receipt、managed payload、checkpoint topology、staging 和 temp 快照
+  - active owner 永不覆盖，unknown/invalid/corrupt/unexpected 现场不提供 force apply
+  - 原 mutation lock 保留到恢复后置状态验证通过，恢复再次中断仍有双锁与 checkpoint 证据
+possible_harm:
+  - v1 mutation lock 不含 intended target，部分实际可前向完成的现场仍会被保守回滚或阻断
+  - 同名文件路径内的用户修改属于 receipt-owned payload，checkpoint rollback 会恢复产品记录字节
+  - recovery lock 自身若在进程终止后遗留，首轮实现只能人工处理
+  - 断电、共享目录、网络文件系统和跨机器 PID 语义尚未验证
+affected_workflows:
+  - inspect_and_recover_delivery
+  - abandoned_prewrite_lock_release
+  - interrupted_checkpoint_rollback
+  - delivery_mutation_and_recovery_exclusion
+mechanism_budget:
+  added_context_surface: delivery_core_cli_harness_and_C16
+  ordinary_load_impact: one_additional_read_only_lock_state
+  ceremony_added: one_confirmation_per_exact_recovery_snapshot
+  duplication_check: extends_existing_C16_and_L29_lock_state
+  cheaper_alternative_considered: 直接按 dead PID 删除 mutation lock；因无法证明跨机器 owner、checkpoint 归属或 TOCTOU 而拒绝
+  retirement_or_thinning_trigger: mutation lock 后续记录完整 intended target 且平台提供同等原子 crash recovery 时，可合并 planner 或开放已证明的 forward branch
+  expected_failure_prevented: stale_lock_theft_wrong_checkpoint_restore_stale_confirmation_reuse_parallel_recovery_and_silent_evidence_loss
+validation_scenarios:
+  - scenario: unit recovery authority and safety boundaries
+    expected: exact confirmation、active/unknown stop、deterministic plan、corrupt/unexpected block 和成功清锁全部通过
+    validation_result_type: executed
+    result: unit_tests_47_of_47_passed
+  - scenario: independent-process interrupted recovery
+    expected: pre-checkpoint release、mid-mutation rollback、TOCTOU、第二 recovery、二次终止和 corrupt checkpoint 均按合同处理
+    validation_result_type: executed
+    result: DELIVERY_RECOVERY_OK_cases_8
+  - scenario: ordinary lifecycle regression
+    expected: 11 步常规、5 步 identity migration、8 类负向和 6 项 L29 并发证据保持通过
+    validation_result_type: executed
+    result: lifecycle_11_migration_5_negative_8_concurrency_6_recovery_8_passed
+  - scenario: forward completion after verifying or committing interruption
+    expected: 只有 intended target 独立证据完整时才允许
+    validation_result_type: deferred
+    result: mutation_lock_v1_does_not_capture_intended_target
+real_project_validation:
+  - scenario: 真实或共享项目中断恢复
+    expected: 用户可理解 exact effects，恢复不改项目真相或无关 Skill，并能在真实终止条件下复验
+    validation_result_type: deferred
+    result: real_project_boundary_remains_closed
+decision: watch
+rollback_triggers:
+  - missing_or_wrong_confirmation 产生任何持久写入
+  - active 或 unknown owner 被覆盖
+  - snapshot 变化后旧 plan 仍执行
+  - checkpoint rollback 删除 unexpected content、项目文件或无关 Skill
+  - 恢复失败同时丢失 mutation lock、recovery lock 和 checkpoint 证据
+review_after: 首次真实项目 recovery、mutation lock intended-target schema 升级或 power-loss 验证后
+watch_closure:
+  - keep_watch
+  - evidence: disposable_snapshot_bound_recovery_and_independent_process_interruption
+```
+
+该变更只修改 CoTend 项目级 delivery transaction，没有修改七个 Skill、共享协议、source framework lock 或 target artifact bytes，因此不触发上游 release 跟进或外部 reviewer 同步。它关闭 L29 留下的两个可证明恢复分支，不等于开放通用 force unlock、自动 unattended recovery 或真实项目恢复。

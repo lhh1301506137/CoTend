@@ -113,6 +113,27 @@ class DeliveryLifecycleTests(unittest.TestCase):
             and not relative.startswith(".agents/skills/user-skill/")
         }
 
+    def abandon_mutation_lock(self, *, phase: str) -> dict[str, object]:
+        metadata = json.loads(
+            self.manager.mutation_owner_path.read_text(encoding="utf-8")
+        )
+        metadata.update({"process_id": 2_147_483_647, "phase": phase})
+        self.manager.mutation_owner_path.write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        return metadata
+
+    def interrupt_update_after_payload_write(self) -> Artifact:
+        updated = self.make_updated_artifact()
+        lease = self.manager._acquire_mutation_lock("update")
+        self.manager._update_mutation_phase(lease, "checkpointing")
+        self.manager._create_checkpoint("update")
+        self.manager._update_mutation_phase(lease, "mutating")
+        self.manager._replace_with_artifact(updated, enabled=True)
+        self.abandon_mutation_lock(phase="mutating")
+        return updated
+
     def test_artifact_identity_dry_run_and_idempotent_install(self) -> None:
         self.assertEqual(len(self.artifact.skills), 7)
         self.assertEqual(len(self.artifact.files), 30)
@@ -976,6 +997,284 @@ class DeliveryLifecycleTests(unittest.TestCase):
         self.assertEqual(state["artifact_id"], updated.artifact_id)
         self.assertEqual(state["candidate_relation"], "same_as_current")
         self.assertEqual(state["mutation_lock"]["state"], "none")
+        self.assert_protected_unchanged()
+
+    def test_recovery_preview_requires_exact_confirmation_before_any_write(self) -> None:
+        self.manager._acquire_mutation_lock("install")
+        self.abandon_mutation_lock(phase="planning")
+
+        preview = self.manager.execute("recover")
+        plan_id = preview["plan"]["recovery"]["recovery_plan_id"]
+        cli_preview = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "cotend_delivery.py"),
+                "recover",
+                "--project",
+                str(self.project),
+                "--repository",
+                str(self.temp_root / "missing-repository"),
+            ],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        self.assertEqual(
+            json.loads(cli_preview.stdout)["plan"]["recovery"]["recovery_plan_id"],
+            plan_id,
+        )
+        self.assertEqual(
+            preview["plan"]["recovery"]["branch"],
+            "release_abandoned_lock",
+        )
+        self.assertTrue(preview["plan"]["recovery"]["requires_confirmation"])
+        cloned_project = self.temp_root / "cloned-recovery-target"
+        shutil.copytree(self.project, cloned_project)
+        cloned_plan_id = DeliveryManager(cloned_project).execute("recover")["plan"][
+            "recovery"
+        ]["recovery_plan_id"]
+        self.assertNotEqual(cloned_plan_id, plan_id)
+        before = tree_manifest(self.project)
+
+        with self.assertRaisesRegex(DeliveryError, "exact previewed"):
+            self.manager.execute("recover", apply=True)
+        self.assertEqual(tree_manifest(self.project), before)
+        with self.assertRaisesRegex(DeliveryError, "does not match"):
+            self.manager.execute(
+                "recover",
+                apply=True,
+                confirm_recovery_plan_id="0" * 64,
+            )
+        self.assertEqual(tree_manifest(self.project), before)
+
+        recovered = self.manager.execute(
+            "recover",
+            apply=True,
+            confirm_recovery_plan_id=plan_id,
+        )
+        self.assertEqual(recovered["branch"], "release_abandoned_lock")
+        self.assertFalse(self.manager.mutation_lock_path.exists())
+        self.assertFalse(self.manager.recovery_lock_path.exists())
+        self.assertEqual(recovered["state_after"]["transition"], "stable")
+        self.assert_protected_unchanged()
+
+    def test_recovery_never_overrides_active_or_unknown_owner(self) -> None:
+        self.manager._acquire_mutation_lock("install")
+        active = self.manager.plan("recover")
+        self.assertFalse(active["allowed"])
+        self.assertEqual(active["reason"], "mutation_owner_active")
+        self.assertEqual(
+            active["recovery"]["recommendation"],
+            "wait_for_active_owner",
+        )
+
+        self.abandon_mutation_lock(phase="planning")
+        with mock.patch(
+            "cotend_delivery.core._process_liveness",
+            return_value="unknown",
+        ):
+            unknown = self.manager.plan("recover")
+        self.assertFalse(unknown["allowed"])
+        self.assertEqual(
+            unknown["reason"],
+            "mutation_owner_liveness_unverifiable",
+        )
+        self.assertTrue(self.manager.mutation_lock_path.is_dir())
+
+        conflict_project = self.temp_root / "phase-checkpoint-conflict"
+        conflict_project.mkdir()
+        conflict = DeliveryManager(conflict_project)
+        conflict._acquire_mutation_lock("install")
+        conflict._create_checkpoint("install")
+        metadata = json.loads(conflict.mutation_owner_path.read_text(encoding="utf-8"))
+        metadata.update({"process_id": 2_147_483_647, "phase": "planning"})
+        conflict.mutation_owner_path.write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        contradictory = conflict.plan("recover")
+        self.assertFalse(contradictory["allowed"])
+        self.assertIn(
+            "checkpoint_belongs_to_mutation",
+            contradictory["recovery"]["diagnostics"],
+        )
+        self.assert_protected_unchanged()
+
+    def test_recovery_rolls_back_interrupted_update_and_reinstates_prior_checkpoint(
+        self,
+    ) -> None:
+        self.install()
+        baseline_receipt = self.load_receipt()
+        baseline_payload = self.managed_payload_manifest()
+        updated = self.interrupt_update_after_payload_write()
+        interrupted = self.manager.inspect(updated)
+        self.assertEqual(interrupted["mutation_lock"]["state"], "recovery_required")
+        self.assertEqual(interrupted["artifact_id"], updated.artifact_id)
+        self.assertTrue(self.manager.previous_rollback_path.is_dir())
+
+        first = self.manager.execute("recover")
+        second = self.manager.execute("recover")
+        self.assertEqual(
+            first["plan"]["recovery"]["recovery_plan_id"],
+            second["plan"]["recovery"]["recovery_plan_id"],
+        )
+        self.assertEqual(
+            first["plan"]["recovery"]["branch"],
+            "rollback_interrupted_transition",
+        )
+        recovered = self.manager.execute(
+            "recover",
+            apply=True,
+            confirm_recovery_plan_id=first["plan"]["recovery"][
+                "recovery_plan_id"
+            ],
+        )
+
+        self.assertEqual(recovered["branch"], "rollback_interrupted_transition")
+        self.assertEqual(self.load_receipt(), baseline_receipt)
+        self.assertEqual(self.managed_payload_manifest(), baseline_payload)
+        self.assertTrue(self.manager.rollback_path.is_dir())
+        self.assertFalse(self.manager.previous_rollback_path.exists())
+        self.assertFalse(self.manager.mutation_lock_path.exists())
+        self.assertFalse(self.manager.recovery_lock_path.exists())
+        self.assert_protected_unchanged()
+
+    def test_stale_recovery_plan_is_rejected_without_recovery_lock_write(self) -> None:
+        self.manager._acquire_mutation_lock("install")
+        self.abandon_mutation_lock(phase="planning")
+        preview = self.manager.execute("recover")
+        stale_plan_id = preview["plan"]["recovery"]["recovery_plan_id"]
+        metadata = json.loads(
+            self.manager.mutation_owner_path.read_text(encoding="utf-8")
+        )
+        metadata["updated_at"] = "2099-01-01T00:00:00+00:00"
+        self.manager.mutation_owner_path.write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        before = tree_manifest(self.project)
+
+        with self.assertRaisesRegex(DeliveryError, "does not match"):
+            self.manager.execute(
+                "recover",
+                apply=True,
+                confirm_recovery_plan_id=stale_plan_id,
+            )
+        self.assertEqual(tree_manifest(self.project), before)
+        self.assertFalse(self.manager.recovery_lock_path.exists())
+        self.assertTrue(self.manager.mutation_lock_path.is_dir())
+
+    def test_recovery_blocks_corrupt_checkpoint_and_unexpected_managed_content(
+        self,
+    ) -> None:
+        self.install()
+        updated = self.interrupt_update_after_payload_write()
+        checkpoint = self.manager.rollback_path / "checkpoint.json"
+        checkpoint.write_text("{broken\n", encoding="utf-8")
+        corrupt_before = tree_manifest(self.project)
+
+        corrupt = self.manager.plan("recover")
+        self.assertFalse(corrupt["allowed"])
+        self.assertIn("checkpoint_invalid", corrupt["recovery"]["diagnostics"])
+        with self.assertRaisesRegex(DeliveryError, "manual_resolution"):
+            self.manager.execute("recover", apply=True)
+        self.assertEqual(tree_manifest(self.project), corrupt_before)
+        self.assertTrue(self.manager.mutation_lock_path.is_dir())
+
+        second_project = self.temp_root / "unexpected-recovery-project"
+        second_project.mkdir()
+        second = DeliveryManager(second_project)
+        second.execute("install", self.artifact, apply=True)
+        lease = second._acquire_mutation_lock("update")
+        second._update_mutation_phase(lease, "checkpointing")
+        second._create_checkpoint("update")
+        second._update_mutation_phase(lease, "mutating")
+        second._replace_with_artifact(updated, enabled=True)
+        extra = second.enabled_root / "cotend-init" / "USER-EXTENSION.md"
+        extra.write_text("preserve me\n", encoding="utf-8")
+        metadata = json.loads(second.mutation_owner_path.read_text(encoding="utf-8"))
+        metadata.update({"process_id": 2_147_483_647, "phase": "mutating"})
+        second.mutation_owner_path.write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+        unexpected = second.plan("recover")
+        self.assertFalse(unexpected["allowed"])
+        self.assertIn(
+            extra.relative_to(second_project).as_posix(),
+            unexpected["recovery"]["unexpected_owned_paths"],
+        )
+        self.assertEqual(extra.read_text(encoding="utf-8"), "preserve me\n")
+
+    def test_recovery_verification_failure_retains_checkpoint_and_both_locks(
+        self,
+    ) -> None:
+        self.install()
+        self.interrupt_update_after_payload_write()
+        checkpoint_before = tree_manifest(self.manager.rollback_path)
+        preview = self.manager.execute("recover")
+        plan_id = preview["plan"]["recovery"]["recovery_plan_id"]
+
+        with mock.patch.object(
+            self.manager,
+            "_verify_recovery_rollback_postcondition",
+            side_effect=DeliveryError(
+                "injected_recovery_verification_failure",
+                "injected recovery verification failure",
+            ),
+        ):
+            with self.assertRaisesRegex(DeliveryError, "available lock"):
+                self.manager.execute(
+                    "recover",
+                    apply=True,
+                    confirm_recovery_plan_id=plan_id,
+                )
+
+        state = self.manager.inspect(self.artifact)
+        self.assertEqual(state["mutation_lock"]["state"], "recovery_required")
+        self.assertEqual(state["recovery_lock"]["state"], "recovery_required")
+        self.assertEqual(
+            state["recovery_lock"]["owner"]["phase"],
+            "recovery_required",
+        )
+        self.assertEqual(tree_manifest(self.manager.rollback_path), checkpoint_before)
+        self.assertTrue(self.manager.previous_rollback_path.is_dir())
+        self.assert_protected_unchanged()
+
+    def test_active_recovery_lock_blocks_second_recovery_and_normal_mutation(
+        self,
+    ) -> None:
+        self.manager._acquire_mutation_lock("install")
+        self.abandon_mutation_lock(phase="planning")
+        plan = self.manager.plan("recover")
+        recovery_lease = self.manager._acquire_recovery_lock(plan)
+        try:
+            state = self.manager.inspect(self.artifact)
+            self.assertEqual(state["recovery_lock"]["state"], "active")
+            second = self.manager.plan("recover")
+            self.assertFalse(second["allowed"])
+            self.assertEqual(second["reason"], "recovery_lock_active")
+            with self.assertRaisesRegex(DeliveryError, "recovery_lock_active"):
+                self.manager.execute("install", self.artifact, apply=True)
+            with self.assertRaisesRegex(DeliveryError, "Another recovery"):
+                self.manager._acquire_recovery_lock(plan)
+        finally:
+            self.manager._update_recovery_phase(recovery_lease, "completed")
+            self.manager._release_recovery_lock(recovery_lease)
+        self.assertTrue(self.manager.mutation_lock_path.is_dir())
+
+        self.manager.recovery_lock_path.mkdir()
+        self.manager.recovery_owner_path.write_text("{broken\n", encoding="utf-8")
+        invalid_before = tree_manifest(self.project)
+        invalid = self.manager.plan("recover")
+        self.assertFalse(invalid["allowed"])
+        self.assertEqual(invalid["reason"], "recovery_lock_stale_or_unverifiable")
+        with self.assertRaisesRegex(DeliveryError, "stale_or_unverifiable"):
+            self.manager.execute("recover", apply=True)
+        self.assertEqual(tree_manifest(self.project), invalid_before)
         self.assert_protected_unchanged()
 
 

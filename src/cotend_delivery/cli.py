@@ -41,6 +41,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Apply the exact printed plan; without this flag no files are changed",
     )
+    parser.add_argument(
+        "--confirm-recovery-plan-id",
+        help="Confirm one exact snapshot-bound recovery plan; valid only with recover --apply",
+    )
     return parser.parse_args(argv)
 
 
@@ -95,6 +99,7 @@ def main(argv: list[str] | None = None) -> int:
             args.operation,
             candidate,
             apply=args.apply,
+            confirm_recovery_plan_id=args.confirm_recovery_plan_id,
         )
         if candidate_diagnostic is not None:
             result["candidate_diagnostic"] = candidate_diagnostic
