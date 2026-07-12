@@ -90,3 +90,69 @@ watch_closure:
 ```
 
 仓库源树 adoption 和项目级 Codex 载体可以保留，但不能据此宣称 CoTend 已完成 Desktop 界面、安装产品化或真实用户验收。Claude、Plugin/Marketplace 和分享包同步继续延后。
+
+## 2026-07-12 项目级交付生命周期核心
+
+```yaml
+current_framework_version: cotend-collaboration-v1.52
+change_type: workflow_behavior
+change_summary: 新增渠道中立的 Codex 项目级交付核心与开发预览 CLI，覆盖 inspect、install、update、repair、enable、disable、uninstall 和 rollback
+intent: 让已采用的七 Skill 源树可以在 disposable 项目中按精确所有权安全写入、检查、恢复和移除，同时不提前选择最终安装渠道
+expected_benefit:
+  - 修改操作默认 dry-run，显式 apply 后才写入
+  - receipt 只声明七个受管 Skill 与精确文件哈希，未知碰撞、额外文件、双载体残留和身份冲突均停止
+  - 每次修改建立一步 checkpoint，受控异常会恢复当时的实际状态，包括 repair 前的受损状态
+  - disable、uninstall 和 rollback 不依赖候选仓库，inspect 在候选不可用时仍报告当前状态
+possible_harm:
+  - CLI 可能被误认为面向小白的最终安装体验
+  - receipt 与 checkpoint 实现错误可能覆盖用户扩展或产生虚假恢复成功
+  - 单进程验证不能证明并发写入或进程被强制终止后的恢复
+affected_workflows:
+  - codex_project_delivery_inspection
+  - install_update_repair_enable_disable_uninstall
+  - one_step_rollback_and_exception_containment
+deviations:
+  - none_from_L24_confirmed_scope
+mechanism_budget:
+  added_context_surface: script
+  ordinary_load_impact: none
+  ceremony_added: low
+  duplication_check: new_capability
+  cheaper_alternative_considered: 直接复制七个 Skill；因无法证明所有权、dry-run、修复、卸载和回滚边界而拒绝
+  retirement_or_thinning_trigger: Codex 提供能保留同等 receipt、所有权和回滚语义的原生项目级交付 API 后，可收缩自建文件事务层
+  expected_failure_prevented: 覆盖无关 Skill、删除用户文件、安装一半却报告成功、损坏 checkpoint 后继续回滚和同 ID 不同字节更新
+validation_scenarios:
+  - scenario: 完整项目级交付生命周期
+    expected: 11 步正向操作完成，七 Skill/30 文件精确，所有非 CoTend 路径不变
+    validation_result_type: executed
+    result: DELIVERY_LIFECYCLE_OK_steps_11_skills_7_files_30
+  - scenario: 碰撞、额外文件、checkpoint 损坏、receipt 损坏和写入故障
+    expected: 六类负向场景停止或恢复，用户路径不变
+    validation_result_type: executed
+    result: DELIVERY_LIFECYCLE_NEGATIVE_OK_cases_6
+  - scenario: 单元级状态与故障矩阵
+    expected: dry-run、幂等、禁用状态、身份冲突、临时文件清理和精确 repair rollback 均通过
+    validation_result_type: executed
+    result: unittest_21_of_21_passed
+  - scenario: 固定 release、隔离 carrier、旧可写生命周期和公开仓库契约回归
+    expected: 既有采用与平台边界不回归
+    validation_result_type: executed
+    result: adopted_7_30_19_carrier_4_negative_writable_9_negative_repository_check_passed
+real_project_validation:
+  - scenario: 在真实本地项目使用交付核心并调用 CoTend
+    expected: 用户文件不变、Skill 可发现调用、更新和卸载可恢复
+    validation_result_type: deferred
+    result: L22_live_and_real_project_boundary_remains_closed
+decision: watch
+rollback_triggers:
+  - 任一受保护项目路径在成功或失败操作后变化
+  - checkpoint 或 postcondition 不匹配却仍报告成功
+  - CLI 被产品界面误用且导致用户无法理解操作影响
+  - 并发或强制终止验证证明当前事务模型无法安全恢复
+review_after: 首次真实项目写入、live 调用和并发或强制终止恢复验证后
+watch_closure:
+  - keep_watch
+  - evidence: deterministic_single_process_project_delivery
+```
+
+当前实现可作为 P4/P6 的项目级底层继续使用，但不是最终小白安装渠道，也不证明用户级/全局安装、Plugin、Marketplace、真实项目调用、并发写入或强制终止恢复已经完成。此次没有修改七个 CoTend Skill 或上游共享行为，因此不触发 Claude/分享包同步。

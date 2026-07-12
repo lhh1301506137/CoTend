@@ -137,6 +137,48 @@ EXPECTED_CODEX_CARRIER_FIXTURE_FILES = {
     "schemas/init-delegation.schema.json",
     "schemas/pending-decision.schema.json",
 }
+EXPECTED_DELIVERY_PRODUCT_FILES = {
+    "scripts/cotend_delivery.py",
+    "scripts/verify_delivery_lifecycle.py",
+    "src/cotend_delivery/__init__.py",
+    "src/cotend_delivery/__main__.py",
+    "src/cotend_delivery/cli.py",
+    "src/cotend_delivery/core.py",
+    "tests/test_cotend_delivery.py",
+}
+EXPECTED_DELIVERY_OPERATIONS = {
+    "inspect",
+    "install",
+    "update",
+    "repair",
+    "enable",
+    "disable",
+    "uninstall",
+    "rollback",
+}
+EXPECTED_DELIVERY_TESTS = {
+    "test_artifact_identity_dry_run_and_idempotent_install",
+    "test_cli_defaults_to_dry_run",
+    "test_commit_cleanup_failure_restores_prior_state",
+    "test_candidate_free_operations_ignore_missing_repository",
+    "test_corrupt_checkpoint_is_rejected_before_mutation",
+    "test_disable_enable_preserves_unrelated_project_content",
+    "test_disabled_lifecycle_preserves_enablement",
+    "test_failed_update_restores_prior_state_and_prior_rollback",
+    "test_invalid_disabled_carrier_boundary_is_rejected",
+    "test_invalid_receipt_blocks_mutation_but_allows_rollback",
+    "test_inspect_reports_current_state_when_repository_is_missing",
+    "test_repair_failure_restores_exact_damaged_state",
+    "test_repair_rollback_restores_exact_damaged_state",
+    "test_repair_restores_modified_and_missing_owned_files",
+    "test_same_artifact_id_with_different_bytes_is_blocked",
+    "test_shadow_payload_blocks_mutation",
+    "test_unexpected_file_blocks_repair_and_uninstall",
+    "test_uninstall_removes_only_owned_files_and_can_rollback",
+    "test_unowned_collision_blocks_install",
+    "test_unowned_delivery_state_blocks_install",
+    "test_update_and_one_step_rollback",
+}
 
 # checker-self-scan-allowlist-start
 LOCAL_ONLY_PATHS = {
@@ -1001,7 +1043,7 @@ def productization_truth_errors(
 
     exact_roadmap_metadata = {
         "route_type": {"source_aware_rename_first_productization"},
-        "current_phase": {"P4-isolated-codex-carrier-validation"},
+        "current_phase": {"P4-codex-project-delivery-core"},
     }
     for key, expected in exact_roadmap_metadata.items():
         if metadata_values(roadmap_text, key) != expected:
@@ -1803,6 +1845,87 @@ def contract_relationship_errors(index_text: str, specs: dict[str, str]) -> list
     return errors
 
 
+def delivery_product_errors(candidates: set[str]) -> list[str]:
+    errors: list[str] = []
+    missing = EXPECTED_DELIVERY_PRODUCT_FILES - candidates
+    if missing:
+        errors.append(f"delivery product files are missing or ignored: {sorted(missing)}")
+
+    package_files = {
+        path
+        for path in candidates
+        if path.startswith("src/cotend_delivery/") and path.endswith(".py")
+    }
+    expected_package_files = {
+        path
+        for path in EXPECTED_DELIVERY_PRODUCT_FILES
+        if path.startswith("src/cotend_delivery/")
+    }
+    if package_files != expected_package_files:
+        errors.append("delivery package inventory drift")
+
+    core_path = "src/cotend_delivery/core.py"
+    if core_path in candidates:
+        core_text = read(core_path)
+        operations = re.search(
+            r"^OPERATIONS = \{(?P<body>.*?)^\}",
+            core_text,
+            re.MULTILINE | re.DOTALL,
+        )
+        actual_operations = (
+            set(re.findall(r'^\s+"([a-z_]+)",\s*$', operations.group("body"), re.MULTILINE))
+            if operations
+            else set()
+        )
+        if actual_operations != EXPECTED_DELIVERY_OPERATIONS:
+            errors.append(f"delivery operation inventory drift: {sorted(actual_operations)}")
+        for marker in (
+            "EXPECTED_FILE_COUNT = 30",
+            'self.enabled_root = self.agents_root / "skills"',
+            'self.state_root = self.agents_root / ".cotend-delivery"',
+            "include_previous_rollback=False",
+            "transition_failed_rolled_back",
+            "receipt_invalid",
+            "unowned_collision",
+            "symlink_boundary",
+        ):
+            if marker not in core_text:
+                errors.append(f"delivery core contract marker is missing: {marker}")
+
+    cli_path = "src/cotend_delivery/cli.py"
+    if cli_path in candidates:
+        cli_text = read(cli_path)
+        for marker in (
+            '"--project"',
+            '"--apply"',
+            "Mutation commands are dry-run unless --apply is provided.",
+        ):
+            if marker not in cli_text:
+                errors.append(f"delivery CLI contract marker is missing: {marker}")
+
+    harness_path = "scripts/verify_delivery_lifecycle.py"
+    if harness_path in candidates:
+        harness_text = read(harness_path)
+        for marker in (
+            "guarded_fixture",
+            "DELIVERY_LIFECYCLE_OK",
+            "DELIVERY_LIFECYCLE_NEGATIVE_OK",
+            "transition_failure_atomicity",
+        ):
+            if marker not in harness_text:
+                errors.append(f"delivery lifecycle harness marker is missing: {marker}")
+
+    tests_path = "tests/test_cotend_delivery.py"
+    if tests_path in candidates:
+        actual_tests = set(
+            re.findall(r"^    def (test_[a-z0-9_]+)\(", read(tests_path), re.MULTILINE)
+        )
+        missing_tests = EXPECTED_DELIVERY_TESTS - actual_tests
+        if missing_tests:
+            errors.append(f"required delivery unit tests are missing: {sorted(missing_tests)}")
+    return errors
+
+
 def main() -> int:
     errors: list[str] = []
     candidates = git_candidates()
@@ -1949,6 +2072,7 @@ def main() -> int:
         if metadata_values(spec_text, "product_baseline_version") != {"0.1.0"}:
             errors.append(f"{spec_path}: product baseline mismatch")
     errors.extend(contract_relationship_errors(index_text, spec_texts))
+    errors.extend(delivery_product_errors(candidates))
 
     journey_path = "docs/NOVICE-JOURNEYS.md"
     journey_text = ""

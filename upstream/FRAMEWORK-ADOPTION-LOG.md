@@ -49,13 +49,21 @@ push_release_or_publish: not_performed
 - `executed`：四个受保护第三方文件的 staged blob 与固定 tag blob 哈希一致；跨平台 checkout 使用 LF 属性。
 - `executed`：主仓库检查与固定上游来源复验通过。
 - `inspection`：活动 CoTend 名称、协议、agent 元数据、委派引用、第三方 notices 和许可证已逐项检查。
-- `deferred`：真实 Codex 安装、菜单发现、自然语言触发、更新/卸载/回滚、Plugin/Marketplace 和 Claude 载体。
+- `executed`：后续项目级交付核心已在 disposable fixture 中完成 install、update、repair、enable、disable、uninstall 和 rollback；单元测试套件、11 步正向生命周期及 6 类负向/故障恢复场景通过。
+- `executed`：每一步都对非 CoTend 所有路径做快照比较，用户项目文件和无关 Skill 保持不变；修改操作默认 dry-run，必须显式 `--apply`。
+- `deferred`：真实项目写入、live 模型调用、Desktop 菜单发现、自然语言触发、用户/全局安装、最终小白安装渠道、Plugin/Marketplace 和 Claude 载体。
 
 ### 锚点与更新规则
 
 `resulting_CoTend_commit: containing_commit` 表示采用提交由 Git 中最近一次修改 `upstream/framework.lock.json` 的提交解析。lock 不嵌入自身提交哈希。任何后续 adoption 或 upgrade 若修改 lock，必须在同一提交同时修改 `codex-skills/` 和本记录；普通文档提交不得单独移动该锚点。
 
-本记录只确认仓库内 Codex Skill 源树已采用并通过静态与隔离验证，不表示已写入用户全局 Skill 目录，也不授权 push、发布或公开分发。
+前述 release adoption 锚点只确认仓库内 Codex Skill 源树已采用并通过静态与隔离验证；后续项目级交付核心证据单列如下。两者都不表示已写入用户全局 Skill 目录，也不授权 push、发布或公开分发。
+
+### 项目级交付核心边界
+
+`src/cotend_delivery/` 现在提供渠道中立的项目级交付底层，目标载体为 `.agents/skills/`，adapter 自有 receipt 与回滚状态位于 `.agents/.cotend-delivery/`。该状态只描述产品文件所有权与交付事务，不取代 C03 项目真相。
+
+当前 `scripts/cotend_delivery.py` 是单进程开发和预览适配器，不是最终用户安装体验。它不联网、不选择 Plugin 或 Marketplace、不修改全局 Skills，也没有在真实项目执行；并发写入与进程被强制终止后的自动恢复尚未验证。这些边界仍由后续 P4/P6 验证关闭。
 
 ## release-2026-07-11-3-isolated-codex-carrier-validation
 

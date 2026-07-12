@@ -171,9 +171,12 @@
       "owners": [
         "codex-skills/cotend-init/SKILL.md",
         "codex-skills/cotend-project-init/SKILL.md",
-        "codex-skills/cotend-collaboration/references/release-hardening.md"
+        "codex-skills/cotend-collaboration/references/release-hardening.md",
+        "src/cotend_delivery/core.py",
+        "src/cotend_delivery/cli.py",
+        "scripts/verify_delivery_lifecycle.py"
       ],
-      "deferred_gap": "live install, update, uninstall, rollback, Plugin and Marketplace carriers remain outside L20"
+      "deferred_gap": "the deterministic single-process project-scoped lifecycle is implemented; real-project writes, live model invocation, concurrent writers, hard-process interruption recovery, user/global scope, platform migration, the final novice installation channel, Plugin, and Marketplace carriers remain unverified"
     },
     {
       "capability_id": "C17",
