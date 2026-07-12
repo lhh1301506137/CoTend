@@ -1978,7 +1978,9 @@ def plugin_namespace_candidate_errors(
         "adopted_skill_files": {"30"},
         "package_files_per_candidate": {"36"},
         "tracked_production_plugin": {"none"},
-        "final_namespace_authority": {"pending_user_confirmation"},
+        "final_namespace_authority": {
+            "candidate_baseline_confirmed_final_namespace_pending"
+        },
     }.items():
         if metadata_values(evidence_text, key) != expected:
             errors.append(f"Plugin namespace evidence mismatch: {key}")
@@ -2004,8 +2006,9 @@ def plugin_namespace_candidate_errors(
             errors.append(f"Plugin namespace evidence is missing: {marker}")
 
     for key, expected in {
-        "status": {"reviewed_recommendation_pending_user_confirmation"},
+        "status": {"user_confirmed_candidate_baseline"},
         "recommendation": {"N3_display_led_preserve_first"},
+        "candidate_baseline_confirmed": {"true"},
         "production_namespace_confirmed": {"false"},
         "production_package_authorized": {"false"},
         "desktop_surface_verified": {"false"},
@@ -2020,6 +2023,7 @@ def plugin_namespace_candidate_errors(
         "必须用 Desktop 实际验证",
         "上游变更提案",
         "N2 的 validator 与 discovery 通过不能升级为",
+        "用户确认后的状态",
     ):
         if marker not in evaluation_text:
             errors.append(f"Plugin namespace evaluation is missing: {marker}")

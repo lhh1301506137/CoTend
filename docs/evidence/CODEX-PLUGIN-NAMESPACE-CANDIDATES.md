@@ -16,7 +16,7 @@ metadata:
   adopted_skill_files: 30
   package_files_per_candidate: 36
   tracked_production_plugin: none
-  final_namespace_authority: pending_user_confirmation
+  final_namespace_authority: candidate_baseline_confirmed_final_namespace_pending
 ```
 
 ## 结论
