@@ -150,6 +150,22 @@ EXPECTED_PLUGIN_FIXTURE_TESTS = {
     "test_stat_only_snapshot_never_contains_content_digest",
     "test_static_fixture_and_twelve_negative_mutations",
 }
+EXPECTED_PLUGIN_NAMESPACE_FILES = {
+    "docs/CODEX-PLUGIN-NAMESPACE-EVALUATION.md",
+    "docs/evidence/CODEX-PLUGIN-NAMESPACE-CANDIDATES.md",
+    "scripts/evaluate_plugin_namespace_candidates.py",
+    "tests/test_plugin_namespace_candidates.py",
+}
+EXPECTED_PLUGIN_NAMESPACE_TESTS = {
+    "test_candidate_state_and_write_roots_are_independent",
+    "test_display_led_overlay_reuses_n1_bytes_and_marks_limits",
+    "test_identifier_categories_distinguish_reference_shapes",
+    "test_protected_boundary_excludes_only_codex_container_metadata",
+    "test_remove_payloads_require_exact_candidate_identity",
+    "test_short_name_map_preserves_companion_names",
+    "test_source_identifier_inventory_is_exact",
+    "test_static_candidates_quantify_transform_and_residual_debt",
+}
 EXPECTED_DELIVERY_PRODUCT_FILES = {
     "delivery/codex-artifact.lock.json",
     "scripts/cotend_delivery.py",
@@ -1908,6 +1924,108 @@ def isolated_codex_plugin_fixture_errors(
     return errors
 
 
+def plugin_namespace_candidate_errors(
+    evidence_text: str,
+    evaluation_text: str,
+    candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    missing = EXPECTED_PLUGIN_NAMESPACE_FILES - candidates
+    if missing:
+        errors.append(
+            f"Plugin namespace evaluation artifacts are missing: {sorted(missing)}"
+        )
+        return errors
+
+    verifier_text = read("scripts/evaluate_plugin_namespace_candidates.py")
+    for marker in (
+        'version="0.0.0-dev.2+codex.namespace-preserve"',
+        'version="0.0.0-dev.2+codex.namespace-short"',
+        "SHORT_NAME_MAP",
+        "VOLATILE_CONTAINER_LABELS",
+        "assert_protected_product_state_unchanged",
+        "verify_candidate_isolation",
+        "validate_plugin_remove",
+        "validate_marketplace_remove",
+        "display_led_overlay",
+        "--prepare and --execute are both required",
+        "residual_migration_review_required",
+    ):
+        if marker not in verifier_text:
+            errors.append(f"Plugin namespace verifier is missing: {marker}")
+
+    test_text = read("tests/test_plugin_namespace_candidates.py")
+    actual_tests = set(
+        re.findall(r"^\s+def (test_[a-z0-9_]+)\(", test_text, re.MULTILINE)
+    )
+    missing_tests = EXPECTED_PLUGIN_NAMESPACE_TESTS - actual_tests
+    if missing_tests:
+        errors.append(
+            f"Plugin namespace tests are missing: {sorted(missing_tests)}"
+        )
+
+    for key, expected in {
+        "status": {"passed_two_physical_candidates"},
+        "evidence_type": {"executed_with_bounded_inspection"},
+        "codex_version": {"codex-cli_0.144.1"},
+        "physical_candidates": {"2"},
+        "metadata_overlays": {"1"},
+        "source_identifier_occurrences": {"77"},
+        "source_identifier_files": {"15"},
+        "isolated_write_roots_per_candidate": {"15"},
+        "lifecycle_steps_per_candidate": {"10"},
+        "adopted_skills": {"7"},
+        "adopted_skill_files": {"30"},
+        "package_files_per_candidate": {"36"},
+        "tracked_production_plugin": {"none"},
+        "final_namespace_authority": {"pending_user_confirmation"},
+    }.items():
+        if metadata_values(evidence_text, key) != expected:
+            errors.append(f"Plugin namespace evidence mismatch: {key}")
+
+    for marker in (
+        "15 个源文件中共出现 77 次",
+        "N1-preserve",
+        "cotend:cotend-init",
+        "移动路径：0；改写字节文件：0",
+        "N2-short",
+        "cotend:init",
+        "28 个文件路径移动、10 个文件字节变化",
+        "逐字节差异只包含这 10 次预期字符串替换",
+        "仍有 67 处原 ID",
+        "仍有 60 处需要语义复核",
+        "N3-display-led",
+        "增加的 package bytes 为 0",
+        "Desktop 和自然语言行为为 `not_run`",
+        "最终两个隔离环境中均没有已安装 Plugin",
+        "PLUGIN_NAMESPACE_EVALUATION_OK physical_candidates=2",
+    ):
+        if marker not in evidence_text:
+            errors.append(f"Plugin namespace evidence is missing: {marker}")
+
+    for key, expected in {
+        "status": {"reviewed_recommendation_pending_user_confirmation"},
+        "recommendation": {"N3_display_led_preserve_first"},
+        "production_namespace_confirmed": {"false"},
+        "production_package_authorized": {"false"},
+        "desktop_surface_verified": {"false"},
+        "shared_behavior_change_authorized": {"false"},
+    }.items():
+        if metadata_values(evaluation_text, key) != expected:
+            errors.append(f"Plugin namespace evaluation mismatch: {key}")
+
+    for marker in (
+        "N3 display-led preserve-first",
+        "不是最终 namespace 定案",
+        "必须用 Desktop 实际验证",
+        "上游变更提案",
+        "N2 的 validator 与 discovery 通过不能升级为",
+    ):
+        if marker not in evaluation_text:
+            errors.append(f"Plugin namespace evaluation is missing: {marker}")
+    return errors
+
+
 def contract_relationship_errors(index_text: str, specs: dict[str, str]) -> list[str]:
     errors: list[str] = []
     dependencies = index_dependencies(index_text)
@@ -2319,6 +2437,26 @@ def main() -> int:
         errors.extend(
             isolated_codex_plugin_fixture_errors(
                 read(plugin_fixture_evidence_path),
+                candidates,
+            )
+        )
+
+    plugin_namespace_evidence_path = (
+        "docs/evidence/CODEX-PLUGIN-NAMESPACE-CANDIDATES.md"
+    )
+    plugin_namespace_evaluation_path = (
+        "docs/CODEX-PLUGIN-NAMESPACE-EVALUATION.md"
+    )
+    if (
+        plugin_namespace_evidence_path not in candidates
+        or plugin_namespace_evaluation_path not in candidates
+    ):
+        errors.append("Plugin namespace candidate evidence is missing or ignored")
+    else:
+        errors.extend(
+            plugin_namespace_candidate_errors(
+                read(plugin_namespace_evidence_path),
+                read(plugin_namespace_evaluation_path),
                 candidates,
             )
         )
