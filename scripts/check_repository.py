@@ -215,6 +215,22 @@ EXPECTED_PLUGIN_SUBMISSION_TESTS = {
     "test_release_notes_are_initial_draft_not_submission_claim",
     "test_fifteen_negative_mutations_are_rejected",
 }
+EXPECTED_SUBMISSION_PREREQUISITE_FILES = {
+    "docs/evidence/SUBMISSION-PREREQUISITE-DECISION-PACKET.md",
+    "packaging/codex-plugin/submission-materials/prerequisites.json",
+    "scripts/verify_submission_prerequisites.py",
+    "tests/test_submission_prerequisites.py",
+}
+EXPECTED_SUBMISSION_PREREQUISITE_TESTS = {
+    "test_valid_packet_binds_exact_candidate_and_submission_contract",
+    "test_prerequisites_exactly_map_ten_canonical_blockers",
+    "test_decision_graph_is_acyclic_and_one_at_a_time",
+    "test_policy_attestations_are_the_final_gate",
+    "test_repository_and_external_responsibilities_are_explicit",
+    "test_owner_facts_and_external_authority_remain_unset",
+    "test_q01_explains_publisher_mode_tradeoff_in_chinese",
+    "test_fourteen_negative_mutations_are_rejected",
+}
 EXPECTED_PUBLIC_README_FILES = {
     "README.md",
     "docs/evidence/PUBLIC-REPOSITORY-ONBOARDING.md",
@@ -2803,6 +2819,77 @@ def public_repository_onboarding_errors(
     return errors
 
 
+def submission_prerequisite_packet_errors(
+    evidence_text: str,
+    candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    missing = EXPECTED_SUBMISSION_PREREQUISITE_FILES - candidates
+    if missing:
+        errors.append(
+            f"submission prerequisite artifacts are missing: {sorted(missing)}"
+        )
+        return errors
+
+    result = subprocess.run(
+        [sys.executable, "scripts/verify_submission_prerequisites.py"],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        detail = result.stderr.strip() or result.stdout.strip() or "unknown failure"
+        errors.append(f"submission prerequisite verifier failed: {detail}")
+    else:
+        for marker in (
+            "SUBMISSION_PREREQUISITES_OK",
+            "status=awaiting_owner_decisions",
+            "prerequisites=10",
+            "decisions=7",
+            "active=Q01-publisher-mode",
+            "digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+        ):
+            if marker not in result.stdout:
+                errors.append(
+                    f"submission prerequisite verifier output is missing: {marker}"
+                )
+
+    test_text = read("tests/test_submission_prerequisites.py")
+    actual_tests = set(
+        re.findall(r"^\s+def (test_[a-z0-9_]+)\(", test_text, re.MULTILINE)
+    )
+    missing_tests = EXPECTED_SUBMISSION_PREREQUISITE_TESTS - actual_tests
+    if missing_tests:
+        errors.append(
+            f"submission prerequisite tests are missing: {sorted(missing_tests)}"
+        )
+    if "NEGATIVE_MUTATION_COUNT = 14" not in test_text:
+        errors.append("submission prerequisite negative mutation count drifted")
+
+    for marker in (
+        "10 个真实外部先决条件",
+        "7 个按依赖回答的问题",
+        "唯一等待用户回答",
+        "policy attestations 位于最后",
+        "没有打开 OpenAI Platform 或 submission Portal",
+        "普通“继续”不回答该问题",
+        "python scripts/verify_submission_prerequisites.py",
+        "不证明任何外部 blocker 已完成",
+        "Ran 145 tests - OK",
+        "REPOSITORY_CHECK_OK public_candidates=157 capabilities=19 behavior_specs=19",
+        "没有安装、Platform 写入、Portal、submission、publish 或 push",
+    ):
+        if marker not in evidence_text:
+            errors.append(f"submission prerequisite evidence is missing: {marker}")
+    if (
+        "/packaging/codex-plugin/submission-materials/prerequisites.json text eol=lf"
+        not in read(".gitattributes")
+    ):
+        errors.append("submission prerequisite LF contract is missing")
+    return errors
+
+
 def contract_relationship_errors(index_text: str, specs: dict[str, str]) -> list[str]:
     errors: list[str] = []
     dependencies = index_dependencies(index_text)
@@ -3481,6 +3568,19 @@ def main() -> int:
         errors.extend(
             plugin_submission_material_errors(
                 read(plugin_submission_evidence_path),
+                candidates,
+            )
+        )
+
+    submission_prerequisite_evidence_path = (
+        "docs/evidence/SUBMISSION-PREREQUISITE-DECISION-PACKET.md"
+    )
+    if submission_prerequisite_evidence_path not in candidates:
+        errors.append("submission prerequisite evidence is missing or ignored")
+    else:
+        errors.extend(
+            submission_prerequisite_packet_errors(
+                read(submission_prerequisite_evidence_path),
                 candidates,
             )
         )

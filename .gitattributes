@@ -13,3 +13,4 @@
 /packaging/codex-plugin/package.lock.json text eol=lf
 /packaging/codex-plugin/submission-materials/submission.json text eol=lf
 /packaging/codex-plugin/submission-materials/reviewer-tests.json text eol=lf
+/packaging/codex-plugin/submission-materials/prerequisites.json text eol=lf
