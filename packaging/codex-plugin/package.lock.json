@@ -1,0 +1,54 @@
+{
+  "schema": "cotend.codex-plugin-package-lock",
+  "schema_version": 1,
+  "status": "production_candidate_not_published",
+  "plugin": {
+    "name": "cotend",
+    "version": "0.1.0-rc.1",
+    "manifest": "packaging/codex-plugin/cotend/.codex-plugin/plugin.json",
+    "manifest_sha256": "4613598cd162ee86c3a6863eb073f34d68e641278d1a1ec9365e209b96747a7b"
+  },
+  "source": {
+    "carrier": "codex-skills/",
+    "artifact_lock": "delivery/codex-artifact.lock.json",
+    "artifact_id": "cotend-codex-r000001",
+    "revision": 1,
+    "target_manifest_sha256": "f8ed51e76a19fb26debcb998fb2c5f8505908f5d73d4cf5351ea52a1c915c049",
+    "skill_count": 7,
+    "skill_file_count": 30,
+    "path_hash_manifest_sha256": "acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b"
+  },
+  "package": {
+    "output_directory_name": "cotend",
+    "file_count": 37,
+    "path_hash_manifest_sha256": "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+    "support_files": [
+      "LICENSE",
+      "NOTICE",
+      "THIRD-PARTY-NOTICES.md",
+      "THIRD-PARTY-SOURCES.json",
+      "THIRD-PARTY-LICENSES/grill-me-MIT.txt",
+      "THIRD-PARTY-LICENSES/karpathy-guidelines-MIT.txt"
+    ],
+    "forbidden_components": [
+      ".app.json",
+      ".mcp.json",
+      ".agents",
+      "assets",
+      "hooks",
+      "scripts"
+    ]
+  },
+  "build": {
+    "script": "scripts/build_codex_plugin.py",
+    "semantic_source_count": 1,
+    "network_required": false,
+    "marketplace_generated": false,
+    "plugin_installation_performed": false
+  },
+  "authority": {
+    "candidate_identity_only": true,
+    "final_plugin_identity_confirmed": false,
+    "release_or_publish_authorized": false
+  }
+}

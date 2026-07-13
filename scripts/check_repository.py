@@ -167,6 +167,24 @@ EXPECTED_PLUGIN_NAMESPACE_TESTS = {
     "test_source_identifier_inventory_is_exact",
     "test_static_candidates_quantify_transform_and_residual_debt",
 }
+EXPECTED_PLUGIN_PACKAGE_FILES = {
+    "docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-PACKAGE.md",
+    "packaging/codex-plugin/cotend/.codex-plugin/plugin.json",
+    "packaging/codex-plugin/package.lock.json",
+    "scripts/build_codex_plugin.py",
+    "scripts/verify_codex_plugin_package.py",
+    "tests/test_codex_plugin_package.py",
+}
+EXPECTED_PLUGIN_PACKAGE_TESTS = {
+    "test_existing_invalid_output_is_not_overwritten",
+    "test_linklike_package_member_is_rejected",
+    "test_manifest_and_lock_define_skills_only_candidate",
+    "test_n3_display_metadata_and_prompt_limits_are_preserved",
+    "test_output_must_stay_in_repository_build_roots",
+    "test_package_drift_is_rejected",
+    "test_two_builds_are_byte_deterministic",
+    "test_valid_existing_output_rebuild_is_idempotent",
+}
 EXPECTED_DELIVERY_PRODUCT_FILES = {
     "delivery/codex-artifact.lock.json",
     "scripts/cotend_delivery.py",
@@ -1982,10 +2000,16 @@ def isolated_codex_plugin_fixture_errors(
         if path.endswith("/.codex-plugin/plugin.json")
         or path == ".codex-plugin/plugin.json"
     )
-    if tracked_plugin_manifests:
+    allowed_later_candidate = {
+        "packaging/codex-plugin/cotend/.codex-plugin/plugin.json"
+    }
+    unexpected_manifests = sorted(
+        set(tracked_plugin_manifests) - allowed_later_candidate
+    )
+    if unexpected_manifests:
         errors.append(
-            "fixture-only validation must not track a production Plugin manifest: "
-            f"{tracked_plugin_manifests}"
+            "fixture history found an unexpected tracked Plugin manifest: "
+            f"{unexpected_manifests}"
         )
     return errors
 
@@ -2092,7 +2116,7 @@ def plugin_namespace_candidate_errors(
         "recommendation": {"N3_display_led_preserve_first"},
         "candidate_baseline_confirmed": {"true"},
         "production_namespace_confirmed": {"false"},
-        "production_package_authorized": {"false"},
+        "production_package_authorized": {"candidate_contract_only"},
         "desktop_surface_verified": {"partial_picker_and_non_sending_chip"},
         "desktop_hot_update_verified": {"false"},
         "desktop_new_task_refresh_verified": {"true"},
@@ -2177,6 +2201,187 @@ def plugin_namespace_candidate_errors(
     ):
         if marker not in desktop_text:
             errors.append(f"Desktop Plugin surface evidence is missing: {marker}")
+    return errors
+
+
+def production_plugin_package_errors(
+    evidence_text: str,
+    candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    missing = EXPECTED_PLUGIN_PACKAGE_FILES - candidates
+    if missing:
+        errors.append(f"production Plugin package artifacts are missing: {sorted(missing)}")
+        return errors
+
+    expected_manifest_path = (
+        "packaging/codex-plugin/cotend/.codex-plugin/plugin.json"
+    )
+    tracked_plugin_manifests = sorted(
+        path
+        for path in candidates
+        if path.endswith("/.codex-plugin/plugin.json")
+        or path == ".codex-plugin/plugin.json"
+    )
+    if tracked_plugin_manifests != [expected_manifest_path]:
+        errors.append(
+            "production Plugin manifest inventory mismatch: "
+            f"{tracked_plugin_manifests}"
+        )
+
+    try:
+        manifest = json.loads(read(expected_manifest_path))
+        package_lock = json.loads(read("packaging/codex-plugin/package.lock.json"))
+    except (json.JSONDecodeError, OSError):
+        errors.append("production Plugin manifest or package lock is invalid JSON")
+        return errors
+    if not isinstance(manifest, dict) or not isinstance(package_lock, dict):
+        errors.append("production Plugin manifest and package lock must be objects")
+        return errors
+
+    for key, expected in {
+        "name": "cotend",
+        "version": "0.1.0-rc.1",
+        "skills": "./skills/",
+        "license": "Apache-2.0",
+    }.items():
+        if manifest.get(key) != expected:
+            errors.append(f"production Plugin manifest mismatch: {key}")
+    for forbidden in ("apps", "mcpServers", "hooks"):
+        if forbidden in manifest:
+            errors.append(f"production Plugin manifest declares forbidden {forbidden}")
+    interface = manifest.get("interface")
+    if not isinstance(interface, dict):
+        errors.append("production Plugin manifest interface is missing")
+    else:
+        if interface.get("displayName") != "CoTend":
+            errors.append("production Plugin display name mismatch")
+        prompts = interface.get("defaultPrompt")
+        if not isinstance(prompts, list) or not 1 <= len(prompts) <= 3:
+            errors.append("production Plugin starter prompt count mismatch")
+        elif any(not isinstance(prompt, str) or len(prompt) > 128 for prompt in prompts):
+            errors.append("production Plugin starter prompt length mismatch")
+
+    manifest_hash = hashlib.sha256(
+        (ROOT / expected_manifest_path).read_bytes()
+    ).hexdigest()
+    plugin_lock = package_lock.get("plugin")
+    source_lock = package_lock.get("source")
+    output_lock = package_lock.get("package")
+    authority = package_lock.get("authority")
+    if package_lock.get("status") != "production_candidate_not_published":
+        errors.append("production Plugin package status must remain candidate-only")
+    if not isinstance(plugin_lock, dict) or plugin_lock.get("manifest_sha256") != manifest_hash:
+        errors.append("production Plugin manifest hash lock mismatch")
+    if not isinstance(source_lock, dict) or source_lock.get(
+        "path_hash_manifest_sha256"
+    ) != "acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b":
+        errors.append("production Plugin source manifest lock mismatch")
+    if not isinstance(output_lock, dict) or output_lock.get(
+        "path_hash_manifest_sha256"
+    ) != "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066":
+        errors.append("production Plugin package digest lock mismatch")
+    if not isinstance(output_lock, dict) or output_lock.get("file_count") != 37:
+        errors.append("production Plugin package file count mismatch")
+    if authority != {
+        "candidate_identity_only": True,
+        "final_plugin_identity_confirmed": False,
+        "release_or_publish_authorized": False,
+    }:
+        errors.append("production Plugin package authority boundary drifted")
+
+    builder_text = read("scripts/build_codex_plugin.py")
+    for marker in (
+        'PLUGIN_VERSION = "0.1.0-rc.1"',
+        'ALLOWED_OUTPUT_ROOTS = {".private-provenance", "dist"}',
+        "expected_package_manifest",
+        "source_bytes_identical",
+        "existing output is not an owned valid CoTend package",
+        "run_official_validator",
+    ):
+        if marker not in builder_text:
+            errors.append(f"production Plugin builder is missing: {marker}")
+    attributes_text = read(".gitattributes")
+    for marker in (
+        "/codex-skills/** text eol=lf",
+        "/LICENSE text eol=lf",
+        "/NOTICE text eol=lf",
+        "/THIRD-PARTY-NOTICES.md text eol=lf",
+        "/THIRD-PARTY-SOURCES.json text eol=lf",
+        "/packaging/codex-plugin/cotend/.codex-plugin/plugin.json text eol=lf",
+        "/packaging/codex-plugin/package.lock.json text eol=lf",
+    ):
+        if marker not in attributes_text:
+            errors.append(f"production Plugin LF contract is missing: {marker}")
+    if "/dist/" not in read(".gitignore"):
+        errors.append("generated production Plugin dist/ output must remain gitignored")
+    verifier_text = read("scripts/verify_codex_plugin_package.py")
+    for marker in (
+        "NEGATIVE_CASES = 13",
+        "protected_boundaries",
+        "CODEX_PLUGIN_PRODUCTION_PACKAGE_OK",
+        "plugin_installation\": \"not_run",
+        "marketplace_write\": \"not_run",
+    ):
+        if marker not in verifier_text:
+            errors.append(f"production Plugin verifier is missing: {marker}")
+
+    test_text = read("tests/test_codex_plugin_package.py")
+    actual_tests = set(
+        re.findall(r"^\s+def (test_[a-z0-9_]+)\(", test_text, re.MULTILINE)
+    )
+    missing_tests = EXPECTED_PLUGIN_PACKAGE_TESTS - actual_tests
+    if missing_tests:
+        errors.append(f"production Plugin package tests are missing: {sorted(missing_tests)}")
+
+    for key, expected in {
+        "status": {"passed_isolated_production_candidate_contract"},
+        "evidence_type": {"executed"},
+        "codex_version": {"codex-cli_0.144.1"},
+        "candidate_plugin_id": {"cotend"},
+        "candidate_version": {"0.1.0-rc.1"},
+        "identity_authority": {"candidate_only_not_release"},
+        "semantic_sources": {"1"},
+        "isolated_builds_compared": {"2"},
+        "package_files": {"37"},
+        "adopted_skills": {"7"},
+        "adopted_skill_files": {"30"},
+        "friendly_display_names": {"5"},
+        "negative_cases": {"13"},
+        "protected_user_boundaries": {"6"},
+        "official_validator": {"passed"},
+        "marketplace_write": {"false"},
+        "plugin_installation": {"false"},
+        "release_or_publish": {"false"},
+        "final_namespace_confirmed": {"false"},
+    }.items():
+        if metadata_values(evidence_text, key) != expected:
+            errors.append(f"production Plugin package evidence mismatch: {key}")
+    for marker in (
+        "`codex-skills/` 仍是唯一语义源",
+        "37 个文件",
+        "逐字节一致",
+        "13 类负向边界",
+        "当前 Plugin Creator validator：`passed`",
+        "没有生成 Marketplace",
+        "不代表已经满足公开 submission",
+        "CODEX_PLUGIN_PRODUCTION_PACKAGE_OK builds=2 files=37",
+    ):
+        if marker not in evidence_text:
+            errors.append(f"production Plugin package evidence is missing: {marker}")
+
+    tracked_marketplaces = sorted(
+        path for path in candidates if path.endswith("/.agents/plugins/marketplace.json")
+    )
+    if tracked_marketplaces:
+        errors.append(f"production package must not track Marketplace files: {tracked_marketplaces}")
+    duplicate_packaged_skills = sorted(
+        path
+        for path in candidates
+        if path.startswith("packaging/codex-plugin/") and "/skills/" in path
+    )
+    if duplicate_packaged_skills:
+        errors.append("production package must not track a second Skill source tree")
     return errors
 
 
@@ -2819,6 +3024,19 @@ def main() -> int:
                 read(plugin_namespace_evidence_path),
                 read(plugin_namespace_evaluation_path),
                 read(desktop_plugin_surface_path),
+                candidates,
+            )
+        )
+
+    production_plugin_package_evidence_path = (
+        "docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-PACKAGE.md"
+    )
+    if production_plugin_package_evidence_path not in candidates:
+        errors.append("isolated production Plugin package evidence is missing or ignored")
+    else:
+        errors.extend(
+            production_plugin_package_errors(
+                read(production_plugin_package_evidence_path),
                 candidates,
             )
         )

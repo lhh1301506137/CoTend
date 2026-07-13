@@ -251,3 +251,23 @@ production_apply: forbidden
 non-live CLI 接受现有 lifecycle operation 用于显示预览，但真实 transaction bridge 硬关闭且不构造 manager。任何 `--apply` 在解析 HOME、扫描 Skills 或读取 state 之前返回 `production_apply_forbidden`。resolver 13 项以及 schema v4/migration 13 项隔离测试都通过六项真实 stat-only 边界保护；详见 [`docs/evidence/PRODUCTION-USER-LAYOUT-RESOLVER.md`](evidence/PRODUCTION-USER-LAYOUT-RESOLVER.md) 与 [`docs/evidence/ISOLATED-PRODUCTION-USER-RECEIPT.md`](evidence/ISOLATED-PRODUCTION-USER-RECEIPT.md)。
 
 production receipt schema v4 已绑定 installation/layout 双身份；schema v3 只有在完整 receipt、payload 与 external shared 验证通过后才能显式 receipt-only migration，layout drift 必须先重绑定再更新。真实 user apply、Desktop 发现、Plugin 共存和公开发布未获授权，也未被本验证证明。
+
+## Public Plugin 生产候选包
+
+L44 已把 N3 display-led preserve-first 从界面候选推进为仓库内可执行的 production-candidate package contract：
+
+```yaml
+plugin_candidate: cotend@0.1.0-rc.1
+semantic_source: codex-skills/
+tracked_duplicate_skill_tree: false
+isolated_builds_compared: 2
+package_files: 37
+official_validator: passed
+plugin_installation: false
+marketplace_write: false
+submission_release_publish: false
+```
+
+仓库只跟踪 manifest、package lock 和构建/验证逻辑；完整包每次从唯一 Skill 源在 gitignored 目录组装。两次构建摘要相同，7 Skill/30 文件逐字节一致，13 类负向边界和 6 项真实用户 stat-only 保护通过。详见 [`docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-PACKAGE.md`](evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-PACKAGE.md)。
+
+该结果只关闭 production package contract，不把候选 ID/version 升级为最终发布决定。完整 Desktop 生命周期、公开身份与法律/品牌素材、submission 的 5+3 测试、Portal 审核和 publish 仍是后续独立门。

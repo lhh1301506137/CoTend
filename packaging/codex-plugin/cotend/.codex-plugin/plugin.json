@@ -1,0 +1,34 @@
+{
+  "name": "cotend",
+  "version": "0.1.0-rc.1",
+  "description": "AI development governance for people who build software with AI.",
+  "author": {
+    "name": "CoTend contributors"
+  },
+  "homepage": "https://github.com/lhh1301506137/CoTend",
+  "repository": "https://github.com/lhh1301506137/CoTend",
+  "license": "Apache-2.0",
+  "keywords": [
+    "ai-development",
+    "project-governance",
+    "agent-skills"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "CoTend",
+    "shortDescription": "Govern AI-assisted software development",
+    "longDescription": "Start, resume, diagnose, review, and hand off software projects while preserving plans, evidence, and user decision boundaries.",
+    "developerName": "CoTend contributors",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use CoTend to initialize or resume this project.",
+      "Use CoTend to continue the current project.",
+      "Use CoTend to diagnose this issue without changing files."
+    ]
+  }
+}
