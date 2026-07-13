@@ -6,10 +6,7 @@ import sys
 from pathlib import Path
 
 from .core import DeliveryError, OPERATIONS
-from .production_resolver import (
-    inspect_production_user_layout,
-    resolve_production_user_layout,
-)
+from .production_scope import ProductionUserDeliveryBridge
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -48,20 +45,13 @@ def main(argv: list[str] | None = None) -> int:
                 "production_apply_forbidden",
                 "Production user delivery is read-only in this build",
             )
-        layout = resolve_production_user_layout(
+        bridge = ProductionUserDeliveryBridge(
             home=args.home,
             codex_home=args.codex_home,
         )
-        result = inspect_production_user_layout(
-            layout,
+        result = bridge.execute(
+            args.operation,
             expected_layout_fingerprint=args.expected_layout_fingerprint,
-        )
-        result.update(
-            {
-                "status": "preview",
-                "operation": args.operation,
-                "apply": False,
-            }
         )
     except DeliveryError as exc:
         print(json.dumps(exc.as_dict(), indent=2, ensure_ascii=False), file=sys.stderr)

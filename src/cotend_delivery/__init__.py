@@ -6,6 +6,10 @@ from .production_resolver import (
     inspect_production_user_layout,
     resolve_production_user_layout,
 )
+from .production_scope import (
+    IsolatedProductionUserSkillDeliveryManager,
+    ProductionUserDeliveryBridge,
+)
 from .user_scope import IsolatedUserSkillDeliveryManager
 
 __all__ = [
@@ -14,6 +18,8 @@ __all__ = [
     "DeliveryLayout",
     "DeliveryManager",
     "IsolatedUserSkillDeliveryManager",
+    "IsolatedProductionUserSkillDeliveryManager",
+    "ProductionUserDeliveryBridge",
     "ProductionUserLayout",
     "inspect_production_user_layout",
     "resolve_production_user_layout",

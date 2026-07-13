@@ -3,19 +3,23 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from .core import DeliveryError, FIRST_PARTY_SKILLS
+from .core import (
+    DeliveryError,
+    FIRST_PARTY_SKILLS,
+    INSTALLATION_ID_PATTERN,
+    LAYOUT_FINGERPRINT_PATTERN,
+    PRODUCTION_USER_RECEIPT_SCHEMA_VERSION,
+    USER_RECEIPT_SCHEMA_VERSION,
+)
 
 
 CONTRACT_NAME = "cotend.production-user-layout"
 CONTRACT_VERSION = 1
-LEGACY_USER_RECEIPT_SCHEMA_VERSION = 3
 STATE_DIRECTORY_NAME = ".cotend-delivery"
-LAYOUT_FINGERPRINT_PATTERN = re.compile(r"^cotend-layout-[0-9a-f]{24}$")
 
 
 def _is_linklike(path: Path) -> bool:
@@ -219,7 +223,12 @@ def _carrier_observation(root: Path) -> tuple[dict[str, Any], list[str]]:
     return {"status": "directory", "first_party_present": present}, blockers
 
 
-def _state_observation(state_root: Path) -> tuple[dict[str, Any], list[str]]:
+def _state_observation(
+    state_root: Path,
+    *,
+    installation_id: str,
+    layout_fingerprint: str,
+) -> tuple[dict[str, Any], list[str]]:
     if _is_linklike(state_root):
         return {
             "status": "unknown_state",
@@ -264,18 +273,58 @@ def _state_observation(state_root: Path) -> tuple[dict[str, Any], list[str]]:
             "receipt_status": "unreadable_or_invalid",
             "entry_count": entry_count,
         }, ["unknown_state"]
-    if (
+    if not (
         isinstance(receipt, dict)
         and receipt.get("schema") == "cotend.delivery-receipt"
-        and receipt.get("schema_version") == LEGACY_USER_RECEIPT_SCHEMA_VERSION
         and receipt.get("scope") == "user"
     ):
         return {
+            "status": "unknown_state",
+            "receipt_status": "unsupported_envelope",
+            "entry_count": entry_count,
+        }, ["unknown_state"]
+    if receipt.get("schema_version") == USER_RECEIPT_SCHEMA_VERSION:
+        return {
             "status": "legacy_user_receipt",
             "receipt_status": "explicit_receipt_migration_required",
-            "receipt_schema_version": LEGACY_USER_RECEIPT_SCHEMA_VERSION,
+            "receipt_schema_version": USER_RECEIPT_SCHEMA_VERSION,
+            "validation_depth": "envelope_only",
             "entry_count": entry_count,
         }, ["explicit_receipt_migration_required"]
+    if receipt.get("schema_version") == PRODUCTION_USER_RECEIPT_SCHEMA_VERSION:
+        receipt_installation_id = receipt.get("installation_id")
+        receipt_layout_fingerprint = receipt.get("layout_fingerprint")
+        if (
+            not isinstance(receipt_installation_id, str)
+            or not INSTALLATION_ID_PATTERN.fullmatch(receipt_installation_id)
+            or not isinstance(receipt_layout_fingerprint, str)
+            or not LAYOUT_FINGERPRINT_PATTERN.fullmatch(receipt_layout_fingerprint)
+        ):
+            return {
+                "status": "unknown_state",
+                "receipt_status": "invalid_production_identity_envelope",
+                "receipt_schema_version": PRODUCTION_USER_RECEIPT_SCHEMA_VERSION,
+                "validation_depth": "envelope_only",
+                "entry_count": entry_count,
+            }, ["unknown_state"]
+        observation = {
+            "status": "production_user_receipt",
+            "receipt_schema_version": PRODUCTION_USER_RECEIPT_SCHEMA_VERSION,
+            "receipt_installation_id": receipt_installation_id,
+            "receipt_layout_fingerprint": receipt_layout_fingerprint,
+            "validation_depth": "envelope_only",
+            "entry_count": entry_count,
+        }
+        if receipt_installation_id != installation_id:
+            observation["receipt_status"] = "installation_identity_mismatch"
+            return observation, ["installation_identity_mismatch"]
+        if receipt_layout_fingerprint != layout_fingerprint:
+            observation["receipt_status"] = (
+                "explicit_layout_context_migration_required"
+            )
+            return observation, ["layout_context_changed"]
+        observation["receipt_status"] = "current_envelope"
+        return observation, []
     return {
         "status": "unknown_state",
         "receipt_status": "unsupported_envelope",
@@ -299,10 +348,18 @@ def inspect_production_user_layout(
     compatibility, compatibility_blockers = _carrier_observation(
         layout.compatibility_root
     )
-    state, state_blockers = _state_observation(layout.state_root)
+    state, state_blockers = _state_observation(
+        layout.state_root,
+        installation_id=layout.installation_id,
+        layout_fingerprint=layout.layout_fingerprint,
+    )
     blockers = canonical_blockers + compatibility_blockers + state_blockers
 
-    if canonical["first_party_present"] and state["status"] != "legacy_user_receipt":
+    receipt_claims_user_ownership = state["status"] in {
+        "legacy_user_receipt",
+        "production_user_receipt",
+    }
+    if canonical["first_party_present"] and not receipt_claims_user_ownership:
         blockers.append("first_party_canonical_residue")
     if compatibility["first_party_present"]:
         blockers.append("first_party_compatibility_residue")
@@ -313,7 +370,9 @@ def inspect_production_user_layout(
         blockers.append("layout_context_changed")
     blockers = list(dict.fromkeys(blockers))
 
-    if "explicit_receipt_migration_required" in blockers:
+    if "installation_identity_mismatch" in blockers:
+        migration_status = "blocked_installation_identity_mismatch"
+    elif "explicit_receipt_migration_required" in blockers:
         migration_status = "explicit_receipt_migration_required"
     elif "unknown_state" in blockers:
         migration_status = "blocked_unknown_state"
@@ -323,6 +382,16 @@ def inspect_production_user_layout(
         migration_status = "explicit_first_party_migration_required"
     else:
         migration_status = "none"
+
+    if "layout_context_changed" in blockers:
+        layout_context_status = "changed"
+    elif (
+        expected_layout_fingerprint is not None
+        or state["status"] == "production_user_receipt"
+    ):
+        layout_context_status = "current"
+    else:
+        layout_context_status = "unbound"
 
     result = layout.as_dict()
     result.update(
@@ -336,16 +405,11 @@ def inspect_production_user_layout(
             "migration_status": migration_status,
             "blockers": blockers,
             "layout_context": {
-                "status": (
-                    "unbound"
-                    if expected_layout_fingerprint is None
-                    else (
-                        "current"
-                        if expected_layout_fingerprint == layout.layout_fingerprint
-                        else "changed"
-                    )
-                ),
+                "status": layout_context_status,
                 "expected_layout_fingerprint": expected_layout_fingerprint,
+                "receipt_layout_fingerprint": state.get(
+                    "receipt_layout_fingerprint"
+                ),
             },
             "production_apply": {
                 "available": False,

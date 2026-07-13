@@ -3,9 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -33,6 +34,7 @@ MUTATION_LOCK_SCHEMA_VERSION = 1
 RECOVERY_LOCK_SCHEMA_VERSION = 1
 RECEIPT_SCHEMA_VERSION = 2
 USER_RECEIPT_SCHEMA_VERSION = 3
+PRODUCTION_USER_RECEIPT_SCHEMA_VERSION = 4
 CHECKPOINT_SCHEMA_VERSION = 2
 LEGACY_SCHEMA_VERSION = 1
 TARGET_PLATFORM = "Codex"
@@ -78,6 +80,8 @@ RECOVERY_BRANCHES = {
     "release_abandoned_lock",
     "rollback_interrupted_transition",
 }
+INSTALLATION_ID_PATTERN = re.compile(r"^cotend-user-[0-9a-f]{24}$")
+LAYOUT_FINGERPRINT_PATTERN = re.compile(r"^cotend-layout-[0-9a-f]{24}$")
 
 
 class DeliveryError(RuntimeError):
@@ -296,6 +300,9 @@ class DeliveryLayout:
     skill_roots: tuple[tuple[str, Path], ...]
     default_owned_skills: tuple[str, ...]
     receipt_schema_version: int
+    legacy_receipt_schema_versions: tuple[int, ...]
+    installation_id: str | None
+    layout_fingerprint: str | None
     isolated: bool
 
     @classmethod
@@ -320,6 +327,9 @@ class DeliveryLayout:
             skill_roots=(("project", enabled_root),),
             default_owned_skills=EXPECTED_SKILLS,
             receipt_schema_version=RECEIPT_SCHEMA_VERSION,
+            legacy_receipt_schema_versions=(LEGACY_SCHEMA_VERSION,),
+            installation_id=None,
+            layout_fingerprint=None,
             isolated=False,
         )
 
@@ -402,7 +412,45 @@ class DeliveryLayout:
             skill_roots=tuple(roots),
             default_owned_skills=FIRST_PARTY_SKILLS,
             receipt_schema_version=USER_RECEIPT_SCHEMA_VERSION,
+            legacy_receipt_schema_versions=(),
+            installation_id=None,
+            layout_fingerprint=None,
             isolated=True,
+        )
+
+    @classmethod
+    def isolated_production_user(
+        cls,
+        *,
+        isolation_root: Path | str,
+        home: Path | str,
+        codex_home: Path | str,
+        state_root: Path | str,
+        installation_id: str,
+        layout_fingerprint: str,
+    ) -> "DeliveryLayout":
+        if not INSTALLATION_ID_PATTERN.fullmatch(installation_id):
+            raise DeliveryError(
+                "production_installation_identity_invalid",
+                "Production installation identity is invalid",
+            )
+        if not LAYOUT_FINGERPRINT_PATTERN.fullmatch(layout_fingerprint):
+            raise DeliveryError(
+                "production_layout_fingerprint_invalid",
+                "Production layout fingerprint is invalid",
+            )
+        layout = cls.isolated_user(
+            isolation_root=isolation_root,
+            home=home,
+            codex_home=codex_home,
+            state_root=state_root,
+        )
+        return replace(
+            layout,
+            receipt_schema_version=PRODUCTION_USER_RECEIPT_SCHEMA_VERSION,
+            legacy_receipt_schema_versions=(USER_RECEIPT_SCHEMA_VERSION,),
+            installation_id=installation_id,
+            layout_fingerprint=layout_fingerprint,
         )
 
 
@@ -1691,6 +1739,18 @@ class DeliveryManager:
                     "components": plan.components,
                 }
             )
+        if self.layout.receipt_schema_version == PRODUCTION_USER_RECEIPT_SCHEMA_VERSION:
+            if self.layout.installation_id is None or self.layout.layout_fingerprint is None:
+                raise DeliveryError(
+                    "production_layout_identity_missing",
+                    "Production delivery layout identity is missing",
+                )
+            payload.update(
+                {
+                    "installation_id": self.layout.installation_id,
+                    "layout_fingerprint": self.layout.layout_fingerprint,
+                }
+            )
         return payload
 
     def _validate_receipt(self, value: Any) -> dict[str, Any]:
@@ -1700,12 +1760,10 @@ class DeliveryManager:
         scope = value.get("scope")
         if value.get("schema") != RECEIPT_SCHEMA:
             raise DeliveryError("receipt_invalid", "Unsupported delivery receipt schema")
-        if scope == "project":
-            valid_versions = {LEGACY_SCHEMA_VERSION, RECEIPT_SCHEMA_VERSION}
-        elif scope == "user":
-            valid_versions = {USER_RECEIPT_SCHEMA_VERSION}
-        else:
-            valid_versions = set()
+        valid_versions = {
+            self.layout.receipt_schema_version,
+            *self.layout.legacy_receipt_schema_versions,
+        }
         if schema_version not in valid_versions or scope != self.scope:
             raise DeliveryError("receipt_invalid", "Unsupported delivery receipt schema")
         if value.get("platform") != TARGET_PLATFORM:
@@ -1739,7 +1797,7 @@ class DeliveryManager:
                 "receipt_invalid",
                 "Legacy receipt contains schema v2 identity fields",
             )
-        if schema_version in {RECEIPT_SCHEMA_VERSION, USER_RECEIPT_SCHEMA_VERSION}:
+        if schema_version != LEGACY_SCHEMA_VERSION:
             revision = value.get("target_revision")
             lineage = value.get("artifact_lineage")
             if (
@@ -1754,6 +1812,32 @@ class DeliveryManager:
                 raise DeliveryError(
                     "receipt_invalid",
                     "Receipt source or target revision identity is invalid",
+                )
+        production_identity_fields = {"installation_id", "layout_fingerprint"}
+        if schema_version != PRODUCTION_USER_RECEIPT_SCHEMA_VERSION and any(
+            key in value for key in production_identity_fields
+        ):
+            raise DeliveryError(
+                "receipt_invalid",
+                "Legacy receipt contains production identity fields",
+            )
+        if schema_version == PRODUCTION_USER_RECEIPT_SCHEMA_VERSION:
+            installation_id = value.get("installation_id")
+            layout_fingerprint = value.get("layout_fingerprint")
+            if (
+                not isinstance(installation_id, str)
+                or not INSTALLATION_ID_PATTERN.fullmatch(installation_id)
+                or not isinstance(layout_fingerprint, str)
+                or not LAYOUT_FINGERPRINT_PATTERN.fullmatch(layout_fingerprint)
+            ):
+                raise DeliveryError(
+                    "receipt_invalid",
+                    "Production receipt identity is invalid",
+                )
+            if installation_id != self.layout.installation_id:
+                raise DeliveryError(
+                    "receipt_installation_identity_mismatch",
+                    "Production receipt belongs to a different installation",
                 )
         if scope == "user":
             owned_skills = value.get("owned_skills")
@@ -1903,6 +1987,27 @@ class DeliveryManager:
             and receipt["protocol"] == candidate.protocol
             and receipt["manifest_sha256"] == candidate.manifest_sha256
         )
+        if (
+            self.scope == "user"
+            and self.layout.receipt_schema_version
+            == PRODUCTION_USER_RECEIPT_SCHEMA_VERSION
+        ):
+            if receipt["schema_version"] == USER_RECEIPT_SCHEMA_VERSION:
+                if exact_identity:
+                    return "identity_migration_available", [
+                        "production_receipt_binding_required"
+                    ]
+                return "incompatible", [
+                    "production_receipt_binding_requires_current_artifact"
+                ]
+            if receipt["layout_fingerprint"] != self.layout.layout_fingerprint:
+                if exact_identity:
+                    return "identity_migration_available", [
+                        "layout_context_changed"
+                    ]
+                return "incompatible", [
+                    "layout_context_migration_required_before_artifact_change"
+                ]
         if exact_identity:
             return "same_as_current", []
         if (
@@ -1917,6 +2022,20 @@ class DeliveryManager:
         if candidate.revision > receipt["target_revision"]:
             return "update_available", []
         return "downgrade_candidate", ["downgrade_requires_explicit_operation"]
+
+    def _identity_migration_kind(self, receipt: dict[str, Any]) -> str | None:
+        if receipt["schema_version"] == LEGACY_SCHEMA_VERSION:
+            return "project_target_identity"
+        if (
+            self.scope == "user"
+            and self.layout.receipt_schema_version
+            == PRODUCTION_USER_RECEIPT_SCHEMA_VERSION
+        ):
+            if receipt["schema_version"] == USER_RECEIPT_SCHEMA_VERSION:
+                return "production_receipt_binding"
+            if receipt["layout_fingerprint"] != self.layout.layout_fingerprint:
+                return "layout_context_rebind"
+        return None
 
     def _collision_paths_without_receipt(
         self,
@@ -2162,6 +2281,11 @@ class DeliveryManager:
             installation = "complete"
 
         relation, diagnostics = self._candidate_relation(receipt, candidate)
+        identity_migration_kind = (
+            self._identity_migration_kind(receipt)
+            if relation == "identity_migration_available"
+            else None
+        )
 
         complete = installation == "complete" and not transition_artifacts
         if complete:
@@ -2198,6 +2322,10 @@ class DeliveryManager:
             "candidate_relation": relation,
             "transition": transition,
             "receipt_schema_version": receipt["schema_version"],
+            "installation_id": receipt.get("installation_id"),
+            "receipt_layout_fingerprint": receipt.get("layout_fingerprint"),
+            "current_layout_fingerprint": self.layout.layout_fingerprint,
+            "identity_migration_kind": identity_migration_kind,
             "source_release_id": receipt.get("source_release_id"),
             "artifact_lineage": receipt.get("artifact_lineage"),
             "artifact_id": receipt["artifact_id"],
@@ -2758,12 +2886,22 @@ class DeliveryManager:
                 assert candidate is not None
                 relation = state["candidate_relation"]
                 if relation in {"same_as_current", "identity_migration_available"}:
-                    allowed = will_mutate = True
-                    reason = (
-                        "reconstruct_legacy_owned_files_and_migrate_identity"
-                        if relation == "identity_migration_available"
-                        else "reconstruct_owned_files_from_same_artifact"
-                    )
+                    migration_kind = state.get("identity_migration_kind")
+                    if relation == "identity_migration_available" and migration_kind in {
+                        "production_receipt_binding",
+                        "layout_context_rebind",
+                    }:
+                        reason = (
+                            "production_identity_migration_requires_complete_"
+                            "verified_payload"
+                        )
+                    else:
+                        allowed = will_mutate = True
+                        reason = (
+                            "reconstruct_legacy_owned_files_and_migrate_identity"
+                            if relation == "identity_migration_available"
+                            else "reconstruct_owned_files_from_same_artifact"
+                        )
                 else:
                     reason = "repair_candidate_does_not_match_receipt"
             elif (
@@ -2779,7 +2917,18 @@ class DeliveryManager:
                 and state["candidate_relation"] == "identity_migration_available"
             ):
                 allowed = will_mutate = True
-                reason = "rebind_verified_legacy_receipt_to_target_identity"
+                migration_kind = state.get("identity_migration_kind")
+                reason = {
+                    "project_target_identity": (
+                        "rebind_verified_legacy_receipt_to_target_identity"
+                    ),
+                    "production_receipt_binding": (
+                        "bind_verified_schema_v3_receipt_to_production_identity"
+                    ),
+                    "layout_context_rebind": (
+                        "rebind_verified_receipt_to_current_layout_context"
+                    ),
+                }.get(migration_kind, "rebind_verified_receipt_identity")
         elif operation == "disable":
             if state["installation"] == "complete" and state["enablement"] == "enabled":
                 allowed = will_mutate = True
@@ -2840,11 +2989,12 @@ class DeliveryManager:
             ]
         if operation == "migrate_identity":
             assert candidate is not None
+            target_schema = self.layout.receipt_schema_version
             return [
                 checkpoint,
                 "preserve the verified managed payload without copying or replacing it",
-                "rewrite only the adapter-owned receipt with schema v2 target identity",
-                f"bind legacy identity to {candidate.artifact_id}",
+                f"rewrite only the adapter-owned receipt with schema v{target_schema} identity",
+                f"bind verified identity to {candidate.artifact_id}",
             ]
         if operation in {"enable", "disable"}:
             return [
@@ -3641,13 +3791,12 @@ class DeliveryManager:
     def _migrate_identity(self, artifact: Artifact, *, enabled: bool) -> None:
         receipt = self._load_receipt(required=True)
         assert receipt is not None
-        if (
-            receipt["schema_version"] != LEGACY_SCHEMA_VERSION
-            or self._legacy_mapping(receipt, artifact) is None
-        ):
+        relation, _ = self._candidate_relation(receipt, artifact)
+        migration_kind = self._identity_migration_kind(receipt)
+        if relation != "identity_migration_available" or migration_kind is None:
             raise DeliveryError(
                 "identity_migration_invalid",
-                "Current receipt is not an explicitly mapped legacy identity",
+                "Current receipt is not eligible for explicit identity migration",
             )
         payload_root = self.enabled_root if enabled else self.disabled_root
         owned_skills = self._receipt_owned_skills(receipt)
@@ -3659,7 +3808,23 @@ class DeliveryManager:
                 "identity_migration_invalid",
                 "Legacy payload does not exactly match the target artifact",
             )
-        self._write_receipt(self._receipt_payload(artifact, enabled=enabled))
+        component_plan: _ComponentPlan | None = None
+        if self.scope == "user":
+            component_issues, _, _ = self._user_component_state(receipt)
+            if component_issues:
+                raise DeliveryError(
+                    "identity_migration_invalid",
+                    "External shared components changed before identity migration",
+                    details={"issues": component_issues},
+                )
+            component_plan = self._component_plan_from_receipt(receipt)
+        self._write_receipt(
+            self._receipt_payload(
+                artifact,
+                enabled=enabled,
+                component_plan=component_plan,
+            )
+        )
 
     def _write_receipt(self, receipt: dict[str, Any]) -> None:
         self.state_root.mkdir(parents=True, exist_ok=True)

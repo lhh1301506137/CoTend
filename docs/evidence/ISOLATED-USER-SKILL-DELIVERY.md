@@ -7,13 +7,13 @@ transaction_core: shared_parameterized_DeliveryManager
 project_receipt_schema: 1_and_2_unchanged
 user_receipt_schema: 3_component_ownership
 real_user_scope_write: false
-production_state_root: unresolved
+production_state_root: resolved_in_later_non_live_contract
 public_release: not_run
 ```
 
 ## 验证目标
 
-本验证证明 CoTend 可以在完全隔离的 user-home fixture 中复用现有交付事务核心，同时把五个 `cotend-*` Skill 固定为 `owned`，把两个 companion 按现场状态记录为 `owned | external_shared`。它不证明真实用户安装、跨平台 production state root、Desktop 发现或公开发布。
+本验证证明 CoTend 可以在完全隔离的 user-home fixture 中复用现有交付事务核心，同时把五个 `cotend-*` Skill 固定为 `owned`，把两个 companion 按现场状态记录为 `owned | external_shared`。后续 resolver 已固定 production state root，schema v4 也已在隔离环境验证；本叶本身仍不证明真实用户安装、跨平台权限、Desktop 发现或公开发布。
 
 ## 实现边界
 
@@ -82,8 +82,7 @@ Project receipt 继续使用 schema v1/v2，并由回归断言保证不出现 `o
 ## 未证明事项
 
 - 真实用户目录 apply；
-- production state root 的跨平台选择、权限和迁移；
-- 同一 canonical/compatibility roots 是否始终解析到唯一 state/lock root；当前并发证据只覆盖共享同一显式 state root 的 manager；
+- production state root 的跨平台权限与真实迁移；路径选择和同一 HOME 的唯一 state/lock identity 已由后续 non-live resolver 固定；
 - 当前真实重复 companion 的自动清理；
 - Desktop 新任务发现、selector 重复和隐式调用；
 - Plugin/Marketplace 共存迁移；
