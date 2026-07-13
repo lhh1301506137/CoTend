@@ -12,6 +12,7 @@ import subprocess
 import sys
 import threading
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 
@@ -25,7 +26,6 @@ DEFAULT_FIXTURE = PRIVATE_ROOT / "L31-isolated-codex-plugin"
 PLUGIN_ID = "cotend"
 PLUGIN_VERSION = "0.0.0-dev.1+codex.fixture"
 MARKETPLACE_NAME = "cotend-fixture-local"
-PLUGIN_SELECTOR = f"{PLUGIN_ID}@{MARKETPLACE_NAME}"
 EXPECTED_SKILLS = (
     "cotend-collaboration",
     "cotend-diagnose-only",
@@ -99,6 +99,26 @@ PHASE_B_NOT_RUN = (
 
 class PluginFixtureError(RuntimeError):
     pass
+
+
+@dataclass(frozen=True)
+class PluginLifecycleIdentity:
+    plugin_id: str
+    plugin_version: str
+    marketplace_name: str
+    expected_skills: tuple[str, ...]
+
+    @property
+    def selector(self) -> str:
+        return f"{self.plugin_id}@{self.marketplace_name}"
+
+
+FIXTURE_LIFECYCLE_IDENTITY = PluginLifecycleIdentity(
+    plugin_id=PLUGIN_ID,
+    plugin_version=PLUGIN_VERSION,
+    marketplace_name=MARKETPLACE_NAME,
+    expected_skills=EXPECTED_SKILLS,
+)
 
 
 def sha256(path: Path) -> str:
@@ -828,9 +848,13 @@ def require_json_object(payload: Any, label: str) -> dict[str, Any]:
     return payload
 
 
-def validate_marketplace_add_payload(payload: Any, fixture: Path) -> None:
+def validate_marketplace_add_payload(
+    payload: Any,
+    fixture: Path,
+    identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY,
+) -> None:
     item = require_json_object(payload, "Marketplace add output")
-    if item.get("marketplaceName") != MARKETPLACE_NAME:
+    if item.get("marketplaceName") != identity.marketplace_name:
         raise PluginFixtureError("Marketplace add identity mismatch")
     installed_root = Path(str(item.get("installedRoot", ""))).resolve()
     if installed_root != (fixture / "source-marketplace").resolve():
@@ -839,23 +863,34 @@ def validate_marketplace_add_payload(payload: Any, fixture: Path) -> None:
         raise PluginFixtureError("fresh fixture Marketplace was already configured")
 
 
-def validate_marketplace_list_payload(payload: Any, *, present: bool) -> None:
+def validate_marketplace_list_payload(
+    payload: Any,
+    *,
+    present: bool,
+    identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY,
+) -> None:
     root = require_json_object(payload, "Marketplace list output")
     entries = root.get("marketplaces")
     if not isinstance(entries, list):
         raise PluginFixtureError("Marketplace list omitted marketplaces")
-    matches = [entry for entry in entries if entry.get("name") == MARKETPLACE_NAME]
+    matches = [
+        entry for entry in entries if entry.get("name") == identity.marketplace_name
+    ]
     if bool(matches) != present:
         raise PluginFixtureError("Marketplace configured-state mismatch")
 
 
-def validate_plugin_add_payload(payload: Any, fixture: Path) -> None:
+def validate_plugin_add_payload(
+    payload: Any,
+    fixture: Path,
+    identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY,
+) -> None:
     item = require_json_object(payload, "Plugin add output")
     expected = {
-        "pluginId": PLUGIN_SELECTOR,
-        "name": PLUGIN_ID,
-        "marketplaceName": MARKETPLACE_NAME,
-        "version": PLUGIN_VERSION,
+        "pluginId": identity.selector,
+        "name": identity.plugin_id,
+        "marketplaceName": identity.marketplace_name,
+        "version": identity.plugin_version,
         "authPolicy": "ON_INSTALL",
     }
     for key, value in expected.items():
@@ -867,7 +902,7 @@ def validate_plugin_add_payload(payload: Any, fixture: Path) -> None:
         installed_path.relative_to(expected_root.resolve())
     except ValueError as exc:
         raise PluginFixtureError("Plugin cache path escaped isolated CODEX_HOME") from exc
-    if installed_path.name != PLUGIN_VERSION:
+    if installed_path.name != identity.plugin_version:
         raise PluginFixtureError("Plugin cache version directory mismatch")
 
 
@@ -877,6 +912,7 @@ def validate_plugin_list_payload(
     *,
     installed: bool,
     available: bool,
+    identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY,
 ) -> None:
     root = require_json_object(payload, "Plugin list output")
     installed_items = root.get("installed")
@@ -884,10 +920,10 @@ def validate_plugin_list_payload(
     if not isinstance(installed_items, list) or not isinstance(available_items, list):
         raise PluginFixtureError("Plugin list omitted installed or available arrays")
     installed_matches = [
-        item for item in installed_items if item.get("pluginId") == PLUGIN_SELECTOR
+        item for item in installed_items if item.get("pluginId") == identity.selector
     ]
     available_matches = [
-        item for item in available_items if item.get("pluginId") == PLUGIN_SELECTOR
+        item for item in available_items if item.get("pluginId") == identity.selector
     ]
     if bool(installed_matches) != installed or bool(available_matches) != available:
         raise PluginFixtureError("Plugin list state mismatch")
@@ -896,9 +932,9 @@ def validate_plugin_list_payload(
         *[(value, False, False) for value in available_matches],
     ):
         expected = {
-            "name": PLUGIN_ID,
-            "marketplaceName": MARKETPLACE_NAME,
-            "version": PLUGIN_VERSION,
+            "name": identity.plugin_id,
+            "marketplaceName": identity.marketplace_name,
+            "version": identity.plugin_version,
             "installed": expected_installed,
             "enabled": expected_enabled,
             "installPolicy": "AVAILABLE",
@@ -912,17 +948,20 @@ def validate_plugin_list_payload(
             raise PluginFixtureError("Plugin list source is not local")
         source_path = Path(str(source.get("path", ""))).resolve()
         if source_path != (
-            fixture / "source-marketplace" / "plugins" / PLUGIN_ID
+            fixture / "source-marketplace" / "plugins" / identity.plugin_id
         ).resolve():
             raise PluginFixtureError("Plugin list source path mismatch")
 
 
-def validate_plugin_remove_payload(payload: Any) -> None:
+def validate_plugin_remove_payload(
+    payload: Any,
+    identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY,
+) -> None:
     item = require_json_object(payload, "Plugin remove output")
     expected = {
-        "pluginId": PLUGIN_SELECTOR,
-        "name": PLUGIN_ID,
-        "marketplaceName": MARKETPLACE_NAME,
+        "pluginId": identity.selector,
+        "name": identity.plugin_id,
+        "marketplaceName": identity.marketplace_name,
     }
     for key, value in expected.items():
         if item.get(key) != value:
@@ -1032,12 +1071,20 @@ def app_server_request(
                 response = message
                 break
     finally:
-        process.terminate()
+        try:
+            process.stdin.close()
+        except OSError:
+            pass
         try:
             process.wait(timeout=5)
         except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait(timeout=5)
+            process.terminate()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait(timeout=5)
+        stderr_reader.join(timeout=1)
     if response is None:
         stderr_reader.join(timeout=1)
         raise PluginFixtureError(
@@ -1058,6 +1105,7 @@ def discover_skills(
     *,
     expect_plugin: bool,
     expect_standalone: bool,
+    identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY,
 ) -> dict[str, Any]:
     result = app_server_request(
         fixture,
@@ -1076,8 +1124,10 @@ def discover_skills(
     if entry.get("errors"):
         raise PluginFixtureError(f"skills/list reported errors: {entry['errors']}")
     skills = entry.get("skills", [])
-    expected_plugin_names = {f"{PLUGIN_ID}:{skill}" for skill in EXPECTED_SKILLS}
-    expected_standalone_names = set(EXPECTED_SKILLS)
+    expected_plugin_names = {
+        f"{identity.plugin_id}:{skill}" for skill in identity.expected_skills
+    }
+    expected_standalone_names = set(identity.expected_skills)
     plugin_items = {
         item.get("name"): item
         for item in skills
@@ -1130,7 +1180,7 @@ def discover_skills(
         "standalone_names": sorted(standalone_items),
         "plugin_scopes": sorted(plugin_scopes),
         "standalone_scopes": sorted(standalone_scopes),
-        "namespace_pattern": f"{PLUGIN_ID}:<skill>",
+        "namespace_pattern": f"{identity.plugin_id}:<skill>",
     }
 
 
@@ -1139,12 +1189,20 @@ def run_phase_a(
     env: dict[str, str],
     protected_before: dict[str, dict[str, Any]],
     source_before: dict[str, Any],
+    *,
+    identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY,
+    fail_after_step: str | None = None,
 ) -> dict[str, Any]:
     fixture = guarded_fixture(fixture)
     marketplace_root = fixture / "source-marketplace"
     empty_project = fixture / "project-empty"
     coexist_project = fixture / "project-with-standalone-skills"
     steps: list[str] = []
+
+    def mark(step: str) -> None:
+        steps.append(step)
+        if fail_after_step == step:
+            raise PluginFixtureError(f"injected lifecycle failure after {step}")
 
     payload = run_cli_step(
         fixture,
@@ -1153,8 +1211,8 @@ def run_phase_a(
         "marketplace-add",
         ["marketplace", "add", str(marketplace_root), "--json"],
     )
-    validate_marketplace_add_payload(payload, fixture)
-    steps.append("marketplace_add")
+    validate_marketplace_add_payload(payload, fixture, identity)
+    mark("marketplace_add")
     payload = run_cli_step(
         fixture,
         env,
@@ -1162,128 +1220,158 @@ def run_phase_a(
         "marketplace-list",
         ["marketplace", "list", "--json"],
     )
-    validate_marketplace_list_payload(payload, present=True)
-    steps.append("marketplace_list")
+    validate_marketplace_list_payload(payload, present=True, identity=identity)
+    mark("marketplace_list")
     payload = run_cli_step(
         fixture,
         env,
         protected_before,
         "plugin-available",
-        ["list", "--marketplace", MARKETPLACE_NAME, "--available", "--json"],
+        ["list", "--marketplace", identity.marketplace_name, "--available", "--json"],
     )
     validate_plugin_list_payload(
-        payload, fixture, installed=False, available=True
+        payload, fixture, installed=False, available=True, identity=identity
     )
-    steps.append("plugin_available")
+    mark("plugin_available")
     payload = run_cli_step(
         fixture,
         env,
         protected_before,
         "plugin-add",
-        ["add", PLUGIN_SELECTOR, "--json"],
+        ["add", identity.selector, "--json"],
     )
-    validate_plugin_add_payload(payload, fixture)
-    steps.append("plugin_add")
+    validate_plugin_add_payload(payload, fixture, identity)
+    mark("plugin_add")
     payload = run_cli_step(
         fixture,
         env,
         protected_before,
         "plugin-list-installed",
-        ["list", "--marketplace", MARKETPLACE_NAME, "--json"],
+        ["list", "--marketplace", identity.marketplace_name, "--json"],
     )
     validate_plugin_list_payload(
-        payload, fixture, installed=True, available=False
+        payload, fixture, installed=True, available=False, identity=identity
     )
-    steps.append("plugin_list_installed")
+    mark("plugin_list_installed")
 
     installed_empty = discover_skills(
-        fixture, env, empty_project, expect_plugin=True, expect_standalone=False
+        fixture,
+        env,
+        empty_project,
+        expect_plugin=True,
+        expect_standalone=False,
+        identity=identity,
     )
     assert_protected_unchanged(protected_before)
-    steps.append("discovery_installed")
+    mark("discovery_installed")
     coexist = discover_skills(
-        fixture, env, coexist_project, expect_plugin=True, expect_standalone=True
+        fixture,
+        env,
+        coexist_project,
+        expect_plugin=True,
+        expect_standalone=True,
+        identity=identity,
     )
     assert_protected_unchanged(protected_before)
-    steps.append("discovery_coexistence")
+    mark("discovery_coexistence")
 
     payload = run_cli_step(
         fixture,
         env,
         protected_before,
         "plugin-remove",
-        ["remove", PLUGIN_SELECTOR, "--json"],
+        ["remove", identity.selector, "--json"],
     )
-    validate_plugin_remove_payload(payload)
-    steps.append("plugin_remove")
+    validate_plugin_remove_payload(payload, identity)
+    mark("plugin_remove")
     payload = run_cli_step(
         fixture,
         env,
         protected_before,
         "plugin-list-after-remove",
-        ["list", "--marketplace", MARKETPLACE_NAME, "--json"],
+        ["list", "--marketplace", identity.marketplace_name, "--json"],
     )
     validate_plugin_list_payload(
-        payload, fixture, installed=False, available=False
+        payload, fixture, installed=False, available=False, identity=identity
     )
-    steps.append("plugin_list_after_remove")
+    mark("plugin_list_after_remove")
     removed_empty = discover_skills(
-        fixture, env, empty_project, expect_plugin=False, expect_standalone=False
+        fixture,
+        env,
+        empty_project,
+        expect_plugin=False,
+        expect_standalone=False,
+        identity=identity,
     )
     removed_coexist = discover_skills(
-        fixture, env, coexist_project, expect_plugin=False, expect_standalone=True
+        fixture,
+        env,
+        coexist_project,
+        expect_plugin=False,
+        expect_standalone=True,
+        identity=identity,
     )
     assert_protected_unchanged(protected_before)
-    steps.append("discovery_after_remove")
+    mark("discovery_after_remove")
 
     payload = run_cli_step(
         fixture,
         env,
         protected_before,
         "plugin-reinstall",
-        ["add", PLUGIN_SELECTOR, "--json"],
+        ["add", identity.selector, "--json"],
     )
-    validate_plugin_add_payload(payload, fixture)
-    steps.append("plugin_reinstall")
+    validate_plugin_add_payload(payload, fixture, identity)
+    mark("plugin_reinstall")
     reinstalled = discover_skills(
-        fixture, env, empty_project, expect_plugin=True, expect_standalone=False
+        fixture,
+        env,
+        empty_project,
+        expect_plugin=True,
+        expect_standalone=False,
+        identity=identity,
     )
     assert_protected_unchanged(protected_before)
-    steps.append("discovery_after_reinstall")
+    mark("discovery_after_reinstall")
 
     payload = run_cli_step(
         fixture,
         env,
         protected_before,
         "plugin-final-remove",
-        ["remove", PLUGIN_SELECTOR, "--json"],
+        ["remove", identity.selector, "--json"],
     )
-    validate_plugin_remove_payload(payload)
-    steps.append("plugin_final_remove")
+    validate_plugin_remove_payload(payload, identity)
+    mark("plugin_final_remove")
     payload = run_cli_step(
         fixture,
         env,
         protected_before,
         "plugin-list-after-final-remove",
-        ["list", "--marketplace", MARKETPLACE_NAME, "--json"],
+        ["list", "--marketplace", identity.marketplace_name, "--json"],
     )
     validate_plugin_list_payload(
-        payload, fixture, installed=False, available=False
+        payload, fixture, installed=False, available=False, identity=identity
     )
-    steps.append("plugin_list_after_final_remove")
+    mark("plugin_list_after_final_remove")
     final_discovery = discover_skills(
-        fixture, env, empty_project, expect_plugin=False, expect_standalone=False
+        fixture,
+        env,
+        empty_project,
+        expect_plugin=False,
+        expect_standalone=False,
+        identity=identity,
     )
     assert_protected_unchanged(protected_before)
-    steps.append("final_discovery_absent")
+    mark("final_discovery_absent")
     run_cli_step(
         fixture,
         env,
         protected_before,
         "marketplace-remove",
-        ["marketplace", "remove", MARKETPLACE_NAME, "--json"],
+        ["marketplace", "remove", identity.marketplace_name, "--json"],
     )
-    steps.append("marketplace_remove_cleanup")
+    mark("marketplace_remove_cleanup")
     final_marketplaces = run_cli_step(
         fixture,
         env,
@@ -1291,8 +1379,10 @@ def run_phase_a(
         "marketplace-list-final",
         ["marketplace", "list", "--json"],
     )
-    validate_marketplace_list_payload(final_marketplaces, present=False)
-    steps.append("marketplace_final_absent")
+    validate_marketplace_list_payload(
+        final_marketplaces, present=False, identity=identity
+    )
+    mark("marketplace_final_absent")
 
     if source_state_snapshot() != source_before:
         raise PluginFixtureError("repository Skill source, locks, or Git HEAD changed")

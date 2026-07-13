@@ -44,7 +44,7 @@ public_submission_performed: false
 | CoTend 名称 | 可保留 `cotend-init` 等 canonical ID，不产生 Plugin namespace 前缀。 | 当前 fixture 观察到 `cotend:cotend-*`，但友好 display name 可隐藏大部分复杂度。 |
 | 更新与卸载 | 隔离 adapter 已实现整套 7 Skill 的 component receipt、更新、修复、禁用、卸载、rollback 和 recovery；production state resolver 与 schema v4 已完成隔离验证，真实 user apply 仍关闭。 | 平台提供 install/enable/disable/remove 与版本化缓存；本地开发更新仍需 cachebuster、reinstall 和新任务。 |
 | 小白前置知识 | 手工复制目录不合格；由 AI 调用 installer 可降低门槛，但仍是本地 setup/实验语义。 | 公共 Directory 支持桌面搜索、详情和点击安装，是当前最明确的公开 novice 路径。 |
-| 当前完成度 | schema v3 adapter 19 项、resolver 13 项、schema v4/migration 13 项隔离测试均复用同一 transaction core；真实用户 apply 尚未验证。 | 隔离 fixture、真实临时 add/remove 和部分 Desktop 表面已验证；production manifest/version/submission 仍未完成。 |
+| 当前完成度 | schema v3 adapter 19 项、resolver 13 项、schema v4/migration 13 项隔离测试均复用同一 transaction core；真实用户 apply 尚未验证。 | 精确 37 文件 production candidate 已通过 17 步隔离 CLI lifecycle 和 5 步故障恢复；完整 Desktop、submission 与公开安装仍未完成。 |
 
 ### 路径冲突的产品含义
 
@@ -271,3 +271,11 @@ submission_release_publish: false
 仓库只跟踪 manifest、package lock 和构建/验证逻辑；完整包每次从唯一 Skill 源在 gitignored 目录组装。两次构建摘要相同，7 Skill/30 文件逐字节一致，13 类负向边界和 6 项真实用户 stat-only 保护通过。详见 [`docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-PACKAGE.md`](evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-PACKAGE.md)。
 
 该结果只关闭 production package contract，不把候选 ID/version 升级为最终发布决定。完整 Desktop 生命周期、公开身份与法律/品牌素材、submission 的 5+3 测试、Portal 审核和 publish 仍是后续独立门。
+
+## Public Plugin 精确候选隔离生命周期
+
+L46 已直接使用 L44 构建器生成的 `cotend@0.1.0-rc.1` 精确 37 文件包，在 15 个重定向写入根和一次性 local Marketplace 中完成 17 步正常生命周期。安装后 app-server 发现 7 个 Plugin Skill；与项目 standalone Skills 共存时两组各 7 项，移除 Plugin 不影响 repo-scope Skills。最终 Plugin 与 Marketplace 均 absent，全部隔离运行时根已清除。
+
+独立故障场景在 `plugin_add` 成功后注入异常，再通过 CLI 完成 Plugin remove/absent、discovery absent、Marketplace remove/absent 共 5 步恢复。8 项真实 Codex/Agents 边界只做 stat-only 快照且前后不变；package inputs、locks 与 Git HEAD 也未变化。详见 [`docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-LIFECYCLE.md`](evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-LIFECYCLE.md)。
+
+这仍是隔离 CLI 证据，不是当前个人安装、Desktop 完整体验或公开上架。最终身份、Portal submission、公开发布和 push 继续关闭。

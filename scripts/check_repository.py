@@ -185,6 +185,20 @@ EXPECTED_PLUGIN_PACKAGE_TESTS = {
     "test_two_builds_are_byte_deterministic",
     "test_valid_existing_output_rebuild_is_idempotent",
 }
+EXPECTED_PLUGIN_LIFECYCLE_FILES = {
+    "docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-LIFECYCLE.md",
+    "scripts/verify_production_plugin_lifecycle.py",
+    "tests/test_production_plugin_lifecycle.py",
+}
+EXPECTED_PLUGIN_LIFECYCLE_TESTS = {
+    "test_fail_after_plugin_add_is_deterministic",
+    "test_l46_root_guard_rejects_other_private_directory",
+    "test_marketplace_is_local_only_and_not_part_of_package",
+    "test_materialized_package_matches_l44_digest",
+    "test_parameterized_payload_rejects_fixture_identity",
+    "test_production_identity_is_separate_from_fixture_default",
+    "test_purge_removes_only_isolated_runtime_roots",
+}
 EXPECTED_DELIVERY_PRODUCT_FILES = {
     "delivery/codex-artifact.lock.json",
     "scripts/cotend_delivery.py",
@@ -2385,6 +2399,105 @@ def production_plugin_package_errors(
     return errors
 
 
+def production_plugin_lifecycle_errors(
+    evidence_text: str,
+    candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    missing = EXPECTED_PLUGIN_LIFECYCLE_FILES - candidates
+    if missing:
+        errors.append(
+            f"production Plugin lifecycle artifacts are missing: {sorted(missing)}"
+        )
+        return errors
+
+    verifier_text = read("scripts/verify_production_plugin_lifecycle.py")
+    for marker in (
+        'MARKETPLACE_NAME = "cotend-production-candidate-local"',
+        "PRODUCTION_IDENTITY = lifecycle.PluginLifecycleIdentity",
+        "package.build_package(plugin_root)",
+        "package.verify_package(plugin_root)",
+        'fail_after_step="plugin_add"',
+        "recover_after_injected_failure",
+        "purge_isolated_write_roots",
+        "protected_user_snapshot",
+        "PRODUCTION_PLUGIN_LIFECYCLE_OK",
+        "real_user_plugin_or_marketplace_write",
+    ):
+        if marker not in verifier_text:
+            errors.append(f"production Plugin lifecycle verifier is missing: {marker}")
+
+    fixture_text = read("scripts/verify_isolated_codex_plugin.py")
+    for marker in (
+        "class PluginLifecycleIdentity",
+        "FIXTURE_LIFECYCLE_IDENTITY = PluginLifecycleIdentity",
+        "identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY",
+        "process.stdin.close()",
+        "injected lifecycle failure after",
+    ):
+        if marker not in fixture_text:
+            errors.append(f"shared Plugin lifecycle harness is missing: {marker}")
+
+    test_text = read("tests/test_production_plugin_lifecycle.py")
+    actual_tests = set(
+        re.findall(r"^\s+def (test_[a-z0-9_]+)\(", test_text, re.MULTILINE)
+    )
+    missing_tests = EXPECTED_PLUGIN_LIFECYCLE_TESTS - actual_tests
+    if missing_tests:
+        errors.append(
+            f"production Plugin lifecycle tests are missing: {sorted(missing_tests)}"
+        )
+
+    for key, expected in {
+        "status": {"passed_isolated_production_plugin_lifecycle"},
+        "evidence_type": {"executed"},
+        "codex_version": {"codex-cli_0.144.1"},
+        "candidate_plugin_id": {"cotend"},
+        "candidate_version": {"0.1.0-rc.1"},
+        "identity_authority": {"candidate_only_not_release"},
+        "package_files": {"37"},
+        "adopted_skills": {"7"},
+        "adopted_skill_files": {"30"},
+        "normal_lifecycle_steps": {"17"},
+        "failure_recovery_steps": {"5"},
+        "installed_plugin_skills": {"7"},
+        "coexistence_standalone_skills": {"7"},
+        "write_roots_redirected": {"15"},
+        "protected_user_boundaries": {"8"},
+        "runtime_write_roots_purged": {"true"},
+        "final_plugin_installed": {"false"},
+        "final_marketplace_configured": {"false"},
+        "real_user_plugin_or_marketplace_write": {"false"},
+        "official_validator": {"passed"},
+        "release_or_publish": {"false"},
+    }.items():
+        if metadata_values(evidence_text, key) != expected:
+            errors.append(f"production Plugin lifecycle evidence mismatch: {key}")
+
+    for marker in (
+        "精确 `cotend@0.1.0-rc.1` 37 文件生产候选",
+        "正常场景完成 17 步",
+        "完成 5 步恢复",
+        "15 个隔离运行时写入根均被清除",
+        "真实用户边界只做 stat-only 元数据快照",
+        "该次运行没有被接受为证据",
+        "不把隔离 lifecycle 表述成已经上架",
+        "PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=37",
+    ):
+        if marker not in evidence_text:
+            errors.append(f"production Plugin lifecycle evidence is missing: {marker}")
+
+    tracked_marketplaces = sorted(
+        path for path in candidates if path.endswith("/.agents/plugins/marketplace.json")
+    )
+    if tracked_marketplaces:
+        errors.append(
+            "production Plugin lifecycle must not track Marketplace files: "
+            f"{tracked_marketplaces}"
+        )
+    return errors
+
+
 def contract_relationship_errors(index_text: str, specs: dict[str, str]) -> list[str]:
     errors: list[str] = []
     dependencies = index_dependencies(index_text)
@@ -3037,6 +3150,19 @@ def main() -> int:
         errors.extend(
             production_plugin_package_errors(
                 read(production_plugin_package_evidence_path),
+                candidates,
+            )
+        )
+
+    production_plugin_lifecycle_evidence_path = (
+        "docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-LIFECYCLE.md"
+    )
+    if production_plugin_lifecycle_evidence_path not in candidates:
+        errors.append("isolated production Plugin lifecycle evidence is missing or ignored")
+    else:
+        errors.extend(
+            production_plugin_lifecycle_errors(
+                read(production_plugin_lifecycle_evidence_path),
                 candidates,
             )
         )
