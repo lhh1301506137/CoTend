@@ -2,7 +2,7 @@
 
 ```yaml
 status: active_productization_and_research_registry
-checked_at: 2026-07-12
+checked_at: 2026-07-13
 relationship: primary_user_owned_productization_source_plus_secondary_public_references
 implementation_dependency: pinned_dual_ai_release_2026_07_11_3
 source_copying: scoped_5_adapted_plus_2_byte_identical_skills
@@ -37,6 +37,21 @@ automatic_update: forbidden
 ```
 
 审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容直接改名或适配，对两个内置 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。仓库源树、逐文件 adoption 和 final lock 已完成；公开分发位置、live 安装、Plugin/Marketplace、Claude 载体和发布者身份认证仍未完成。
+
+## PF01 OpenAI Codex 官方平台文档
+
+```yaml
+role: platform_capability_source
+sources:
+  - https://learn.chatgpt.com/docs/build-skills#where-to-save-skills
+  - https://learn.chatgpt.com/docs/config-file/config-advanced#config-and-state-locations
+checked_at: 2026-07-13
+relationship: official_path_and_discovery_facts
+adoption_status: path_facts_only
+content_adoption: none
+```
+
+采用范围只包括 canonical user Skill 路径、同名 Skill 不合并、symlink discovery 和 `CODEX_HOME` 的平台含义。CoTend state root、installation ID、layout fingerprint 与写入停止边界是本产品自己的设计决定，不归因于官方文档。平台事实变化时必须重新验证 resolver；本条不授权 Plugin、Marketplace、配置或身份材料读取。
 
 ## RF01 Superpowers
 

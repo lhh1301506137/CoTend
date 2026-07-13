@@ -170,16 +170,22 @@ EXPECTED_PLUGIN_NAMESPACE_TESTS = {
 EXPECTED_DELIVERY_PRODUCT_FILES = {
     "delivery/codex-artifact.lock.json",
     "scripts/cotend_delivery.py",
+    "scripts/cotend_user_delivery.py",
     "scripts/verify_delivery_lifecycle.py",
+    "scripts/verify_production_user_resolver.py",
     "scripts/verify_user_skill_delivery.py",
     "src/cotend_delivery/__init__.py",
     "src/cotend_delivery/__main__.py",
     "src/cotend_delivery/cli.py",
     "src/cotend_delivery/core.py",
+    "src/cotend_delivery/production_cli.py",
+    "src/cotend_delivery/production_resolver.py",
     "src/cotend_delivery/user_scope.py",
     "tests/test_cotend_delivery.py",
+    "tests/test_production_user_resolver.py",
     "tests/test_user_skill_delivery.py",
     "docs/evidence/ISOLATED-USER-SKILL-DELIVERY.md",
+    "docs/evidence/PRODUCTION-USER-LAYOUT-RESOLVER.md",
 }
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
@@ -261,6 +267,21 @@ EXPECTED_USER_DELIVERY_TESTS = {
     "test_layout_rejects_linked_user_root",
     "test_layout_rejects_state_and_skill_root_overlap",
     "test_linked_companion_is_rejected_when_platform_allows_link_creation",
+}
+EXPECTED_PRODUCTION_RESOLVER_TESTS = {
+    "test_resolves_official_roots_and_home_owned_state",
+    "test_same_home_multiple_codex_home_shares_installation_identity",
+    "test_identity_does_not_expose_user_or_absolute_path",
+    "test_environment_codex_home_is_used_when_not_injected",
+    "test_relative_empty_and_overlapping_roots_are_rejected",
+    "test_linked_codex_home_is_rejected",
+    "test_resolve_and_absent_inspection_are_zero_write",
+    "test_cli_dry_run_is_structured_and_zero_write",
+    "test_cli_apply_rejects_before_path_resolution_and_zero_write",
+    "test_schema_v3_receipt_requires_explicit_migration",
+    "test_unknown_state_blocks_without_cleanup",
+    "test_first_party_compatibility_residue_requires_migration",
+    "test_unowned_canonical_residue_requires_migration",
 }
 
 # checker-self-scan-allowlist-start
@@ -2359,6 +2380,81 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         ):
             if marker not in user_evidence:
                 errors.append(f"user delivery evidence is missing: {marker}")
+
+    production_resolver_path = "src/cotend_delivery/production_resolver.py"
+    if production_resolver_path in candidates:
+        production_resolver = read(production_resolver_path)
+        for marker in (
+            "class ProductionUserLayout",
+            'STATE_DIRECTORY_NAME = ".cotend-delivery"',
+            '"cotend.production-installation.v1"',
+            '"cotend.production-layout.v1"',
+            '"explicit_receipt_migration_required"',
+            '"first_party_compatibility_residue"',
+            '"layout_context_changed"',
+            '"production_apply_forbidden"',
+        ):
+            if marker not in production_resolver:
+                errors.append(f"production resolver marker is missing: {marker}")
+
+    production_cli_path = "src/cotend_delivery/production_cli.py"
+    if production_cli_path in candidates:
+        production_cli = read(production_cli_path)
+        for marker in (
+            'prog="cotend-user-delivery"',
+            "if args.apply:",
+            '"production_apply_forbidden"',
+            "resolve_production_user_layout",
+            "inspect_production_user_layout",
+            '"--expected-layout-fingerprint"',
+        ):
+            if marker not in production_cli:
+                errors.append(f"production user CLI marker is missing: {marker}")
+
+    production_harness_path = "scripts/verify_production_user_resolver.py"
+    if production_harness_path in candidates:
+        production_harness = read(production_harness_path)
+        for marker in (
+            "protected_boundaries",
+            "stat_only_snapshot",
+            "PRODUCTION_USER_RESOLVER_OK",
+            "unchanged=true",
+            "production_apply=false",
+        ):
+            if marker not in production_harness:
+                errors.append(f"production resolver harness marker is missing: {marker}")
+
+    production_tests_path = "tests/test_production_user_resolver.py"
+    if production_tests_path in candidates:
+        actual_production_tests = set(
+            re.findall(
+                r"^    def (test_[a-z0-9_]+)\(",
+                read(production_tests_path),
+                re.MULTILINE,
+            )
+        )
+        missing_production_tests = (
+            EXPECTED_PRODUCTION_RESOLVER_TESTS - actual_production_tests
+        )
+        if missing_production_tests:
+            errors.append(
+                "required production resolver tests are missing: "
+                f"{sorted(missing_production_tests)}"
+            )
+
+    production_evidence_path = "docs/evidence/PRODUCTION-USER-LAYOUT-RESOLVER.md"
+    if production_evidence_path in candidates:
+        production_evidence = read(production_evidence_path)
+        for marker in (
+            "status: passed_non_live_only",
+            "canonical_payload: $HOME/.agents/skills",
+            "state_root: $HOME/.agents/.cotend-delivery",
+            "PRODUCTION_USER_RESOLVER_OK tests=13 skipped=0 protected_boundaries=6 unchanged=true production_apply=false",
+            "real_user_scope_write: false",
+            "production_apply: forbidden",
+        ):
+            if marker not in production_evidence:
+                errors.append(f"production resolver evidence is missing: {marker}")
 
     target_lock_path = ROOT / "delivery" / "codex-artifact.lock.json"
     framework_lock_path = ROOT / "upstream" / "framework.lock.json"
