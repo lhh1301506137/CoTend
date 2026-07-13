@@ -199,6 +199,22 @@ EXPECTED_PLUGIN_LIFECYCLE_TESTS = {
     "test_production_identity_is_separate_from_fixture_default",
     "test_purge_removes_only_isolated_runtime_roots",
 }
+EXPECTED_PLUGIN_SUBMISSION_FILES = {
+    "docs/evidence/CODEX-PLUGIN-SUBMISSION-MATERIAL-CONTRACT.md",
+    "packaging/codex-plugin/submission-materials/submission.json",
+    "packaging/codex-plugin/submission-materials/reviewer-tests.json",
+    "scripts/verify_plugin_submission_materials.py",
+    "tests/test_plugin_submission_materials.py",
+}
+EXPECTED_PLUGIN_SUBMISSION_TESTS = {
+    "test_valid_contract_binds_exact_production_candidate",
+    "test_listing_and_starter_prompts_match_plugin_manifest",
+    "test_reviewer_contract_has_exact_five_positive_three_negative",
+    "test_reviewer_fixtures_are_public_and_self_contained",
+    "test_external_requirements_remain_real_blockers",
+    "test_release_notes_are_initial_draft_not_submission_claim",
+    "test_fifteen_negative_mutations_are_rejected",
+}
 EXPECTED_DELIVERY_PRODUCT_FILES = {
     "delivery/codex-artifact.lock.json",
     "scripts/cotend_delivery.py",
@@ -2498,6 +2514,173 @@ def production_plugin_lifecycle_errors(
     return errors
 
 
+def plugin_submission_material_errors(
+    evidence_text: str,
+    candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    missing = EXPECTED_PLUGIN_SUBMISSION_FILES - candidates
+    if missing:
+        errors.append(
+            f"Plugin submission material artifacts are missing: {sorted(missing)}"
+        )
+        return errors
+
+    try:
+        submission = json.loads(
+            read("packaging/codex-plugin/submission-materials/submission.json")
+        )
+        reviewer_tests = json.loads(
+            read("packaging/codex-plugin/submission-materials/reviewer-tests.json")
+        )
+    except (json.JSONDecodeError, OSError) as exc:
+        return [f"Plugin submission material JSON is invalid: {exc}"]
+
+    package_binding = submission.get("package", {})
+    if submission.get("status") != "draft_not_submitted":
+        errors.append("Plugin submission contract must remain draft_not_submitted")
+    if package_binding.get("plugin_id") != "cotend" or package_binding.get(
+        "version"
+    ) != "0.1.0-rc.1":
+        errors.append("Plugin submission package identity drifted")
+    if package_binding.get("file_count") != 37 or package_binding.get(
+        "path_hash_manifest_sha256"
+    ) != "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066":
+        errors.append("Plugin submission package digest drifted")
+
+    prompts = submission.get("starter_prompts")
+    manifest = json.loads(
+        read("packaging/codex-plugin/cotend/.codex-plugin/plugin.json")
+    )
+    if prompts != manifest.get("interface", {}).get("defaultPrompt"):
+        errors.append("Plugin submission starter prompts differ from manifest")
+    positive = reviewer_tests.get("positive_cases")
+    negative = reviewer_tests.get("negative_cases")
+    if not isinstance(positive, list) or len(positive) != 5:
+        errors.append("Plugin submission must contain exactly five positive cases")
+    if not isinstance(negative, list) or len(negative) != 3:
+        errors.append("Plugin submission must contain exactly three negative cases")
+    if reviewer_tests.get("status") != "contract_only_not_run":
+        errors.append("Plugin reviewer cases must remain contract_only_not_run")
+
+    blockers = submission.get("blockers")
+    if not isinstance(blockers, list) or len(blockers) != 10:
+        errors.append("Plugin submission external blocker inventory drifted")
+    elif any(
+        not isinstance(item, dict)
+        or item.get("status") != "unresolved"
+        or item.get("value") is not None
+        for item in blockers
+    ):
+        errors.append("Plugin submission blocker was resolved without evidence")
+    if submission.get("readiness") != {
+        "status": "blocked_not_ready_for_portal_submission",
+        "unresolved_blocker_ids": [
+            "final_plugin_identity_and_version",
+            "verified_publisher_identity",
+            "apps_management_write_access",
+            "production_logo",
+            "website_url",
+            "support_url",
+            "privacy_policy_url",
+            "terms_url",
+            "country_or_region_availability",
+            "policy_attestations",
+        ],
+        "portal_submission_ready": False,
+    }:
+        errors.append("Plugin submission readiness boundary drifted")
+    if submission.get("authority") != {
+        "repository_contract_only": True,
+        "portal_opened": False,
+        "portal_draft_created": False,
+        "submitted_for_review": False,
+        "approved": False,
+        "published": False,
+        "release_authorized": False,
+        "push_authorized": False,
+    }:
+        errors.append("Plugin submission authority boundary drifted")
+
+    verifier_text = read("scripts/verify_plugin_submission_materials.py")
+    for marker in (
+        "EXPECTED_POSITIVE_IDS",
+        "EXPECTED_NEGATIVE_IDS",
+        "EXPECTED_BLOCKER_IDS",
+        "contract_only_not_run",
+        "submission blocker was resolved without evidence",
+        "PLUGIN_SUBMISSION_MATERIALS_OK",
+    ):
+        if marker not in verifier_text:
+            errors.append(f"Plugin submission verifier is missing: {marker}")
+    test_text = read("tests/test_plugin_submission_materials.py")
+    actual_tests = set(
+        re.findall(r"^\s+def (test_[a-z0-9_]+)\(", test_text, re.MULTILINE)
+    )
+    missing_tests = EXPECTED_PLUGIN_SUBMISSION_TESTS - actual_tests
+    if missing_tests:
+        errors.append(
+            f"Plugin submission material tests are missing: {sorted(missing_tests)}"
+        )
+    if "NEGATIVE_MUTATION_COUNT = 15" not in test_text:
+        errors.append("Plugin submission negative mutation count drifted")
+
+    for key, expected in {
+        "status": {"passed_repo_only_submission_material_contract"},
+        "evidence_type": {"executed"},
+        "submission_type": {"skills_only"},
+        "candidate_plugin_id": {"cotend"},
+        "candidate_version": {"0.1.0-rc.1"},
+        "identity_authority": {"candidate_only_not_release"},
+        "package_files": {"37"},
+        "submission_contract_status": {"draft_not_submitted"},
+        "starter_prompts": {"3"},
+        "positive_reviewer_cases": {"5"},
+        "negative_reviewer_cases": {"3"},
+        "reviewer_case_execution": {"contract_only_not_run"},
+        "unresolved_external_blockers": {"10"},
+        "focused_unit_tests": {"7"},
+        "negative_mutations": {"15"},
+        "full_unit_tests": {"131"},
+        "production_package_regression": {
+            "passed_8_tests_13_negative_6_boundaries"
+        },
+        "production_lifecycle_regression": {
+            "passed_17_normal_5_recovery_15_roots_purged"
+        },
+        "repository_check": {
+            "passed_150_public_candidates_19_capabilities_19_specs"
+        },
+        "ruff_and_compileall": {"passed"},
+        "portal_opened": {"false"},
+        "submitted_for_review": {"false"},
+        "release_or_publish": {"false"},
+        "push": {"false"},
+    }.items():
+        if metadata_values(evidence_text, key) != expected:
+            errors.append(f"Plugin submission material evidence mismatch: {key}")
+    for marker in (
+        "恰好 5 个正向和 3 个负向 reviewer case",
+        "contract_only_not_run",
+        "10 个未解决 blocker",
+        "没有打开 OpenAI Platform 或 submission Portal",
+        "PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted",
+        "Ran 131 tests - OK",
+        "PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=37",
+        "不表示已经 ready for Portal submission",
+    ):
+        if marker not in evidence_text:
+            errors.append(f"Plugin submission material evidence is missing: {marker}")
+    attributes = read(".gitattributes")
+    for path in (
+        "/packaging/codex-plugin/submission-materials/submission.json text eol=lf",
+        "/packaging/codex-plugin/submission-materials/reviewer-tests.json text eol=lf",
+    ):
+        if path not in attributes:
+            errors.append(f"Plugin submission LF contract is missing: {path}")
+    return errors
+
+
 def contract_relationship_errors(index_text: str, specs: dict[str, str]) -> list[str]:
     errors: list[str] = []
     dependencies = index_dependencies(index_text)
@@ -3163,6 +3346,19 @@ def main() -> int:
         errors.extend(
             production_plugin_lifecycle_errors(
                 read(production_plugin_lifecycle_evidence_path),
+                candidates,
+            )
+        )
+
+    plugin_submission_evidence_path = (
+        "docs/evidence/CODEX-PLUGIN-SUBMISSION-MATERIAL-CONTRACT.md"
+    )
+    if plugin_submission_evidence_path not in candidates:
+        errors.append("Plugin submission material evidence is missing or ignored")
+    else:
+        errors.extend(
+            plugin_submission_material_errors(
+                read(plugin_submission_evidence_path),
                 candidates,
             )
         )
