@@ -227,7 +227,7 @@ EXPECTED_SUBMISSION_PREREQUISITE_TESTS = {
     "test_decision_graph_is_acyclic_and_one_at_a_time",
     "test_policy_attestations_are_the_final_gate",
     "test_repository_and_external_responsibilities_are_explicit",
-    "test_owner_facts_and_external_authority_remain_unset",
+    "test_q01_route_is_recorded_but_external_authority_remains_unset",
     "test_q01_explains_publisher_mode_tradeoff_in_chinese",
     "test_fourteen_negative_mutations_are_rejected",
 }
@@ -2847,7 +2847,7 @@ def submission_prerequisite_packet_errors(
             "status=awaiting_owner_decisions",
             "prerequisites=10",
             "decisions=7",
-            "active=Q01-publisher-mode",
+            "active=Q02-final-plugin-identity",
             "digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
         ):
             if marker not in result.stdout:

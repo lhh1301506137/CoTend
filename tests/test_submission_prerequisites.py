@@ -43,11 +43,14 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
         self.assertEqual(result["status"], "awaiting_owner_decisions")
         self.assertEqual(result["prerequisites"], 10)
         self.assertEqual(result["decisions"], 7)
-        self.assertEqual(result["active_decision"], "Q01-publisher-mode")
+        self.assertEqual(result["active_decision"], "Q02-final-plugin-identity")
         self.assertEqual(
             result["package_digest"],
             self.submission["package"]["path_hash_manifest_sha256"],
         )
+        q02 = self.packet["decisions"][1]
+        self.assertIn("尚未验证", q02["options"][0]["impact_zh"])
+        self.assertIn("重新打开 Q02", q02["options"][0]["impact_zh"])
 
     def test_prerequisites_exactly_map_ten_canonical_blockers(self) -> None:
         canonical = [blocker["id"] for blocker in self.submission["blockers"]]
@@ -69,7 +72,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             if decision["status"] == "awaiting_user_decision":
                 awaiting.append(decision["id"])
             seen.add(decision["id"])
-        self.assertEqual(awaiting, ["Q01-publisher-mode"])
+        self.assertEqual(awaiting, ["Q02-final-plugin-identity"])
         self.assertFalse(
             self.packet["decision_policy"]["ordinary_continue_answers_decision"]
         )
@@ -93,32 +96,39 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             all(len(item["completion_evidence_zh"]) >= 2 for item in by_id.values())
         )
 
-    def test_owner_facts_and_external_authority_remain_unset(self) -> None:
+    def test_q01_route_is_recorded_but_external_authority_remains_unset(self) -> None:
         self.assertTrue(
             all(
                 item["status"] == "unresolved" and item["value"] is None
                 for item in self.packet["prerequisites"]
             )
         )
+        q01, *remaining = self.packet["decisions"]
+        self.assertEqual(q01["status"], "answered")
+        self.assertEqual(q01["answer"], "1")
+        self.assertEqual(q01["evidence"]["evidence_type"], "user_explicit")
         self.assertTrue(
             all(
                 decision["answer"] is None and decision["evidence"] is None
-                for decision in self.packet["decisions"]
+                for decision in remaining
             )
         )
         authority = self.packet["authority"]
         self.assertTrue(authority["repository_preparation_only"])
+        self.assertTrue(authority["publisher_mode_selected"])
         self.assertTrue(
             all(
                 value is False
                 for key, value in authority.items()
-                if key != "repository_preparation_only"
+                if key not in {"repository_preparation_only", "publisher_mode_selected"}
             )
         )
 
     def test_q01_explains_publisher_mode_tradeoff_in_chinese(self) -> None:
         q01 = self.packet["decisions"][0]
         self.assertEqual(q01["id"], "Q01-publisher-mode")
+        self.assertEqual(q01["status"], "answered")
+        self.assertEqual(q01["answer"], "1")
         self.assertEqual(q01["recommended_option_id"], "1")
         self.assertEqual([option["id"] for option in q01["options"]], ["1", "2", "3"])
         self.assertIn("个人身份", q01["options"][0]["label_zh"])
@@ -162,10 +172,10 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
                 )
             ),
             "filled_owner_answer": mutate_packet(
-                lambda value: value["decisions"][0].__setitem__("answer", "1")
+                lambda value: value["decisions"][1].__setitem__("answer", "1")
             ),
             "two_active_decisions": mutate_packet(
-                lambda value: value["decisions"][1].__setitem__(
+                lambda value: value["decisions"][2].__setitem__(
                     "status", "awaiting_user_decision"
                 )
             ),
@@ -187,7 +197,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             ),
             "wrong_next_action": mutate_packet(
                 lambda value: value["next_action"].__setitem__(
-                    "decision_id", "Q02-final-plugin-identity"
+                    "decision_id", "Q03-public-web-presence"
                 )
             ),
         }

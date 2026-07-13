@@ -60,6 +60,16 @@ EXPECTED_DECISION_BLOCKERS = {
     "Q06-launch-availability": ["country_or_region_availability"],
     "Q07-policy-attestations": ["policy_attestations"],
 }
+EXPECTED_ANSWERED_DECISIONS = {
+    "Q01-publisher-mode": {
+        "answer": "1",
+        "evidence": {
+            "evidence_type": "user_explicit",
+            "recorded_on": "2026-07-14",
+            "scope": "publisher_mode_route_only_not_identity_verification",
+        },
+    }
+}
 EXPECTED_PREREQUISITE_DECISIONS = {
     blocker_id: decision_id
     for decision_id, blocker_ids in EXPECTED_DECISION_BLOCKERS.items()
@@ -115,7 +125,7 @@ EXPECTED_CAPABILITIES = {
 }
 EXPECTED_AUTHORITY = {
     "repository_preparation_only": True,
-    "publisher_mode_selected": False,
+    "publisher_mode_selected": True,
     "final_identity_selected": False,
     "verified_identity_observed": False,
     "apps_management_write_access_observed": False,
@@ -212,18 +222,28 @@ def _validate_decisions(decisions: Any) -> None:
         if decision["blocker_ids"] != EXPECTED_DECISION_BLOCKERS[decision_id]:
             raise SubmissionPrerequisiteError("decision-to-blocker mapping drifted")
         covered_blockers.extend(decision["blocker_ids"])
-        expected_status = (
-            "awaiting_user_decision"
-            if decision_id == EXPECTED_DECISION_IDS[0]
-            else "blocked_by_dependencies"
-        )
+        if decision_id in EXPECTED_ANSWERED_DECISIONS:
+            expected_status = "answered"
+        elif decision_id == "Q02-final-plugin-identity":
+            expected_status = "awaiting_user_decision"
+        else:
+            expected_status = "blocked_by_dependencies"
         if decision["status"] != expected_status:
             raise SubmissionPrerequisiteError("one-at-a-time decision state drifted")
         if decision["status"] == "awaiting_user_decision":
             awaiting.append(decision_id)
-        if decision["answer"] is not None or decision["evidence"] is not None:
+        expected_answer = EXPECTED_ANSWERED_DECISIONS.get(decision_id)
+        if expected_answer is None:
+            if decision["answer"] is not None or decision["evidence"] is not None:
+                raise SubmissionPrerequisiteError(
+                    "owner decision was filled without evidence"
+                )
+        elif {
+            "answer": decision["answer"],
+            "evidence": decision["evidence"],
+        } != expected_answer:
             raise SubmissionPrerequisiteError(
-                "owner decision was filled without evidence"
+                "recorded owner decision or evidence drifted"
             )
         _non_empty_chinese(decision["question_zh"], "decision question")
         _non_empty_chinese(decision["why_it_matters_zh"], "decision rationale")
@@ -240,8 +260,8 @@ def _validate_decisions(decisions: Any) -> None:
             _non_empty_chinese(option["impact_zh"], "decision option impact")
         seen.add(decision_id)
 
-    if awaiting != ["Q01-publisher-mode"]:
-        raise SubmissionPrerequisiteError("Q01 must be the only active decision")
+    if awaiting != ["Q02-final-plugin-identity"]:
+        raise SubmissionPrerequisiteError("Q02 must be the only active decision")
     if sorted(covered_blockers) != sorted(submission.EXPECTED_BLOCKER_IDS):
         raise SubmissionPrerequisiteError(
             "decisions do not cover every blocker exactly once"
@@ -384,7 +404,7 @@ def validate_submission_prerequisites(
         raise SubmissionPrerequisiteError("package binding drifted")
     if packet["decision_policy"] != {
         "mode": "one_at_a_time",
-        "current_decision_id": "Q01-publisher-mode",
+        "current_decision_id": "Q02-final-plugin-identity",
         "current_decision_status": "awaiting_user_decision",
         "ordinary_continue_answers_decision": False,
         "auto_fill_owner_facts": False,
@@ -398,12 +418,12 @@ def validate_submission_prerequisites(
     _validate_prerequisites(packet["prerequisites"], submission_contract)
     if packet["next_action"] != {
         "action": "ask_user",
-        "decision_id": "Q01-publisher-mode",
+        "decision_id": "Q02-final-plugin-identity",
         "expected_answer": "explicit_option_1_2_or_3",
         "external_action_permitted": False,
         "ordinary_continue_answers_decision": False,
     }:
-        raise SubmissionPrerequisiteError("next action must remain the Q01 user gate")
+        raise SubmissionPrerequisiteError("next action must remain the Q02 user gate")
 
     return {
         "status": packet["status"],

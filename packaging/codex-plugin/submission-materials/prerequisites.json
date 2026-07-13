@@ -22,7 +22,7 @@
   },
   "decision_policy": {
     "mode": "one_at_a_time",
-    "current_decision_id": "Q01-publisher-mode",
+    "current_decision_id": "Q02-final-plugin-identity",
     "current_decision_status": "awaiting_user_decision",
     "ordinary_continue_answers_decision": false,
     "auto_fill_owner_facts": false,
@@ -30,7 +30,7 @@
   },
   "authority": {
     "repository_preparation_only": true,
-    "publisher_mode_selected": false,
+    "publisher_mode_selected": true,
     "final_identity_selected": false,
     "verified_identity_observed": false,
     "apps_management_write_access_observed": false,
@@ -47,7 +47,7 @@
     {
       "id": "Q01-publisher-mode",
       "sequence": 1,
-      "status": "awaiting_user_decision",
+      "status": "answered",
       "decision_authority": "publisher",
       "depends_on": [],
       "blocker_ids": [
@@ -73,13 +73,17 @@
           "impact_zh": "保持所有依赖项阻塞，不进行身份验证、公开页面定案或 Portal 操作。"
         }
       ],
-      "answer": null,
-      "evidence": null
+      "answer": "1",
+      "evidence": {
+        "evidence_type": "user_explicit",
+        "recorded_on": "2026-07-14",
+        "scope": "publisher_mode_route_only_not_identity_verification"
+      }
     },
     {
       "id": "Q02-final-plugin-identity",
       "sequence": 2,
-      "status": "blocked_by_dependencies",
+      "status": "awaiting_user_decision",
       "decision_authority": "publisher",
       "depends_on": [
         "Q01-publisher-mode"
@@ -88,13 +92,13 @@
         "final_plugin_identity_and_version"
       ],
       "question_zh": "是否把当前 cotend@0.1.0-rc.1 候选作为首次提交身份与版本，还是先调整？",
-      "why_it_matters_zh": "最终身份会决定 manifest、package lock、logo、公开页面和后续更新兼容性，候选值本身不等于发布授权。",
+      "why_it_matters_zh": "最终身份会决定 manifest、package lock、logo、公开页面和后续更新兼容性，候选值本身不等于发布授权；OpenAI Platform 对预发布版本的实际接受尚未验证。",
       "recommended_option_id": "1",
       "options": [
         {
           "id": "1",
           "label_zh": "沿用当前候选",
-          "impact_zh": "保留已经通过隔离验证的 ID 和预发布版本，再执行最终重建与全量回归。"
+          "impact_zh": "保留已经通过隔离验证的 ID 和预发布版本，再执行最终重建与全量回归；OpenAI Platform 对预发布版本的实际接受尚未验证，若 Portal 不接受则必须重新打开 Q02。"
         },
         {
           "id": "2",
@@ -538,7 +542,7 @@
   ],
   "next_action": {
     "action": "ask_user",
-    "decision_id": "Q01-publisher-mode",
+    "decision_id": "Q02-final-plugin-identity",
     "expected_answer": "explicit_option_1_2_or_3",
     "external_action_permitted": false,
     "ordinary_continue_answers_decision": false
