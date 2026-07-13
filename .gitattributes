@@ -1,4 +1,5 @@
 # Preserve byte identity for directly adopted third-party files on every platform.
+/README.md text eol=lf
 /codex-skills/** text eol=lf
 /LICENSE text eol=lf
 /NOTICE text eol=lf

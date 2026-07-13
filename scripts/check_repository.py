@@ -215,6 +215,19 @@ EXPECTED_PLUGIN_SUBMISSION_TESTS = {
     "test_release_notes_are_initial_draft_not_submission_claim",
     "test_fifteen_negative_mutations_are_rejected",
 }
+EXPECTED_PUBLIC_README_FILES = {
+    "README.md",
+    "docs/evidence/PUBLIC-REPOSITORY-ONBOARDING.md",
+    "tests/test_public_readme.py",
+}
+EXPECTED_PUBLIC_README_TESTS = {
+    "test_readme_is_english_and_novice_first",
+    "test_readme_declares_pre_release_and_no_public_install",
+    "test_readme_skill_catalog_matches_seven_packaged_skills",
+    "test_readme_starter_prompts_match_submission_contract",
+    "test_readme_relative_links_resolve",
+    "test_readme_maintainer_commands_are_safe_and_real",
+}
 EXPECTED_DELIVERY_PRODUCT_FILES = {
     "delivery/codex-artifact.lock.json",
     "scripts/cotend_delivery.py",
@@ -2681,6 +2694,115 @@ def plugin_submission_material_errors(
     return errors
 
 
+def public_repository_onboarding_errors(
+    evidence_text: str,
+    candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    missing = EXPECTED_PUBLIC_README_FILES - candidates
+    if missing:
+        errors.append(f"public repository onboarding artifacts are missing: {sorted(missing)}")
+        return errors
+
+    readme = read("README.md")
+    for marker in (
+        "# CoTend",
+        "Pre-release AI development governance framework",
+        "CoTend is not yet available in the Public Plugin Directory.",
+        "No supported end-user installation is available yet.",
+        "The current pre-release adapter targets Codex",
+        "`CoTend Init` is the normal start or resume entry",
+        "The plugin has not been submitted for review and has not been published.",
+        "Do not treat them as a supported end-user installation.",
+        "Codex or ChatGPT platform login, network access, permissions",
+        "python scripts/build_codex_plugin.py --output dist/cotend --json",
+        "python scripts/verify_plugin_submission_materials.py",
+        "python scripts/verify_production_plugin_lifecycle.py",
+    ):
+        if marker not in readme:
+            errors.append(f"public README is missing: {marker}")
+    if re.search(r"[\u3400-\u9fff]", readme):
+        errors.append("public README must remain English")
+    skill_section = readme.split("<!-- skill-catalog-start -->", 1)
+    if len(skill_section) != 2 or "<!-- skill-catalog-end -->" not in skill_section[1]:
+        errors.append("public README Skill catalog markers are missing")
+    else:
+        ids = re.findall(
+            r"^\| [^|]+ \| `([^`]+)` \|",
+            skill_section[1].split("<!-- skill-catalog-end -->", 1)[0],
+            re.MULTILINE,
+        )
+        expected_ids = {
+            "cotend-init",
+            "cotend-project-init",
+            "cotend-collaboration",
+            "cotend-diagnose-only",
+            "cotend-model-upgrade",
+            "grill-me",
+            "karpathy-guidelines",
+        }
+        if len(ids) != 7 or set(ids) != expected_ids:
+            errors.append("public README seven-Skill catalog drifted")
+
+    submission = json.loads(
+        read("packaging/codex-plugin/submission-materials/submission.json")
+    )
+    prompts = submission.get("starter_prompts")
+    if not isinstance(prompts, list) or any(
+        f"`{prompt}`" not in readme for prompt in prompts
+    ):
+        errors.append("public README starter prompts drifted")
+
+    test_text = read("tests/test_public_readme.py")
+    actual_tests = set(
+        re.findall(r"^\s+def (test_[a-z0-9_]+)\(", test_text, re.MULTILINE)
+    )
+    missing_tests = EXPECTED_PUBLIC_README_TESTS - actual_tests
+    if missing_tests:
+        errors.append(f"public README tests are missing: {sorted(missing_tests)}")
+    for key, expected in {
+        "status": {"passed_public_repository_onboarding_contract"},
+        "evidence_type": {"executed"},
+        "public_surface_language": {"en"},
+        "readme_status": {"pre_release_not_publicly_installable"},
+        "visible_skill_catalog_rows": {"7"},
+        "starter_prompts": {"3"},
+        "relative_links_valid": {"true"},
+        "maintainer_commands": {"6_safe_repo_only"},
+        "focused_tests": {"6"},
+        "full_unit_tests": {"137"},
+        "production_package_regression": {
+            "passed_8_tests_13_negative_6_boundaries"
+        },
+        "submission_material_regression": {
+            "passed_3_prompts_5_positive_3_negative_10_blockers"
+        },
+        "production_lifecycle_regression": {
+            "passed_17_normal_5_recovery_15_roots_purged"
+        },
+        "repository_check": {
+            "passed_153_public_candidates_19_capabilities_19_specs"
+        },
+        "real_user_installation": {"false"},
+        "portal_or_submission": {"false"},
+        "release_publish_push": {"false"},
+    }.items():
+        if metadata_values(evidence_text, key) != expected:
+            errors.append(f"public onboarding evidence mismatch: {key}")
+    for marker in (
+        "README 没有把 7 个物理 Skill 平铺成 7 个日常命令",
+        "Public Plugin Directory 尚不可用",
+        "没有 Plugin install、Marketplace、Portal、submission、publish 或 push 命令",
+        "不表示产品已经公开可安装或完成上架",
+        "Ran 137 tests - OK",
+    ):
+        if marker not in evidence_text:
+            errors.append(f"public onboarding evidence is missing: {marker}")
+    if "/README.md text eol=lf" not in read(".gitattributes"):
+        errors.append("public README LF contract is missing")
+    return errors
+
+
 def contract_relationship_errors(index_text: str, specs: dict[str, str]) -> list[str]:
     errors: list[str] = []
     dependencies = index_dependencies(index_text)
@@ -3359,6 +3481,19 @@ def main() -> int:
         errors.extend(
             plugin_submission_material_errors(
                 read(plugin_submission_evidence_path),
+                candidates,
+            )
+        )
+
+    public_onboarding_evidence_path = (
+        "docs/evidence/PUBLIC-REPOSITORY-ONBOARDING.md"
+    )
+    if public_onboarding_evidence_path not in candidates:
+        errors.append("public repository onboarding evidence is missing or ignored")
+    else:
+        errors.extend(
+            public_repository_onboarding_errors(
+                read(public_onboarding_evidence_path),
                 candidates,
             )
         )
