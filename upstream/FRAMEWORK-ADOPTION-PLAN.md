@@ -1,5 +1,7 @@
 # CoTend Codex 技能首次采用与适配计划
 
+> 范围说明：本文固定首次采用 release 与其 containing-commit lock，顶部 `plugin_or_marketplace_carrier` 是该采用提交当时的交付边界，不随之后的分发验证改写。当前 GitHub Open Beta 状态以 [`FRAMEWORK-ADOPTION-LOG.md`](FRAMEWORK-ADOPTION-LOG.md#github-open-beta-remote-validation) 和远端生命周期证据为准。
+
 ```yaml
 status: implemented_verified
 authority: implementation_record
@@ -105,7 +107,7 @@ analysis_language: zh-CN
 - 两个 MIT Skill 与固定 release 中的对应文件保持字节一致，独立许可证、notice 和机器可读来源记录已落位。
 - C01-C19 已映射到实际 Skill 文件；C16 只完成仓库源树部分，live 安装与交付生命周期继续延后。
 - adoption log 与 `upstream/framework.lock.json` 使用 `containing_commit` 约定进入同一采用提交。
-- 仓库根 Plugin/Marketplace 的隔离本地 Git 生命周期已通过；live `$CODEX_HOME/skills`、真实 `owner/repo` 安装、Claude 载体、push 和发布均未执行。
+- 在首次采用/L54 锁定时，仓库根 Plugin/Marketplace 的隔离本地 Git 生命周期已通过，live `$CODEX_HOME/skills`、真实 `owner/repo` 安装、Claude 载体、push 和发布均未执行。此后首次普通 push 与全重定向真实 `owner/repo` Open Beta 生命周期已由独立 L55 证据关闭，不回写固定 release lock。
 
 ## 验证契约
 
@@ -122,7 +124,7 @@ analysis_language: zh-CN
 - 活动产品文本中无未进入允许清单的 `dual-ai` 技能 ID、协议值、回退路径或默认提示词；
 - 不存在私有路径、维护日志、密钥、缓存、用户项目状态或未声明第三方文件；
 - 仓库检查器、已采用技能集验证器、Python 编译、负向变异和 `git diff --check` 通过；
-- 真实 Codex 安装与菜单/触发验证明确标记为延后，除非用户另行授权隔离或 live 安装测试。
+- 本首次采用合同把真实 Codex 安装与菜单/触发验证标记为后续独立门；之后只能由相应授权和独立执行证据更新分发状态，不能改写采用输入或历史 lock。
 
 ## 框架变更评估
 

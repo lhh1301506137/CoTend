@@ -404,23 +404,23 @@ validation_scenarios:
     result: package_and_lifecycle_passed_digest_18f0b6_source_acbd6d
   - scenario: true_GitHub_owner_repo_and_novice_install
     expected: 真实远端 fetch、upgrade、洁净环境安装和 Desktop 可见性按实际结果记录
-    validation_result_type: deferred
-    result: L55_after_explicit_first_push_authorization
+    validation_result_type: executed_with_scope_limit
+    result: owner_repo_fetch_same_revision_refresh_clean_isolated_install_passed_Desktop_not_run
 real_project_validation:
   - scenario: current_CoTend_repository_under_real_Codex_CLI
     expected: 父仓库根 Marketplace 不污染外部临时项目，保护用户边界不变
     validation_result_type: executed
     result: L21_L46_L54_external_project_boundaries_passed
-decision: watch
+decision: keep
 rollback_triggers:
   - 根 Marketplace 导致普通项目误发现或污染不受控 cwd
   - Skill 摘要变化或出现第二个语义源
   - owner/repo 安装无法工作且无官方兼容修复
   - 清理越过精确生成根或修改真实用户状态
-review_after: L55_true_GitHub_Open_Beta_validation
+review_after: Codex_Plugin_or_Marketplace_platform_contract_change
 watch_closure:
-  - keep_watch
-  - evidence: local_carrier_and_production_lifecycle_passed_remote_not_run
+  - close_keep
+  - evidence: local_15_plus_5_production_17_plus_5_remote_12_plus_5_and_protected_boundaries_passed
 ```
 
-本项不修改 CoTend 的共享框架行为、七个 Skill 字节或产品协议，因此不发起上游反馈或外部 reviewer 同步；它只改变 CoTend 的分发载体与验证 harness。
+L55 已关闭该分发载体 watch：真实 `owner/repo` fetch、同 revision refresh、洁净隔离安装、失败恢复和清理均通过。Desktop、真实用户状态和跨版本升级属于后续独立验证面，不回滚当前根载体。该项没有修改 CoTend 的共享框架行为、七个 Skill 字节或产品协议，因此不发起上游反馈或外部 reviewer 同步。

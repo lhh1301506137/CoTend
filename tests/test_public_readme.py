@@ -27,6 +27,7 @@ EXPECTED_COMMANDS = {
     "python scripts/check_repository.py",
     "python scripts/verify_production_plugin_lifecycle.py",
     "python scripts/verify_github_marketplace_carrier.py",
+    "python scripts/verify_remote_github_marketplace.py",
 }
 
 
@@ -42,14 +43,19 @@ class PublicReadmeTests(unittest.TestCase):
         self.assertIn("The current pre-release adapter targets Codex", self.text)
         self.assertNotRegex(self.text, r"[\u3400-\u9fff]")
 
-    def test_readme_declares_pre_release_and_no_public_install(self) -> None:
+    def test_readme_declares_github_open_beta_and_directory_boundary(self) -> None:
         for marker in (
             "Pre-release AI development governance framework",
-            "CoTend is not yet available in the Public Plugin Directory.",
-            "No supported end-user installation is available yet.",
-            "The plugin has not been submitted for review and has not been published.",
+            "available as a GitHub Open Beta for Codex",
+            "not yet available in the Public Plugin Directory",
+            "codex plugin marketplace add lhh1301506137/CoTend",
+            "codex plugin add cotend@cotend",
+            "codex plugin marketplace upgrade cotend",
+            "codex plugin remove cotend@cotend",
+            "search `/cotend` in the Skill picker",
+            "select **CoTend Init**",
             "initial submission identity and version are confirmed",
-            "Do not treat them as a supported end-user installation.",
+            "Use the GitHub Marketplace commands instead of copying internal files.",
         ):
             self.assertIn(marker, self.text)
         self.assertNotIn("Install CoTend from the Public Plugin Directory", self.text)
@@ -96,7 +102,6 @@ class PublicReadmeTests(unittest.TestCase):
         joined = "\n".join(commands).lower()
         for forbidden in (
             "plugin install",
-            "codex plugin marketplace",
             "git push",
             "publish",
             "portal",

@@ -185,3 +185,21 @@ push_release_or_publish: not_performed
 ```
 
 官方 Plugin Creator validator 要求 Plugin manifest 的 `skills` contract path 解析到根 `skills/`，并拒绝 `./codex-skills/`。L54 因此只迁移 CoTend 当前仓库载体路径，不改 Skill 字节，也不改固定上游 release 中的来源路径。包内 `THIRD-PARTY-SOURCES.json` 的目标路径随之更新，因此完整 41 文件包摘要从旧值重算为 `18f0b6...d858f`，但 30 个 Skill 的 `acbd6d...ba1b` 摘要不变。根 Marketplace 使用 `url: "./"`，一次性本地 Git fixture 已通过真实 Codex CLI 的安装、7 Skill namespaced discovery、standalone 共存、卸载、重装、失败恢复和隔离清理；真实 GitHub `owner/repo` 拉取与 upgrade 仍需首次 push 后验证。
+
+## github-open-beta-remote-validation
+
+```yaml
+status: real_github_marketplace_lifecycle_verified
+authority: user_authorized_first_ordinary_push
+remote_slug: lhh1301506137/CoTend
+verified_remote_head: cdae8a972b3aba36727a4ee7646f147cac3b958c
+normal_lifecycle_steps: 12
+failure_recovery_steps: 5
+namespaced_skills_discovered: 7
+git_backed_refresh: passed_same_revision_only
+real_user_state_write: false
+desktop_lifecycle: not_run
+github_release_or_public_directory: not_performed
+```
+
+L55 在 15 个重定向写入根和独立临时项目中，从真实公开仓库完成 Marketplace add/list、远端 commit 绑定、同 revision refresh、Plugin install/remove、7 Skill discovery 和故障恢复。隔离 Git 禁用 credential helper 与交互提示；网络只允许直连或经结构验证的无凭据回环代理，正式运行使用后者。该结果开放 GitHub Open Beta CLI 路径，但不改变 `framework.lock.json` 中固定 release 的采用身份，也不证明跨版本升级、真实用户写入、完整 Desktop 生命周期或 Public Directory 上架。

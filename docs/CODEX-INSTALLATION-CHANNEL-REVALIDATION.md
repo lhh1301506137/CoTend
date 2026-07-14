@@ -98,7 +98,7 @@ submission_reviewer_cases_executed: false
 | `skills/list` | 已安装 Plugin 的 Skill 以 `plugin-name:skill-name` 形式出现，例如 `sites:sites-building`。 | `executed_current_installation` |
 | 多 Skill Plugin fixture | 当前缓存中的官方测试 fixture 以一个 manifest 的 `skills: "./skills/"` 暴露两个 Skills。 | `inspection_current_installation` |
 
-本渠道研究轮次本身没有执行 `plugin add`、`plugin remove`、`marketplace add/upgrade/remove`，没有创建 Plugin，也没有修改 Marketplace。后续在独立授权和全隔离边界内完成了不可发布 fixture Phase A；结果见 [`docs/evidence/ISOLATED-CODEX-PLUGIN-FIXTURE.md`](evidence/ISOLATED-CODEX-PLUGIN-FIXTURE.md)。
+本渠道研究轮次本身没有执行 `plugin add`、`plugin remove`、`marketplace add/upgrade/remove`，没有创建 Plugin，也没有修改 Marketplace。后续在独立授权和全隔离边界内依次完成不可发布 fixture、production candidate、本地根载体和真实 GitHub `owner/repo` 生命周期；最后一项结果见 [`docs/evidence/REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md`](evidence/REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md)。
 
 ## 渠道比较
 
@@ -107,7 +107,7 @@ submission_reviewer_cases_executed: false
 | 项目 `.agents/skills` | CoTend 开发与确定性回归 | 需要先拥有正确项目文件 | CoTend 自有交付核心已覆盖项目级生命周期 | 否 | 保留为开发载体，不作为发布渠道 |
 | Direct user Skills | 个人 Early Access、本地/离线与修复 | 若由 AI installer 执行可不要求手工目录知识；手工复制仍不合格 | CoTend 隔离 adapter 已覆盖组件级 lifecycle、production identity 与 v3 migration；真实用户 apply 仍关闭 | 仅个人 | 已确认为次级渠道，等待真实可写验证 |
 | Repo 本地 Marketplace | 单仓库开发测试 | 路径、文件复制、重启 | 可以测试 Desktop 安装副本和开关 | 否 | 推荐作为首个 Plugin fixture 入口 |
-| Git Marketplace + CLI | 外部技术预览者 | Git 仓库概念和终端命令 | CLI 有 add/list/upgrade/remove | 否 | 可选技术预览，不是 novice 主路径 |
+| Git Marketplace + CLI | 外部技术预览者 | 需要执行 README 中的终端命令 | 真实 owner/repo add、同 revision refresh、install/remove 已验证 | 否 | 当前 GitHub Open Beta 路径，不是零终端 novice 终态 |
 | Personal Marketplace | 维护者个人测试 | 本地路径、文件复制、重启 | Desktop 可安装、启用、禁用、卸载 | 仅个人 | 可用于维护者日常验证 |
 | Workspace sharing | 同一组织内封闭测试 | 接收者可从桌面安装；创建者仍需本地 setup | 可从桌面管理 | 仅同 workspace | 可选封闭测试，不替代公开目录 |
 | Public Plugins Directory | 最终普通用户 | 搜索、查看、点击安装 | Desktop 提供安装与卸载；发布更新流程仍需单独验证 | 是 | 推荐最终渠道，必须先通过载体测试和审核 |
@@ -140,7 +140,7 @@ submission_reviewer_cases_executed: false
 - 构建产物把 7 Skills 装入一个 skills-only CoTend Plugin；
 - 项目 `.agents/skills` 只承担开发和回归；
 - 本地/Repo Marketplace 承担隔离 Plugin 验证；
-- Git Marketplace 只作为可选技术预览；
+- Git Marketplace 是当前已验证的 GitHub Open Beta 技术预览路径；
 - Public Plugins Directory 是最终 novice 发布目标。
 
 最新只读结论对该架构增加一个待确认修正：direct user Skills 可作为 Early Access、本地/离线、修复和迁移渠道；Marketplace 更准确地属于 Plugin QA/技术运输层，而不是唯一技术预览入口。Public Plugins Directory 的长期目标不变。
@@ -157,13 +157,13 @@ submission_reviewer_cases_executed: false
 4. repo-scoped standalone Skills 与 Plugin 共存时是否发生重复或错误路由；
 5. install、enable、disable、update、uninstall 后，Plugin 缓存与项目真相是否符合 C16。
 
-该叶仍不得发布、提交审核、写入真实项目或修改用户级 Marketplace。若 namespace 需要改变共享 Skill 名称或行为，必须先走既定的 `CoTend 提案 -> 用户自有上游审计与实现 -> 新 release -> CoTend 复审适配` 上游门。
+该叶当时仍不得发布、提交审核、写入真实项目或修改用户级 Marketplace。后续 L54/L55 已在用户逐门授权下完成首次普通 push 和全重定向真实 GitHub Marketplace 验证，但没有写真实用户状态、发布 Release 或提交 Public Directory。若 namespace 需要改变共享 Skill 名称或行为，仍必须先走既定的 `CoTend 提案 -> 用户自有上游审计与实现 -> 新 release -> CoTend 复审适配` 上游门。
 
 ## 用户决定与后续状态
 
-用户已选择方案 1：确认三层渠道路线，并允许下一叶设计隔离 skills-only Plugin fixture。后续独立实施门也已确认并完成：只在 ignored fixture 和全重定向子进程环境执行 static、17 步 Phase A 和 12 类负向矩阵。候选 `cotend` ID、fixture 版本和观察到的 `cotend:<skill>` namespace 仍不构成正式产品定案；tracked production Plugin、真实用户安装、公开提交和发布继续关闭。
+用户已选择方案 1：确认三层渠道路线，并允许下一叶设计隔离 skills-only Plugin fixture。后续独立实施门也已确认并完成：从 fixture、production candidate、本地根载体推进到真实 GitHub Open Beta。`cotend` Marketplace、`cotend@cotend` Plugin、`0.1.0-rc.1` 和 preserve namespace 已成为当前 Open Beta 身份；真实用户安装测试、稳定版、Public Directory 提交和发布继续关闭。
 
-1. **已选择并完成隔离验证**：确认三层渠道路线，设计并执行不可发布 skills-only Plugin fixture；正式 Plugin 与公开操作仍需后续门。
+1. **已选择并分阶段完成**：确认三层渠道路线，从不可发布 fixture 推进到真实 GitHub Open Beta；当前 Beta 身份与 CLI 操作已验证，真实用户/Desktop、稳定版和 Public Directory 仍需后续门。
 2. 只确认 Public Plugins Directory 为长期目标，暂不进入 Plugin fixture，继续等待 L22/upstream。
 3. 保持 standalone Skills 为正式渠道，延期 Plugin 产品化；这会保留当前调用名，但无法满足已确认的零 Git/npm/终端最终用户目标。
 
@@ -280,10 +280,16 @@ L46 已直接使用构建器生成的 `cotend@0.1.0-rc.1` 精确 41 文件包，
 
 独立故障场景在 `plugin_add` 成功后注入异常，再通过 CLI 完成 Plugin remove/absent、discovery absent、Marketplace remove/absent 共 5 步恢复。8 项真实 Codex/Agents 边界只做 stat-only 快照且前后不变；package inputs、locks 与 Git HEAD 也未变化。详见 [`docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-LIFECYCLE.md`](evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-LIFECYCLE.md)。
 
-这仍是隔离 CLI 证据，不是当前个人安装、Desktop 完整体验或公开上架。首次提交身份已确认；Portal 对 `-rc.1` 的接受性、submission、公开发布和 push 继续关闭。
+这是 L46 的隔离 CLI 证据，不是当前个人安装或 Desktop 完整体验。后续首次普通 push 与真实 GitHub Open Beta CLI 验证已完成；Portal 对 `-rc.1` 的接受性、Public Directory submission 和正式发布继续关闭。
 
 ## Public Plugin Submission Material Contract
 
 仓库已按当前官方 skills-only submission 字段建立英文材料合同：listing、与 manifest 一致的 3 个 starter prompts、恰好 5 个正向和 3 个负向 reviewer case，以及 initial submission release notes。合同绑定精确 41 文件候选；静态验证器和 7 项聚焦测试另以 17 类负向变异保护 package、Logo、prompt、5+3 数量、必填字段和 authority 不漂移。详见 [`docs/evidence/CODEX-PLUGIN-SUBMISSION-MATERIAL-CONTRACT.md`](evidence/CODEX-PLUGIN-SUBMISSION-MATERIAL-CONTRACT.md)。
 
-材料状态明确为 `draft_not_submitted`，8 个 case 均为 `contract_only_not_run`。合同跟踪 10 个 blocker：首次提交 identity/version 与 repository production Logo 已解决；verified publisher identity、Apps Management Write access、website/support/privacy/terms、availability 和 policy attestations 等其余 8 个 blocker 保持 unresolved/null。Portal exact Logo format 仍未验证；没有打开 Portal、创建 draft、提交审核、发布或 push，若 Portal 不接受 `-rc.1` 或当前 Logo 格式，必须重开对应决策。
+材料状态明确为 `draft_not_submitted`，8 个 case 均为 `contract_only_not_run`。合同跟踪 10 个 blocker：首次提交 identity/version 与 repository production Logo 已解决；verified publisher identity、Apps Management Write access、website/support/privacy/terms、availability 和 policy attestations 等其余 8 个 blocker 保持 unresolved/null。Portal exact Logo format 仍未验证；L49 当时没有打开 Portal、创建 draft、提交审核、发布或 push。此后只有首次普通 GitHub push 和 Open Beta CLI 验证完成；若 Portal 不接受 `-rc.1` 或当前 Logo 格式，必须重开对应决策。
+
+## 真实 GitHub Open Beta 生命周期
+
+L55 从公开仓库 `lhh1301506137/CoTend` 完成 12 步正常路径和 5 步故障恢复：Marketplace add/list、精确远端 commit 核对、同 revision Git-backed refresh、Plugin add、7 个 namespaced Skills 发现、Plugin/Marketplace remove 与最终缺席。全部写入被重定向到 15 个一次性运行根和独立临时项目，8 项真实用户边界保持不变；Git 禁用 credential helper 与交互提示，网络只允许直连或无凭据回环代理。
+
+该证据开放 README 中的 GitHub Open Beta CLI 安装入口。它不覆盖跨版本升级、真实用户状态写入、现有任务热刷新、完整 Desktop 重启/GUI 卸载、GitHub Release 或 Public Plugins Directory。详见 [`docs/evidence/REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md`](evidence/REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md)。

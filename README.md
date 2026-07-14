@@ -2,11 +2,37 @@
 
 **Pre-release AI development governance framework for people who build software with AI.**
 
-> CoTend is not yet available in the Public Plugin Directory. No supported end-user installation is available yet. The current package is a tested release candidate, not a stable public release.
+> CoTend is available as a GitHub Open Beta for Codex. It is not yet available in the Public Plugin Directory and is not a stable release.
 
 CoTend helps people who do not read code, or who prefer not to manage development details themselves, keep AI-assisted software projects understandable and under control. It gives the AI a repeatable way to start or resume a project, continue an approved plan, verify work, diagnose failures, prepare model handoffs, and stop when a human decision is required.
 
 CoTend is not a coding model, IDE, hosted service, or sample app. It is a governance layer for an AI coding tool. The current pre-release adapter targets Codex; support for other platforms is future work, not a current compatibility claim.
+
+## Install from GitHub (Open Beta)
+
+The GitHub Marketplace route is validated with `codex-cli 0.144.1`. Add the CoTend repository as a personal Marketplace, then install its Plugin:
+
+```powershell
+codex plugin marketplace add lhh1301506137/CoTend
+codex plugin add cotend@cotend
+```
+
+Start a new Codex task, search `/cotend` in the Skill picker, select **CoTend Init**, and then describe the project you want to initialize or resume. Existing-task catalog refresh and the complete Desktop restart lifecycle remain beta coverage gaps.
+
+Refresh the Git-backed Marketplace clone:
+
+```powershell
+codex plugin marketplace upgrade cotend
+```
+
+Remove CoTend and its Marketplace entry:
+
+```powershell
+codex plugin remove cotend@cotend
+codex plugin marketplace remove cotend
+```
+
+These commands intentionally update the current user's Codex Plugin and Marketplace state. The repository verification scripts later in this document use redirected disposable roots instead.
 
 ## What CoTend changes
 
@@ -69,14 +95,14 @@ CoTend is currently a repository-verified pre-release project:
 | Source carrier | Seven Codex Skills are adopted in [`skills/`](skills/), which is also the repository-root Plugin contract path. |
 | Package candidate | `cotend@0.1.0-rc.1`, 41 deterministic files including four locked brand assets; initial submission identity and version are confirmed, the repository Logo is locked, and the package remains unpublished. |
 | Isolated lifecycle | Package add, install, discovery, coexistence, remove, recovery, and cleanup are verified in redirected disposable roots. |
-| GitHub Marketplace carrier | Root Plugin and Marketplace manifests pass an isolated local Git lifecycle. Real `owner/repo` fetch, Git-backed upgrade, clean novice installation, and Desktop restart behavior have not been run. |
+| GitHub Marketplace carrier | Real `lhh1301506137/CoTend` fetch, Git-backed refresh, clean isolated install, seven-Skill discovery, remove, recovery, and cleanup are verified at commit `cdae8a9`. |
 | Submission materials | English listing, three starter prompts, five positive cases, three negative cases, and release-note structure exist as a repository draft. |
-| Public installation | Unavailable. The plugin has not been submitted for review and has not been published. |
+| Public installation | GitHub Open Beta is available through the personal Marketplace commands above. The Plugin has not been submitted to or published in the Public Plugin Directory. |
 | External readiness | Repository Logo assets are ready, but Portal format is not yet verified. Publisher identity, public support and legal URLs, availability, and policy attestations remain unresolved. |
 | Reviewer execution | The five positive and three negative cases are contracts only; they have not been run by an external reviewer. |
 | Desktop coverage | Basic picker visibility and new-task refresh have evidence; the complete production Desktop lifecycle is not yet verified. |
 
-The repository source tree and generated `dist/` package are development artifacts. Do not treat them as a supported end-user installation.
+The repository source tree and generated `dist/` package are development artifacts. Use the GitHub Marketplace commands instead of copying internal files.
 
 ## Accounts, data, and infrastructure
 
@@ -96,9 +122,10 @@ python -m unittest discover -s tests
 python scripts/check_repository.py
 python scripts/verify_production_plugin_lifecycle.py
 python scripts/verify_github_marketplace_carrier.py
+python scripts/verify_remote_github_marketplace.py
 ```
 
-The final two lifecycle commands require the Codex CLI. They redirect runtime write roots into disposable fixtures, reject protected-user-state drift, and clean the isolated roots after the run. Run them without concurrent activity that intentionally changes Codex user-state metadata.
+The final three lifecycle commands require the Codex CLI. They redirect runtime write roots into disposable fixtures, reject protected-user-state drift, and clean the isolated roots after the run. The remote verifier also requires network access and checks that the GitHub clone matches the current local HEAD. Run them without concurrent activity that intentionally changes Codex user-state metadata.
 
 ## Evidence and specifications
 
@@ -108,6 +135,7 @@ The final two lifecycle commands require the Codex CLI. They redirect runtime wr
 - [Production candidate package evidence](docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-PACKAGE.md)
 - [Isolated production lifecycle evidence](docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-LIFECYCLE.md)
 - [GitHub Marketplace root-carrier evidence](docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md)
+- [Real GitHub Marketplace lifecycle evidence](docs/evidence/REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md)
 - [Submission material contract evidence](docs/evidence/CODEX-PLUGIN-SUBMISSION-MATERIAL-CONTRACT.md)
 - [Structured submission draft](packaging/codex-plugin/submission-materials/submission.json)
 - [Reviewer case contract](packaging/codex-plugin/submission-materials/reviewer-tests.json)
@@ -118,4 +146,4 @@ CoTend-owned material is licensed under [Apache License 2.0](LICENSE). Bundled t
 
 ## Contributing during pre-release
 
-Keep changes scoped and evidence-backed. Do not weaken human decision boundaries, convert unexecuted cases into success claims, add secrets or private project data, or describe a candidate channel as publicly available. Changes to bundled third-party files must preserve their license and source records.
+Keep changes scoped and evidence-backed. Do not weaken human decision boundaries, convert unexecuted cases into success claims, add secrets or private project data, or describe unverified Desktop or Public Directory coverage as complete. Changes to bundled third-party files must preserve their license and source records.

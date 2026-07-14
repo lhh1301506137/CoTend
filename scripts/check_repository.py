@@ -224,6 +224,24 @@ EXPECTED_GITHUB_MARKETPLACE_CARRIER_TESTS = {
     "test_repository_carrier_requires_both_root_files",
     "test_root_source_validation_rejects_nested_package_source",
 }
+EXPECTED_REMOTE_GITHUB_MARKETPLACE_FILES = {
+    "docs/evidence/REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md",
+    "scripts/verify_remote_github_marketplace.py",
+    "tests/test_remote_github_marketplace.py",
+}
+EXPECTED_REMOTE_GITHUB_MARKETPLACE_TESTS = {
+    "test_cleanup_attempts_external_root_when_runtime_purge_fails",
+    "test_external_project_root_is_guarded_and_removable",
+    "test_l55_root_guard_rejects_other_private_directory",
+    "test_marketplace_add_requires_exact_isolated_clone_root",
+    "test_marketplace_list_requires_git_provenance",
+    "test_network_env_allows_direct_connection_without_proxy",
+    "test_network_env_is_write_isolated_and_credential_free",
+    "test_remote_git_state_is_bound_to_full_expected_commit",
+    "test_remote_plugin_list_requires_git_marketplace_source",
+    "test_remote_source_is_exact_and_not_file_url",
+    "test_upgrade_payload_requires_no_errors_and_exact_clone",
+}
 EXPECTED_PLUGIN_SUBMISSION_FILES = {
     "docs/evidence/CODEX-PLUGIN-SUBMISSION-MATERIAL-CONTRACT.md",
     "packaging/codex-plugin/submission-materials/submission.json",
@@ -263,7 +281,7 @@ EXPECTED_PUBLIC_README_FILES = {
 }
 EXPECTED_PUBLIC_README_TESTS = {
     "test_readme_is_english_and_novice_first",
-    "test_readme_declares_pre_release_and_no_public_install",
+    "test_readme_declares_github_open_beta_and_directory_boundary",
     "test_readme_skill_catalog_matches_seven_packaged_skills",
     "test_readme_starter_prompts_match_submission_contract",
     "test_readme_relative_links_resolve",
@@ -2810,6 +2828,111 @@ def github_marketplace_root_carrier_errors(
     return errors
 
 
+def remote_github_marketplace_errors(
+    evidence_text: str,
+    candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    missing = EXPECTED_REMOTE_GITHUB_MARKETPLACE_FILES - candidates
+    if missing:
+        errors.append(
+            "remote GitHub Marketplace artifacts are missing: "
+            f"{sorted(missing)}"
+        )
+        return errors
+
+    verifier_text = read("scripts/verify_remote_github_marketplace.py")
+    for marker in (
+        'REMOTE_SLUG = "lhh1301506137/CoTend"',
+        'REMOTE_URL = "https://github.com/lhh1301506137/CoTend.git"',
+        'EXTERNAL_PROJECT_PREFIX = "cotend-L55-projects-"',
+        'INSTALL_METADATA_NAME = ".codex-marketplace-install.json"',
+        "validated_loopback_proxy_env",
+        'env["GIT_CONFIG_NOSYSTEM"] = "1"',
+        'env["GIT_TERMINAL_PROMPT"] = "0"',
+        'env["GCM_INTERACTIVE"] = "Never"',
+        "validate_install_metadata",
+        "validate_remote_git_state",
+        "allow_install_metadata=True",
+        'fail_after_step="plugin_add"',
+        "cleanup_scenario",
+        "REMOTE_GITHUB_MARKETPLACE_OK",
+    ):
+        if marker not in verifier_text:
+            errors.append(f"remote GitHub verifier is missing: {marker}")
+
+    test_text = read("tests/test_remote_github_marketplace.py")
+    actual_tests = set(
+        re.findall(r"^\s+def (test_[a-z0-9_]+)\(", test_text, re.MULTILINE)
+    )
+    missing_tests = EXPECTED_REMOTE_GITHUB_MARKETPLACE_TESTS - actual_tests
+    if missing_tests:
+        errors.append(
+            "remote GitHub Marketplace tests are missing: "
+            f"{sorted(missing_tests)}"
+        )
+
+    for key, expected in {
+        "status": {"passed_real_github_marketplace_lifecycle"},
+        "evidence_type": {"executed"},
+        "codex_version": {"codex-cli_0.144.1"},
+        "remote_slug": {"lhh1301506137/CoTend"},
+        "remote_url": {"https://github.com/lhh1301506137/CoTend.git"},
+        "verified_remote_head": {
+            "cdae8a972b3aba36727a4ee7646f147cac3b958c"
+        },
+        "marketplace_name": {"cotend"},
+        "plugin_id": {"cotend@cotend"},
+        "plugin_version": {"0.1.0-rc.1"},
+        "remote_owner_repo_fetch": {"passed"},
+        "git_backed_marketplace_upgrade": {"passed_same_revision_refresh"},
+        "clean_isolated_install": {"passed"},
+        "namespaced_skills_discovered": {"7"},
+        "normal_lifecycle_steps": {"12"},
+        "failure_recovery_steps": {"5"},
+        "write_roots_redirected": {"15"},
+        "protected_user_boundaries": {"8"},
+        "credential_inheritance": {"false"},
+        "proxy_policy": {"direct_or_credential_free_loopback"},
+        "git_terminal_prompt": {"false"},
+        "platform_install_metadata": {"exact_schema_and_revision"},
+        "focused_tests": {"11"},
+        "full_unit_tests": {"168"},
+        "repository_check": {
+            "passed_169_public_candidates_19_capabilities_19_specs"
+        },
+        "real_user_scope_write": {"false"},
+        "desktop_restart_visibility": {"not_run"},
+        "github_release": {"false"},
+        "public_plugin_directory_submission": {"false"},
+    }.items():
+        if metadata_values(evidence_text, key) != expected:
+            errors.append(f"remote GitHub evidence mismatch: {key}")
+
+    for marker in (
+        "不再依赖本地路径或 `file://` surrogate",
+        "同 revision Git-backed fetch/refresh 路径",
+        "只允许这一条 untracked 平台文件",
+        "最初的代理阻断、一次网络 reset 和用户根元数据并发变化均未被计为通过证据",
+        "没有写入真实用户 `~/.codex`、`~/.agents` 或 Desktop Plugin 状态",
+        "REMOTE_GITHUB_MARKETPLACE_OK head=cdae8a972b3aba36727a4ee7646f147cac3b958c",
+    ):
+        if marker not in evidence_text:
+            errors.append(f"remote GitHub evidence is missing: {marker}")
+
+    readme = read("README.md")
+    for marker in (
+        "codex plugin marketplace add lhh1301506137/CoTend",
+        "codex plugin add cotend@cotend",
+        "codex plugin marketplace upgrade cotend",
+        "codex plugin remove cotend@cotend",
+        "docs/evidence/REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md",
+    ):
+        if marker not in readme:
+            errors.append(f"public README remote install surface is missing: {marker}")
+    return errors
+
+
 def plugin_submission_material_errors(
     evidence_text: str,
     candidates: set[str],
@@ -3039,17 +3162,19 @@ def public_repository_onboarding_errors(
     for marker in (
         "# CoTend",
         "Pre-release AI development governance framework",
-        "CoTend is not yet available in the Public Plugin Directory.",
-        "No supported end-user installation is available yet.",
+        "CoTend is available as a GitHub Open Beta for Codex.",
+        "not yet available in the Public Plugin Directory",
         "The current pre-release adapter targets Codex",
         "`CoTend Init` is the normal start or resume entry",
-        "The plugin has not been submitted for review and has not been published.",
-        "Do not treat them as a supported end-user installation.",
+        "codex plugin marketplace add lhh1301506137/CoTend",
+        "codex plugin add cotend@cotend",
+        "Use the GitHub Marketplace commands instead of copying internal files.",
         "Codex or ChatGPT platform login, network access, permissions",
         "python scripts/build_codex_plugin.py --output dist/cotend --json",
         "python scripts/verify_plugin_submission_materials.py",
         "python scripts/verify_production_plugin_lifecycle.py",
         "python scripts/verify_github_marketplace_carrier.py",
+        "python scripts/verify_remote_github_marketplace.py",
     ):
         if marker not in readme:
             errors.append(f"public README is missing: {marker}")
@@ -3093,16 +3218,16 @@ def public_repository_onboarding_errors(
     if missing_tests:
         errors.append(f"public README tests are missing: {sorted(missing_tests)}")
     for key, expected in {
-        "status": {"passed_public_repository_onboarding_contract"},
+        "status": {"passed_github_open_beta_repository_onboarding"},
         "evidence_type": {"executed"},
         "public_surface_language": {"en"},
-        "readme_status": {"pre_release_not_publicly_installable"},
+        "readme_status": {"github_open_beta_cli_installable_not_public_directory"},
         "visible_skill_catalog_rows": {"7"},
         "starter_prompts": {"3"},
         "relative_links_valid": {"true"},
-        "maintainer_commands": {"7_safe_repo_only"},
+        "maintainer_commands": {"8_safe_repo_only"},
         "focused_tests": {"6"},
-        "full_unit_tests": {"157"},
+        "full_unit_tests": {"168"},
         "production_package_regression": {
             "passed_8_tests_17_negative_6_boundaries"
         },
@@ -3113,20 +3238,21 @@ def public_repository_onboarding_errors(
             "passed_17_normal_5_recovery_15_roots_purged"
         },
         "repository_check": {
-            "passed_166_public_candidates_19_capabilities_19_specs"
+            "passed_169_public_candidates_19_capabilities_19_specs"
         },
+        "remote_owner_repo_lifecycle": {"passed_12_normal_5_recovery"},
         "real_user_installation": {"false"},
         "portal_or_submission": {"false"},
-        "release_publish_push": {"false"},
+        "first_public_push": {"true"},
     }.items():
         if metadata_values(evidence_text, key) != expected:
             errors.append(f"public onboarding evidence mismatch: {key}")
     for marker in (
         "README 没有把 7 个物理 Skill 平铺成 7 个日常命令",
-        "Public Plugin Directory 尚不可用",
-        "没有真实用户 Plugin 安装、`codex plugin marketplace` 写入、Portal、submission、publish 或 push 命令",
-        "不表示产品已经公开可安装或完成上架",
-        "Ran 157 tests - OK",
+        "Public Plugin Directory 仍不可用",
+        "公开安装区另列真实用户主动执行的 Marketplace 安装、刷新和卸载命令",
+        "它不表示完整 Desktop 生命周期、稳定版或 Public Plugin Directory 上架已经完成",
+        "Ran 168 tests - OK",
     ):
         if marker not in evidence_text:
             errors.append(f"public onboarding evidence is missing: {marker}")
@@ -3786,7 +3912,7 @@ def main() -> int:
     framework_eval_text = read("FRAMEWORK-CHANGE-EVAL.md")
     for key, expected in {
         "change_type": {"workflow_behavior"},
-        "decision": {"watch"},
+        "decision": {"watch", "keep"},
     }.items():
         if metadata_values(framework_eval_text, key) != expected:
             errors.append(f"framework change evaluation mismatch: {key}")
@@ -3796,6 +3922,9 @@ def main() -> int:
         "later_head_passed_and_lock_only_update_rejected",
         "four_protected_blobs_match_and_text_eol_lf_enforced",
         "first_live_codex_validation",
+        "owner_repo_fetch_same_revision_refresh_clean_isolated_install_passed_Desktop_not_run",
+        "close_keep",
+        "local_15_plus_5_production_17_plus_5_remote_12_plus_5_and_protected_boundaries_passed",
     ):
         if required_text not in framework_eval_text:
             errors.append(f"framework change evaluation is missing: {required_text}")
@@ -3886,6 +4015,19 @@ def main() -> int:
         errors.extend(
             github_marketplace_root_carrier_errors(
                 read(github_marketplace_carrier_evidence_path),
+                candidates,
+            )
+        )
+
+    remote_github_marketplace_evidence_path = (
+        "docs/evidence/REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md"
+    )
+    if remote_github_marketplace_evidence_path not in candidates:
+        errors.append("remote GitHub Marketplace evidence is missing or ignored")
+    else:
+        errors.extend(
+            remote_github_marketplace_errors(
+                read(remote_github_marketplace_evidence_path),
                 candidates,
             )
         )

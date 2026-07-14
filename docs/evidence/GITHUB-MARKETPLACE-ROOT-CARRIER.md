@@ -1,5 +1,7 @@
 # GitHub Marketplace 仓库根载体验证证据
 
+> 范围说明：本文记录首次 push 之前的 L54 本地载体验证，因此下方远端字段保持当时真实的 `not_run`。真实 GitHub 后续验证现已通过，见 [REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md](REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md)。
+
 ```yaml
 status: passed_isolated_github_marketplace_root_carrier
 evidence_type: executed
@@ -90,7 +92,7 @@ REPOSITORY_CHECK_OK public_candidates=166 capabilities=19 behavior_specs=19
 
 详细 JSON、逐命令输出和一次性 Git fixture 只保存在 gitignored 私有证据目录；公开证据不携带本机绝对路径或用户配置内容。
 
-## 尚未执行
+## 本次 L54 运行当时尚未执行
 
 - 没有从真实 GitHub `owner/repo` 添加 Marketplace；
 - 没有验证远端提交变化后的 Git-backed Marketplace upgrade；

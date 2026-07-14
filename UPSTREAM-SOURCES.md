@@ -36,7 +36,7 @@ final_framework_lock: upstream/framework.lock.json
 automatic_update: forbidden
 ```
 
-审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容直接改名或适配，对两个内置 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。仓库源树、逐文件 adoption、final lock 与本地隔离的仓库根 Plugin/Marketplace 载体已完成；真实 GitHub `owner/repo` 安装和升级、洁净新手/Desktop 生命周期、Claude 载体和发布者身份认证仍未完成。
+审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容直接改名或适配，对两个内置 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。仓库源树、逐文件 adoption、final lock、本地隔离根载体与真实 GitHub `owner/repo` Open Beta 生命周期已完成。远端 refresh 只验证同 revision，不冒充跨版本升级；真实用户/Desktop 生命周期、Claude 载体和发布者身份认证仍未完成。
 
 ## PF01 OpenAI Codex 官方平台文档
 
