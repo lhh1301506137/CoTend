@@ -233,7 +233,7 @@ EXPECTED_SUBMISSION_PREREQUISITE_TESTS = {
     "test_repository_and_external_responsibilities_are_explicit",
     "test_confirmed_routes_do_not_set_external_authority",
     "test_q01_explains_publisher_mode_tradeoff_in_chinese",
-    "test_seventeen_negative_mutations_are_rejected",
+    "test_eighteen_negative_mutations_are_rejected",
 }
 EXPECTED_PUBLIC_README_FILES = {
     "README.md",
@@ -2937,10 +2937,11 @@ def submission_prerequisite_packet_errors(
     else:
         for marker in (
             "SUBMISSION_PREREQUISITES_OK",
-            "status=awaiting_owner_decisions",
+            "status=prerequisite_resolution_required",
             "prerequisites=10",
             "decisions=7",
-            "active=Q06-launch-availability",
+            "active=none",
+            "blocked=Q07-policy-attestations",
             "digest=be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
         ):
             if marker not in result.stdout:
@@ -2957,16 +2958,17 @@ def submission_prerequisite_packet_errors(
         errors.append(
             f"submission prerequisite tests are missing: {sorted(missing_tests)}"
         )
-    if "NEGATIVE_MUTATION_COUNT = 17" not in test_text:
+    if "NEGATIVE_MUTATION_COUNT = 18" not in test_text:
         errors.append("submission prerequisite negative mutation count drifted")
 
     for marker in (
         "10 个先决条件、其中 8 个仍未解决",
         "7 个决策无环",
-        "Q06 是唯一等待用户回答",
+        "Q06 已记录全球首发意图",
+        "Q07 在 7 项前置证据解决前保持 blocked",
         "policy attestations 位于最后",
         "没有打开 OpenAI Platform 或 submission Portal",
-        "普通“继续”不回答该问题",
+        "普通“继续”不解决这些前置证据",
         "python scripts/verify_submission_prerequisites.py",
         "不证明任何外部 blocker 已完成",
         "Ran 145 tests - OK",

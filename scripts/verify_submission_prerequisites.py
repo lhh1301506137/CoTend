@@ -111,6 +111,17 @@ EXPECTED_ANSWERED_DECISIONS = {
             ),
         },
     },
+    "Q06-launch-availability": {
+        "answer": "2",
+        "evidence": {
+            "evidence_type": "user_explicit",
+            "recorded_on": "2026-07-15",
+            "scope": (
+                "global_availability_intent_only_not_exact_country_list_"
+                "support_legal_readiness_or_portal_selection"
+            ),
+        },
+    },
 }
 EXPECTED_RESOLVED_PREREQUISITES = {
     "final_plugin_identity_and_version": submission.EXPECTED_IDENTITY_VALUE,
@@ -271,8 +282,6 @@ def _validate_decisions(decisions: Any) -> None:
         covered_blockers.extend(decision["blocker_ids"])
         if decision_id in EXPECTED_ANSWERED_DECISIONS:
             expected_status = "answered"
-        elif decision_id == "Q06-launch-availability":
-            expected_status = "awaiting_user_decision"
         else:
             expected_status = "blocked_by_dependencies"
         if decision["status"] != expected_status:
@@ -307,8 +316,10 @@ def _validate_decisions(decisions: Any) -> None:
             _non_empty_chinese(option["impact_zh"], "decision option impact")
         seen.add(decision_id)
 
-    if awaiting != ["Q06-launch-availability"]:
-        raise SubmissionPrerequisiteError("Q06 must be the only active decision")
+    if awaiting:
+        raise SubmissionPrerequisiteError(
+            "no decision may be active until prerequisites are resolved"
+        )
     if sorted(covered_blockers) != sorted(submission.EXPECTED_BLOCKER_IDS):
         raise SubmissionPrerequisiteError(
             "decisions do not cover every blocker exactly once"
@@ -456,13 +467,16 @@ def validate_submission_prerequisites(
     )
     if packet["schema"] != "cotend.codex-plugin-submission-prerequisites":
         raise SubmissionPrerequisiteError("prerequisite schema drifted")
-    if packet["schema_version"] != 1 or packet["status"] != "awaiting_owner_decisions":
+    if (
+        packet["schema_version"] != 1
+        or packet["status"] != "prerequisite_resolution_required"
+    ):
         raise SubmissionPrerequisiteError(
-            "prerequisite packet must remain unresolved v1"
+            "prerequisite packet must remain prerequisite-resolution v1"
         )
     if packet["official_requirements"] != {
         "source": submission.OFFICIAL_SUBMISSION_URL,
-        "checked_on": "2026-07-14",
+        "checked_on": "2026-07-15",
         "scope": "pre_submission_decisions_and_external_evidence",
     }:
         raise SubmissionPrerequisiteError("official requirement anchor drifted")
@@ -476,8 +490,8 @@ def validate_submission_prerequisites(
         raise SubmissionPrerequisiteError("package binding drifted")
     if packet["decision_policy"] != {
         "mode": "one_at_a_time",
-        "current_decision_id": "Q06-launch-availability",
-        "current_decision_status": "awaiting_user_decision",
+        "current_decision_id": None,
+        "current_decision_status": "blocked_until_prerequisites_resolved",
         "ordinary_continue_answers_decision": False,
         "auto_fill_owner_facts": False,
         "advance_only_after_explicit_answer": True,
@@ -489,19 +503,23 @@ def validate_submission_prerequisites(
     _validate_decisions(packet["decisions"])
     _validate_prerequisites(packet["prerequisites"], submission_contract)
     if packet["next_action"] != {
-        "action": "ask_user",
-        "decision_id": "Q06-launch-availability",
-        "expected_answer": "explicit_option_1_2_or_3",
+        "action": "resolve_prerequisites_before_q07",
+        "decision_id": "Q07-policy-attestations",
+        "expected_answer": None,
         "external_action_permitted": False,
         "ordinary_continue_answers_decision": False,
     }:
-        raise SubmissionPrerequisiteError("next action must remain the Q06 user gate")
+        raise SubmissionPrerequisiteError(
+            "next action must remain the prerequisite-resolution gate"
+        )
 
     return {
         "status": packet["status"],
         "prerequisites": len(packet["prerequisites"]),
         "decisions": len(packet["decisions"]),
-        "active_decision": packet["decision_policy"]["current_decision_id"],
+        "active_decision": packet["decision_policy"]["current_decision_id"]
+        or "none",
+        "blocked_decision": "Q07-policy-attestations",
         "package_digest": packet["package"]["path_hash_manifest_sha256"],
     }
 
@@ -520,6 +538,7 @@ def main() -> int:
         "SUBMISSION_PREREQUISITES_OK "
         f"status={result['status']} prerequisites={result['prerequisites']} "
         f"decisions={result['decisions']} active={result['active_decision']} "
+        f"blocked={result['blocked_decision']} "
         f"digest={result['package_digest']}"
     )
     return 0

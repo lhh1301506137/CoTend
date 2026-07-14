@@ -16,7 +16,7 @@ import verify_plugin_submission_materials as submission  # noqa: E402
 import verify_submission_prerequisites as prerequisites  # noqa: E402
 
 
-NEGATIVE_MUTATION_COUNT = 17
+NEGATIVE_MUTATION_COUNT = 18
 
 
 class SubmissionPrerequisiteTests(unittest.TestCase):
@@ -40,10 +40,11 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
 
     def test_valid_packet_binds_exact_candidate_and_submission_contract(self) -> None:
         result = self.validate()
-        self.assertEqual(result["status"], "awaiting_owner_decisions")
+        self.assertEqual(result["status"], "prerequisite_resolution_required")
         self.assertEqual(result["prerequisites"], 10)
         self.assertEqual(result["decisions"], 7)
-        self.assertEqual(result["active_decision"], "Q06-launch-availability")
+        self.assertEqual(result["active_decision"], "none")
+        self.assertEqual(result["blocked_decision"], "Q07-policy-attestations")
         self.assertEqual(
             result["package_digest"],
             self.submission["package"]["path_hash_manifest_sha256"],
@@ -72,7 +73,15 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             if decision["status"] == "awaiting_user_decision":
                 awaiting.append(decision["id"])
             seen.add(decision["id"])
-        self.assertEqual(awaiting, ["Q06-launch-availability"])
+        self.assertEqual(awaiting, [])
+        self.assertEqual(
+            self.packet["decisions"][-1]["status"], "blocked_by_dependencies"
+        )
+        self.assertIsNone(self.packet["decision_policy"]["current_decision_id"])
+        self.assertEqual(
+            self.packet["decision_policy"]["current_decision_status"],
+            "blocked_until_prerequisites_resolved",
+        )
         self.assertFalse(
             self.packet["decision_policy"]["ordinary_continue_answers_decision"]
         )
@@ -115,7 +124,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
                 for blocker_id in submission.EXPECTED_UNRESOLVED_BLOCKER_IDS
             )
         )
-        q01, q02, q03, q04, q05, *remaining = self.packet["decisions"]
+        q01, q02, q03, q04, q05, q06, *remaining = self.packet["decisions"]
         self.assertEqual(q01["status"], "answered")
         self.assertEqual(q01["answer"], "1")
         self.assertEqual(q01["evidence"]["evidence_type"], "user_explicit")
@@ -139,6 +148,12 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
         self.assertEqual(
             q05["evidence"]["scope"],
             "platform_access_check_route_only_not_permission_observation_or_portal_access",
+        )
+        self.assertEqual(q06["status"], "answered")
+        self.assertEqual(q06["answer"], "2")
+        self.assertEqual(
+            q06["evidence"]["scope"],
+            "global_availability_intent_only_not_exact_country_list_support_legal_readiness_or_portal_selection",
         )
         self.assertTrue(
             all(
@@ -177,7 +192,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
         self.assertIn("企业身份", q01["options"][1]["label_zh"])
         self.assertIn("个人名称", q01["options"][0]["impact_zh"])
 
-    def test_seventeen_negative_mutations_are_rejected(self) -> None:
+    def test_eighteen_negative_mutations_are_rejected(self) -> None:
         def mutate_packet(
             callback: Callable[[dict[str, Any]], None],
         ) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -214,9 +229,9 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
                 )
             ),
             "filled_owner_answer": mutate_packet(
-                lambda value: value["decisions"][5].__setitem__("answer", "1")
+                lambda value: value["decisions"][6].__setitem__("answer", "1")
             ),
-            "two_active_decisions": mutate_packet(
+            "blocked_decision_activated_early": mutate_packet(
                 lambda value: value["decisions"][6].__setitem__(
                     "status", "awaiting_user_decision"
                 )
@@ -240,6 +255,11 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             "public_urls_selected_claim": mutate_packet(
                 lambda value: value["authority"].__setitem__(
                     "public_urls_selected", True
+                )
+            ),
+            "global_intent_resolves_availability": mutate_packet(
+                lambda value: value["prerequisites"][8].update(
+                    {"status": "resolved", "value": ["worldwide"]}
                 )
             ),
             "wrong_next_action": mutate_packet(

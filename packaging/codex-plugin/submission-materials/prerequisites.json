@@ -1,10 +1,10 @@
 {
   "schema": "cotend.codex-plugin-submission-prerequisites",
   "schema_version": 1,
-  "status": "awaiting_owner_decisions",
+  "status": "prerequisite_resolution_required",
   "official_requirements": {
     "source": "https://developers.openai.com/codex/submit-plugins",
-    "checked_on": "2026-07-14",
+    "checked_on": "2026-07-15",
     "scope": "pre_submission_decisions_and_external_evidence"
   },
   "submission_contract": {
@@ -22,8 +22,8 @@
   },
   "decision_policy": {
     "mode": "one_at_a_time",
-    "current_decision_id": "Q06-launch-availability",
-    "current_decision_status": "awaiting_user_decision",
+    "current_decision_id": null,
+    "current_decision_status": "blocked_until_prerequisites_resolved",
     "ordinary_continue_answers_decision": false,
     "auto_fill_owner_facts": false,
     "advance_only_after_explicit_answer": true
@@ -240,7 +240,7 @@
     {
       "id": "Q06-launch-availability",
       "sequence": 6,
-      "status": "awaiting_user_decision",
+      "status": "answered",
       "decision_authority": "publisher",
       "depends_on": [
         "Q03-public-web-presence",
@@ -270,8 +270,12 @@
           "impact_zh": "不填充任何国家或地区，availability blocker 保持未解决。"
         }
       ],
-      "answer": null,
-      "evidence": null
+      "answer": "2",
+      "evidence": {
+        "evidence_type": "user_explicit",
+        "recorded_on": "2026-07-15",
+        "scope": "global_availability_intent_only_not_exact_country_list_support_legal_readiness_or_portal_selection"
+      }
     },
     {
       "id": "Q07-policy-attestations",
@@ -577,9 +581,9 @@
     }
   ],
   "next_action": {
-    "action": "ask_user",
-    "decision_id": "Q06-launch-availability",
-    "expected_answer": "explicit_option_1_2_or_3",
+    "action": "resolve_prerequisites_before_q07",
+    "decision_id": "Q07-policy-attestations",
+    "expected_answer": null,
     "external_action_permitted": false,
     "ordinary_continue_answers_decision": false
   }
