@@ -62,7 +62,7 @@ submission_reviewer_cases_executed: false
 
 推荐把已确认三层路线细化为四种职责，而不是四套产品实现：
 
-1. `codex-skills/` 与项目 `.agents/skills`：源码、项目交付和回归；
+1. 根 `skills/` 与项目 `.agents/skills`：源码、仓库根 Plugin contract、项目交付和回归；
 2. direct user Skills：Early Access、本地/离线、修复与 legacy migration 的支持渠道；
 3. local/Repo/Git Marketplace：Plugin 开发、QA 与技术预览运输层；
 4. Public Plugins Directory：公开 novice 主渠道。
@@ -136,7 +136,7 @@ submission_reviewer_cases_executed: false
 
 采用“一个语义源树、一个 CoTend Plugin、三层渠道”的路线：
 
-- `codex-skills/` 继续是经过锁定和验证的语义源树；
+- 根 `skills/` 是经过锁定和验证的唯一语义源树；
 - 构建产物把 7 Skills 装入一个 skills-only CoTend Plugin；
 - 项目 `.agents/skills` 只承担开发和回归；
 - 本地/Repo Marketplace 承担隔离 Plugin 验证；
@@ -260,7 +260,7 @@ L44 已把 N3 display-led preserve-first 从界面候选推进为仓库内可执
 
 ```yaml
 plugin_candidate: cotend@0.1.0-rc.1
-semantic_source: codex-skills/
+semantic_source: skills/
 tracked_duplicate_skill_tree: false
 isolated_builds_compared: 2
 package_files: 41

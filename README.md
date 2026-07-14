@@ -66,9 +66,10 @@ CoTend is currently a repository-verified pre-release project:
 
 | Area | Current state |
 |---|---|
-| Source carrier | Seven Codex Skills are adopted in [`codex-skills/`](codex-skills/). |
+| Source carrier | Seven Codex Skills are adopted in [`skills/`](skills/), which is also the repository-root Plugin contract path. |
 | Package candidate | `cotend@0.1.0-rc.1`, 41 deterministic files including four locked brand assets; initial submission identity and version are confirmed, the repository Logo is locked, and the package remains unpublished. |
 | Isolated lifecycle | Package add, install, discovery, coexistence, remove, recovery, and cleanup are verified in redirected disposable roots. |
+| GitHub Marketplace carrier | Root Plugin and Marketplace manifests pass an isolated local Git lifecycle. Real `owner/repo` fetch, Git-backed upgrade, clean novice installation, and Desktop restart behavior have not been run. |
 | Submission materials | English listing, three starter prompts, five positive cases, three negative cases, and release-note structure exist as a repository draft. |
 | Public installation | Unavailable. The plugin has not been submitted for review and has not been published. |
 | External readiness | Repository Logo assets are ready, but Portal format is not yet verified. Publisher identity, public support and legal URLs, availability, and policy attestations remain unresolved. |
@@ -94,9 +95,10 @@ python scripts/verify_plugin_submission_materials.py
 python -m unittest discover -s tests
 python scripts/check_repository.py
 python scripts/verify_production_plugin_lifecycle.py
+python scripts/verify_github_marketplace_carrier.py
 ```
 
-The final lifecycle command requires the Codex CLI. It redirects runtime write roots into disposable repository-local fixtures, rejects protected-user-state drift, and cleans the isolated roots after the run. Run it without concurrent activity that intentionally changes Codex user-state metadata.
+The final two lifecycle commands require the Codex CLI. They redirect runtime write roots into disposable fixtures, reject protected-user-state drift, and clean the isolated roots after the run. Run them without concurrent activity that intentionally changes Codex user-state metadata.
 
 ## Evidence and specifications
 
@@ -105,6 +107,7 @@ The final lifecycle command requires the Codex CLI. It redirects runtime write r
 - [Installation channel revalidation](docs/CODEX-INSTALLATION-CHANNEL-REVALIDATION.md)
 - [Production candidate package evidence](docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-PACKAGE.md)
 - [Isolated production lifecycle evidence](docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-LIFECYCLE.md)
+- [GitHub Marketplace root-carrier evidence](docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md)
 - [Submission material contract evidence](docs/evidence/CODEX-PLUGIN-SUBMISSION-MATERIAL-CONTRACT.md)
 - [Structured submission draft](packaging/codex-plugin/submission-materials/submission.json)
 - [Reviewer case contract](packaging/codex-plugin/submission-materials/reviewer-tests.json)

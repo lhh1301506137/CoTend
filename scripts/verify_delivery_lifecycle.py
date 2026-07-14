@@ -101,7 +101,7 @@ def prepare_project(path: Path) -> Path:
 
 def make_updated_artifact(fixture: Path, baseline: Artifact) -> Artifact:
     source = fixture / "artifacts" / "candidate-v2"
-    shutil.copytree(ROOT / "codex-skills", source)
+    shutil.copytree(ROOT / "skills", source)
     changed = source / "cotend-init" / "SKILL.md"
     changed.write_text(
         changed.read_text(encoding="utf-8") + "\n<!-- L24 integration candidate -->\n",

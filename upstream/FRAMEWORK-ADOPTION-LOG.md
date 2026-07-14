@@ -7,14 +7,14 @@ status: adopted_verified
 source_release: 2026.07.11.3
 source_anchor: dual-ai-share-2026.07.11.3
 target_platform: Codex
-target_source_carrier: codex-skills/
+target_source_carrier: skills/
 resulting_CoTend_commit: containing_commit
 framework_lock: upstream/framework.lock.json
 skill_count: 7
 skill_file_count: 30
 capability_count: 19
 live_install_performed: false
-plugin_or_marketplace_carrier: deferred
+plugin_or_marketplace_carrier: github_root_candidate_local_verified
 claude_carrier: deferred
 push_release_or_publish: not_performed
 ```
@@ -56,7 +56,7 @@ push_release_or_publish: not_performed
 
 ### 锚点与更新规则
 
-`resulting_CoTend_commit: containing_commit` 表示采用提交由 Git 中最近一次修改 `upstream/framework.lock.json` 的提交解析。lock 不嵌入自身提交哈希。任何后续 adoption 或 upgrade 若修改 lock，必须在同一提交同时修改 `codex-skills/` 和本记录；普通文档提交不得单独移动该锚点。
+`resulting_CoTend_commit: containing_commit` 表示采用提交由 Git 中最近一次修改 `upstream/framework.lock.json` 的提交解析。lock 不嵌入自身提交哈希。任何后续 adoption、carrier migration 或 upgrade 若修改 lock，必须在同一提交同时修改当前 `skills/` 和本记录；普通文档提交不得单独移动该锚点。
 
 前述 release adoption 锚点只确认仓库内 Codex Skill 源树已采用并通过静态与隔离验证；后续项目级交付核心证据单列如下。两者都不表示已写入用户全局 Skill 目录，也不授权 push、发布或公开分发。
 
@@ -164,3 +164,24 @@ implicit_invocation_verified: false
 ### 仍未证明
 
 Desktop 技能选择器渲染/排序、自然语言隐式触发、可写真实项目旅程、用户级安装/更新/卸载/回滚、Plugin/Marketplace、Claude 载体和最终用户验收继续 deferred。
+
+## github-root-carrier-path-migration
+
+```yaml
+status: isolated_local_git_marketplace_verified
+authority: user_confirmed_github_open_beta_route
+previous_repository_carrier: codex-skills/
+current_repository_carrier: skills/
+upstream_release_carrier_unchanged: dual-ai-collaboration-skill-share/codex-skills/
+skill_count: 7
+skill_file_count: 30
+source_manifest_sha256_before_after: acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b
+plugin_package_sha256_after_support_path_update: 18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f
+normal_lifecycle_steps: 15
+failure_recovery_steps: 5
+real_user_state_write: false
+owner_repo_network_validation: not_run
+push_release_or_publish: not_performed
+```
+
+官方 Plugin Creator validator 要求 Plugin manifest 的 `skills` contract path 解析到根 `skills/`，并拒绝 `./codex-skills/`。L54 因此只迁移 CoTend 当前仓库载体路径，不改 Skill 字节，也不改固定上游 release 中的来源路径。包内 `THIRD-PARTY-SOURCES.json` 的目标路径随之更新，因此完整 41 文件包摘要从旧值重算为 `18f0b6...d858f`，但 30 个 Skill 的 `acbd6d...ba1b` 摘要不变。根 Marketplace 使用 `url: "./"`，一次性本地 Git fixture 已通过真实 Codex CLI 的安装、7 Skill namespaced discovery、standalone 共存、卸载、重装、失败恢复和隔离清理；真实 GitHub `owner/repo` 拉取与 upgrade 仍需首次 push 后验证。

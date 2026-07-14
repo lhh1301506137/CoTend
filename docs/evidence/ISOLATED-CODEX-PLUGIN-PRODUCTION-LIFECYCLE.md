@@ -12,7 +12,7 @@ metadata:
   package_files: 41
   adopted_skills: 7
   adopted_skill_files: 30
-  package_manifest_sha256: be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070
+  package_manifest_sha256: 18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f
   local_marketplace: cotend-production-candidate-local
   normal_lifecycle_steps: 17
   failure_recovery_steps: 5
@@ -30,11 +30,13 @@ metadata:
 
 ## 结论
 
-L44 的精确 `cotend@0.1.0-rc.1` 41 文件生产候选已经在真实 Codex CLI 0.144.1 中完成完全隔离的安装生命周期。验证不是重新制作一份近似 fixture：两个场景都直接调用 `scripts/build_codex_plugin.py`，随后再次校验 package lock v2 与完整 path/hash manifest。包摘要保持 `be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070`，7 个 Skill、30 个 Skill 文件继续与 `codex-skills/` 逐字节一致，4 个品牌资产保持锁定。
+L44 的精确 `cotend@0.1.0-rc.1` 41 文件生产候选已经在真实 Codex CLI 0.144.1 中完成完全隔离的安装生命周期。验证不是重新制作一份近似 fixture：两个场景都直接调用 `scripts/build_codex_plugin.py`，随后再次校验 package lock v2 与完整 path/hash manifest。包摘要保持 `18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f`，7 个 Skill、30 个 Skill 文件继续与 `skills/` 逐字节一致，4 个品牌资产保持锁定。
 
 正常场景完成 17 步：local Marketplace add/list、Plugin available/add/list、空项目发现、standalone Skills 共存发现、remove/缺席发现、reinstall/重新发现、最终 remove、最终缺席发现、Marketplace remove 与最终缺席确认。安装时 app-server 发现 7 个 `cotend:<skill>` Plugin Skill；共存项目同时保留 7 个 repo-scope standalone Skill。移除 Plugin 后，standalone 项仍存在，没有被接管或删除。
 
 第二个场景在 `plugin_add` 已成功后注入确定性异常，然后完成 5 步恢复：Plugin remove、Plugin list absent、Plugin Skill discovery absent、Marketplace remove、Marketplace list absent。恢复完成后，正常场景和失败场景的 15 个隔离运行时写入根均被清除。
+
+L54 在仓库根加入 Plugin/Marketplace 后，原先位于仓库私有夹具内的两个项目 cwd 会继承父仓库上下文。生产 lifecycle 因此把空项目和 standalone 共存项目迁到系统临时目录下、带 `cotend-L46-projects-` 固定前缀的独立根；package、一次性 Marketplace、命令证据和 15 个写入根仍留在 L46 ignored fixture。共享 Phase A 通过显式 cwd boundary 拒绝路径逃逸，场景结束后外部项目根也必须清除。这只修复测试上下文隔离，不改变生产候选包或生命周期合同。
 
 该结果关闭的是**精确生产候选的隔离 CLI lifecycle** 缺口。`cotend@0.1.0-rc.1` 已确认为首次提交身份，但仍没有 release/publish 授权，也尚未验证 Portal 是否接受 `-rc.1` 预发布版本；本轮没有触碰真实个人 Plugin 或 Marketplace，也没有验证 Desktop picker、Portal submission、公开安装或发布。
 
@@ -92,7 +94,7 @@ marketplace_final_absent
 
 以下 15 个写入环境键全部解析到各自场景内部：`CODEX_HOME`、`HOME`、`USERPROFILE`、`TEMP`、`TMP`、`TMPDIR`、`APPDATA`、`LOCALAPPDATA`、四个 XDG 根、npm cache、pip cache 和 Python bytecode cache。secret-like 环境变量不继承，网络代理指向本地失败端点。
 
-真实用户边界只做 stat-only 元数据快照，不读取内容：默认 Codex root、config、auth、plugins、skills，以及 Agents root、plugins、skills，共 8 项。两个实际 CLI/app-server 场景前后均完全一致。`codex-skills/`、所有 package inputs、package lock、artifact lock 和 Git HEAD 也保持不变。
+真实用户边界只做 stat-only 元数据快照，不读取内容：默认 Codex root、config、auth、plugins、skills，以及 Agents root、plugins、skills，共 8 项。两个实际 CLI/app-server 场景前后均完全一致。`skills/`、所有 package inputs、package lock、artifact lock 和 Git HEAD 也保持不变。
 
 场景结束后删除的是 fixture 内 15 个运行时写入根，不删除 source Marketplace、精确候选包、项目输入或命令证据。`.private-provenance/` 已被 Git 忽略，任何真实用户路径逃逸都会在命令执行前或边界比较时失败。
 

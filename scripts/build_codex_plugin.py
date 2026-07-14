@@ -20,7 +20,7 @@ CONTRACT_ROOT = ROOT / "packaging" / "codex-plugin"
 PLUGIN_TEMPLATE_ROOT = CONTRACT_ROOT / "cotend"
 MANIFEST_SOURCE = PLUGIN_TEMPLATE_ROOT / ".codex-plugin" / "plugin.json"
 PACKAGE_LOCK_PATH = CONTRACT_ROOT / "package.lock.json"
-SOURCE_SKILLS_ROOT = ROOT / "codex-skills"
+SOURCE_SKILLS_ROOT = ROOT / "skills"
 TARGET_ARTIFACT_LOCK = ROOT / "delivery" / "codex-artifact.lock.json"
 DEFAULT_OUTPUT = (
     ROOT
@@ -397,7 +397,7 @@ def validate_contract() -> dict[str, Any]:
     if not isinstance(target, dict):
         raise PluginPackageError("target artifact lock target is invalid")
     expected_source = {
-        "carrier": "codex-skills/",
+        "carrier": "skills/",
         "artifact_lock": "delivery/codex-artifact.lock.json",
         "artifact_id": target.get("artifact_id"),
         "revision": target.get("revision"),

@@ -16,7 +16,7 @@
     "plugin_id": "cotend",
     "version": "0.1.0-rc.1",
     "file_count": 41,
-    "path_hash_manifest_sha256": "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
+    "path_hash_manifest_sha256": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
     "source_skill_manifest_sha256": "acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b",
     "identity_authority": "initial_submission_identity_confirmed_not_release"
   },
@@ -325,7 +325,7 @@
       "value": {
         "plugin_id": "cotend",
         "version": "0.1.0-rc.1",
-        "package_digest": "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
+        "package_digest": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
         "confirmed_on": "2026-07-14",
         "confirmation_scope": "initial_submission_identity_not_release_or_platform_acceptance",
         "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected"

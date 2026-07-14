@@ -26,6 +26,7 @@ EXPECTED_COMMANDS = {
     "python -m unittest discover -s tests",
     "python scripts/check_repository.py",
     "python scripts/verify_production_plugin_lifecycle.py",
+    "python scripts/verify_github_marketplace_carrier.py",
 }
 
 
@@ -95,7 +96,7 @@ class PublicReadmeTests(unittest.TestCase):
         joined = "\n".join(commands).lower()
         for forbidden in (
             "plugin install",
-            "marketplace",
+            "codex plugin marketplace",
             "git push",
             "publish",
             "portal",

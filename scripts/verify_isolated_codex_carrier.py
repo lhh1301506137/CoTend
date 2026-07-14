@@ -7,8 +7,10 @@ import os
 import queue
 import re
 import shutil
+import stat
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from pathlib import Path
@@ -16,10 +18,11 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_ROOT = ROOT / "codex-skills"
+SOURCE_ROOT = ROOT / "skills"
 TEMPLATE_ROOT = ROOT / "tests" / "fixtures" / "codex-carrier"
 PRIVATE_ROOT = ROOT / ".private-provenance"
 DEFAULT_FIXTURE = PRIVATE_ROOT / "L21-isolated-codex-carrier"
+EXTERNAL_RUNTIME_PREFIX = "cotend-L21-runtime-"
 EXPECTED_SKILLS = {
     "cotend-collaboration",
     "cotend-diagnose-only",
@@ -116,6 +119,78 @@ def guarded_fixture(path: Path) -> Path:
     if not relative.parts:
         raise CarrierError("fixture cannot be the .private-provenance root")
     return resolved
+
+
+def guarded_external_runtime_root(path: Path) -> Path:
+    temp_root = Path(tempfile.gettempdir()).resolve()
+    resolved = path.expanduser().resolve()
+    try:
+        relative = resolved.relative_to(temp_root)
+    except ValueError as exc:
+        raise CarrierError("external runtime root must stay under system temp") from exc
+    if len(relative.parts) != 1 or not relative.name.startswith(
+        EXTERNAL_RUNTIME_PREFIX
+    ):
+        raise CarrierError("external runtime root identity is invalid")
+    return resolved
+
+
+def reject_symlink_tree(root: Path) -> None:
+    if root.is_symlink():
+        raise CarrierError("external runtime root cannot be a symlink")
+    for path in root.rglob("*"):
+        if path.is_symlink():
+            raise CarrierError("external runtime tree cannot contain symlinks")
+
+
+def create_external_runtime_copy(fixture: Path) -> tuple[Path, Path]:
+    fixture = guarded_fixture(fixture)
+    runtime_root = guarded_external_runtime_root(
+        Path(tempfile.mkdtemp(prefix=EXTERNAL_RUNTIME_PREFIX))
+    )
+    runtime_fixture = runtime_root / "project"
+    try:
+        shutil.copytree(fixture, runtime_fixture)
+        if file_manifest(fixture, exclude={"runs"}) != file_manifest(
+            runtime_fixture, exclude={"runs"}
+        ):
+            raise CarrierError("external runtime copy differs from ignored fixture")
+        return runtime_root, runtime_fixture
+    except Exception:
+        remove_external_runtime_root(runtime_root)
+        raise
+
+
+def remove_external_runtime_root(
+    path: Path, *, timeout_seconds: float = 45.0, retry_seconds: float = 0.1
+) -> int:
+    root = guarded_external_runtime_root(path)
+    if not root.exists():
+        return 0
+    reject_symlink_tree(root)
+    deadline = time.monotonic() + timeout_seconds
+    retries = 0
+
+    def make_writable_and_retry(function: Any, raw_path: str, _: Any) -> None:
+        target = Path(raw_path).resolve(strict=False)
+        try:
+            target.relative_to(root)
+        except ValueError as exc:
+            raise CarrierError("external runtime cleanup escaped its root") from exc
+        os.chmod(target, stat.S_IWRITE | stat.S_IREAD)
+        function(raw_path)
+
+    while root.exists():
+        try:
+            shutil.rmtree(root, onerror=make_writable_and_retry)
+        except OSError as exc:
+            if getattr(exc, "winerror", None) not in {5, 32}:
+                raise
+            if time.monotonic() >= deadline:
+                raise
+            retries += 1
+            time.sleep(retry_seconds)
+    return retries
 
 
 def codex_executable() -> str:
@@ -385,12 +460,17 @@ def app_server_request(fixture: Path, request: dict[str, Any]) -> dict[str, Any]
                 response = message
                 break
     finally:
-        process.terminate()
+        if process.stdin is not None and not process.stdin.closed:
+            process.stdin.close()
         try:
             process.wait(timeout=5)
         except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait(timeout=5)
+            process.terminate()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait(timeout=5)
     if response is None:
         stderr_reader.join(timeout=1)
         stderr = "".join(stderr_lines).strip()
@@ -645,6 +725,8 @@ def main() -> int:
     args = parse_args()
     fixture = guarded_fixture(args.fixture)
     evidence: dict[str, Any] = {}
+    runtime_root: Path | None = None
+    runtime_fixture: Path | None = None
     try:
         if args.prepare:
             prepare_fixture(fixture)
@@ -663,8 +745,17 @@ def main() -> int:
                 f"cases={negative_cases}"
             )
 
+        if args.discover or args.live:
+            runtime_root, runtime_fixture = create_external_runtime_copy(fixture)
+            evidence["runtime_isolation"] = {
+                "external_system_temp_project": True,
+                "parent_repository_context_inherited": False,
+            }
+
         if args.discover:
-            discovery = discover_skills(fixture)
+            if runtime_fixture is None:
+                raise CarrierError("external discovery fixture was not created")
+            discovery = discover_skills(runtime_fixture)
             evidence["discovery"] = discovery
             version = subprocess.run(
                 [codex_executable(), "--version"],
@@ -680,6 +771,8 @@ def main() -> int:
             )
 
         if args.live:
+            if runtime_fixture is None:
+                raise CarrierError("external live fixture was not created")
             scenarios = load_scenarios()
             selected = (
                 scenarios
@@ -688,13 +781,19 @@ def main() -> int:
             )
             live_results = []
             for scenario in selected:
-                result = run_live_scenario(fixture, scenario)
+                result = run_live_scenario(runtime_fixture, scenario)
                 live_results.append(result)
                 print(
                     f"CODEX_LIVE_SCENARIO_OK id={scenario['id']} "
                     f"skill={scenario['skill']}"
                 )
             evidence["live"] = live_results
+        if runtime_root is not None:
+            retries = remove_external_runtime_root(runtime_root)
+            runtime_root = None
+            evidence.setdefault("runtime_isolation", {})[
+                "windows_handle_release_retries"
+            ] = retries
         write_evidence(args.evidence, evidence)
     except (
         CarrierError,
@@ -705,6 +804,9 @@ def main() -> int:
         print("ISOLATED_CODEX_CARRIER_FAILED", file=sys.stderr)
         print(f"- {exc}", file=sys.stderr)
         return 1
+    finally:
+        if runtime_root is not None:
+            remove_external_runtime_root(runtime_root)
     return 0
 
 

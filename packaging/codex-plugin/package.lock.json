@@ -9,7 +9,7 @@
     "manifest_sha256": "36655662ebeca0cd89b8525bdb91318cd859ce11535a58e94d1c99933ddb0fc5"
   },
   "source": {
-    "carrier": "codex-skills/",
+    "carrier": "skills/",
     "artifact_lock": "delivery/codex-artifact.lock.json",
     "artifact_id": "cotend-codex-r000001",
     "revision": 1,
@@ -21,7 +21,7 @@
   "package": {
     "output_directory_name": "cotend",
     "file_count": 41,
-    "path_hash_manifest_sha256": "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
+    "path_hash_manifest_sha256": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
     "support_files": [
       "LICENSE",
       "NOTICE",

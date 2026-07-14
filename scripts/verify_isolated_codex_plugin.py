@@ -20,7 +20,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_SKILLS_ROOT = ROOT / "codex-skills"
+SOURCE_SKILLS_ROOT = ROOT / "skills"
 PRIVATE_ROOT = ROOT / ".private-provenance"
 DEFAULT_FIXTURE = PRIVATE_ROOT / "L31-isolated-codex-plugin"
 PLUGIN_ID = "cotend"
@@ -1006,9 +1006,21 @@ def app_server_request(
     env: dict[str, str],
     cwd: Path,
     request: dict[str, Any],
+    *,
+    cwd_boundary: Path | None = None,
 ) -> dict[str, Any]:
     fixture = guarded_fixture(fixture)
-    assert_fixture_path(fixture, cwd, "app-server cwd")
+    if cwd_boundary is None:
+        assert_fixture_path(fixture, cwd, "app-server cwd")
+    else:
+        boundary = cwd_boundary.expanduser().resolve()
+        resolved_cwd = cwd.expanduser().resolve()
+        try:
+            relative = resolved_cwd.relative_to(boundary)
+        except ValueError as exc:
+            raise PluginFixtureError("app-server cwd escapes its explicit boundary") from exc
+        if not relative.parts or not boundary.is_dir():
+            raise PluginFixtureError("app-server cwd boundary is invalid")
     process = subprocess.Popen(
         [codex_executable(), "--disable", "remote_plugin", "app-server", "--stdio"],
         cwd=cwd,
@@ -1106,6 +1118,7 @@ def discover_skills(
     expect_plugin: bool,
     expect_standalone: bool,
     identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY,
+    cwd_boundary: Path | None = None,
 ) -> dict[str, Any]:
     result = app_server_request(
         fixture,
@@ -1116,6 +1129,7 @@ def discover_skills(
             "id": 31,
             "params": {"cwds": [str(project.resolve())], "forceReload": True},
         },
+        cwd_boundary=cwd_boundary,
     )
     entries = result.get("data")
     if not isinstance(entries, list) or len(entries) != 1:
@@ -1146,8 +1160,18 @@ def discover_skills(
     if set(standalone_items) != (
         expected_standalone_names if expect_standalone else set()
     ):
+        observed = [
+            {
+                "name": item.get("name"),
+                "scope": item.get("scope"),
+                "path": str(item.get("path", "")),
+            }
+            for item in skills
+            if item.get("name") in expected_standalone_names
+        ]
         raise PluginFixtureError(
-            "standalone Skill discovery mismatch: " + ", ".join(sorted(standalone_items))
+            "standalone Skill discovery mismatch: "
+            + json.dumps(observed, ensure_ascii=True, sort_keys=True)
         )
 
     plugin_scopes: set[str] = set()
@@ -1192,11 +1216,20 @@ def run_phase_a(
     *,
     identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY,
     fail_after_step: str | None = None,
+    projects_root: Path | None = None,
 ) -> dict[str, Any]:
     fixture = guarded_fixture(fixture)
     marketplace_root = fixture / "source-marketplace"
-    empty_project = fixture / "project-empty"
-    coexist_project = fixture / "project-with-standalone-skills"
+    if projects_root is None:
+        empty_project = fixture / "project-empty"
+        coexist_project = fixture / "project-with-standalone-skills"
+        cwd_boundary: Path | None = None
+    else:
+        cwd_boundary = projects_root.expanduser().resolve()
+        if not cwd_boundary.is_dir():
+            raise PluginFixtureError("external lifecycle project root is invalid")
+        empty_project = cwd_boundary / "project-empty"
+        coexist_project = cwd_boundary / "project-with-standalone-skills"
     steps: list[str] = []
 
     def mark(step: str) -> None:
@@ -1261,6 +1294,7 @@ def run_phase_a(
         expect_plugin=True,
         expect_standalone=False,
         identity=identity,
+        cwd_boundary=cwd_boundary,
     )
     assert_protected_unchanged(protected_before)
     mark("discovery_installed")
@@ -1271,6 +1305,7 @@ def run_phase_a(
         expect_plugin=True,
         expect_standalone=True,
         identity=identity,
+        cwd_boundary=cwd_boundary,
     )
     assert_protected_unchanged(protected_before)
     mark("discovery_coexistence")
@@ -1302,6 +1337,7 @@ def run_phase_a(
         expect_plugin=False,
         expect_standalone=False,
         identity=identity,
+        cwd_boundary=cwd_boundary,
     )
     removed_coexist = discover_skills(
         fixture,
@@ -1310,6 +1346,7 @@ def run_phase_a(
         expect_plugin=False,
         expect_standalone=True,
         identity=identity,
+        cwd_boundary=cwd_boundary,
     )
     assert_protected_unchanged(protected_before)
     mark("discovery_after_remove")
@@ -1330,6 +1367,7 @@ def run_phase_a(
         expect_plugin=True,
         expect_standalone=False,
         identity=identity,
+        cwd_boundary=cwd_boundary,
     )
     assert_protected_unchanged(protected_before)
     mark("discovery_after_reinstall")
@@ -1361,6 +1399,7 @@ def run_phase_a(
         expect_plugin=False,
         expect_standalone=False,
         identity=identity,
+        cwd_boundary=cwd_boundary,
     )
     assert_protected_unchanged(protected_before)
     mark("final_discovery_absent")

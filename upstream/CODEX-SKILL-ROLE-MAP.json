@@ -221,13 +221,13 @@
     "third_party_bundling_confirmed": true,
     "codex_skill_set_decisions_complete": true,
     "actual_adoption_authorized": true,
-    "repository_source_carrier": "codex-skills/",
+    "repository_source_carrier": "skills/",
     "repository_source_implemented": true,
     "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
     "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption",
     "live_install_authorized": false,
     "live_install_performed": false,
-    "plugin_or_marketplace_carrier": "deferred",
+    "plugin_or_marketplace_carrier": "github_root_candidate_local_verified",
     "final_framework_lock_exists": true
   }
 }

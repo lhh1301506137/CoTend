@@ -1,12 +1,14 @@
 # Preserve byte identity for directly adopted third-party files on every platform.
 /README.md text eol=lf
-/codex-skills/** text eol=lf
+/skills/** text eol=lf
 /LICENSE text eol=lf
 /NOTICE text eol=lf
 /THIRD-PARTY-NOTICES.md text eol=lf
 /THIRD-PARTY-SOURCES.json text eol=lf
-/codex-skills/grill-me/SKILL.md text eol=lf
-/codex-skills/karpathy-guidelines/SKILL.md text eol=lf
+/skills/grill-me/SKILL.md text eol=lf
+/skills/karpathy-guidelines/SKILL.md text eol=lf
+/\.codex-plugin/plugin.json text eol=lf
+/.agents/plugins/marketplace.json text eol=lf
 /THIRD-PARTY-LICENSES/grill-me-MIT.txt text eol=lf
 /THIRD-PARTY-LICENSES/karpathy-guidelines-MIT.txt text eol=lf
 /packaging/codex-plugin/cotend/.codex-plugin/plugin.json text eol=lf

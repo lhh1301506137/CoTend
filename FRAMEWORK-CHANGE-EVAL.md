@@ -363,3 +363,64 @@ watch_closure:
 ```
 
 该变更只修改 CoTend 项目级 delivery transaction，没有修改七个 Skill、共享协议、source framework lock 或 target artifact bytes，因此不触发上游 release 跟进或外部 reviewer 同步。它关闭 L29 留下的两个可证明恢复分支，不等于开放通用 force unlock、自动 unattended recovery 或真实项目恢复。
+
+## 2026-07-15 CoTend GitHub Marketplace 根载体
+
+```yaml
+current_framework_version: cotend-collaboration-v1.52
+change_type: workflow_behavior
+change_summary: 在不改变 Skill 字节和共享协议的前提下，将唯一仓库载体迁移为根 skills/，增加 GitHub repo Marketplace 根 manifest 与隔离安装生命周期
+intent: 让 GitHub Open Beta 具备受支持的 Codex Plugin/Marketplace 安装路径，同时避免双 Skill 树、父仓库上下文假阳性和真实用户状态污染
+expected_benefit:
+  - 仓库根满足官方 Plugin validator，并可作为 owner/repo Marketplace 候选
+  - 七个 Skills 保持单一语义源和稳定摘要
+  - 本地载体、生产包、故障恢复和清理有可重复执行证据
+possible_harm:
+  - 根 Marketplace 会影响仓库内嵌套测试项目的祖先上下文
+  - Windows app-server 句柄可能让临时项目清理延迟
+  - 本地路径证据可能被误表述成真实 GitHub 安装已通过
+affected_workflows:
+  - Codex_Plugin_packaging_and_repository_distribution
+  - isolated_skill_discovery_and_plugin_lifecycle
+  - project_delivery_source_carrier_resolution
+deviations:
+  - L54 原候选希望保留 codex-skills/；官方 validator 执行证据要求改为唯一根 skills/，未采用 duplicate tree 或 symlink
+mechanism_budget:
+  added_context_surface: script
+  ordinary_load_impact: none
+  ceremony_added: low
+  duplication_check: replaces_existing_repository_carrier_and_reuses_existing_package_contract
+  cheaper_alternative_considered: 复制或链接第二份根 skills/；因漂移、跨平台和审查风险拒绝
+  retirement_or_thinning_trigger: Codex 官方提供不要求根 skills/ 的声明式外部 Skill source，或仓库 Marketplace 被更简单且等价的官方安装载体替代
+  expected_failure_prevented: duplicate_skill_drift_parent_marketplace_false_positive_real_user_state_pollution_cleanup_residue_and_false_remote_install_claim
+validation_scenarios:
+  - scenario: isolated_repository_root_marketplace_lifecycle
+    expected: 7 Skill 安装/发现/卸载/重装、失败恢复、15 根清理和真实用户边界不变
+    validation_result_type: executed
+    result: 15_normal_5_recovery_passed
+  - scenario: production_package_regression
+    expected: 41 文件包、17 步生命周期、5 步恢复和 30 Skill 文件摘要保持一致
+    validation_result_type: executed
+    result: package_and_lifecycle_passed_digest_18f0b6_source_acbd6d
+  - scenario: true_GitHub_owner_repo_and_novice_install
+    expected: 真实远端 fetch、upgrade、洁净环境安装和 Desktop 可见性按实际结果记录
+    validation_result_type: deferred
+    result: L55_after_explicit_first_push_authorization
+real_project_validation:
+  - scenario: current_CoTend_repository_under_real_Codex_CLI
+    expected: 父仓库根 Marketplace 不污染外部临时项目，保护用户边界不变
+    validation_result_type: executed
+    result: L21_L46_L54_external_project_boundaries_passed
+decision: watch
+rollback_triggers:
+  - 根 Marketplace 导致普通项目误发现或污染不受控 cwd
+  - Skill 摘要变化或出现第二个语义源
+  - owner/repo 安装无法工作且无官方兼容修复
+  - 清理越过精确生成根或修改真实用户状态
+review_after: L55_true_GitHub_Open_Beta_validation
+watch_closure:
+  - keep_watch
+  - evidence: local_carrier_and_production_lifecycle_passed_remote_not_run
+```
+
+本项不修改 CoTend 的共享框架行为、七个 Skill 字节或产品协议，因此不发起上游反馈或外部 reviewer 同步；它只改变 CoTend 的分发载体与验证 harness。

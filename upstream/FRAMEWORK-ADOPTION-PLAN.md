@@ -6,9 +6,9 @@ authority: implementation_record
 candidate_release: 2026.07.11.3
 release_anchor: dual-ai-share-2026.07.11.3
 target_platform: Codex
-target_source_carrier: codex-skills/
+target_source_carrier: skills/
 live_install_target: not_authorized
-plugin_or_marketplace_carrier: deferred
+plugin_or_marketplace_carrier: github_root_candidate_local_verified
 implementation_authority: product_owner_confirmed
 adoption_state: adopted
 final_framework_lock_exists: true
@@ -19,7 +19,7 @@ analysis_language: zh-CN
 
 在 CoTend 仓库内建立第一套可验证的 Codex 技能源树，直接产品化已验证的 `dual-ai` 发布版，而不是重新设计一套工作流。实现完成后，仓库应包含五个 CoTend 用户原创技能和两个保持第三方身份的 MIT 伴随技能；默认入口、内部委派、治理核心、停止边界、证据、恢复和模型生命周期保持行为等价。
 
-本计划只使用仓库内 `codex-skills/` 作为首个源代码载体。它与上游发布目录同构，便于逐文件对照，也可以在后续被安装器或 Plugin 包装。它不是用户全局 `$CODEX_HOME/skills`，不授权修改本机已安装技能，也不提前决定 Marketplace、Plugin 清单或最终安装渠道。
+首次采用时仓库使用 `codex-skills/` 与上游发布目录同构。L54 在不改变 30 个文件字节的前提下，把 CoTend 当前唯一源迁移为根 `skills/`，以满足官方 Plugin contract；上游固定 release 内部仍使用 `codex-skills/`。该仓库源不是用户全局 `$CODEX_HOME/skills`，不授权修改本机已安装技能。
 
 ## 固定输入
 
@@ -39,13 +39,13 @@ analysis_language: zh-CN
 
 | 标记发布版中的源技能 | 文件数 | 源目录树 | CoTend 目标 | 计划状态 | 处理方式 |
 |---|---:|---|---|---|---|
-| `dual-ai-init` | 2 | `cb233ade310c37e0cd038ff5752eeced92a303f0` | `codex-skills/cotend-init/` | `adapted` | 直接改名；更新入口、委派、回退路径和界面元数据。 |
-| `dual-ai-project-init` | 2 | `1f2fdd44e90f31fec310eaf78b02e48de4fed53c` | `codex-skills/cotend-project-init/` | `adapted` | 保留自动模式；更新品牌、协议、技能引用、迁移与输出标识。 |
-| `dual-ai-collaboration` | 19 | `b75114a7e0fd2027943ed98217a0f9d581cbdae9` | `codex-skills/cotend-collaboration/` | `adapted` | 保留共享治理核心与全部参考模块；更新自引用、协议标识和产品品牌。 |
-| `diagnose-only` | 2 | `88dc2e47dba438720a336c38103308aeae3d635e` | `codex-skills/cotend-diagnose-only/` | `adapted` | 保持只读诊断；更新前置元数据、默认提示词和内部路由名称。 |
-| `dual-model-upgrade` | 3 | `dfb25bd4464e0266b665af138a5f3902b44ce281` | `codex-skills/cotend-model-upgrade/` | `adapted` | 保留顾问/试用/接手/回退/复诊；更新协议、数据包族和治理引用。 |
-| `grill-me` | 1 | `70df660726ef12349a40dc0353a681c82414fe95` | `codex-skills/grill-me/` | `adopted` | 从标记发布包字节复用，不添加 CoTend 前缀，不改变语义。 |
-| `karpathy-guidelines` | 1 | `e119339197d600aa39a24fd7a95c946800c9c949` | `codex-skills/karpathy-guidelines/` | `adopted` | 从标记发布包字节复用，不添加 CoTend 前缀，不改变语义。 |
+| `dual-ai-init` | 2 | `cb233ade310c37e0cd038ff5752eeced92a303f0` | `skills/cotend-init/` | `adapted` | 直接改名；更新入口、委派、回退路径和界面元数据。 |
+| `dual-ai-project-init` | 2 | `1f2fdd44e90f31fec310eaf78b02e48de4fed53c` | `skills/cotend-project-init/` | `adapted` | 保留自动模式；更新品牌、协议、技能引用、迁移与输出标识。 |
+| `dual-ai-collaboration` | 19 | `b75114a7e0fd2027943ed98217a0f9d581cbdae9` | `skills/cotend-collaboration/` | `adapted` | 保留共享治理核心与全部参考模块；更新自引用、协议标识和产品品牌。 |
+| `diagnose-only` | 2 | `88dc2e47dba438720a336c38103308aeae3d635e` | `skills/cotend-diagnose-only/` | `adapted` | 保持只读诊断；更新前置元数据、默认提示词和内部路由名称。 |
+| `dual-model-upgrade` | 3 | `dfb25bd4464e0266b665af138a5f3902b44ce281` | `skills/cotend-model-upgrade/` | `adapted` | 保留顾问/试用/接手/回退/复诊；更新协议、数据包族和治理引用。 |
+| `grill-me` | 1 | `70df660726ef12349a40dc0353a681c82414fe95` | `skills/grill-me/` | `adopted` | 从标记发布包字节复用，不添加 CoTend 前缀，不改变语义。 |
+| `karpathy-guidelines` | 1 | `e119339197d600aa39a24fd7a95c946800c9c949` | `skills/karpathy-guidelines/` | `adopted` | 从标记发布包字节复用，不添加 CoTend 前缀，不改变语义。 |
 
 ## CoTend 适配规则
 
@@ -91,7 +91,7 @@ analysis_language: zh-CN
 ## 实施批次
 
 1. 从附注标签读取 30 个 Codex 技能文件并核对每个源目录树。
-2. 在仓库内创建 `codex-skills/`，先落位两个字节复用的 MIT Skill，再适配五个用户原创 Skill。
+2. 首次采用时在 `codex-skills/` 落位并适配 30 个文件；L54 后仅把当前仓库载体路径迁移为根 `skills/`，上游读取路径不变。
 3. 机械更新五个目录、前置元数据、agent 元数据、委派、自引用、回退路径、协议与数据包族。
 4. 逐文件语义审查高风险文本，不用无上下文全局替换修改旧版迁移、来源或第三方归属。
 5. 增加许可证、许可告知、来源记录和已采用技能集验证器。
@@ -101,11 +101,11 @@ analysis_language: zh-CN
 
 ## 实施结果
 
-- `codex-skills/` 已包含 7 个 Skill 目录和 30 个文件；五个用户原创 Skill 已完成 CoTend 品牌与 Codex 元数据适配。
+- 根 `skills/` 已包含 7 个 Skill 目录和 30 个文件；五个用户原创 Skill 已完成 CoTend 品牌与 Codex 元数据适配，迁移前后 path/hash manifest 不变。
 - 两个 MIT Skill 与固定 release 中的对应文件保持字节一致，独立许可证、notice 和机器可读来源记录已落位。
 - C01-C19 已映射到实际 Skill 文件；C16 只完成仓库源树部分，live 安装与交付生命周期继续延后。
 - adoption log 与 `upstream/framework.lock.json` 使用 `containing_commit` 约定进入同一采用提交。
-- live `$CODEX_HOME/skills`、Plugin/Marketplace、Claude 载体、push 和发布均未执行。
+- 仓库根 Plugin/Marketplace 的隔离本地 Git 生命周期已通过；live `$CODEX_HOME/skills`、真实 `owner/repo` 安装、Claude 载体、push 和发布均未执行。
 
 ## 验证契约
 

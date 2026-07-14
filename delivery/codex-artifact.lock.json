@@ -5,7 +5,7 @@
   "source": {
     "framework_lock": "upstream/framework.lock.json",
     "release_id": "2026.07.11.3",
-    "carrier": "codex-skills/",
+    "carrier": "skills/",
     "framework_protocol": "cotend-collaboration-v1.52"
   },
   "target": {

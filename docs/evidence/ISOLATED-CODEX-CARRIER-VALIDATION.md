@@ -25,6 +25,22 @@ CoTend 的七个仓库 Skill 可以无差异复制到临时项目的 `.agents/sk
 
 这证明了项目级 Codex 载体、显式 `$skill-name` 调用和三项关键行为，不证明全局安装、Desktop 技能选择器渲染、自然语言隐式触发或完整安装生命周期。
 
+## L54 后的父仓库上下文隔离补强
+
+仓库根加入 Plugin/Marketplace 载体后，原先位于 `.private-provenance` 的嵌套 discovery fixture 会继承父仓库 Plugin 上下文，Codex 因而把同一组 Skill 解释为 `cotend:<skill>`，不再是本证据要验证的 repo-scope standalone 载体。该次失败未被接受为产品回归结论。
+
+验证器现保留 ignored fixture 作为静态真相和本地证据位置，但在 discovery 或 live scenario 前把精确 fixture 复制到系统临时目录下、带 `cotend-L21-runtime-` 固定前缀的独立 Git 项目。运行时副本必须与 ignored fixture 的文件摘要一致，父仓库根 Marketplace 上下文不继承；app-server 按 EOF 优雅退出，外部根只允许在精确临时边界内限时清理。
+
+补强后使用 Codex CLI 0.144.1 重跑通过：
+
+```text
+ISOLATED_CODEX_CARRIER_OK skills=7 files=30 interfaces=5
+ISOLATED_CODEX_CARRIER_NEGATIVE_MUTATIONS_OK cases=4
+CODEX_SKILL_DISCOVERY_OK version=codex-cli_0.144.1 repo_skills=7
+```
+
+这项补强只修复验证器的父上下文隔离，不改变 7 个 Skill、30 个文件、原始三条只读 live scenario 结论或真实用户边界。
+
 ## 验证环境与依据
 
 - 官方当前 Skills 文档规定仓库 Skill 位于 `.agents/skills`，并支持 `$skill-name` 显式调用和 `agents/openai.yaml` 可选界面元数据：[Build skills](https://learn.chatgpt.com/docs/build-skills)。
@@ -36,7 +52,7 @@ CoTend 的七个仓库 Skill 可以无差异复制到临时项目的 `.agents/sk
 
 | 检查 | 方法 | 结果 |
 |---|---|---|
-| 安装内容 | 比较 `codex-skills/` 与 fixture `.agents/skills` 的相对路径和 SHA-256 | 7 个 Skill、30 个文件完全一致 |
+| 安装内容 | 比较执行时的 `codex-skills/`（现已迁移为 `skills/`）与 fixture `.agents/skills` 的相对路径和 SHA-256 | 7 个 Skill、30 个文件完全一致 |
 | Skill 身份 | 检查目录、`SKILL.md` frontmatter 和名称 | 7/7 通过 |
 | 界面元数据 | 解析五份 `agents/openai.yaml` | 5/5 展示名、短描述、默认提示通过 |
 | companion 边界 | 检查两个 MIT Skill 不新增 CoTend agent metadata | 2/2 通过 |

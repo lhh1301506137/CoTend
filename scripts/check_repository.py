@@ -203,6 +203,27 @@ EXPECTED_PLUGIN_LIFECYCLE_TESTS = {
     "test_production_identity_is_separate_from_fixture_default",
     "test_purge_removes_only_isolated_runtime_roots",
 }
+EXPECTED_GITHUB_MARKETPLACE_CARRIER_FILES = {
+    ".agents/plugins/marketplace.json",
+    ".codex-plugin/plugin.json",
+    "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md",
+    "scripts/verify_github_marketplace_carrier.py",
+    "tests/test_github_marketplace_carrier.py",
+}
+EXPECTED_GITHUB_MARKETPLACE_CARRIER_TESTS = {
+    "test_boundary_change_summary_never_includes_metadata_values",
+    "test_carrier_manifest_is_exact_path_only_transform",
+    "test_cleanup_removes_readonly_git_objects_inside_fixture",
+    "test_external_project_cleanup_retries_windows_handle_release",
+    "test_external_project_root_is_exact_temp_child_and_removable",
+    "test_git_environment_is_isolated_and_forces_lf",
+    "test_l54_root_guard_rejects_other_private_directory",
+    "test_marketplace_uses_repository_root_url_source",
+    "test_materialized_carrier_has_one_skill_source_and_locked_assets",
+    "test_repeat_add_and_local_refresh_require_known_outcomes",
+    "test_repository_carrier_requires_both_root_files",
+    "test_root_source_validation_rejects_nested_package_source",
+}
 EXPECTED_PLUGIN_SUBMISSION_FILES = {
     "docs/evidence/CODEX-PLUGIN-SUBMISSION-MATERIAL-CONTRACT.md",
     "packaging/codex-plugin/submission-materials/submission.json",
@@ -1431,7 +1452,7 @@ def upstream_adoption_errors(
         ("carriers", "codex", "skill_count"): 7,
         ("carriers", "claude", "skill_count"): 3,
         ("adoption", "state"): "adopted",
-        ("adoption", "source_carrier"): "codex-skills/",
+        ("adoption", "source_carrier"): "skills/",
         ("adoption", "capability_map"): "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
         ("adoption", "adoption_record"): (
             "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption"
@@ -1463,7 +1484,7 @@ def upstream_adoption_errors(
         "karpathy-guidelines",
     }
     skill_files = {
-        path for path in public_candidates if path.startswith("codex-skills/")
+        path for path in public_candidates if path.startswith("skills/")
     }
     actual_skill_ids = {
         path.split("/", 2)[1] for path in skill_files if path.count("/") >= 2
@@ -1480,8 +1501,8 @@ def upstream_adoption_errors(
         adopted_set = set(adopted_files)
         adapted_set = set(adapted_files)
         expected_direct_adoption = {
-            "codex-skills/grill-me/SKILL.md",
-            "codex-skills/karpathy-guidelines/SKILL.md",
+            "skills/grill-me/SKILL.md",
+            "skills/karpathy-guidelines/SKILL.md",
         }
         if adopted_set != expected_direct_adoption:
             errors.append("directly adopted Skill file inventory drift")
@@ -1631,7 +1652,7 @@ def upstream_adoption_errors(
             "third_party_bundling_confirmed": True,
             "codex_skill_set_decisions_complete": True,
             "actual_adoption_authorized": True,
-            "repository_source_carrier": "codex-skills/",
+            "repository_source_carrier": "skills/",
             "repository_source_implemented": True,
             "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
             "adoption_record": (
@@ -1639,7 +1660,7 @@ def upstream_adoption_errors(
             ),
             "live_install_authorized": False,
             "live_install_performed": False,
-            "plugin_or_marketplace_carrier": "deferred",
+            "plugin_or_marketplace_carrier": "github_root_candidate_local_verified",
             "final_framework_lock_exists": True,
         }
         for key, expected in expected_adoption_boundary.items():
@@ -1681,9 +1702,9 @@ def upstream_adoption_errors(
     exact_plan_metadata = {
         "candidate_release": {"2026.07.11.3"},
         "target_platform": {"Codex"},
-        "target_source_carrier": {"codex-skills/"},
+        "target_source_carrier": {"skills/"},
         "live_install_target": {"not_authorized"},
-        "plugin_or_marketplace_carrier": {"deferred"},
+        "plugin_or_marketplace_carrier": {"github_root_candidate_local_verified"},
         "implementation_authority": {"product_owner_confirmed"},
         "adoption_state": {"adopted"},
         "final_framework_lock_exists": {"true"},
@@ -1694,13 +1715,13 @@ def upstream_adoption_errors(
             errors.append(f"framework adoption plan metadata mismatch: {key}")
     for required_text in (
         "7 个技能目录，共 30 个文件",
-        "codex-skills/cotend-init/",
-        "codex-skills/cotend-project-init/",
-        "codex-skills/cotend-collaboration/",
-        "codex-skills/cotend-diagnose-only/",
-        "codex-skills/cotend-model-upgrade/",
-        "codex-skills/grill-me/",
-        "codex-skills/karpathy-guidelines/",
+        "skills/cotend-init/",
+        "skills/cotend-project-init/",
+        "skills/cotend-collaboration/",
+        "skills/cotend-diagnose-only/",
+        "skills/cotend-model-upgrade/",
+        "skills/grill-me/",
+        "skills/karpathy-guidelines/",
         "cotend-collaboration-v1.52",
         "cotend-model-upgrade-v1.7",
         "mechanism_budget: three_repository_integrity_mechanisms_no_new_user_workflow",
@@ -1752,7 +1773,7 @@ def upstream_adoption_errors(
             "919fe34254b51619ddca1d010445281d4f7ceec958ee8cfd1958eaccb02bd006"
         ),
         ("target_platform",): "Codex",
-        ("source_carrier",): "codex-skills/",
+        ("source_carrier",): "skills/",
         ("skill_count",): 7,
         ("skill_file_count",): 30,
         ("capability_map",): "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
@@ -1761,7 +1782,9 @@ def upstream_adoption_errors(
         ),
         ("delivery_boundaries", "repository_source_adopted"): True,
         ("delivery_boundaries", "live_install_performed"): False,
-        ("delivery_boundaries", "plugin_or_marketplace_carrier"): "deferred",
+        ("delivery_boundaries", "plugin_or_marketplace_carrier"): (
+            "github_root_candidate_local_verified"
+        ),
         ("delivery_boundaries", "claude_carrier"): "deferred",
         ("delivery_boundaries", "push_release_or_publish"): "not_performed",
     }
@@ -1916,6 +1939,17 @@ def isolated_codex_carrier_errors(
     }
     if "scripts/verify_isolated_codex_carrier.py" not in candidates:
         errors.append("isolated Codex carrier verifier is missing or ignored")
+    else:
+        verifier_text = read("scripts/verify_isolated_codex_carrier.py")
+        for marker in (
+            'EXTERNAL_RUNTIME_PREFIX = "cotend-L21-runtime-"',
+            "create_external_runtime_copy",
+            "guarded_external_runtime_root",
+            "parent_repository_context_inherited",
+            "process.stdin.close()",
+        ):
+            if marker not in verifier_text:
+                errors.append(f"isolated Codex carrier isolation is missing: {marker}")
     missing_paths = expected_paths - candidates
     if missing_paths:
         errors.append(
@@ -1942,6 +1976,8 @@ def isolated_codex_carrier_errors(
         "passed_3_of_3",
         "passed_4_of_4",
         "passed_7_of_7_with_PYTHONUTF8",
+        "父仓库根 Marketplace 上下文不继承",
+        "CODEX_SKILL_DISCOVERY_OK version=codex-cli_0.144.1 repo_skills=7",
         "1024",
     ):
         if marker not in combined_evidence:
@@ -1969,7 +2005,7 @@ def isolated_codex_carrier_errors(
         "cotend-diagnose-only",
         "cotend-model-upgrade",
     ):
-        agent_path = ROOT / "codex-skills" / skill / "agents" / "openai.yaml"
+        agent_path = ROOT / "skills" / skill / "agents" / "openai.yaml"
         if not agent_path.is_file():
             errors.append(f"Codex agent metadata is missing: {skill}")
             continue
@@ -2064,6 +2100,7 @@ def isolated_codex_plugin_fixture_errors(
         or path == ".codex-plugin/plugin.json"
     )
     allowed_later_candidate = {
+        ".codex-plugin/plugin.json",
         "packaging/codex-plugin/cotend/.codex-plugin/plugin.json"
     }
     unexpected_manifests = sorted(
@@ -2286,7 +2323,10 @@ def production_plugin_package_errors(
         if path.endswith("/.codex-plugin/plugin.json")
         or path == ".codex-plugin/plugin.json"
     )
-    if tracked_plugin_manifests != [expected_manifest_path]:
+    if tracked_plugin_manifests != [
+        ".codex-plugin/plugin.json",
+        expected_manifest_path,
+    ]:
         errors.append(
             "production Plugin manifest inventory mismatch: "
             f"{tracked_plugin_manifests}"
@@ -2352,7 +2392,7 @@ def production_plugin_package_errors(
         errors.append("production Plugin source manifest lock mismatch")
     if not isinstance(output_lock, dict) or output_lock.get(
         "path_hash_manifest_sha256"
-    ) != "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070":
+    ) != "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f":
         errors.append("production Plugin package digest lock mismatch")
     if not isinstance(output_lock, dict) or output_lock.get("file_count") != 41:
         errors.append("production Plugin package file count mismatch")
@@ -2404,7 +2444,7 @@ def production_plugin_package_errors(
             errors.append(f"production Plugin builder is missing: {marker}")
     attributes_text = read(".gitattributes")
     for marker in (
-        "/codex-skills/** text eol=lf",
+        "/skills/** text eol=lf",
         "/LICENSE text eol=lf",
         "/NOTICE text eol=lf",
         "/THIRD-PARTY-NOTICES.md text eol=lf",
@@ -2462,7 +2502,7 @@ def production_plugin_package_errors(
         if metadata_values(evidence_text, key) != expected:
             errors.append(f"production Plugin package evidence mismatch: {key}")
     for marker in (
-        "`codex-skills/` 仍是唯一语义源",
+        "`skills/` 仍是唯一语义源",
         "41 个文件",
         "逐字节一致",
         "17 类负向边界",
@@ -2510,6 +2550,9 @@ def production_plugin_lifecycle_errors(
         'fail_after_step="plugin_add"',
         "recover_after_injected_failure",
         "purge_isolated_write_roots",
+        'EXTERNAL_PROJECT_PREFIX = "cotend-L46-projects-"',
+        "owned_external_system_temp_root",
+        "projects_root=projects_root",
         "protected_user_snapshot",
         "PRODUCTION_PLUGIN_LIFECYCLE_OK",
         "real_user_plugin_or_marketplace_write",
@@ -2569,6 +2612,7 @@ def production_plugin_lifecycle_errors(
         "正常场景完成 17 步",
         "完成 5 步恢复",
         "15 个隔离运行时写入根均被清除",
+        "带 `cotend-L46-projects-` 固定前缀的独立根",
         "真实用户边界只做 stat-only 元数据快照",
         "该次运行没有被接受为证据",
         "不把隔离 lifecycle 表述成已经上架",
@@ -2585,6 +2629,184 @@ def production_plugin_lifecycle_errors(
             "production Plugin lifecycle must not track Marketplace files: "
             f"{tracked_marketplaces}"
         )
+    return errors
+
+
+def github_marketplace_root_carrier_errors(
+    evidence_text: str,
+    candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    missing = EXPECTED_GITHUB_MARKETPLACE_CARRIER_FILES - candidates
+    if missing:
+        errors.append(
+            "GitHub Marketplace root-carrier artifacts are missing: "
+            f"{sorted(missing)}"
+        )
+        return errors
+
+    try:
+        root_manifest = json.loads(read(".codex-plugin/plugin.json"))
+        production_manifest = json.loads(
+            read("packaging/codex-plugin/cotend/.codex-plugin/plugin.json")
+        )
+        marketplace = json.loads(read(".agents/plugins/marketplace.json"))
+    except (json.JSONDecodeError, OSError) as exc:
+        return [f"GitHub Marketplace root-carrier JSON is invalid: {exc}"]
+    if not isinstance(root_manifest, dict) or not isinstance(
+        production_manifest, dict
+    ):
+        return ["GitHub Marketplace Plugin manifests must be objects"]
+
+    expected_root = json.loads(json.dumps(production_manifest))
+    expected_interface = expected_root.get("interface")
+    if not isinstance(expected_interface, dict):
+        errors.append("production Plugin interface is invalid for root derivation")
+    else:
+        expected_interface.update(
+            {
+                "composerIcon": (
+                    "./packaging/codex-plugin/cotend/assets/cotend-logo.png"
+                ),
+                "logo": "./packaging/codex-plugin/cotend/assets/cotend-logo.png",
+                "logoDark": (
+                    "./packaging/codex-plugin/cotend/assets/cotend-logo-dark.png"
+                ),
+            }
+        )
+        if root_manifest != expected_root:
+            errors.append(
+                "root Plugin manifest must be the exact three-path production transform"
+            )
+
+    expected_marketplace = {
+        "name": "cotend",
+        "interface": {"displayName": "CoTend"},
+        "plugins": [
+            {
+                "name": "cotend",
+                "source": {"source": "url", "url": "./"},
+                "policy": {
+                    "installation": "AVAILABLE",
+                    "authentication": "ON_INSTALL",
+                },
+                "category": "Developer Tools",
+            }
+        ],
+    }
+    if marketplace != expected_marketplace:
+        errors.append("root Marketplace manifest drifted from the repository-root contract")
+
+    tracked_marketplaces = sorted(
+        path
+        for path in candidates
+        if path == ".agents/plugins/marketplace.json"
+        or path.endswith("/.agents/plugins/marketplace.json")
+    )
+    if tracked_marketplaces != [".agents/plugins/marketplace.json"]:
+        errors.append(
+            "tracked Marketplace inventory mismatch: " f"{tracked_marketplaces}"
+        )
+    source_files = sorted(path for path in candidates if path.startswith("skills/"))
+    if len(source_files) != 30:
+        errors.append(f"root Marketplace Skill source count drifted: {len(source_files)}")
+    if any(path.startswith("codex-skills/") for path in candidates):
+        errors.append("legacy codex-skills source must not coexist with root skills")
+    if any((ROOT / path).is_symlink() for path in source_files):
+        errors.append("root Marketplace Skill source must not contain symlinks")
+
+    verifier_text = read("scripts/verify_github_marketplace_carrier.py")
+    for marker in (
+        'EXTERNAL_PROJECT_PREFIX = "cotend-L54-projects-"',
+        "POST_PUSH_NOT_RUN",
+        "run_official_validator",
+        "initialize_fixture_git_repository",
+        "wait_for_protected_quiet_window",
+        "lifecycle.protected_user_snapshot()",
+        "lifecycle.WRITE_ROOT_ENV_KEYS",
+        "local_marketplace_not_git_upgradeable",
+        "remove_tree_with_readonly_retry",
+        "remove_external_project_root",
+        "external_project_handle_release_retries",
+        "GITHUB_MARKETPLACE_CARRIER_OK",
+    ):
+        if marker not in verifier_text:
+            errors.append(f"GitHub Marketplace verifier is missing: {marker}")
+
+    test_text = read("tests/test_github_marketplace_carrier.py")
+    actual_tests = set(
+        re.findall(r"^\s+def (test_[a-z0-9_]+)\(", test_text, re.MULTILINE)
+    )
+    missing_tests = EXPECTED_GITHUB_MARKETPLACE_CARRIER_TESTS - actual_tests
+    if missing_tests:
+        errors.append(
+            "GitHub Marketplace root-carrier tests are missing: "
+            f"{sorted(missing_tests)}"
+        )
+
+    for key, expected in {
+        "status": {"passed_isolated_github_marketplace_root_carrier"},
+        "evidence_type": {"executed"},
+        "codex_version": {"codex-cli_0.144.1"},
+        "repository_carrier": {"present_and_valid"},
+        "root_plugin_manifest": {".codex-plugin/plugin.json"},
+        "root_marketplace_manifest": {".agents/plugins/marketplace.json"},
+        "marketplace_name": {"cotend"},
+        "marketplace_source": {"url_relative_root"},
+        "candidate_version": {"0.1.0-rc.1"},
+        "semantic_source": {"skills/"},
+        "semantic_sources": {"1"},
+        "source_skill_manifest_sha256": {
+            "acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b"
+        },
+        "package_manifest_sha256": {
+            "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f"
+        },
+        "allowed_manifest_path_rewrites": {"3"},
+        "adopted_skills": {"7"},
+        "adopted_skill_files": {"30"},
+        "normal_lifecycle_steps": {"15"},
+        "failure_recovery_steps": {"5"},
+        "write_roots_redirected": {"15"},
+        "protected_user_boundaries": {"8"},
+        "focused_tests": {"12"},
+        "full_unit_tests": {"157"},
+        "repository_check": {
+            "passed_166_public_candidates_19_capabilities_19_specs"
+        },
+        "official_validator": {"passed"},
+        "local_marketplace_repeat_add": {"idempotent_success"},
+        "local_marketplace_upgrade": {
+            "local_path_not_configured_as_git_marketplace"
+        },
+        "external_project_root_removed": {"true"},
+        "remote_owner_repo_fetch": {"not_run"},
+        "git_backed_marketplace_upgrade": {"not_run"},
+        "clean_novice_install": {"not_run"},
+        "desktop_restart_visibility": {"not_run"},
+        "release_publish_push": {"false"},
+    }.items():
+        if metadata_values(evidence_text, key) != expected:
+            errors.append(f"GitHub Marketplace evidence mismatch: {key}")
+    for marker in (
+        "一次性本地 Git Marketplace",
+        "正常场景观察到 1 次、恢复场景观察到 7 次",
+        "真实用户 Codex/Agents 的 8 个边界只做 stat-only 元数据快照",
+        "remote_git=not_run",
+        "没有从真实 GitHub `owner/repo` 添加 Marketplace",
+        "不表示 CoTend 已经公开可安装或完成上架",
+    ):
+        if marker not in evidence_text:
+            errors.append(f"GitHub Marketplace evidence is missing: {marker}")
+
+    attributes = read(".gitattributes")
+    for marker in (
+        "/\\.codex-plugin/plugin.json text eol=lf",
+        "/.agents/plugins/marketplace.json text eol=lf",
+        "/skills/** text eol=lf",
+    ):
+        if marker not in attributes:
+            errors.append(f"GitHub Marketplace LF contract is missing: {marker}")
     return errors
 
 
@@ -2619,7 +2841,7 @@ def plugin_submission_material_errors(
         errors.append("Plugin submission package identity drifted")
     if package_binding.get("file_count") != 41 or package_binding.get(
         "path_hash_manifest_sha256"
-    ) != "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070":
+    ) != "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f":
         errors.append("Plugin submission package digest drifted")
     if (
         package_binding.get("identity_authority")
@@ -2657,7 +2879,7 @@ def plugin_submission_material_errors(
             "plugin_id": "cotend",
             "version": "0.1.0-rc.1",
             "package_digest": (
-                "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070"
+                "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f"
             ),
             "confirmed_on": "2026-07-14",
             "confirmation_scope": (
@@ -2763,7 +2985,7 @@ def plugin_submission_material_errors(
         "unresolved_external_blockers": {"8"},
         "focused_unit_tests": {"7"},
         "negative_mutations": {"17"},
-        "full_unit_tests": {"145"},
+        "full_unit_tests": {"157"},
         "production_package_regression": {
             "passed_8_tests_17_negative_6_boundaries"
         },
@@ -2771,7 +2993,7 @@ def plugin_submission_material_errors(
             "passed_17_normal_5_recovery_15_roots_purged"
         },
         "repository_check": {
-            "passed_161_public_candidates_19_capabilities_19_specs"
+            "passed_166_public_candidates_19_capabilities_19_specs"
         },
         "ruff_and_compileall": {"passed"},
         "portal_opened": {"false"},
@@ -2787,7 +3009,7 @@ def plugin_submission_material_errors(
         "8 个未解决 blocker",
         "没有打开 OpenAI Platform 或 submission Portal",
         "PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted",
-        "Ran 145 tests - OK",
+        "Ran 157 tests - OK",
         "PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=41",
         "不表示已经 ready for Portal submission",
     ):
@@ -2827,6 +3049,7 @@ def public_repository_onboarding_errors(
         "python scripts/build_codex_plugin.py --output dist/cotend --json",
         "python scripts/verify_plugin_submission_materials.py",
         "python scripts/verify_production_plugin_lifecycle.py",
+        "python scripts/verify_github_marketplace_carrier.py",
     ):
         if marker not in readme:
             errors.append(f"public README is missing: {marker}")
@@ -2877,9 +3100,9 @@ def public_repository_onboarding_errors(
         "visible_skill_catalog_rows": {"7"},
         "starter_prompts": {"3"},
         "relative_links_valid": {"true"},
-        "maintainer_commands": {"6_safe_repo_only"},
+        "maintainer_commands": {"7_safe_repo_only"},
         "focused_tests": {"6"},
-        "full_unit_tests": {"145"},
+        "full_unit_tests": {"157"},
         "production_package_regression": {
             "passed_8_tests_17_negative_6_boundaries"
         },
@@ -2890,7 +3113,7 @@ def public_repository_onboarding_errors(
             "passed_17_normal_5_recovery_15_roots_purged"
         },
         "repository_check": {
-            "passed_161_public_candidates_19_capabilities_19_specs"
+            "passed_166_public_candidates_19_capabilities_19_specs"
         },
         "real_user_installation": {"false"},
         "portal_or_submission": {"false"},
@@ -2901,9 +3124,9 @@ def public_repository_onboarding_errors(
     for marker in (
         "README 没有把 7 个物理 Skill 平铺成 7 个日常命令",
         "Public Plugin Directory 尚不可用",
-        "没有 Plugin install、Marketplace、Portal、submission、publish 或 push 命令",
+        "没有真实用户 Plugin 安装、`codex plugin marketplace` 写入、Portal、submission、publish 或 push 命令",
         "不表示产品已经公开可安装或完成上架",
-        "Ran 145 tests - OK",
+        "Ran 157 tests - OK",
     ):
         if marker not in evidence_text:
             errors.append(f"public onboarding evidence is missing: {marker}")
@@ -2942,7 +3165,7 @@ def submission_prerequisite_packet_errors(
             "decisions=7",
             "active=none",
             "blocked=Q07-policy-attestations",
-            "digest=be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
+            "digest=18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
         ):
             if marker not in result.stdout:
                 errors.append(
@@ -2971,8 +3194,8 @@ def submission_prerequisite_packet_errors(
         "普通“继续”不解决这些前置证据",
         "python scripts/verify_submission_prerequisites.py",
         "不证明任何外部 blocker 已完成",
-        "Ran 145 tests - OK",
-        "REPOSITORY_CHECK_OK public_candidates=161 capabilities=19 behavior_specs=19",
+        "Ran 157 tests - OK",
+        "REPOSITORY_CHECK_OK public_candidates=166 capabilities=19 behavior_specs=19",
         "没有真实用户安装、Platform 写入、Portal、submission、publish 或 push",
     ):
         if marker not in evidence_text:
@@ -3390,10 +3613,10 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     ):
         errors.append("delivery target lock identity mismatch")
     carrier_files = {
-        path.relative_to(ROOT / "codex-skills").as_posix(): hashlib.sha256(
+        path.relative_to(ROOT / "skills").as_posix(): hashlib.sha256(
             path.read_bytes()
         ).hexdigest()
-        for path in sorted((ROOT / "codex-skills").rglob("*"))
+        for path in sorted((ROOT / "skills").rglob("*"))
         if path.is_file()
     }
     carrier_manifest = hashlib.sha256(
@@ -3489,13 +3712,13 @@ def main() -> int:
         text = read(relative_path)
         for label, pattern in FORBIDDEN_PUBLIC_PATTERNS.items():
             if (
-                relative_path.startswith("codex-skills/")
+                relative_path.startswith("skills/")
                 and label in FRAMEWORK_SOURCE_ALLOWED_PATTERN_LABELS
             ):
                 continue
             if pattern.search(text):
                 errors.append(f"{relative_path}: {label}")
-        if relative_path.startswith("codex-skills/"):
+        if relative_path.startswith("skills/"):
             for label, pattern in FORBIDDEN_SKILL_MAINTAINER_PATTERNS.items():
                 if pattern.search(text):
                     errors.append(f"{relative_path}: {label}")
@@ -3650,6 +3873,19 @@ def main() -> int:
         errors.extend(
             production_plugin_lifecycle_errors(
                 read(production_plugin_lifecycle_evidence_path),
+                candidates,
+            )
+        )
+
+    github_marketplace_carrier_evidence_path = (
+        "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md"
+    )
+    if github_marketplace_carrier_evidence_path not in candidates:
+        errors.append("GitHub Marketplace root-carrier evidence is missing or ignored")
+    else:
+        errors.extend(
+            github_marketplace_root_carrier_errors(
+                read(github_marketplace_carrier_evidence_path),
                 candidates,
             )
         )

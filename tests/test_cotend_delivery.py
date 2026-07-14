@@ -62,7 +62,7 @@ class DeliveryLifecycleTests(unittest.TestCase):
 
     def make_updated_artifact(self) -> Artifact:
         source = self.temp_root / "artifact-v2"
-        shutil.copytree(ROOT / "codex-skills", source)
+        shutil.copytree(ROOT / "skills", source)
         changed = source / "cotend-init" / "SKILL.md"
         changed.write_text(
             changed.read_text(encoding="utf-8") + "\n<!-- delivery-test-v2 -->\n",
@@ -443,7 +443,7 @@ class DeliveryLifecycleTests(unittest.TestCase):
 
     def test_target_lock_manifest_drift_is_rejected(self) -> None:
         repository = self.temp_root / "repository"
-        shutil.copytree(ROOT / "codex-skills", repository / "codex-skills")
+        shutil.copytree(ROOT / "skills", repository / "skills")
         shutil.copytree(ROOT / "upstream", repository / "upstream")
         target_lock = repository / "delivery" / "codex-artifact.lock.json"
         target_lock.parent.mkdir()

@@ -23,7 +23,7 @@ metadata:
 
 当前 7 个 Codex Skills 可以作为一个纯 Skills Plugin 被本机 Codex CLI 安装、发现、移除和重装。验证使用 disposable fixture、隔离进程环境和本地 Marketplace source；最终清理后，隔离环境中没有已安装的 fixture Plugin，也没有保留已配置的 fixture Marketplace。
 
-本结果只证明当前 Codex 平台上的分发适配可行，不确认公开 Plugin ID、公开版本、最终命名空间、Marketplace listing 或正式发布包。仓库仍以 `codex-skills/` 为唯一 Skill 语义源，没有加入 tracked `.codex-plugin/plugin.json`。
+本结果只证明当时 Codex 平台上的分发适配可行，不确认公开 Plugin ID、公开版本、最终命名空间、Marketplace listing 或正式发布包。执行本证据时，仓库以 `codex-skills/` 为唯一 Skill 语义源，尚未加入 tracked `.codex-plugin/plugin.json`；L54 后续已把唯一源机械迁移到 `skills/` 并单独验证仓库根载体，本历史证据不承担该结论。
 
 ## 隔离边界
 

@@ -6,7 +6,7 @@
   "components": [
     {
       "component": "grill-me",
-      "target_path": "codex-skills/grill-me/**",
+      "target_path": "skills/grill-me/**",
       "relationship": "adapted_third_party",
       "source_tree": "70df660726ef12349a40dc0353a681c82414fe95",
       "upstream_url": "https://github.com/mattpocock/skills/blob/43ea0884b07a3e67a5a07f025ce92aefa983177b/skills/productivity/grilling/SKILL.md",
@@ -20,7 +20,7 @@
     },
     {
       "component": "karpathy-guidelines",
-      "target_path": "codex-skills/karpathy-guidelines/**",
+      "target_path": "skills/karpathy-guidelines/**",
       "relationship": "bundled_third_party",
       "source_tree": "e119339197d600aa39a24fd7a95c946800c9c949",
       "upstream_url": "https://github.com/multica-ai/andrej-karpathy-skills/blob/2c606141936f1eeef17fa3043a72095b4765b9c2/skills/karpathy-guidelines/SKILL.md",

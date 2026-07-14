@@ -14,7 +14,7 @@
     "manifest_sha256": "919fe34254b51619ddca1d010445281d4f7ceec958ee8cfd1958eaccb02bd006"
   },
   "target_platform": "Codex",
-  "source_carrier": "codex-skills/",
+  "source_carrier": "skills/",
   "skill_count": 7,
   "skill_file_count": 30,
   "source_skill_trees": {
@@ -84,7 +84,7 @@
   "delivery_boundaries": {
     "repository_source_adopted": true,
     "live_install_performed": false,
-    "plugin_or_marketplace_carrier": "deferred",
+    "plugin_or_marketplace_carrier": "github_root_candidate_local_verified",
     "claude_carrier": "deferred",
     "push_release_or_publish": "not_performed"
   },

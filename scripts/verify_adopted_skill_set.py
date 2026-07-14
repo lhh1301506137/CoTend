@@ -110,9 +110,9 @@ REQUIRED_MARKERS = {
 }
 
 LEGACY_ALLOWLIST = {
-    "codex-skills/cotend-init/SKILL.md": ("legacy",),
-    "codex-skills/cotend-project-init/SKILL.md": ("legacy", "Old dual-ai"),
-    "codex-skills/cotend-collaboration/SKILL.md": ("legacy",),
+    "skills/cotend-init/SKILL.md": ("legacy",),
+    "skills/cotend-project-init/SKILL.md": ("legacy", "Old dual-ai"),
+    "skills/cotend-collaboration/SKILL.md": ("legacy",),
 }
 
 
@@ -180,7 +180,7 @@ def metadata_value(text: str, key: str) -> str | None:
 def verify_source_topology(upstream_repo: Path, errors: list[str]) -> None:
     for source_id, record in SKILLS.items():
         target_id = str(record["target"])
-        target_dir = ROOT / "codex-skills" / target_id
+        target_dir = ROOT / "skills" / target_id
         if not target_dir.is_dir():
             errors.append(f"target Skill directory is missing: {target_id}")
             continue
@@ -208,7 +208,7 @@ def verify_source_topology(upstream_repo: Path, errors: list[str]) -> None:
 def verify_skill_metadata(errors: list[str]) -> None:
     for record in SKILLS.values():
         target_id = str(record["target"])
-        skill_path = ROOT / "codex-skills" / target_id / "SKILL.md"
+        skill_path = ROOT / "skills" / target_id / "SKILL.md"
         if not skill_path.is_file():
             continue
         text = skill_path.read_text(encoding="utf-8")
@@ -259,7 +259,7 @@ def verify_skill_metadata(errors: list[str]) -> None:
 
 
 def verify_references(errors: list[str]) -> None:
-    collaboration = ROOT / "codex-skills" / "cotend-collaboration"
+    collaboration = ROOT / "skills" / "cotend-collaboration"
     skill_path = collaboration / "SKILL.md"
     references_dir = collaboration / "references"
     if not skill_path.is_file() or not references_dir.is_dir():
@@ -276,7 +276,7 @@ def verify_references(errors: list[str]) -> None:
         errors.append("cotend-collaboration reference count must be 17")
     packet = (
         ROOT
-        / "codex-skills"
+        / "skills"
         / "cotend-model-upgrade"
         / "references"
         / "packet-templates.md"
@@ -302,7 +302,7 @@ def verify_legacy_brand_boundary(errors: list[str]) -> None:
         ),
         re.compile(r"^\s*language:\s*zh-CN\s*$", re.IGNORECASE),
     )
-    for path in (ROOT / "codex-skills").rglob("*"):
+    for path in (ROOT / "skills").rglob("*"):
         if not path.is_file():
             continue
         try:
@@ -331,7 +331,7 @@ def verify_legacy_brand_boundary(errors: list[str]) -> None:
 
 def verify_third_party(upstream_repo: Path, errors: list[str]) -> None:
     for skill_id in ("grill-me", "karpathy-guidelines"):
-        target = ROOT / "codex-skills" / skill_id / "SKILL.md"
+        target = ROOT / "skills" / skill_id / "SKILL.md"
         try:
             expected = tagged_file(upstream_repo, f"codex-skills/{skill_id}/SKILL.md")
         except subprocess.CalledProcessError as exc:
@@ -384,8 +384,8 @@ def verify_third_party(upstream_repo: Path, errors: list[str]) -> None:
     else:
         attributes = attributes_path.read_text(encoding="utf-8")
         for protected_path in (
-            "/codex-skills/grill-me/SKILL.md",
-            "/codex-skills/karpathy-guidelines/SKILL.md",
+            "/skills/grill-me/SKILL.md",
+            "/skills/karpathy-guidelines/SKILL.md",
             "/THIRD-PARTY-LICENSES/grill-me-MIT.txt",
             "/THIRD-PARTY-LICENSES/karpathy-guidelines-MIT.txt",
         ):
@@ -503,7 +503,7 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
     if lock.get("source_release") != expected_source_release:
         errors.append("framework lock source release drift")
     if (
-        lock.get("source_carrier") != "codex-skills/"
+        lock.get("source_carrier") != "skills/"
         or lock.get("skill_file_count") != 30
     ):
         errors.append("framework lock source carrier or file count drift")
@@ -511,10 +511,10 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
     if lock.get("source_skill_trees") != expected_trees:
         errors.append("framework lock source Skill tree inventory drift")
     carrier_files = {
-        path.relative_to(ROOT / "codex-skills").as_posix(): hashlib.sha256(
+        path.relative_to(ROOT / "skills").as_posix(): hashlib.sha256(
             path.read_bytes()
         ).hexdigest()
-        for path in sorted((ROOT / "codex-skills").rglob("*"))
+        for path in sorted((ROOT / "skills").rglob("*"))
         if path.is_file()
     }
     carrier_manifest = hashlib.sha256(
@@ -591,7 +591,7 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
     if boundaries != {
         "repository_source_adopted": True,
         "live_install_performed": False,
-        "plugin_or_marketplace_carrier": "deferred",
+        "plugin_or_marketplace_carrier": "github_root_candidate_local_verified",
         "claude_carrier": "deferred",
         "push_release_or_publish": "not_performed",
     }:
@@ -628,7 +628,7 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
             recorded = set(imported) | set(adapted)
             actual = {
                 path.relative_to(ROOT).as_posix()
-                for path in (ROOT / "codex-skills").rglob("*")
+                for path in (ROOT / "skills").rglob("*")
                 if path.is_file()
             }
             if (
@@ -749,7 +749,7 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
     ):
         if path not in changed_paths:
             errors.append(f"containing adoption commit does not change {path}")
-    if not any(path.startswith("codex-skills/") for path in changed_paths):
+    if not any(path.startswith("skills/") for path in changed_paths):
         errors.append(
             "containing adoption commit does not change the adopted Skill set"
         )

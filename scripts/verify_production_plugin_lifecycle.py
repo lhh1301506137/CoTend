@@ -5,6 +5,7 @@ import json
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import unittest
 from pathlib import Path
@@ -25,7 +26,7 @@ PRIVATE_ROOT = ROOT / ".private-provenance"
 DEFAULT_RUN_ROOT = PRIVATE_ROOT / "L46-isolated-production-plugin-lifecycle"
 MARKETPLACE_NAME = "cotend-production-candidate-local"
 EXPECTED_PACKAGE_DIGEST = (
-    "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070"
+    "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f"
 )
 PRODUCTION_IDENTITY = lifecycle.PluginLifecycleIdentity(
     plugin_id=package.PLUGIN_NAME,
@@ -33,6 +34,7 @@ PRODUCTION_IDENTITY = lifecycle.PluginLifecycleIdentity(
     marketplace_name=MARKETPLACE_NAME,
     expected_skills=package.EXPECTED_SKILLS,
 )
+EXTERNAL_PROJECT_PREFIX = "cotend-L46-projects-"
 
 
 def guarded_run_root(path: Path) -> Path:
@@ -68,6 +70,38 @@ def remove_tree_with_retry(path: Path, *, timeout_seconds: float = 45.0) -> int:
             retries += 1
             time.sleep(0.1)
     return retries
+
+
+def guarded_external_project_root(path: Path) -> Path:
+    temp_root = Path(tempfile.gettempdir()).resolve()
+    resolved = path.expanduser().resolve()
+    try:
+        relative = resolved.relative_to(temp_root)
+    except ValueError as exc:
+        raise lifecycle.PluginFixtureError(
+            "production project root must stay under system temp"
+        ) from exc
+    if len(relative.parts) != 1 or not relative.name.startswith(
+        EXTERNAL_PROJECT_PREFIX
+    ):
+        raise lifecycle.PluginFixtureError(
+            "production project root identity is invalid"
+        )
+    return resolved
+
+
+def create_external_project_root() -> Path:
+    return guarded_external_project_root(
+        Path(tempfile.mkdtemp(prefix=EXTERNAL_PROJECT_PREFIX))
+    )
+
+
+def remove_external_project_root(path: Path) -> int:
+    root = guarded_external_project_root(path)
+    if not root.exists():
+        return 0
+    lifecycle.reject_symlink_tree(root, label="external L46 project fixture")
+    return remove_tree_with_retry(root)
 
 
 def marketplace_manifest() -> dict[str, Any]:
@@ -109,7 +143,9 @@ def production_source_snapshot() -> dict[str, Any]:
     }
 
 
-def materialize_scenario(fixture: Path) -> dict[str, Any]:
+def materialize_scenario(
+    fixture: Path, projects_root: Path | None = None
+) -> dict[str, Any]:
     fixture = lifecycle.guarded_fixture(fixture)
     marketplace_root = fixture / "source-marketplace"
     plugin_root = marketplace_root / "plugins" / package.PLUGIN_NAME
@@ -121,12 +157,17 @@ def materialize_scenario(fixture: Path) -> dict[str, Any]:
     marketplace_path = marketplace_root / ".agents" / "plugins" / "marketplace.json"
     lifecycle.write_json(marketplace_path, marketplace_manifest())
 
-    empty_project = fixture / "project-empty"
+    project_boundary = (
+        fixture
+        if projects_root is None
+        else guarded_external_project_root(projects_root)
+    )
+    empty_project = project_boundary / "project-empty"
     empty_project.mkdir(parents=True)
     (empty_project / "README.md").write_text(
         "# Empty production-candidate lifecycle project\n", encoding="utf-8"
     )
-    coexist_project = fixture / "project-with-standalone-skills"
+    coexist_project = project_boundary / "project-with-standalone-skills"
     coexist_project.mkdir(parents=True)
     (coexist_project / "README.md").write_text(
         "# Production-candidate coexistence project\n", encoding="utf-8"
@@ -145,13 +186,14 @@ def materialize_scenario(fixture: Path) -> dict[str, Any]:
 def prepare_scenario(
     fixture: Path,
     protected_before: dict[str, dict[str, Any]],
-) -> tuple[dict[str, str], dict[str, Any]]:
+) -> tuple[dict[str, str], dict[str, Any], Path]:
     fixture = lifecycle.guarded_fixture(fixture)
     fixture.mkdir(parents=True, exist_ok=True)
     env = lifecycle.build_isolated_env(fixture)
+    projects_root = create_external_project_root()
     try:
         preflight = lifecycle.run_preflight(fixture, env, protected_before)
-        materialized = materialize_scenario(fixture)
+        materialized = materialize_scenario(fixture, projects_root)
         validator = lifecycle.plugin_creator_script("validate_plugin.py")
         official = package.run_official_validator(
             materialized["plugin_root"], validator
@@ -160,10 +202,14 @@ def prepare_scenario(
         return env, {
             "preflight": preflight,
             "package": materialized["package"],
+            "project_fixture_boundary": "owned_external_system_temp_root",
             "official_validator": official,
-        }
+        }, projects_root
     except Exception:
-        purge_isolated_write_roots(fixture, env)
+        try:
+            purge_isolated_write_roots(fixture, env)
+        finally:
+            remove_external_project_root(projects_root)
         raise
 
 
@@ -211,6 +257,7 @@ def recover_after_injected_failure(
     fixture: Path,
     env: dict[str, str],
     protected_before: dict[str, dict[str, Any]],
+    projects_root: Path,
 ) -> dict[str, Any]:
     steps: list[str] = []
     payload = lifecycle.run_cli_step(
@@ -240,10 +287,11 @@ def recover_after_injected_failure(
     discovery = lifecycle.discover_skills(
         fixture,
         env,
-        fixture / "project-empty",
+        guarded_external_project_root(projects_root) / "project-empty",
         expect_plugin=False,
         expect_standalone=False,
         identity=PRODUCTION_IDENTITY,
+        cwd_boundary=projects_root,
     )
     lifecycle.assert_protected_unchanged(protected_before)
     steps.append("discovery_absent")
@@ -273,8 +321,8 @@ def run_success_scenario(
     fixture: Path,
     protected_before: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    env, preparation = prepare_scenario(fixture, protected_before)
     source_before = lifecycle.source_state_snapshot()
+    env, preparation, projects_root = prepare_scenario(fixture, protected_before)
     try:
         phase = lifecycle.run_phase_a(
             fixture,
@@ -282,9 +330,15 @@ def run_success_scenario(
             protected_before,
             source_before,
             identity=PRODUCTION_IDENTITY,
+            projects_root=projects_root,
         )
     finally:
-        cleanup = purge_isolated_write_roots(fixture, env)
+        try:
+            cleanup = purge_isolated_write_roots(fixture, env)
+        finally:
+            external_retries = remove_external_project_root(projects_root)
+        cleanup["external_project_root_removed"] = True
+        cleanup["external_project_handle_release_retries"] = external_retries
     lifecycle.assert_protected_unchanged(protected_before)
     return {"preparation": preparation, "lifecycle": phase, "cleanup": cleanup}
 
@@ -293,8 +347,8 @@ def run_failure_recovery_scenario(
     fixture: Path,
     protected_before: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    env, preparation = prepare_scenario(fixture, protected_before)
     source_before = lifecycle.source_state_snapshot()
+    env, preparation, projects_root = prepare_scenario(fixture, protected_before)
     injected_error = ""
     recovery: dict[str, Any] | None = None
     try:
@@ -306,6 +360,7 @@ def run_failure_recovery_scenario(
                 source_before,
                 identity=PRODUCTION_IDENTITY,
                 fail_after_step="plugin_add",
+                projects_root=projects_root,
             )
         except lifecycle.PluginFixtureError as exc:
             injected_error = str(exc)
@@ -313,9 +368,16 @@ def run_failure_recovery_scenario(
                 raise
         else:
             raise lifecycle.PluginFixtureError("injected lifecycle failure did not fire")
-        recovery = recover_after_injected_failure(fixture, env, protected_before)
+        recovery = recover_after_injected_failure(
+            fixture, env, protected_before, projects_root
+        )
     finally:
-        cleanup = purge_isolated_write_roots(fixture, env)
+        try:
+            cleanup = purge_isolated_write_roots(fixture, env)
+        finally:
+            external_retries = remove_external_project_root(projects_root)
+        cleanup["external_project_root_removed"] = True
+        cleanup["external_project_handle_release_retries"] = external_retries
     if recovery is None:
         raise lifecycle.PluginFixtureError("failure recovery did not complete")
     lifecycle.assert_protected_unchanged(protected_before)

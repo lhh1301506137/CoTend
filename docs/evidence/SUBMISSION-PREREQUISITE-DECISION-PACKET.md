@@ -99,15 +99,15 @@ python -m unittest tests.test_submission_prerequisites
 ## 执行证据
 
 ```text
-SUBMISSION_PREREQUISITES_OK status=prerequisite_resolution_required prerequisites=10 decisions=7 active=none blocked=Q07-policy-attestations digest=be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070
+SUBMISSION_PREREQUISITES_OK status=prerequisite_resolution_required prerequisites=10 decisions=7 active=none blocked=Q07-policy-attestations digest=18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f
 Ran 8 tests - OK
-Ran 145 tests - OK
-PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted prompts=3 positive=5 negative=3 blockers=8 digest=be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070
-CODEX_PLUGIN_PRODUCTION_PACKAGE_OK builds=2 files=41 skills=7 skill_files=30 tests=8 negatives=17 validator=passed boundaries=6 unchanged=true digest=be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070
+Ran 157 tests - OK
+PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted prompts=3 positive=5 negative=3 blockers=8 digest=18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f
+CODEX_PLUGIN_PRODUCTION_PACKAGE_OK builds=2 files=41 skills=7 skill_files=30 tests=8 negatives=17 validator=passed boundaries=6 unchanged=true digest=18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f
 PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=41 steps=17 recovery=5 tests=7 roots=15 purged=true protected_unchanged=true
-REPOSITORY_CHECK_OK public_candidates=161 capabilities=19 behavior_specs=19
+REPOSITORY_CHECK_OK public_candidates=166 capabilities=19 behavior_specs=19
 ```
 
-此前首次全量测试运行在工具的 124 秒上限处终止，没有形成完成结果，因此未计入证据；后续完整运行均通过 145 项测试，本轮运行耗时约 112 秒。此前一次带不存在的 `--exclusive` 参数的 lifecycle 命令只在参数解析阶段退出，没有启动 fixture，也未计入证据。本轮首次 lifecycle 的 7 项功能测试通过，但保护哨兵观察到真实 `user_codex_root` 元数据变化并正确拒绝成功结论；随后一次 10 秒静默预检仍观察到变化。仅做 stat-only 差异定位后，在 5 秒顶层元数据静默窗口中按原保护条件重跑，上方 17/5/7/15 结果通过且 `protected_unchanged=true`，没有修改或放宽 lifecycle 规则。
+此前首次全量测试运行在工具的 124 秒上限处终止，没有形成完成结果，因此未计入证据；后续完整运行均通过，L54 新增 12 项根载体测试后当前总数为 157，本轮运行耗时约 117 秒。此前一次带不存在的 `--exclusive` 参数的 lifecycle 命令只在参数解析阶段退出，没有启动 fixture，也未计入证据。本轮首次 lifecycle 的 7 项功能测试通过，但保护哨兵观察到真实 `user_codex_root` 元数据变化并正确拒绝成功结论；随后一次 10 秒静默预检仍观察到变化。仅做 stat-only 差异定位后，在 5 秒顶层元数据静默窗口中按原保护条件重跑，上方 17/5/7/15 结果通过且 `protected_unchanged=true`，没有修改或放宽 lifecycle 规则。
 
-Ruff 静态检查、`compileall` 与 `git diff --check` 通过。`codex-skills/`、delivery lock 和 upstream framework lock 均未修改；Plugin manifest、package lock v2 与四个品牌资产已按 Q04 用户证据同步为 41 文件摘要。没有真实用户安装、Platform 写入、Portal、submission、publish 或 push。
+Ruff 静态检查、`compileall` 与 `git diff --check` 通过。L54 只把仓库语义源从 `codex-skills/` 迁移到 `skills/`，Skill 摘要不变；delivery lock 和 upstream framework lock 的当前载体路径已同步，Plugin manifest、package lock v2 与四个品牌资产继续绑定 41 文件摘要。没有真实用户安装、Platform 写入、Portal、submission、publish 或 push。

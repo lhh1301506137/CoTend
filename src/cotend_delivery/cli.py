@@ -29,7 +29,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--repository",
         type=Path,
         default=repository_root(),
-        help="CoTend repository containing codex-skills and framework.lock.json",
+        help="CoTend repository containing skills and framework.lock.json",
     )
     parser.add_argument("--source", type=Path)
     parser.add_argument("--source-release-id")

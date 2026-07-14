@@ -70,7 +70,7 @@ class CodexPluginPackageTests(unittest.TestCase):
         self.assertEqual(len(first_manifest), 41)
         self.assertEqual(
             package.path_hash_manifest_sha256(first_manifest),
-            "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
+            "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
         )
 
     def test_output_must_stay_in_repository_build_roots(self) -> None:
@@ -78,7 +78,7 @@ class CodexPluginPackageTests(unittest.TestCase):
         with self.assertRaises(package.PluginPackageError):
             package.build_package(outside)
         with self.assertRaises(package.PluginPackageError):
-            package.build_package(ROOT / "codex-skills" / package.PLUGIN_NAME)
+            package.build_package(ROOT / "skills" / package.PLUGIN_NAME)
         with self.assertRaises(package.PluginPackageError):
             package.build_package(self.root / "wrong-name")
 

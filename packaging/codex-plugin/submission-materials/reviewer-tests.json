@@ -5,7 +5,7 @@
   "package": {
     "plugin_id": "cotend",
     "version": "0.1.0-rc.1",
-    "path_hash_manifest_sha256": "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070"
+    "path_hash_manifest_sha256": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f"
   },
   "reviewer_context": {
     "plugin_specific_authentication_required": false,

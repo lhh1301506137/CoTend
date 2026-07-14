@@ -37,7 +37,7 @@ EXPECTED_BLOCKER_IDS = [
 EXPECTED_IDENTITY_VALUE = {
     "plugin_id": "cotend",
     "version": "0.1.0-rc.1",
-    "package_digest": "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
+    "package_digest": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
     "confirmed_on": "2026-07-14",
     "confirmation_scope": (
         "initial_submission_identity_not_release_or_platform_acceptance"

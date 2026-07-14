@@ -640,7 +640,7 @@ class Artifact:
             )
         carrier = PurePosixPath(str(lock.get("source_carrier", "")))
         if (
-            carrier != PurePosixPath("codex-skills")
+            carrier != PurePosixPath("skills")
             or carrier.is_absolute()
             or ".." in carrier.parts
         ):
