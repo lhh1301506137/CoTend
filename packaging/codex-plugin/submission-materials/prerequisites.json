@@ -3,7 +3,7 @@
   "schema_version": 1,
   "status": "awaiting_owner_decisions",
   "official_requirements": {
-    "source": "https://learn.chatgpt.com/docs/submit-plugins",
+    "source": "https://developers.openai.com/codex/submit-plugins",
     "checked_on": "2026-07-14",
     "scope": "pre_submission_decisions_and_external_evidence"
   },
@@ -15,14 +15,14 @@
   "package": {
     "plugin_id": "cotend",
     "version": "0.1.0-rc.1",
-    "file_count": 37,
-    "path_hash_manifest_sha256": "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+    "file_count": 41,
+    "path_hash_manifest_sha256": "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
     "source_skill_manifest_sha256": "acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b",
     "identity_authority": "initial_submission_identity_confirmed_not_release"
   },
   "decision_policy": {
     "mode": "one_at_a_time",
-    "current_decision_id": "Q04-production-logo",
+    "current_decision_id": "Q05-platform-access",
     "current_decision_status": "awaiting_user_decision",
     "ordinary_continue_answers_decision": false,
     "auto_fill_owner_facts": false,
@@ -32,6 +32,7 @@
     "repository_preparation_only": true,
     "publisher_mode_selected": true,
     "final_identity_selected": true,
+    "production_logo_selected": true,
     "verified_identity_observed": false,
     "apps_management_write_access_observed": false,
     "public_urls_selected": false,
@@ -163,7 +164,7 @@
     {
       "id": "Q04-production-logo",
       "sequence": 4,
-      "status": "awaiting_user_decision",
+      "status": "answered",
       "decision_authority": "publisher",
       "depends_on": [
         "Q02-final-plugin-identity"
@@ -191,13 +192,17 @@
           "impact_zh": "不生成或上传占位图，production logo blocker 保持未解决。"
         }
       ],
-      "answer": null,
-      "evidence": null
+      "answer": "1",
+      "evidence": {
+        "evidence_type": "user_explicit",
+        "recorded_on": "2026-07-14",
+        "scope": "exact_repository_production_logo_acceptance_not_portal_upload_or_format_verification"
+      }
     },
     {
       "id": "Q05-platform-access",
       "sequence": 5,
-      "status": "blocked_by_dependencies",
+      "status": "awaiting_user_decision",
       "decision_authority": "publisher",
       "depends_on": [
         "Q01-publisher-mode"
@@ -312,7 +317,7 @@
       "value": {
         "plugin_id": "cotend",
         "version": "0.1.0-rc.1",
-        "package_digest": "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+        "package_digest": "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
         "confirmed_on": "2026-07-14",
         "confirmation_scope": "initial_submission_identity_not_release_or_platform_acceptance",
         "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected"
@@ -380,8 +385,20 @@
       "id": "production_logo",
       "sequence": 4,
       "phase": "public_presence",
-      "status": "unresolved",
-      "value": null,
+      "status": "resolved",
+      "value": {
+        "source_asset_path": "assets/cotend-mark.svg",
+        "source_sha256": "27c5a8566bb4d7800f9250715aef649adf5806b35784955a093cc37cf477238a",
+        "dark_source_asset_path": "assets/cotend-mark-dark.svg",
+        "dark_source_sha256": "63e1f28fee998a7d3a7d39a381d2990132ed5f9c63a70a10fd533ef2dbb1afac",
+        "primary_asset_path": "assets/cotend-logo.png",
+        "primary_sha256": "3a39de1b6c956b37a5e6efc0fb616a06104ce9d9417d3157ab5c5a002af72d49",
+        "dark_asset_path": "assets/cotend-logo-dark.png",
+        "dark_sha256": "dc495bcbdba3c35f32e60a7f4d250593007de3e5620431f3b780d98a5e4c46fe",
+        "user_confirmed_on": "2026-07-14",
+        "confirmation_scope": "repository_production_asset_not_portal_upload_or_format_verification",
+        "portal_exact_format": "not_verified"
+      },
       "decision_authority": "publisher",
       "execution_owner": "repository_maintainer",
       "decision_id": "Q04-production-logo",
@@ -395,9 +412,9 @@
       "completion_evidence_zh": [
         "用户明确选择 production logo",
         "最终资产已纳入仓库并记录校验摘要",
-        "按提交表单当时的实际资产要求完成格式与可读性检查"
+        "公开提交要求、manifest 资产路径、格式和可读性已检查；Portal 未公开或现场要求保留提交前复核"
       ],
-      "boundary_zh": "草图、占位图或未经用户确认的生成图不得写成 production logo。"
+      "boundary_zh": "草图、占位图或未经用户确认的生成图不得写成 production logo；repository resolved 不等于 Portal 已接受格式或完成上传。"
     },
     {
       "id": "website_url",
@@ -557,7 +574,7 @@
   ],
   "next_action": {
     "action": "ask_user",
-    "decision_id": "Q04-production-logo",
+    "decision_id": "Q05-platform-access",
     "expected_answer": "explicit_option_1_2_or_3",
     "external_action_permitted": false,
     "ordinary_continue_answers_decision": false

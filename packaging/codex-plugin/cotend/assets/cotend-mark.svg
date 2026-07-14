@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">CoTend candidate C mark</title>
+  <desc id="description">A charcoal C and T monogram joined to a three-node plan tree in green, teal, and coral.</desc>
+  <g fill="none" stroke="#20252B" stroke-width="42" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M246 82 C145 70 76 148 76 255 C76 322 103 373 146 405"/>
+    <path d="M268 187 V319 M268 319 L130 431 M268 319 L406 431"/>
+  </g>
+  <rect x="176" y="166" width="184" height="42" fill="#20252B"/>
+  <circle cx="246" cy="82" r="28" fill="#67B94B"/>
+  <circle cx="130" cy="431" r="28" fill="#139C98"/>
+  <circle cx="406" cy="431" r="28" fill="#F15B50"/>
+</svg>

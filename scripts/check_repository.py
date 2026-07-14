@@ -170,6 +170,10 @@ EXPECTED_PLUGIN_NAMESPACE_TESTS = {
 EXPECTED_PLUGIN_PACKAGE_FILES = {
     "docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-PACKAGE.md",
     "packaging/codex-plugin/cotend/.codex-plugin/plugin.json",
+    "packaging/codex-plugin/cotend/assets/cotend-mark.svg",
+    "packaging/codex-plugin/cotend/assets/cotend-mark-dark.svg",
+    "packaging/codex-plugin/cotend/assets/cotend-logo.png",
+    "packaging/codex-plugin/cotend/assets/cotend-logo-dark.png",
     "packaging/codex-plugin/package.lock.json",
     "scripts/build_codex_plugin.py",
     "scripts/verify_codex_plugin_package.py",
@@ -178,7 +182,7 @@ EXPECTED_PLUGIN_PACKAGE_FILES = {
 EXPECTED_PLUGIN_PACKAGE_TESTS = {
     "test_existing_invalid_output_is_not_overwritten",
     "test_linklike_package_member_is_rejected",
-    "test_manifest_and_lock_define_skills_only_candidate",
+    "test_manifest_and_lock_define_skills_candidate_with_brand_assets",
     "test_n3_display_metadata_and_prompt_limits_are_preserved",
     "test_output_must_stay_in_repository_build_roots",
     "test_package_drift_is_rejected",
@@ -213,7 +217,7 @@ EXPECTED_PLUGIN_SUBMISSION_TESTS = {
     "test_reviewer_fixtures_are_public_and_self_contained",
     "test_external_requirements_remain_real_blockers",
     "test_release_notes_are_initial_draft_not_submission_claim",
-    "test_fifteen_negative_mutations_are_rejected",
+    "test_seventeen_negative_mutations_are_rejected",
 }
 EXPECTED_SUBMISSION_PREREQUISITE_FILES = {
     "docs/evidence/SUBMISSION-PREREQUISITE-DECISION-PACKET.md",
@@ -229,7 +233,7 @@ EXPECTED_SUBMISSION_PREREQUISITE_TESTS = {
     "test_repository_and_external_responsibilities_are_explicit",
     "test_confirmed_routes_do_not_set_external_authority",
     "test_q01_explains_publisher_mode_tradeoff_in_chinese",
-    "test_fifteen_negative_mutations_are_rejected",
+    "test_seventeen_negative_mutations_are_rejected",
 }
 EXPECTED_PUBLIC_README_FILES = {
     "README.md",
@@ -2315,6 +2319,14 @@ def production_plugin_package_errors(
     else:
         if interface.get("displayName") != "CoTend":
             errors.append("production Plugin display name mismatch")
+        if interface.get("brandColor") != "#139C98":
+            errors.append("production Plugin brand color mismatch")
+        if interface.get("composerIcon") != "./assets/cotend-logo.png":
+            errors.append("production Plugin composer icon mismatch")
+        if interface.get("logo") != "./assets/cotend-logo.png":
+            errors.append("production Plugin logo mismatch")
+        if interface.get("logoDark") != "./assets/cotend-logo-dark.png":
+            errors.append("production Plugin dark logo mismatch")
         prompts = interface.get("defaultPrompt")
         if not isinstance(prompts, list) or not 1 <= len(prompts) <= 3:
             errors.append("production Plugin starter prompt count mismatch")
@@ -2330,6 +2342,8 @@ def production_plugin_package_errors(
     authority = package_lock.get("authority")
     if package_lock.get("status") != "production_candidate_not_published":
         errors.append("production Plugin package status must remain candidate-only")
+    if package_lock.get("schema_version") != 2:
+        errors.append("production Plugin package lock schema mismatch")
     if not isinstance(plugin_lock, dict) or plugin_lock.get("manifest_sha256") != manifest_hash:
         errors.append("production Plugin manifest hash lock mismatch")
     if not isinstance(source_lock, dict) or source_lock.get(
@@ -2338,10 +2352,36 @@ def production_plugin_package_errors(
         errors.append("production Plugin source manifest lock mismatch")
     if not isinstance(output_lock, dict) or output_lock.get(
         "path_hash_manifest_sha256"
-    ) != "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066":
+    ) != "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070":
         errors.append("production Plugin package digest lock mismatch")
-    if not isinstance(output_lock, dict) or output_lock.get("file_count") != 37:
+    if not isinstance(output_lock, dict) or output_lock.get("file_count") != 41:
         errors.append("production Plugin package file count mismatch")
+    expected_brand_assets = [
+        {
+            "path": "assets/cotend-mark.svg",
+            "role": "canonical_light_source",
+            "sha256": "27c5a8566bb4d7800f9250715aef649adf5806b35784955a093cc37cf477238a",
+        },
+        {
+            "path": "assets/cotend-mark-dark.svg",
+            "role": "canonical_dark_source",
+            "sha256": "63e1f28fee998a7d3a7d39a381d2990132ed5f9c63a70a10fd533ef2dbb1afac",
+        },
+        {
+            "path": "assets/cotend-logo.png",
+            "role": "composer_icon_and_light_logo",
+            "sha256": "3a39de1b6c956b37a5e6efc0fb616a06104ce9d9417d3157ab5c5a002af72d49",
+        },
+        {
+            "path": "assets/cotend-logo-dark.png",
+            "role": "dark_logo",
+            "sha256": "dc495bcbdba3c35f32e60a7f4d250593007de3e5620431f3b780d98a5e4c46fe",
+        },
+    ]
+    if not isinstance(output_lock, dict) or output_lock.get(
+        "brand_assets"
+    ) != expected_brand_assets:
+        errors.append("production Plugin brand asset lock mismatch")
     if authority != {
         "candidate_identity_only": False,
         "final_plugin_identity_confirmed": True,
@@ -2354,6 +2394,8 @@ def production_plugin_package_errors(
         'PLUGIN_VERSION = "0.1.0-rc.1"',
         'ALLOWED_OUTPUT_ROOTS = {".private-provenance", "dist"}',
         "expected_package_manifest",
+        "PACKAGE_BRAND_ASSETS",
+        "validate_brand_assets",
         "source_bytes_identical",
         "existing output is not an owned valid CoTend package",
         "run_official_validator",
@@ -2368,6 +2410,8 @@ def production_plugin_package_errors(
         "/THIRD-PARTY-NOTICES.md text eol=lf",
         "/THIRD-PARTY-SOURCES.json text eol=lf",
         "/packaging/codex-plugin/cotend/.codex-plugin/plugin.json text eol=lf",
+        "/packaging/codex-plugin/cotend/assets/*.svg text eol=lf",
+        "/packaging/codex-plugin/cotend/assets/*.png binary",
         "/packaging/codex-plugin/package.lock.json text eol=lf",
     ):
         if marker not in attributes_text:
@@ -2376,7 +2420,7 @@ def production_plugin_package_errors(
         errors.append("generated production Plugin dist/ output must remain gitignored")
     verifier_text = read("scripts/verify_codex_plugin_package.py")
     for marker in (
-        "NEGATIVE_CASES = 13",
+        "NEGATIVE_CASES = 17",
         "protected_boundaries",
         "CODEX_PLUGIN_PRODUCTION_PACKAGE_OK",
         "plugin_installation\": \"not_run",
@@ -2402,11 +2446,12 @@ def production_plugin_package_errors(
         "identity_authority": {"initial_submission_identity_confirmed_not_release"},
         "semantic_sources": {"1"},
         "isolated_builds_compared": {"2"},
-        "package_files": {"37"},
+        "package_files": {"41"},
+        "brand_assets": {"4"},
         "adopted_skills": {"7"},
         "adopted_skill_files": {"30"},
         "friendly_display_names": {"5"},
-        "negative_cases": {"13"},
+        "negative_cases": {"17"},
         "protected_user_boundaries": {"6"},
         "official_validator": {"passed"},
         "marketplace_write": {"false"},
@@ -2418,13 +2463,13 @@ def production_plugin_package_errors(
             errors.append(f"production Plugin package evidence mismatch: {key}")
     for marker in (
         "`codex-skills/` 仍是唯一语义源",
-        "37 个文件",
+        "41 个文件",
         "逐字节一致",
-        "13 类负向边界",
+        "17 类负向边界",
         "当前 Plugin Creator validator：`passed`",
         "没有生成 Marketplace",
         "不代表已经满足公开 submission",
-        "CODEX_PLUGIN_PRODUCTION_PACKAGE_OK builds=2 files=37",
+        "CODEX_PLUGIN_PRODUCTION_PACKAGE_OK builds=2 files=41",
     ):
         if marker not in evidence_text:
             errors.append(f"production Plugin package evidence is missing: {marker}")
@@ -2500,7 +2545,7 @@ def production_plugin_lifecycle_errors(
         "candidate_plugin_id": {"cotend"},
         "candidate_version": {"0.1.0-rc.1"},
         "identity_authority": {"initial_submission_identity_confirmed_not_release"},
-        "package_files": {"37"},
+        "package_files": {"41"},
         "adopted_skills": {"7"},
         "adopted_skill_files": {"30"},
         "normal_lifecycle_steps": {"17"},
@@ -2520,14 +2565,14 @@ def production_plugin_lifecycle_errors(
             errors.append(f"production Plugin lifecycle evidence mismatch: {key}")
 
     for marker in (
-        "精确 `cotend@0.1.0-rc.1` 37 文件生产候选",
+        "精确 `cotend@0.1.0-rc.1` 41 文件生产候选",
         "正常场景完成 17 步",
         "完成 5 步恢复",
         "15 个隔离运行时写入根均被清除",
         "真实用户边界只做 stat-only 元数据快照",
         "该次运行没有被接受为证据",
         "不把隔离 lifecycle 表述成已经上架",
-        "PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=37",
+        "PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=41",
     ):
         if marker not in evidence_text:
             errors.append(f"production Plugin lifecycle evidence is missing: {marker}")
@@ -2572,9 +2617,9 @@ def plugin_submission_material_errors(
         "version"
     ) != "0.1.0-rc.1":
         errors.append("Plugin submission package identity drifted")
-    if package_binding.get("file_count") != 37 or package_binding.get(
+    if package_binding.get("file_count") != 41 or package_binding.get(
         "path_hash_manifest_sha256"
-    ) != "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066":
+    ) != "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070":
         errors.append("Plugin submission package digest drifted")
     if (
         package_binding.get("identity_authority")
@@ -2589,6 +2634,12 @@ def plugin_submission_material_errors(
     )
     if prompts != manifest.get("interface", {}).get("defaultPrompt"):
         errors.append("Plugin submission starter prompts differ from manifest")
+    listing_logo = submission.get("listing", {}).get("logo")
+    if listing_logo != {
+        "status": "repository_asset_ready_portal_format_not_verified",
+        "asset_path": "assets/cotend-logo.png",
+    }:
+        errors.append("Plugin submission listing logo drifted")
     positive = reviewer_tests.get("positive_cases")
     negative = reviewer_tests.get("negative_cases")
     if not isinstance(positive, list) or len(positive) != 5:
@@ -2606,7 +2657,7 @@ def plugin_submission_material_errors(
             "plugin_id": "cotend",
             "version": "0.1.0-rc.1",
             "package_digest": (
-                "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066"
+                "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070"
             ),
             "confirmed_on": "2026-07-14",
             "confirmation_scope": (
@@ -2622,11 +2673,26 @@ def plugin_submission_material_errors(
             or identity.get("value") != expected_identity_value
         ):
             errors.append("Plugin submission confirmed identity evidence drifted")
+        logo = blockers[3]
+        logo_value = logo.get("value") if isinstance(logo, dict) else None
+        if (
+            not isinstance(logo, dict)
+            or logo.get("id") != "production_logo"
+            or logo.get("status") != "resolved"
+            or not isinstance(logo_value, dict)
+            or logo_value.get("source_sha256")
+            != "27c5a8566bb4d7800f9250715aef649adf5806b35784955a093cc37cf477238a"
+            or logo_value.get("primary_sha256")
+            != "3a39de1b6c956b37a5e6efc0fb616a06104ce9d9417d3157ab5c5a002af72d49"
+            or logo_value.get("portal_exact_format") != "not_verified"
+        ):
+            errors.append("Plugin submission production logo evidence drifted")
         if any(
             not isinstance(item, dict)
             or item.get("status") != "unresolved"
             or item.get("value") is not None
-            for item in blockers[1:]
+            for index, item in enumerate(blockers)
+            if index not in {0, 3}
         ):
             errors.append("Plugin submission blocker was resolved without evidence")
     if submission.get("readiness") != {
@@ -2634,7 +2700,6 @@ def plugin_submission_material_errors(
         "unresolved_blocker_ids": [
             "verified_publisher_identity",
             "apps_management_write_access",
-            "production_logo",
             "website_url",
             "support_url",
             "privacy_policy_url",
@@ -2662,6 +2727,7 @@ def plugin_submission_material_errors(
         "EXPECTED_POSITIVE_IDS",
         "EXPECTED_NEGATIVE_IDS",
         "EXPECTED_BLOCKER_IDS",
+        "EXPECTED_PRODUCTION_LOGO_VALUE",
         "contract_only_not_run",
         "submission blocker was resolved without evidence",
         "PLUGIN_SUBMISSION_MATERIALS_OK",
@@ -2677,7 +2743,7 @@ def plugin_submission_material_errors(
         errors.append(
             f"Plugin submission material tests are missing: {sorted(missing_tests)}"
         )
-    if "NEGATIVE_MUTATION_COUNT = 15" not in test_text:
+    if "NEGATIVE_MUTATION_COUNT = 17" not in test_text:
         errors.append("Plugin submission negative mutation count drifted")
 
     for key, expected in {
@@ -2688,24 +2754,24 @@ def plugin_submission_material_errors(
         "candidate_version": {"0.1.0-rc.1"},
         "identity_authority": {"initial_submission_identity_confirmed_not_release"},
         "final_plugin_identity_confirmed": {"true"},
-        "package_files": {"37"},
+        "package_files": {"41"},
         "submission_contract_status": {"draft_not_submitted"},
         "starter_prompts": {"3"},
         "positive_reviewer_cases": {"5"},
         "negative_reviewer_cases": {"3"},
         "reviewer_case_execution": {"contract_only_not_run"},
-        "unresolved_external_blockers": {"9"},
+        "unresolved_external_blockers": {"8"},
         "focused_unit_tests": {"7"},
-        "negative_mutations": {"15"},
+        "negative_mutations": {"17"},
         "full_unit_tests": {"145"},
         "production_package_regression": {
-            "passed_8_tests_13_negative_6_boundaries"
+            "passed_8_tests_17_negative_6_boundaries"
         },
         "production_lifecycle_regression": {
             "passed_17_normal_5_recovery_15_roots_purged"
         },
         "repository_check": {
-            "passed_157_public_candidates_19_capabilities_19_specs"
+            "passed_161_public_candidates_19_capabilities_19_specs"
         },
         "ruff_and_compileall": {"passed"},
         "portal_opened": {"false"},
@@ -2718,11 +2784,11 @@ def plugin_submission_material_errors(
     for marker in (
         "恰好 5 个正向和 3 个负向 reviewer case",
         "contract_only_not_run",
-        "9 个未解决 blocker",
+        "8 个未解决 blocker",
         "没有打开 OpenAI Platform 或 submission Portal",
         "PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted",
         "Ran 145 tests - OK",
-        "PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=37",
+        "PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=41",
         "不表示已经 ready for Portal submission",
     ):
         if marker not in evidence_text:
@@ -2815,16 +2881,16 @@ def public_repository_onboarding_errors(
         "focused_tests": {"6"},
         "full_unit_tests": {"145"},
         "production_package_regression": {
-            "passed_8_tests_13_negative_6_boundaries"
+            "passed_8_tests_17_negative_6_boundaries"
         },
         "submission_material_regression": {
-            "passed_3_prompts_5_positive_3_negative_9_blockers"
+            "passed_3_prompts_5_positive_3_negative_8_blockers"
         },
         "production_lifecycle_regression": {
             "passed_17_normal_5_recovery_15_roots_purged"
         },
         "repository_check": {
-            "passed_157_public_candidates_19_capabilities_19_specs"
+            "passed_161_public_candidates_19_capabilities_19_specs"
         },
         "real_user_installation": {"false"},
         "portal_or_submission": {"false"},
@@ -2874,8 +2940,8 @@ def submission_prerequisite_packet_errors(
             "status=awaiting_owner_decisions",
             "prerequisites=10",
             "decisions=7",
-            "active=Q04-production-logo",
-            "digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+            "active=Q05-platform-access",
+            "digest=be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
         ):
             if marker not in result.stdout:
                 errors.append(
@@ -2891,21 +2957,21 @@ def submission_prerequisite_packet_errors(
         errors.append(
             f"submission prerequisite tests are missing: {sorted(missing_tests)}"
         )
-    if "NEGATIVE_MUTATION_COUNT = 15" not in test_text:
+    if "NEGATIVE_MUTATION_COUNT = 17" not in test_text:
         errors.append("submission prerequisite negative mutation count drifted")
 
     for marker in (
-        "10 个先决条件、其中 9 个仍未解决",
+        "10 个先决条件、其中 8 个仍未解决",
         "7 个决策无环",
-        "Q04 是唯一等待用户回答",
+        "Q05 是唯一等待用户回答",
         "policy attestations 位于最后",
         "没有打开 OpenAI Platform 或 submission Portal",
         "普通“继续”不回答该问题",
         "python scripts/verify_submission_prerequisites.py",
         "不证明任何外部 blocker 已完成",
         "Ran 145 tests - OK",
-        "REPOSITORY_CHECK_OK public_candidates=157 capabilities=19 behavior_specs=19",
-        "没有安装、Platform 写入、Portal、submission、publish 或 push",
+        "REPOSITORY_CHECK_OK public_candidates=161 capabilities=19 behavior_specs=19",
+        "没有真实用户安装、Platform 写入、Portal、submission、publish 或 push",
     ):
         if marker not in evidence_text:
             errors.append(f"submission prerequisite evidence is missing: {marker}")

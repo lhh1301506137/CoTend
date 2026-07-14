@@ -9,10 +9,10 @@ metadata:
   candidate_plugin_id: cotend
   candidate_version: 0.1.0-rc.1
   identity_authority: initial_submission_identity_confirmed_not_release
-  package_files: 37
+  package_files: 41
   adopted_skills: 7
   adopted_skill_files: 30
-  package_manifest_sha256: e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066
+  package_manifest_sha256: be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070
   local_marketplace: cotend-production-candidate-local
   normal_lifecycle_steps: 17
   failure_recovery_steps: 5
@@ -30,7 +30,7 @@ metadata:
 
 ## 结论
 
-L44 的精确 `cotend@0.1.0-rc.1` 37 文件生产候选已经在真实 Codex CLI 0.144.1 中完成完全隔离的安装生命周期。验证不是重新制作一份近似 fixture：两个场景都直接调用 `scripts/build_codex_plugin.py`，随后再次校验 L44 package lock 与完整 path/hash manifest。包摘要保持 `e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066`，7 个 Skill、30 个 Skill 文件继续与 `codex-skills/` 逐字节一致。
+L44 的精确 `cotend@0.1.0-rc.1` 41 文件生产候选已经在真实 Codex CLI 0.144.1 中完成完全隔离的安装生命周期。验证不是重新制作一份近似 fixture：两个场景都直接调用 `scripts/build_codex_plugin.py`，随后再次校验 package lock v2 与完整 path/hash manifest。包摘要保持 `be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070`，7 个 Skill、30 个 Skill 文件继续与 `codex-skills/` 逐字节一致，4 个品牌资产保持锁定。
 
 正常场景完成 17 步：local Marketplace add/list、Plugin available/add/list、空项目发现、standalone Skills 共存发现、remove/缺席发现、reinstall/重新发现、最终 remove、最终缺席发现、Marketplace remove 与最终缺席确认。安装时 app-server 发现 7 个 `cotend:<skill>` Plugin Skill；共存项目同时保留 7 个 repo-scope standalone Skill。移除 Plugin 后，standalone 项仍存在，没有被接管或删除。
 
@@ -40,7 +40,7 @@ L44 的精确 `cotend@0.1.0-rc.1` 37 文件生产候选已经在真实 Codex CLI
 
 ## 精确包与一次性 Marketplace
 
-生产候选包只包含 L44 锁定的 37 个文件，不含 Marketplace。验证器在 `.private-provenance/L46-isolated-production-plugin-lifecycle/` 外围生成一次性 `cotend-production-candidate-local` Marketplace，source 类型固定为 `local`，路径只指向同一场景中的精确包。
+生产候选包只包含锁定的 41 个文件，不含 Marketplace。验证器在 `.private-provenance/L46-isolated-production-plugin-lifecycle/` 外围生成一次性 `cotend-production-candidate-local` Marketplace，source 类型固定为 `local`，路径只指向同一场景中的精确包。
 
 生命周期身份由显式合同传入旧 L31 校验设施：
 
@@ -98,7 +98,7 @@ marketplace_final_absent
 
 ## 测试与复现
 
-聚焦测试 7/7 通过，覆盖 production/fixture identity 分离、L46 删除根保护、local-only Marketplace、精确 37 文件摘要、错误身份拒绝、`plugin_add` 后确定性故障注入，以及只清除隔离 runtime roots。
+聚焦测试 7/7 通过，覆盖 production/fixture identity 分离、L46 删除根保护、local-only Marketplace、精确 41 文件摘要、错误身份拒绝、`plugin_add` 后确定性故障注入，以及只清除隔离 runtime roots。
 
 ```powershell
 python scripts/verify_production_plugin_lifecycle.py
@@ -107,7 +107,7 @@ python scripts/verify_production_plugin_lifecycle.py
 预期终端标记：
 
 ```text
-PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=37 steps=17 recovery=5 tests=7 roots=15 purged=true protected_unchanged=true
+PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=41 steps=17 recovery=5 tests=7 roots=15 purged=true protected_unchanged=true
 ```
 
 详细 JSON 与逐命令 stdout/stderr 只保存在 gitignored L46 fixture；公开证据不携带本机绝对路径。
@@ -118,7 +118,7 @@ PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=37 steps=17 recovery=5 t
 - 当前已打开任务的热更新，既有证据仍要求新任务/刷新 Skill snapshot；
 - Plugin 内自然语言触发、self-prompt 与跨 Skill 委派；
 - Portal 对 `0.1.0-rc.1` 预发布版本的接受性，以及 verified publisher identity；若 Portal 拒绝该版本，需要重开 Q02；
-- logo、website/support/privacy/terms、5+3 reviewer tests、Portal submission、审核、地区和 release notes；
+- Logo 的 Portal 实际格式/上传、website/support/privacy/terms、5+3 reviewer tests 执行、Portal submission、审核、地区和 release notes；
 - Public Plugins Directory 的真实公开安装、release、publish 或 push。
 
 这些项目仍需要后续路线和相应用户门；本证据不把隔离 lifecycle 表述成已经上架。

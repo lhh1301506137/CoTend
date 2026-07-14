@@ -62,7 +62,7 @@ class ProductionPluginLifecycleTests(unittest.TestCase):
         scenario.mkdir()
         result = production.materialize_scenario(scenario)
         package_result = package.verify_package(result["plugin_root"])
-        self.assertEqual(package_result["package_files"], 37)
+        self.assertEqual(package_result["package_files"], 41)
         self.assertEqual(
             package_result["package_manifest_sha256"],
             production.EXPECTED_PACKAGE_DIGEST,

@@ -35,17 +35,28 @@ class CodexPluginPackageTests(unittest.TestCase):
         package.build_package(output)
         return output
 
-    def test_manifest_and_lock_define_skills_only_candidate(self) -> None:
+    def test_manifest_and_lock_define_skills_candidate_with_brand_assets(self) -> None:
         contract = package.validate_contract()
         manifest = contract["manifest"]
         lock = contract["lock"]
         self.assertEqual(manifest["name"], "cotend")
         self.assertEqual(manifest["version"], "0.1.0-rc.1")
         self.assertEqual(manifest["skills"], "./skills/")
+        self.assertEqual(manifest["interface"]["brandColor"], "#139C98")
+        self.assertEqual(
+            manifest["interface"]["composerIcon"], "./assets/cotend-logo.png"
+        )
+        self.assertEqual(manifest["interface"]["logo"], "./assets/cotend-logo.png")
+        self.assertEqual(
+            manifest["interface"]["logoDark"], "./assets/cotend-logo-dark.png"
+        )
         self.assertNotIn("apps", manifest)
         self.assertNotIn("mcpServers", manifest)
         self.assertNotIn("hooks", manifest)
         self.assertEqual(lock["status"], "production_candidate_not_published")
+        self.assertEqual(lock["schema_version"], 2)
+        self.assertEqual(len(lock["package"]["brand_assets"]), 4)
+        self.assertNotIn("assets", lock["package"]["forbidden_components"])
         self.assertFalse(lock["authority"]["candidate_identity_only"])
         self.assertTrue(lock["authority"]["final_plugin_identity_confirmed"])
         self.assertFalse(lock["authority"]["release_or_publish_authorized"])
@@ -56,10 +67,10 @@ class CodexPluginPackageTests(unittest.TestCase):
         first_manifest = package.path_hash_manifest(first)
         second_manifest = package.path_hash_manifest(second)
         self.assertEqual(first_manifest, second_manifest)
-        self.assertEqual(len(first_manifest), 37)
+        self.assertEqual(len(first_manifest), 41)
         self.assertEqual(
             package.path_hash_manifest_sha256(first_manifest),
-            "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+            "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
         )
 
     def test_output_must_stay_in_repository_build_roots(self) -> None:
@@ -104,6 +115,22 @@ class CodexPluginPackageTests(unittest.TestCase):
             path.parent.mkdir(parents=True)
             path.write_text("{}\n", encoding="utf-8")
 
+        def missing_brand_asset(root: Path) -> None:
+            (root / "assets" / "cotend-logo.png").unlink()
+
+        def brand_asset_drift(root: Path) -> None:
+            path = root / "assets" / "cotend-logo-dark.png"
+            path.write_bytes(path.read_bytes() + b"drift")
+
+        def extra_brand_asset(root: Path) -> None:
+            (root / "assets" / "unexpected.png").write_bytes(b"unexpected")
+
+        def manifest_logo_path_drift(root: Path) -> None:
+            path = root / ".codex-plugin" / "plugin.json"
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload["interface"]["logo"] = "./assets/unexpected.png"
+            path.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
         mutations = {
             "extra_file": extra_file,
             "missing_skill": missing_skill,
@@ -113,6 +140,10 @@ class CodexPluginPackageTests(unittest.TestCase):
             "undeclared_app": undeclared_app,
             "hooks_directory": hooks_directory,
             "marketplace_file": marketplace_file,
+            "missing_brand_asset": missing_brand_asset,
+            "brand_asset_drift": brand_asset_drift,
+            "extra_brand_asset": extra_brand_asset,
+            "manifest_logo_path_drift": manifest_logo_path_drift,
         }
         for case_id, mutate in mutations.items():
             with self.subTest(case_id=case_id):
@@ -149,12 +180,17 @@ class CodexPluginPackageTests(unittest.TestCase):
         result = package.verify_package(output)
         self.assertEqual(result["friendly_display_names"], 5)
         self.assertEqual(result["relative_notice_links"], 4)
+        self.assertEqual(result["brand_assets"], 4)
         manifest = json.loads(
             (output / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
         )
         prompts = manifest["interface"]["defaultPrompt"]
         self.assertEqual(len(prompts), 3)
         self.assertTrue(all(len(prompt) <= 128 for prompt in prompts))
+        self.assertEqual(
+            package.sha256_file(output / "assets" / "cotend-mark.svg"),
+            "27c5a8566bb4d7800f9250715aef649adf5806b35784955a093cc37cf477238a",
+        )
 
     def test_valid_existing_output_rebuild_is_idempotent(self) -> None:
         output = self.build("idempotent")

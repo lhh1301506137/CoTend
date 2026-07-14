@@ -25,6 +25,10 @@
       "Read",
       "Write"
     ],
+    "brandColor": "#139C98",
+    "composerIcon": "./assets/cotend-logo.png",
+    "logo": "./assets/cotend-logo.png",
+    "logoDark": "./assets/cotend-logo-dark.png",
     "defaultPrompt": [
       "Use CoTend to initialize or resume this project.",
       "Use CoTend to continue the current project.",

@@ -6,9 +6,11 @@ import json
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import tempfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
@@ -56,6 +58,24 @@ PACKAGE_SUPPORT_FILES = {
     "THIRD-PARTY-LICENSES/karpathy-guidelines-MIT.txt": (
         ROOT / "THIRD-PARTY-LICENSES" / "karpathy-guidelines-MIT.txt"
     ),
+}
+PACKAGE_BRAND_ASSETS = {
+    "assets/cotend-mark.svg": {
+        "source": PLUGIN_TEMPLATE_ROOT / "assets" / "cotend-mark.svg",
+        "role": "canonical_light_source",
+    },
+    "assets/cotend-mark-dark.svg": {
+        "source": PLUGIN_TEMPLATE_ROOT / "assets" / "cotend-mark-dark.svg",
+        "role": "canonical_dark_source",
+    },
+    "assets/cotend-logo.png": {
+        "source": PLUGIN_TEMPLATE_ROOT / "assets" / "cotend-logo.png",
+        "role": "composer_icon_and_light_logo",
+    },
+    "assets/cotend-logo-dark.png": {
+        "source": PLUGIN_TEMPLATE_ROOT / "assets" / "cotend-logo-dark.png",
+        "role": "dark_logo",
+    },
 }
 ALLOWED_OUTPUT_ROOTS = {".private-provenance", "dist"}
 SEMVER_RE = re.compile(
@@ -117,6 +137,80 @@ def path_hash_manifest_sha256(manifest: dict[str, str]) -> str:
         digest.update(file_hash.encode("ascii"))
         digest.update(b"\n")
     return digest.hexdigest()
+
+
+def _svg_shapes(path: Path) -> list[tuple[str, tuple[tuple[str, str], ...]]]:
+    try:
+        root = ET.parse(path).getroot()
+    except (OSError, ET.ParseError) as exc:
+        raise PluginPackageError(f"invalid brand SVG: {path}") from exc
+    if root.tag.rsplit("}", 1)[-1] != "svg" or root.attrib.get("viewBox") != "0 0 512 512":
+        raise PluginPackageError("brand SVG viewBox drifted")
+    shapes: list[tuple[str, tuple[tuple[str, str], ...]]] = []
+    forbidden = {"image", "script", "foreignObject", "text", "use", "style"}
+    for element in root.iter():
+        tag = element.tag.rsplit("}", 1)[-1]
+        if tag in forbidden:
+            raise PluginPackageError(f"brand SVG contains forbidden element: {tag}")
+        for key, value in element.attrib.items():
+            local_key = key.rsplit("}", 1)[-1]
+            if local_key == "href" or "url(" in value.lower():
+                raise PluginPackageError("brand SVG contains an external reference")
+        if tag in {"path", "rect", "circle"}:
+            geometry = tuple(
+                sorted(
+                    (key, value)
+                    for key, value in element.attrib.items()
+                    if key not in {"fill", "stroke"}
+                )
+            )
+            shapes.append((tag, geometry))
+    if [tag for tag, _ in shapes].count("circle") != 3:
+        raise PluginPackageError("brand SVG must contain exactly three endpoint circles")
+    return shapes
+
+
+def _validate_png(path: Path) -> None:
+    try:
+        payload = path.read_bytes()
+    except OSError as exc:
+        raise PluginPackageError(f"missing brand PNG: {path}") from exc
+    if len(payload) < 33 or payload[:8] != b"\x89PNG\r\n\x1a\n":
+        raise PluginPackageError("brand PNG signature drifted")
+    if payload[12:16] != b"IHDR":
+        raise PluginPackageError("brand PNG IHDR is missing")
+    width, height, bit_depth, color_type = struct.unpack(">IIBB", payload[16:26])
+    if (width, height, bit_depth, color_type) != (1024, 1024, 8, 6):
+        raise PluginPackageError("brand PNG must be 1024x1024 RGBA")
+
+
+def validate_brand_assets() -> None:
+    asset_root = PLUGIN_TEMPLATE_ROOT / "assets"
+    reject_link_tree(asset_root, label="Plugin brand assets")
+    actual = {
+        path.relative_to(PLUGIN_TEMPLATE_ROOT).as_posix()
+        for path in asset_root.rglob("*")
+        if path.is_file()
+    }
+    if actual != set(PACKAGE_BRAND_ASSETS):
+        raise PluginPackageError("Plugin brand asset inventory drifted")
+    light_svg = PACKAGE_BRAND_ASSETS["assets/cotend-mark.svg"]["source"]
+    dark_svg = PACKAGE_BRAND_ASSETS["assets/cotend-mark-dark.svg"]["source"]
+    assert isinstance(light_svg, Path)
+    assert isinstance(dark_svg, Path)
+    if _svg_shapes(light_svg) != _svg_shapes(dark_svg):
+        raise PluginPackageError("light and dark brand SVG geometry drifted")
+    light_text = light_svg.read_text(encoding="utf-8")
+    dark_text = dark_svg.read_text(encoding="utf-8")
+    for color in ("#139C98", "#F15B50", "#67B94B"):
+        if color not in light_text or color not in dark_text:
+            raise PluginPackageError("brand node palette drifted")
+    if "#20252B" not in light_text or "#F4F6F8" not in dark_text:
+        raise PluginPackageError("brand light or dark foreground drifted")
+    for relative in ("assets/cotend-logo.png", "assets/cotend-logo-dark.png"):
+        source = PACKAGE_BRAND_ASSETS[relative]["source"]
+        assert isinstance(source, Path)
+        _validate_png(source)
 
 
 def load_json_object(path: Path, label: str) -> dict[str, Any]:
@@ -182,6 +276,10 @@ def validate_manifest_contract(manifest: dict[str, Any]) -> None:
         "developerName",
         "category",
         "capabilities",
+        "brandColor",
+        "composerIcon",
+        "logo",
+        "logoDark",
         "defaultPrompt",
     }
     if set(interface) != expected_interface_keys:
@@ -194,6 +292,14 @@ def validate_manifest_contract(manifest: dict[str, Any]) -> None:
         raise PluginPackageError("Plugin category drifted")
     if interface.get("capabilities") != ["Interactive", "Read", "Write"]:
         raise PluginPackageError("Plugin capability declaration drifted")
+    if interface.get("brandColor") != "#139C98":
+        raise PluginPackageError("Plugin brand color drifted")
+    if interface.get("composerIcon") != "./assets/cotend-logo.png":
+        raise PluginPackageError("Plugin composer icon path drifted")
+    if interface.get("logo") != "./assets/cotend-logo.png":
+        raise PluginPackageError("Plugin logo path drifted")
+    if interface.get("logoDark") != "./assets/cotend-logo-dark.png":
+        raise PluginPackageError("Plugin dark logo path drifted")
     prompts = interface.get("defaultPrompt")
     if not isinstance(prompts, list) or not 1 <= len(prompts) <= 3:
         raise PluginPackageError("Plugin defaultPrompt must contain one to three prompts")
@@ -236,6 +342,7 @@ def source_skill_manifest() -> dict[str, str]:
 
 
 def expected_package_manifest() -> dict[str, str]:
+    validate_brand_assets()
     manifest = {
         ".codex-plugin/plugin.json": sha256_file(MANIFEST_SOURCE),
     }
@@ -244,6 +351,12 @@ def expected_package_manifest() -> dict[str, str]:
     )
     manifest.update(
         {relative: sha256_file(source) for relative, source in PACKAGE_SUPPORT_FILES.items()}
+    )
+    manifest.update(
+        {
+            relative: sha256_file(asset["source"])
+            for relative, asset in PACKAGE_BRAND_ASSETS.items()
+        }
     )
     return dict(sorted(manifest.items()))
 
@@ -255,7 +368,7 @@ def validate_contract() -> dict[str, Any]:
     lock = load_json_object(PACKAGE_LOCK_PATH, "Plugin package lock")
     if lock.get("schema") != "cotend.codex-plugin-package-lock":
         raise PluginPackageError("Plugin package lock schema drifted")
-    if lock.get("schema_version") != 1:
+    if lock.get("schema_version") != 2:
         raise PluginPackageError("Plugin package lock version drifted")
     if lock.get("status") != "production_candidate_not_published":
         raise PluginPackageError("Plugin package lock status drifted")
@@ -304,11 +417,18 @@ def validate_contract() -> dict[str, Any]:
         "file_count": len(expected_files),
         "path_hash_manifest_sha256": path_hash_manifest_sha256(expected_files),
         "support_files": list(PACKAGE_SUPPORT_FILES),
+        "brand_assets": [
+            {
+                "path": relative,
+                "role": asset["role"],
+                "sha256": sha256_file(asset["source"]),
+            }
+            for relative, asset in PACKAGE_BRAND_ASSETS.items()
+        ],
         "forbidden_components": [
             ".app.json",
             ".mcp.json",
             ".agents",
-            "assets",
             "hooks",
             "scripts",
         ],
@@ -386,6 +506,14 @@ def verify_package(package_root: Path) -> dict[str, Any]:
     for forbidden in package_lock["forbidden_components"]:
         if (package_root / forbidden).exists():
             raise PluginPackageError(f"forbidden Plugin component exists: {forbidden}")
+    expected_brand_paths = set(PACKAGE_BRAND_ASSETS)
+    actual_brand_paths = {
+        path.relative_to(package_root).as_posix()
+        for path in (package_root / "assets").rglob("*")
+        if path.is_file()
+    }
+    if actual_brand_paths != expected_brand_paths:
+        raise PluginPackageError("packaged brand asset inventory drifted")
 
     for skill, display_name in EXPECTED_DISPLAY_NAMES.items():
         agent = package_root / "skills" / skill / "agents" / "openai.yaml"
@@ -408,6 +536,7 @@ def verify_package(package_root: Path) -> dict[str, Any]:
         "skill_files": len(contract["source_manifest"]),
         "friendly_display_names": len(EXPECTED_DISPLAY_NAMES),
         "relative_notice_links": len(relative_notice_links),
+        "brand_assets": len(PACKAGE_BRAND_ASSETS),
         "source_bytes_identical": True,
         "source_manifest_sha256": path_hash_manifest_sha256(
             contract["source_manifest"]
@@ -423,6 +552,12 @@ def _materialize_package(package_root: Path) -> None:
     shutil.copy2(MANIFEST_SOURCE, package_root / ".codex-plugin" / "plugin.json")
     shutil.copytree(SOURCE_SKILLS_ROOT, package_root / "skills")
     for relative, source in PACKAGE_SUPPORT_FILES.items():
+        target = package_root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+    for relative, asset in PACKAGE_BRAND_ASSETS.items():
+        source = asset["source"]
+        assert isinstance(source, Path)
         target = package_root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)

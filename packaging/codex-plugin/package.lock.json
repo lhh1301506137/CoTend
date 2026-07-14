@@ -1,12 +1,12 @@
 {
   "schema": "cotend.codex-plugin-package-lock",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "production_candidate_not_published",
   "plugin": {
     "name": "cotend",
     "version": "0.1.0-rc.1",
     "manifest": "packaging/codex-plugin/cotend/.codex-plugin/plugin.json",
-    "manifest_sha256": "4613598cd162ee86c3a6863eb073f34d68e641278d1a1ec9365e209b96747a7b"
+    "manifest_sha256": "36655662ebeca0cd89b8525bdb91318cd859ce11535a58e94d1c99933ddb0fc5"
   },
   "source": {
     "carrier": "codex-skills/",
@@ -20,8 +20,8 @@
   },
   "package": {
     "output_directory_name": "cotend",
-    "file_count": 37,
-    "path_hash_manifest_sha256": "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+    "file_count": 41,
+    "path_hash_manifest_sha256": "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
     "support_files": [
       "LICENSE",
       "NOTICE",
@@ -30,11 +30,32 @@
       "THIRD-PARTY-LICENSES/grill-me-MIT.txt",
       "THIRD-PARTY-LICENSES/karpathy-guidelines-MIT.txt"
     ],
+    "brand_assets": [
+      {
+        "path": "assets/cotend-mark.svg",
+        "role": "canonical_light_source",
+        "sha256": "27c5a8566bb4d7800f9250715aef649adf5806b35784955a093cc37cf477238a"
+      },
+      {
+        "path": "assets/cotend-mark-dark.svg",
+        "role": "canonical_dark_source",
+        "sha256": "63e1f28fee998a7d3a7d39a381d2990132ed5f9c63a70a10fd533ef2dbb1afac"
+      },
+      {
+        "path": "assets/cotend-logo.png",
+        "role": "composer_icon_and_light_logo",
+        "sha256": "3a39de1b6c956b37a5e6efc0fb616a06104ce9d9417d3157ab5c5a002af72d49"
+      },
+      {
+        "path": "assets/cotend-logo-dark.png",
+        "role": "dark_logo",
+        "sha256": "dc495bcbdba3c35f32e60a7f4d250593007de3e5620431f3b780d98a5e4c46fe"
+      }
+    ],
     "forbidden_components": [
       ".app.json",
       ".mcp.json",
       ".agents",
-      "assets",
       "hooks",
       "scripts"
     ]

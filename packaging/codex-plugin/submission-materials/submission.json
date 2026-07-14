@@ -3,7 +3,7 @@
   "schema_version": 1,
   "status": "draft_not_submitted",
   "official_requirements": {
-    "source": "https://learn.chatgpt.com/docs/submit-plugins",
+    "source": "https://developers.openai.com/codex/submit-plugins",
     "checked_on": "2026-07-14",
     "submission_type": "skills_only"
   },
@@ -13,9 +13,9 @@
     "package_status": "production_candidate_not_published",
     "package_lock": "packaging/codex-plugin/package.lock.json",
     "manifest": "packaging/codex-plugin/cotend/.codex-plugin/plugin.json",
-    "manifest_sha256": "4613598cd162ee86c3a6863eb073f34d68e641278d1a1ec9365e209b96747a7b",
-    "file_count": 37,
-    "path_hash_manifest_sha256": "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+    "manifest_sha256": "36655662ebeca0cd89b8525bdb91318cd859ce11535a58e94d1c99933ddb0fc5",
+    "file_count": 41,
+    "path_hash_manifest_sha256": "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
     "skill_count": 7,
     "skill_file_count": 30,
     "source_skill_manifest_sha256": "acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b",
@@ -30,8 +30,8 @@
     "candidate_developer_name": "CoTend contributors",
     "source_repository_url": "https://github.com/lhh1301506137/CoTend",
     "logo": {
-      "status": "missing_required_asset",
-      "asset_path": null
+      "status": "repository_asset_ready_portal_format_not_verified",
+      "asset_path": "assets/cotend-logo.png"
     },
     "public_urls": {
       "website_url": null,
@@ -89,7 +89,7 @@
       "value": {
         "plugin_id": "cotend",
         "version": "0.1.0-rc.1",
-        "package_digest": "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+        "package_digest": "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
         "confirmed_on": "2026-07-14",
         "confirmation_scope": "initial_submission_identity_not_release_or_platform_acceptance",
         "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected"
@@ -113,8 +113,20 @@
     },
     {
       "id": "production_logo",
-      "status": "unresolved",
-      "value": null,
+      "status": "resolved",
+      "value": {
+        "source_asset_path": "assets/cotend-mark.svg",
+        "source_sha256": "27c5a8566bb4d7800f9250715aef649adf5806b35784955a093cc37cf477238a",
+        "dark_source_asset_path": "assets/cotend-mark-dark.svg",
+        "dark_source_sha256": "63e1f28fee998a7d3a7d39a381d2990132ed5f9c63a70a10fd533ef2dbb1afac",
+        "primary_asset_path": "assets/cotend-logo.png",
+        "primary_sha256": "3a39de1b6c956b37a5e6efc0fb616a06104ce9d9417d3157ab5c5a002af72d49",
+        "dark_asset_path": "assets/cotend-logo-dark.png",
+        "dark_sha256": "dc495bcbdba3c35f32e60a7f4d250593007de3e5620431f3b780d98a5e4c46fe",
+        "user_confirmed_on": "2026-07-14",
+        "confirmation_scope": "repository_production_asset_not_portal_upload_or_format_verification",
+        "portal_exact_format": "not_verified"
+      },
       "required_before": "portal_submission",
       "owner": "publisher"
     },
@@ -166,7 +178,6 @@
     "unresolved_blocker_ids": [
       "verified_publisher_identity",
       "apps_management_write_access",
-      "production_logo",
       "website_url",
       "support_url",
       "privacy_policy_url",

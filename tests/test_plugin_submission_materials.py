@@ -16,7 +16,7 @@ import build_codex_plugin as package  # noqa: E402
 import verify_plugin_submission_materials as submission  # noqa: E402
 
 
-NEGATIVE_MUTATION_COUNT = 15
+NEGATIVE_MUTATION_COUNT = 17
 
 
 class PluginSubmissionMaterialTests(unittest.TestCase):
@@ -44,12 +44,12 @@ class PluginSubmissionMaterialTests(unittest.TestCase):
         self.assertEqual(result["status"], "draft_not_submitted")
         self.assertEqual(result["positive_cases"], 5)
         self.assertEqual(result["negative_cases"], 3)
-        self.assertEqual(result["unresolved_blockers"], 9)
+        self.assertEqual(result["unresolved_blockers"], 8)
         self.assertEqual(
             result["package_digest"],
             package.path_hash_manifest_sha256(contract["expected_package_manifest"]),
         )
-        self.assertEqual(self.materials["package"]["file_count"], 37)
+        self.assertEqual(self.materials["package"]["file_count"], 41)
         self.assertTrue(self.materials["package"]["final_identity_confirmed"])
         self.assertEqual(
             self.materials["package"]["identity_authority"],
@@ -64,6 +64,13 @@ class PluginSubmissionMaterialTests(unittest.TestCase):
         self.assertEqual(listing["short_description"], interface["shortDescription"])
         self.assertEqual(listing["long_description"], interface["longDescription"])
         self.assertEqual(self.materials["starter_prompts"], interface["defaultPrompt"])
+        self.assertEqual(
+            listing["logo"],
+            {
+                "status": "repository_asset_ready_portal_format_not_verified",
+                "asset_path": interface["logo"].removeprefix("./"),
+            },
+        )
 
     def test_reviewer_contract_has_exact_five_positive_three_negative(self) -> None:
         self.assertEqual(
@@ -103,13 +110,20 @@ class PluginSubmissionMaterialTests(unittest.TestCase):
             [blocker["id"] for blocker in self.materials["blockers"]],
             submission.EXPECTED_BLOCKER_IDS,
         )
-        identity, *external = self.materials["blockers"]
-        self.assertEqual(identity["status"], "resolved")
-        self.assertEqual(identity["value"], submission.EXPECTED_IDENTITY_VALUE)
+        blockers = {blocker["id"]: blocker for blocker in self.materials["blockers"]}
+        self.assertEqual(
+            blockers["final_plugin_identity_and_version"]["value"],
+            submission.EXPECTED_IDENTITY_VALUE,
+        )
+        self.assertEqual(
+            blockers["production_logo"]["value"],
+            submission.EXPECTED_PRODUCTION_LOGO_VALUE,
+        )
         self.assertTrue(
             all(
-                blocker["status"] == "unresolved" and blocker["value"] is None
-                for blocker in external
+                blockers[blocker_id]["status"] == "unresolved"
+                and blockers[blocker_id]["value"] is None
+                for blocker_id in submission.EXPECTED_UNRESOLVED_BLOCKER_IDS
             )
         )
         self.assertEqual(
@@ -130,7 +144,7 @@ class PluginSubmissionMaterialTests(unittest.TestCase):
         self.assertIn("Initial submission", notes["initial_or_update"])
         self.assertIn("No CoTend account", notes["reviewer_setup"])
 
-    def test_fifteen_negative_mutations_are_rejected(self) -> None:
+    def test_seventeen_negative_mutations_are_rejected(self) -> None:
         def mutate_materials(
             callback: Callable[[dict[str, Any]], None],
         ) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -170,6 +184,16 @@ class PluginSubmissionMaterialTests(unittest.TestCase):
             "package_digest_drift": mutate_materials(
                 lambda value: value["package"].__setitem__(
                     "path_hash_manifest_sha256", "0" * 64
+                )
+            ),
+            "logo_listing_path_drift": mutate_materials(
+                lambda value: value["listing"]["logo"].__setitem__(
+                    "asset_path", "assets/unexpected.png"
+                )
+            ),
+            "production_logo_hash_drift": mutate_materials(
+                lambda value: value["blockers"][3]["value"].__setitem__(
+                    "primary_sha256", "0" * 64
                 )
             ),
             "starter_prompt_drift": mutate_materials(

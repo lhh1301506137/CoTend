@@ -89,9 +89,21 @@ EXPECTED_ANSWERED_DECISIONS = {
             ),
         },
     },
+    "Q04-production-logo": {
+        "answer": "1",
+        "evidence": {
+            "evidence_type": "user_explicit",
+            "recorded_on": "2026-07-14",
+            "scope": (
+                "exact_repository_production_logo_acceptance_not_portal_upload_"
+                "or_format_verification"
+            ),
+        },
+    },
 }
 EXPECTED_RESOLVED_PREREQUISITES = {
     "final_plugin_identity_and_version": submission.EXPECTED_IDENTITY_VALUE,
+    "production_logo": submission.EXPECTED_PRODUCTION_LOGO_VALUE,
 }
 EXPECTED_PREREQUISITE_DECISIONS = {
     blocker_id: decision_id
@@ -150,6 +162,7 @@ EXPECTED_AUTHORITY = {
     "repository_preparation_only": True,
     "publisher_mode_selected": True,
     "final_identity_selected": True,
+    "production_logo_selected": True,
     "verified_identity_observed": False,
     "apps_management_write_access_observed": False,
     "public_urls_selected": False,
@@ -247,7 +260,7 @@ def _validate_decisions(decisions: Any) -> None:
         covered_blockers.extend(decision["blocker_ids"])
         if decision_id in EXPECTED_ANSWERED_DECISIONS:
             expected_status = "answered"
-        elif decision_id == "Q04-production-logo":
+        elif decision_id == "Q05-platform-access":
             expected_status = "awaiting_user_decision"
         else:
             expected_status = "blocked_by_dependencies"
@@ -283,8 +296,8 @@ def _validate_decisions(decisions: Any) -> None:
             _non_empty_chinese(option["impact_zh"], "decision option impact")
         seen.add(decision_id)
 
-    if awaiting != ["Q04-production-logo"]:
-        raise SubmissionPrerequisiteError("Q04 must be the only active decision")
+    if awaiting != ["Q05-platform-access"]:
+        raise SubmissionPrerequisiteError("Q05 must be the only active decision")
     if sorted(covered_blockers) != sorted(submission.EXPECTED_BLOCKER_IDS):
         raise SubmissionPrerequisiteError(
             "decisions do not cover every blocker exactly once"
@@ -452,7 +465,7 @@ def validate_submission_prerequisites(
         raise SubmissionPrerequisiteError("package binding drifted")
     if packet["decision_policy"] != {
         "mode": "one_at_a_time",
-        "current_decision_id": "Q04-production-logo",
+        "current_decision_id": "Q05-platform-access",
         "current_decision_status": "awaiting_user_decision",
         "ordinary_continue_answers_decision": False,
         "auto_fill_owner_facts": False,
@@ -466,12 +479,12 @@ def validate_submission_prerequisites(
     _validate_prerequisites(packet["prerequisites"], submission_contract)
     if packet["next_action"] != {
         "action": "ask_user",
-        "decision_id": "Q04-production-logo",
+        "decision_id": "Q05-platform-access",
         "expected_answer": "explicit_option_1_2_or_3",
         "external_action_permitted": False,
         "ordinary_continue_answers_decision": False,
     }:
-        raise SubmissionPrerequisiteError("next action must remain the Q04 user gate")
+        raise SubmissionPrerequisiteError("next action must remain the Q05 user gate")
 
     return {
         "status": packet["status"],

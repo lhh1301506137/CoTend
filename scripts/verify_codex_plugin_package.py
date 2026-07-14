@@ -28,7 +28,7 @@ PRIVATE_ROOT = (
     ROOT / ".private-provenance" / "L44-codex-plugin-production-package"
 )
 DEFAULT_EVIDENCE = PRIVATE_ROOT / "evidence" / "result.json"
-NEGATIVE_CASES = 13
+NEGATIVE_CASES = 17
 
 
 def source_state() -> dict[str, Any]:

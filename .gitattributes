@@ -10,6 +10,8 @@
 /THIRD-PARTY-LICENSES/grill-me-MIT.txt text eol=lf
 /THIRD-PARTY-LICENSES/karpathy-guidelines-MIT.txt text eol=lf
 /packaging/codex-plugin/cotend/.codex-plugin/plugin.json text eol=lf
+/packaging/codex-plugin/cotend/assets/*.svg text eol=lf
+/packaging/codex-plugin/cotend/assets/*.png binary
 /packaging/codex-plugin/package.lock.json text eol=lf
 /packaging/codex-plugin/submission-materials/submission.json text eol=lf
 /packaging/codex-plugin/submission-materials/reviewer-tests.json text eol=lf

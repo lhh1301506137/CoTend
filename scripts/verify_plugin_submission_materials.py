@@ -18,7 +18,7 @@ SUBMISSION_PATH = (
     ROOT / "packaging" / "codex-plugin" / "submission-materials" / "submission.json"
 )
 REVIEWER_TESTS_PATH = SUBMISSION_PATH.with_name("reviewer-tests.json")
-OFFICIAL_SUBMISSION_URL = "https://learn.chatgpt.com/docs/submit-plugins"
+OFFICIAL_SUBMISSION_URL = "https://developers.openai.com/codex/submit-plugins"
 REPOSITORY_URL = "https://github.com/lhh1301506137/CoTend"
 EXPECTED_POSITIVE_IDS = [f"P{number:02d}" for number in range(1, 6)]
 EXPECTED_NEGATIVE_IDS = [f"N{number:02d}" for number in range(1, 4)]
@@ -37,14 +37,39 @@ EXPECTED_BLOCKER_IDS = [
 EXPECTED_IDENTITY_VALUE = {
     "plugin_id": "cotend",
     "version": "0.1.0-rc.1",
-    "package_digest": "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+    "package_digest": "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
     "confirmed_on": "2026-07-14",
     "confirmation_scope": (
         "initial_submission_identity_not_release_or_platform_acceptance"
     ),
     "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected",
 }
-EXPECTED_UNRESOLVED_BLOCKER_IDS = EXPECTED_BLOCKER_IDS[1:]
+EXPECTED_PRODUCTION_LOGO_VALUE = {
+    "source_asset_path": "assets/cotend-mark.svg",
+    "source_sha256": "27c5a8566bb4d7800f9250715aef649adf5806b35784955a093cc37cf477238a",
+    "dark_source_asset_path": "assets/cotend-mark-dark.svg",
+    "dark_source_sha256": (
+        "63e1f28fee998a7d3a7d39a381d2990132ed5f9c63a70a10fd533ef2dbb1afac"
+    ),
+    "primary_asset_path": "assets/cotend-logo.png",
+    "primary_sha256": "3a39de1b6c956b37a5e6efc0fb616a06104ce9d9417d3157ab5c5a002af72d49",
+    "dark_asset_path": "assets/cotend-logo-dark.png",
+    "dark_sha256": "dc495bcbdba3c35f32e60a7f4d250593007de3e5620431f3b780d98a5e4c46fe",
+    "user_confirmed_on": "2026-07-14",
+    "confirmation_scope": (
+        "repository_production_asset_not_portal_upload_or_format_verification"
+    ),
+    "portal_exact_format": "not_verified",
+}
+EXPECTED_RESOLVED_BLOCKER_VALUES = {
+    "final_plugin_identity_and_version": EXPECTED_IDENTITY_VALUE,
+    "production_logo": EXPECTED_PRODUCTION_LOGO_VALUE,
+}
+EXPECTED_UNRESOLVED_BLOCKER_IDS = [
+    blocker_id
+    for blocker_id in EXPECTED_BLOCKER_IDS
+    if blocker_id not in EXPECTED_RESOLVED_BLOCKER_VALUES
+]
 EXPECTED_AUTHORITY = {
     "repository_contract_only": True,
     "portal_opened": False,
@@ -220,7 +245,10 @@ def _validate_submission(
         "category": interface["category"],
         "candidate_developer_name": interface["developerName"],
         "source_repository_url": manifest["repository"],
-        "logo": {"status": "missing_required_asset", "asset_path": None},
+        "logo": {
+            "status": "repository_asset_ready_portal_format_not_verified",
+            "asset_path": interface["logo"].removeprefix("./"),
+        },
         "public_urls": {
             "website_url": None,
             "support_url": None,
@@ -308,13 +336,14 @@ def _validate_submission(
     expected_blocker_keys = {"id", "status", "value", "required_before", "owner"}
     for blocker in blockers:
         _exact_keys(blocker, expected_blocker_keys, "submission blocker")
-        if blocker["id"] == "final_plugin_identity_and_version":
+        expected_value = EXPECTED_RESOLVED_BLOCKER_VALUES.get(blocker["id"])
+        if expected_value is not None:
             if (
                 blocker["status"] != "resolved"
-                or blocker["value"] != EXPECTED_IDENTITY_VALUE
+                or blocker["value"] != expected_value
             ):
                 raise SubmissionMaterialError(
-                    "confirmed submission identity evidence drifted"
+                    "confirmed repository blocker evidence drifted"
                 )
         elif blocker["status"] != "unresolved" or blocker["value"] is not None:
             raise SubmissionMaterialError(

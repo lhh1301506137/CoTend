@@ -25,7 +25,7 @@ PRIVATE_ROOT = ROOT / ".private-provenance"
 DEFAULT_RUN_ROOT = PRIVATE_ROOT / "L46-isolated-production-plugin-lifecycle"
 MARKETPLACE_NAME = "cotend-production-candidate-local"
 EXPECTED_PACKAGE_DIGEST = (
-    "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066"
+    "be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070"
 )
 PRODUCTION_IDENTITY = lifecycle.PluginLifecycleIdentity(
     plugin_id=package.PLUGIN_NAME,
