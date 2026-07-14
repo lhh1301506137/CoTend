@@ -20,11 +20,11 @@ CoTend 已有一个绑定 `cotend@0.1.0-rc.1`、41 文件生产候选的 repo-on
 | 2 | Q02 Final Plugin identity | `final_plugin_identity_and_version` | 已回答：`cotend@0.1.0-rc.1`；未授权发布 |
 | 3 | Q03 Public web presence | `website_url`、`support_url`、`privacy_policy_url`、`terms_url` | 已回答：GitHub 优先承载；四个 URL 仍未解决 |
 | 4 | Q04 Production logo | `production_logo` | 已回答：精确主/暗色资产已集成；Portal 格式未验证 |
-| 5 | Q05 Platform access | `apps_management_write_access` | 唯一等待用户回答 |
-| 6 | Q06 Launch availability | `country_or_region_availability` | 被公开页面、logo 和 Platform access 阻塞 |
+| 5 | Q05 Platform access | `apps_management_write_access` | 已回答：提交前只读确认路线；权限仍未观察 |
+| 6 | Q06 Launch availability | `country_or_region_availability` | 唯一等待用户回答；国家或地区仍为空 |
 | 7 | Q07 Policy attestations | `policy_attestations` | 必须最后完成 |
 
-Q01 已选择个人身份首发路线，但这不等于身份已经验证；`verified_publisher_identity` 继续保持 unresolved/null，只有 OpenAI Platform 出现真实验证证据后才能关闭。Q02 已确认首次提交 ID/version，但这不表示 Portal 接受 `-rc.1`、submission ready 或 release authorized；若实际不接受必须重新打开 Q02。Q03 只选择 GitHub-first 承载路线，没有填入、创建或验证任何 URL，`public_urls_selected` 仍为 false。Q04 已确认并集成用户接受的精确 Logo，但不表示 Portal 已接受格式或完成上传。决策包没有记录姓名、证件、organization 或开发者名称。
+Q01 已选择个人身份首发路线，但这不等于身份已经验证；`verified_publisher_identity` 继续保持 unresolved/null，只有 OpenAI Platform 出现真实验证证据后才能关闭。Q02 已确认首次提交 ID/version，但这不表示 Portal 接受 `-rc.1`、submission ready 或 release authorized；若实际不接受必须重新打开 Q02。Q03 只选择 GitHub-first 承载路线，没有填入、创建或验证任何 URL，`public_urls_selected` 仍为 false。Q04 已确认并集成用户接受的精确 Logo，但不表示 Portal 已接受格式或完成上传。Q05 只确定未来在提交前由用户登录 Platform 做只读权限检查；当前没有打开 Platform、识别 organization 或观察到 Apps Management Write。决策包没有记录姓名、证件、organization 或开发者名称。
 
 ## 10 个 Blocker 的责任与证据
 
@@ -59,13 +59,19 @@ Q01 已选择个人身份首发路线，但这不等于身份已经验证；`ver
 
 用户最终接受候选 C 的精确资产。仓库已纳入相同几何的主/暗色 SVG 和 1024×1024 RGBA PNG，并锁定四项摘要；`production_logo` 已在 repository scope 关闭。Portal exact format 与上传仍为 `not_verified`，若实际表单拒绝当前格式必须重新打开 Q04。
 
-## 当前问题：Q05 Platform Access
+## 已回答：Q05 Platform Access
 
 **问题**：在目标 OpenAI organization 中如何确认或补齐 Apps Management Write 权限？
 
-1. **推荐：在提交前只读确认**。等身份与目标 organization 明确后，由用户登录 Platform 检查权限；若缺失，再由组织管理员补齐。
-2. **先由管理员准备**。提前请目标组织管理员确认角色和权限，但仍不能由仓库记录代替 Platform 证据。
-3. **暂缓检查**。不登录 Platform，权限 blocker 保持未解决。
+用户已明确选择方案 `1`：等身份与目标 organization 明确后，在提交前由用户登录 Platform 做只读权限检查；若缺失，再由组织管理员补齐。该结果只固定未来检查路线，不授权当前打开 Platform，也不证明 organization、角色或权限存在；`apps_management_write_access` 继续保持 unresolved/null，`apps_management_write_access_observed` 继续为 false。
+
+## 当前问题：Q06 Launch Availability
+
+**问题**：首次发布应选择哪些实际具备支持与法律准备的国家或地区？
+
+1. **推荐：最小可支持范围**。由用户明确列出当前确实能支持且法律页面适用的最小国家或地区集合，后续再扩展。
+2. **较广首发范围**。需要逐地确认支持、政策和法律准备，验证成本与误配风险更高。
+3. **暂缓选择**。不填充任何国家或地区，availability blocker 保持未解决。
 
 用户需要明确回复 `1`、`2` 或 `3`。普通“继续”不回答该问题。
 
@@ -79,9 +85,9 @@ python -m unittest tests.test_submission_prerequisites
 验证器直接读取 `submission.json` 的 canonical blocker 顺序，并要求：
 
 - 10 个 prerequisite 与 10 个 blocker 精确一一对应；
-- 7 个决策无环，Q01-Q04 有精确用户证据且 Q05 是唯一等待用户回答的问题；
+- 7 个决策无环，Q01-Q05 有精确用户证据且 Q06 是唯一等待用户回答的问题；
 - final Plugin identity/version、production Logo 与 submission/package lock 精确一致，其他 8 个 prerequisite 仍为 unresolved/null；
-- Q03 只记录 GitHub-first route，verified identity、四个 URL、地区、政策声明和 Q05-Q07 用户答案仍为空；
+- Q03 只记录 GitHub-first route，Q05 只记录 future read-only check route；verified identity、Platform 权限、四个 URL、地区、政策声明和 Q06-Q07 用户答案仍为空；
 - policy attestations 位于最后；
 - package digest 和 source Skill digest 未漂移；
 - Portal、submission、approval 和 publish authority 全部为 false。
@@ -91,7 +97,7 @@ python -m unittest tests.test_submission_prerequisites
 ## 执行证据
 
 ```text
-SUBMISSION_PREREQUISITES_OK status=awaiting_owner_decisions prerequisites=10 decisions=7 active=Q05-platform-access digest=be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070
+SUBMISSION_PREREQUISITES_OK status=awaiting_owner_decisions prerequisites=10 decisions=7 active=Q06-launch-availability digest=be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070
 Ran 8 tests - OK
 Ran 145 tests - OK
 PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted prompts=3 positive=5 negative=3 blockers=8 digest=be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070

@@ -43,7 +43,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
         self.assertEqual(result["status"], "awaiting_owner_decisions")
         self.assertEqual(result["prerequisites"], 10)
         self.assertEqual(result["decisions"], 7)
-        self.assertEqual(result["active_decision"], "Q05-platform-access")
+        self.assertEqual(result["active_decision"], "Q06-launch-availability")
         self.assertEqual(
             result["package_digest"],
             self.submission["package"]["path_hash_manifest_sha256"],
@@ -72,7 +72,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             if decision["status"] == "awaiting_user_decision":
                 awaiting.append(decision["id"])
             seen.add(decision["id"])
-        self.assertEqual(awaiting, ["Q05-platform-access"])
+        self.assertEqual(awaiting, ["Q06-launch-availability"])
         self.assertFalse(
             self.packet["decision_policy"]["ordinary_continue_answers_decision"]
         )
@@ -115,7 +115,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
                 for blocker_id in submission.EXPECTED_UNRESOLVED_BLOCKER_IDS
             )
         )
-        q01, q02, q03, q04, *remaining = self.packet["decisions"]
+        q01, q02, q03, q04, q05, *remaining = self.packet["decisions"]
         self.assertEqual(q01["status"], "answered")
         self.assertEqual(q01["answer"], "1")
         self.assertEqual(q01["evidence"]["evidence_type"], "user_explicit")
@@ -133,6 +133,12 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
         self.assertEqual(
             q04["evidence"]["scope"],
             "exact_repository_production_logo_acceptance_not_portal_upload_or_format_verification",
+        )
+        self.assertEqual(q05["status"], "answered")
+        self.assertEqual(q05["answer"], "1")
+        self.assertEqual(
+            q05["evidence"]["scope"],
+            "platform_access_check_route_only_not_permission_observation_or_portal_access",
         )
         self.assertTrue(
             all(
@@ -208,10 +214,10 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
                 )
             ),
             "filled_owner_answer": mutate_packet(
-                lambda value: value["decisions"][4].__setitem__("answer", "1")
+                lambda value: value["decisions"][5].__setitem__("answer", "1")
             ),
             "two_active_decisions": mutate_packet(
-                lambda value: value["decisions"][5].__setitem__(
+                lambda value: value["decisions"][6].__setitem__(
                     "status", "awaiting_user_decision"
                 )
             ),
@@ -238,7 +244,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             ),
             "wrong_next_action": mutate_packet(
                 lambda value: value["next_action"].__setitem__(
-                    "decision_id", "Q04-production-logo"
+                    "decision_id", "Q05-platform-access"
                 )
             ),
             "production_logo_hash_drift": mutate_packet(

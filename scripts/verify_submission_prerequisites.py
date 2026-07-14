@@ -100,6 +100,17 @@ EXPECTED_ANSWERED_DECISIONS = {
             ),
         },
     },
+    "Q05-platform-access": {
+        "answer": "1",
+        "evidence": {
+            "evidence_type": "user_explicit",
+            "recorded_on": "2026-07-14",
+            "scope": (
+                "platform_access_check_route_only_not_permission_observation_"
+                "or_portal_access"
+            ),
+        },
+    },
 }
 EXPECTED_RESOLVED_PREREQUISITES = {
     "final_plugin_identity_and_version": submission.EXPECTED_IDENTITY_VALUE,
@@ -260,7 +271,7 @@ def _validate_decisions(decisions: Any) -> None:
         covered_blockers.extend(decision["blocker_ids"])
         if decision_id in EXPECTED_ANSWERED_DECISIONS:
             expected_status = "answered"
-        elif decision_id == "Q05-platform-access":
+        elif decision_id == "Q06-launch-availability":
             expected_status = "awaiting_user_decision"
         else:
             expected_status = "blocked_by_dependencies"
@@ -296,8 +307,8 @@ def _validate_decisions(decisions: Any) -> None:
             _non_empty_chinese(option["impact_zh"], "decision option impact")
         seen.add(decision_id)
 
-    if awaiting != ["Q05-platform-access"]:
-        raise SubmissionPrerequisiteError("Q05 must be the only active decision")
+    if awaiting != ["Q06-launch-availability"]:
+        raise SubmissionPrerequisiteError("Q06 must be the only active decision")
     if sorted(covered_blockers) != sorted(submission.EXPECTED_BLOCKER_IDS):
         raise SubmissionPrerequisiteError(
             "decisions do not cover every blocker exactly once"
@@ -465,7 +476,7 @@ def validate_submission_prerequisites(
         raise SubmissionPrerequisiteError("package binding drifted")
     if packet["decision_policy"] != {
         "mode": "one_at_a_time",
-        "current_decision_id": "Q05-platform-access",
+        "current_decision_id": "Q06-launch-availability",
         "current_decision_status": "awaiting_user_decision",
         "ordinary_continue_answers_decision": False,
         "auto_fill_owner_facts": False,
@@ -479,12 +490,12 @@ def validate_submission_prerequisites(
     _validate_prerequisites(packet["prerequisites"], submission_contract)
     if packet["next_action"] != {
         "action": "ask_user",
-        "decision_id": "Q05-platform-access",
+        "decision_id": "Q06-launch-availability",
         "expected_answer": "explicit_option_1_2_or_3",
         "external_action_permitted": False,
         "ordinary_continue_answers_decision": False,
     }:
-        raise SubmissionPrerequisiteError("next action must remain the Q05 user gate")
+        raise SubmissionPrerequisiteError("next action must remain the Q06 user gate")
 
     return {
         "status": packet["status"],

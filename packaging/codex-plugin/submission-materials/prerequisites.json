@@ -22,7 +22,7 @@
   },
   "decision_policy": {
     "mode": "one_at_a_time",
-    "current_decision_id": "Q05-platform-access",
+    "current_decision_id": "Q06-launch-availability",
     "current_decision_status": "awaiting_user_decision",
     "ordinary_continue_answers_decision": false,
     "auto_fill_owner_facts": false,
@@ -202,7 +202,7 @@
     {
       "id": "Q05-platform-access",
       "sequence": 5,
-      "status": "awaiting_user_decision",
+      "status": "answered",
       "decision_authority": "publisher",
       "depends_on": [
         "Q01-publisher-mode"
@@ -230,13 +230,17 @@
           "impact_zh": "不登录 Platform，权限 blocker 保持未解决。"
         }
       ],
-      "answer": null,
-      "evidence": null
+      "answer": "1",
+      "evidence": {
+        "evidence_type": "user_explicit",
+        "recorded_on": "2026-07-14",
+        "scope": "platform_access_check_route_only_not_permission_observation_or_portal_access"
+      }
     },
     {
       "id": "Q06-launch-availability",
       "sequence": 6,
-      "status": "blocked_by_dependencies",
+      "status": "awaiting_user_decision",
       "decision_authority": "publisher",
       "depends_on": [
         "Q03-public-web-presence",
@@ -574,7 +578,7 @@
   ],
   "next_action": {
     "action": "ask_user",
-    "decision_id": "Q05-platform-access",
+    "decision_id": "Q06-launch-availability",
     "expected_answer": "explicit_option_1_2_or_3",
     "external_action_permitted": false,
     "ordinary_continue_answers_decision": false

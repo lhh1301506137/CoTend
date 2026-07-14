@@ -2940,7 +2940,7 @@ def submission_prerequisite_packet_errors(
             "status=awaiting_owner_decisions",
             "prerequisites=10",
             "decisions=7",
-            "active=Q05-platform-access",
+            "active=Q06-launch-availability",
             "digest=be76ac16cb3d19d95e5803f5581bdf0e07285bf1f67b65767268d8dd0aa00070",
         ):
             if marker not in result.stdout:
@@ -2963,7 +2963,7 @@ def submission_prerequisite_packet_errors(
     for marker in (
         "10 个先决条件、其中 8 个仍未解决",
         "7 个决策无环",
-        "Q05 是唯一等待用户回答",
+        "Q06 是唯一等待用户回答",
         "policy attestations 位于最后",
         "没有打开 OpenAI Platform 或 submission Portal",
         "普通“继续”不回答该问题",
