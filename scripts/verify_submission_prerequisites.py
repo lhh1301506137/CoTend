@@ -79,6 +79,16 @@ EXPECTED_ANSWERED_DECISIONS = {
             ),
         },
     },
+    "Q03-public-web-presence": {
+        "answer": "1",
+        "evidence": {
+            "evidence_type": "user_explicit",
+            "recorded_on": "2026-07-14",
+            "scope": (
+                "public_web_presence_hosting_route_only_not_urls_or_publication"
+            ),
+        },
+    },
 }
 EXPECTED_RESOLVED_PREREQUISITES = {
     "final_plugin_identity_and_version": submission.EXPECTED_IDENTITY_VALUE,
@@ -237,7 +247,7 @@ def _validate_decisions(decisions: Any) -> None:
         covered_blockers.extend(decision["blocker_ids"])
         if decision_id in EXPECTED_ANSWERED_DECISIONS:
             expected_status = "answered"
-        elif decision_id == "Q03-public-web-presence":
+        elif decision_id == "Q04-production-logo":
             expected_status = "awaiting_user_decision"
         else:
             expected_status = "blocked_by_dependencies"
@@ -273,8 +283,8 @@ def _validate_decisions(decisions: Any) -> None:
             _non_empty_chinese(option["impact_zh"], "decision option impact")
         seen.add(decision_id)
 
-    if awaiting != ["Q03-public-web-presence"]:
-        raise SubmissionPrerequisiteError("Q03 must be the only active decision")
+    if awaiting != ["Q04-production-logo"]:
+        raise SubmissionPrerequisiteError("Q04 must be the only active decision")
     if sorted(covered_blockers) != sorted(submission.EXPECTED_BLOCKER_IDS):
         raise SubmissionPrerequisiteError(
             "decisions do not cover every blocker exactly once"
@@ -442,7 +452,7 @@ def validate_submission_prerequisites(
         raise SubmissionPrerequisiteError("package binding drifted")
     if packet["decision_policy"] != {
         "mode": "one_at_a_time",
-        "current_decision_id": "Q03-public-web-presence",
+        "current_decision_id": "Q04-production-logo",
         "current_decision_status": "awaiting_user_decision",
         "ordinary_continue_answers_decision": False,
         "auto_fill_owner_facts": False,
@@ -456,12 +466,12 @@ def validate_submission_prerequisites(
     _validate_prerequisites(packet["prerequisites"], submission_contract)
     if packet["next_action"] != {
         "action": "ask_user",
-        "decision_id": "Q03-public-web-presence",
+        "decision_id": "Q04-production-logo",
         "expected_answer": "explicit_option_1_2_or_3",
         "external_action_permitted": False,
         "ordinary_continue_answers_decision": False,
     }:
-        raise SubmissionPrerequisiteError("next action must remain the Q03 user gate")
+        raise SubmissionPrerequisiteError("next action must remain the Q04 user gate")
 
     return {
         "status": packet["status"],

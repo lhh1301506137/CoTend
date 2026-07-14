@@ -22,7 +22,7 @@
   },
   "decision_policy": {
     "mode": "one_at_a_time",
-    "current_decision_id": "Q03-public-web-presence",
+    "current_decision_id": "Q04-production-logo",
     "current_decision_status": "awaiting_user_decision",
     "ordinary_continue_answers_decision": false,
     "auto_fill_owner_facts": false,
@@ -121,7 +121,7 @@
     {
       "id": "Q03-public-web-presence",
       "sequence": 3,
-      "status": "awaiting_user_decision",
+      "status": "answered",
       "decision_authority": "publisher",
       "depends_on": [
         "Q01-publisher-mode",
@@ -153,13 +153,17 @@
           "impact_zh": "不创建占位 URL，四个公开页面 blocker 保持未解决。"
         }
       ],
-      "answer": null,
-      "evidence": null
+      "answer": "1",
+      "evidence": {
+        "evidence_type": "user_explicit",
+        "recorded_on": "2026-07-14",
+        "scope": "public_web_presence_hosting_route_only_not_urls_or_publication"
+      }
     },
     {
       "id": "Q04-production-logo",
       "sequence": 4,
-      "status": "blocked_by_dependencies",
+      "status": "awaiting_user_decision",
       "decision_authority": "publisher",
       "depends_on": [
         "Q02-final-plugin-identity"
@@ -553,7 +557,7 @@
   ],
   "next_action": {
     "action": "ask_user",
-    "decision_id": "Q03-public-web-presence",
+    "decision_id": "Q04-production-logo",
     "expected_answer": "explicit_option_1_2_or_3",
     "external_action_permitted": false,
     "ordinary_continue_answers_decision": false

@@ -16,7 +16,7 @@ import verify_plugin_submission_materials as submission  # noqa: E402
 import verify_submission_prerequisites as prerequisites  # noqa: E402
 
 
-NEGATIVE_MUTATION_COUNT = 14
+NEGATIVE_MUTATION_COUNT = 15
 
 
 class SubmissionPrerequisiteTests(unittest.TestCase):
@@ -43,7 +43,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
         self.assertEqual(result["status"], "awaiting_owner_decisions")
         self.assertEqual(result["prerequisites"], 10)
         self.assertEqual(result["decisions"], 7)
-        self.assertEqual(result["active_decision"], "Q03-public-web-presence")
+        self.assertEqual(result["active_decision"], "Q04-production-logo")
         self.assertEqual(
             result["package_digest"],
             self.submission["package"]["path_hash_manifest_sha256"],
@@ -72,7 +72,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             if decision["status"] == "awaiting_user_decision":
                 awaiting.append(decision["id"])
             seen.add(decision["id"])
-        self.assertEqual(awaiting, ["Q03-public-web-presence"])
+        self.assertEqual(awaiting, ["Q04-production-logo"])
         self.assertFalse(
             self.packet["decision_policy"]["ordinary_continue_answers_decision"]
         )
@@ -96,7 +96,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             all(len(item["completion_evidence_zh"]) >= 2 for item in by_id.values())
         )
 
-    def test_confirmed_repository_identity_does_not_set_external_authority(
+    def test_confirmed_routes_do_not_set_external_authority(
         self,
     ) -> None:
         identity, *external = self.packet["prerequisites"]
@@ -108,13 +108,19 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
                 for item in external
             )
         )
-        q01, q02, *remaining = self.packet["decisions"]
+        q01, q02, q03, *remaining = self.packet["decisions"]
         self.assertEqual(q01["status"], "answered")
         self.assertEqual(q01["answer"], "1")
         self.assertEqual(q01["evidence"]["evidence_type"], "user_explicit")
         self.assertEqual(q02["status"], "answered")
         self.assertEqual(q02["answer"], "1")
         self.assertEqual(q02["evidence"]["evidence_type"], "user_explicit")
+        self.assertEqual(q03["status"], "answered")
+        self.assertEqual(q03["answer"], "1")
+        self.assertEqual(
+            q03["evidence"]["scope"],
+            "public_web_presence_hosting_route_only_not_urls_or_publication",
+        )
         self.assertTrue(
             all(
                 decision["answer"] is None and decision["evidence"] is None
@@ -125,6 +131,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
         self.assertTrue(authority["repository_preparation_only"])
         self.assertTrue(authority["publisher_mode_selected"])
         self.assertTrue(authority["final_identity_selected"])
+        self.assertFalse(authority["public_urls_selected"])
         self.assertTrue(
             all(
                 value is False
@@ -149,7 +156,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
         self.assertIn("企业身份", q01["options"][1]["label_zh"])
         self.assertIn("个人名称", q01["options"][0]["impact_zh"])
 
-    def test_fourteen_negative_mutations_are_rejected(self) -> None:
+    def test_fifteen_negative_mutations_are_rejected(self) -> None:
         def mutate_packet(
             callback: Callable[[dict[str, Any]], None],
         ) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -186,10 +193,10 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
                 )
             ),
             "filled_owner_answer": mutate_packet(
-                lambda value: value["decisions"][2].__setitem__("answer", "1")
+                lambda value: value["decisions"][3].__setitem__("answer", "1")
             ),
             "two_active_decisions": mutate_packet(
-                lambda value: value["decisions"][3].__setitem__(
+                lambda value: value["decisions"][4].__setitem__(
                     "status", "awaiting_user_decision"
                 )
             ),
@@ -209,9 +216,14 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             "portal_opened_claim": mutate_packet(
                 lambda value: value["authority"].__setitem__("portal_opened", True)
             ),
+            "public_urls_selected_claim": mutate_packet(
+                lambda value: value["authority"].__setitem__(
+                    "public_urls_selected", True
+                )
+            ),
             "wrong_next_action": mutate_packet(
                 lambda value: value["next_action"].__setitem__(
-                    "decision_id", "Q04-production-logo"
+                    "decision_id", "Q05-platform-access"
                 )
             ),
         }

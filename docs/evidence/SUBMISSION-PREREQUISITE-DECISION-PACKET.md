@@ -18,13 +18,13 @@ CoTend 已有一个绑定 `cotend@0.1.0-rc.1`、37 文件生产候选的 repo-on
 | --- | --- | --- | --- |
 | 1 | Q01 Publisher mode | `verified_publisher_identity` | 已回答：个人身份路线；身份仍未验证 |
 | 2 | Q02 Final Plugin identity | `final_plugin_identity_and_version` | 已回答：`cotend@0.1.0-rc.1`；未授权发布 |
-| 3 | Q03 Public web presence | `website_url`、`support_url`、`privacy_policy_url`、`terms_url` | 唯一等待用户回答 |
-| 4 | Q04 Production logo | `production_logo` | 在逐题队列中等待 Q03 |
-| 5 | Q05 Platform access | `apps_management_write_access` | 在逐题队列中等待 Q03/Q04 |
+| 3 | Q03 Public web presence | `website_url`、`support_url`、`privacy_policy_url`、`terms_url` | 已回答：GitHub 优先承载；四个 URL 仍未解决 |
+| 4 | Q04 Production logo | `production_logo` | 唯一等待用户回答 |
+| 5 | Q05 Platform access | `apps_management_write_access` | 在逐题队列中等待 Q04 |
 | 6 | Q06 Launch availability | `country_or_region_availability` | 被公开页面、logo 和 Platform access 阻塞 |
 | 7 | Q07 Policy attestations | `policy_attestations` | 必须最后完成 |
 
-Q01 已选择个人身份首发路线，但这不等于身份已经验证；`verified_publisher_identity` 继续保持 unresolved/null，只有 OpenAI Platform 出现真实验证证据后才能关闭。Q02 已确认首次提交 ID/version，但这不表示 Portal 接受 `-rc.1`、submission ready 或 release authorized；若实际不接受必须重新打开 Q02。决策包没有记录姓名、证件、organization 或开发者名称。
+Q01 已选择个人身份首发路线，但这不等于身份已经验证；`verified_publisher_identity` 继续保持 unresolved/null，只有 OpenAI Platform 出现真实验证证据后才能关闭。Q02 已确认首次提交 ID/version，但这不表示 Portal 接受 `-rc.1`、submission ready 或 release authorized；若实际不接受必须重新打开 Q02。Q03 只选择 GitHub-first 承载路线，没有填入、创建或验证任何 URL，`public_urls_selected` 仍为 false。决策包没有记录姓名、证件、organization 或开发者名称。
 
 ## 10 个 Blocker 的责任与证据
 
@@ -51,13 +51,17 @@ Q01 已选择个人身份首发路线，但这不等于身份已经验证；`ver
 
 用户已明确选择方案 `1`：沿用 `cotend@0.1.0-rc.1` 作为首次提交 Plugin ID/version。该结果关闭 repository-owned final identity prerequisite，但包仍是未发布候选；若 Portal 不接受预发布版本，必须重新打开 Q02。
 
-## 当前问题：Q03 Public Web Presence
+## 已回答：Q03 Public Web Presence
 
-**问题**：CoTend 的 website、support、privacy policy 和 terms 应采用哪种可公开访问的承载方式？
+用户已明确选择方案 `1`：GitHub 优先承载。该结果只确定后续优先使用公开仓库、Issues 和公开仓库页面或 Pages 的准备路线；当前没有填写或验证 website/support/privacy/terms URL，没有创建 Pages 或修改 GitHub 设置，四个 blocker 继续保持 unresolved/null。
 
-1. **推荐：GitHub 优先承载**。优先使用公开仓库作为 website、GitHub Issues 作为 support，并用可公开访问的仓库/Pages 法律页面承载 privacy policy 和 terms。基础设施最少，但实际 URL 和内容仍需后续逐项创建、复核和验证。
-2. **独立站点承载**。使用独立域名和站点统一承载四类页面，品牌控制更完整，但增加域名、托管、维护和法律页面发布工作。
-3. **暂缓决定**。不创建占位 URL，四个公开页面 blocker 继续保持未解决。
+## 当前问题：Q04 Production Logo
+
+**问题**：首次提交应采用哪种 CoTend production logo 路线？
+
+1. **推荐：制作简洁品牌标识**。先生成少量清晰候选供用户选择，再按官方表单实际要求导出和验证最终资产。
+2. **用户提供现有标识**。沿用用户已有品牌资产，但仍需检查授权、尺寸、可读性和最终名称一致性。
+3. **暂缓决定**。不生成或上传占位图，production logo blocker 保持未解决。
 
 用户需要明确回复 `1`、`2` 或 `3`。普通“继续”不回答该问题。
 
@@ -71,9 +75,9 @@ python -m unittest tests.test_submission_prerequisites
 验证器直接读取 `submission.json` 的 canonical blocker 顺序，并要求：
 
 - 10 个 prerequisite 与 10 个 blocker 精确一一对应；
-- 7 个决策无环，Q01/Q02 有精确用户证据且 Q03 是唯一等待用户回答的问题；
+- 7 个决策无环，Q01-Q03 有精确用户证据且 Q04 是唯一等待用户回答的问题；
 - final Plugin identity/version 与 submission/package lock 精确一致，其他 9 个 prerequisite 仍为 unresolved/null；
-- verified identity、URL、地区、政策声明和后续用户答案仍为空；
+- Q03 只记录 GitHub-first route，verified identity、四个 URL、logo、地区、政策声明和后续用户答案仍为空；
 - policy attestations 位于最后；
 - package digest 和 source Skill digest 未漂移；
 - Portal、submission、approval 和 publish authority 全部为 false。
@@ -83,7 +87,7 @@ python -m unittest tests.test_submission_prerequisites
 ## 执行证据
 
 ```text
-SUBMISSION_PREREQUISITES_OK status=awaiting_owner_decisions prerequisites=10 decisions=7 active=Q03-public-web-presence digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066
+SUBMISSION_PREREQUISITES_OK status=awaiting_owner_decisions prerequisites=10 decisions=7 active=Q04-production-logo digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066
 Ran 8 tests - OK
 Ran 145 tests - OK
 PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted prompts=3 positive=5 negative=3 blockers=9 digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066
