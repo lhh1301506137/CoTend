@@ -2,7 +2,7 @@
 
 ## 结论
 
-CoTend 已有一个绑定 `cotend@0.1.0-rc.1`、37 文件生产候选的 repo-only submission material contract，但它仍被 10 个真实外部先决条件阻塞。本文与 `prerequisites.json` 把这些 blocker 整理为 7 个按依赖回答的问题；它们不会自动填充身份、网址、国家或地区、权限和政策声明。
+CoTend 已有一个绑定 `cotend@0.1.0-rc.1`、37 文件生产候选的 repo-only submission material contract。本决策包跟踪 10 个先决条件、其中 9 个仍未解决：仓库内 final Plugin identity/version 已由用户确认，其余身份、网址、国家或地区、权限、logo 和政策声明不会被自动填充。
 
 当前状态是 `awaiting_owner_decisions`，不是 ready、submitted、approved 或 published。没有打开 OpenAI Platform 或 submission Portal，没有创建 draft，也没有执行身份验证、提交审核或发布。
 
@@ -17,14 +17,14 @@ CoTend 已有一个绑定 `cotend@0.1.0-rc.1`、37 文件生产候选的 repo-on
 | 顺序 | 决策 | 覆盖 blocker | 当前状态 |
 | --- | --- | --- | --- |
 | 1 | Q01 Publisher mode | `verified_publisher_identity` | 已回答：个人身份路线；身份仍未验证 |
-| 2 | Q02 Final Plugin identity | `final_plugin_identity_and_version` | 唯一等待用户回答 |
-| 3 | Q03 Public web presence | `website_url`、`support_url`、`privacy_policy_url`、`terms_url` | 被 Q02 阻塞 |
-| 4 | Q04 Production logo | `production_logo` | 被 Q02 阻塞 |
-| 5 | Q05 Platform access | `apps_management_write_access` | 被 Q01 阻塞 |
+| 2 | Q02 Final Plugin identity | `final_plugin_identity_and_version` | 已回答：`cotend@0.1.0-rc.1`；未授权发布 |
+| 3 | Q03 Public web presence | `website_url`、`support_url`、`privacy_policy_url`、`terms_url` | 唯一等待用户回答 |
+| 4 | Q04 Production logo | `production_logo` | 在逐题队列中等待 Q03 |
+| 5 | Q05 Platform access | `apps_management_write_access` | 在逐题队列中等待 Q03/Q04 |
 | 6 | Q06 Launch availability | `country_or_region_availability` | 被公开页面、logo 和 Platform access 阻塞 |
 | 7 | Q07 Policy attestations | `policy_attestations` | 必须最后完成 |
 
-Q01 已选择个人身份首发路线，但这不等于身份已经验证；`verified_publisher_identity` 继续保持 unresolved/null，只有 OpenAI Platform 出现真实验证证据后才能关闭。决策包没有记录姓名、证件、organization 或开发者名称。
+Q01 已选择个人身份首发路线，但这不等于身份已经验证；`verified_publisher_identity` 继续保持 unresolved/null，只有 OpenAI Platform 出现真实验证证据后才能关闭。Q02 已确认首次提交 ID/version，但这不表示 Portal 接受 `-rc.1`、submission ready 或 release authorized；若实际不接受必须重新打开 Q02。决策包没有记录姓名、证件、organization 或开发者名称。
 
 ## 10 个 Blocker 的责任与证据
 
@@ -47,13 +47,17 @@ Q01 已选择个人身份首发路线，但这不等于身份已经验证；`ver
 
 用户已明确选择方案 `1`：个人身份首发路线。该结果只确定后续准备路径，不授权现在登录 Platform、验证身份或公开个人信息。
 
-## 当前问题：Q02 Final Plugin Identity
+## 已回答：Q02 Final Plugin Identity
 
-**问题**：是否把当前 `cotend@0.1.0-rc.1` 候选作为首次提交身份与版本，还是先调整？
+用户已明确选择方案 `1`：沿用 `cotend@0.1.0-rc.1` 作为首次提交 Plugin ID/version。该结果关闭 repository-owned final identity prerequisite，但包仍是未发布候选；若 Portal 不接受预发布版本，必须重新打开 Q02。
 
-1. **推荐：沿用当前候选**。保留已经通过隔离验证的 Plugin ID 和预发布版本；确认后仍需按最终身份重新验证 package、submission 和 lifecycle，且不等于提交或发布。当前官方提交说明未明确预发布版本是否会被 Portal 接受；若实际校验不接受，必须重新打开 Q02。
-2. **提交前调整**。先重新决定 Plugin ID 或版本，再重建 package、submission contract 和全部绑定证据。
-3. **暂缓决定**。不修改 manifest 或 lock，依赖最终身份的 logo 和公开页面继续阻塞。
+## 当前问题：Q03 Public Web Presence
+
+**问题**：CoTend 的 website、support、privacy policy 和 terms 应采用哪种可公开访问的承载方式？
+
+1. **推荐：GitHub 优先承载**。优先使用公开仓库作为 website、GitHub Issues 作为 support，并用可公开访问的仓库/Pages 法律页面承载 privacy policy 和 terms。基础设施最少，但实际 URL 和内容仍需后续逐项创建、复核和验证。
+2. **独立站点承载**。使用独立域名和站点统一承载四类页面，品牌控制更完整，但增加域名、托管、维护和法律页面发布工作。
+3. **暂缓决定**。不创建占位 URL，四个公开页面 blocker 继续保持未解决。
 
 用户需要明确回复 `1`、`2` 或 `3`。普通“继续”不回答该问题。
 
@@ -67,21 +71,22 @@ python -m unittest tests.test_submission_prerequisites
 验证器直接读取 `submission.json` 的 canonical blocker 顺序，并要求：
 
 - 10 个 prerequisite 与 10 个 blocker 精确一一对应；
-- 7 个决策无环，Q01 已有用户明确证据且只激活 Q02；
-- 除 Q01 路线外，身份验证、URL、地区、政策声明和后续用户答案仍为空；
+- 7 个决策无环，Q01/Q02 有精确用户证据且 Q03 是唯一等待用户回答的问题；
+- final Plugin identity/version 与 submission/package lock 精确一致，其他 9 个 prerequisite 仍为 unresolved/null；
+- verified identity、URL、地区、政策声明和后续用户答案仍为空；
 - policy attestations 位于最后；
 - package digest 和 source Skill digest 未漂移；
 - Portal、submission、approval 和 publish authority 全部为 false。
 
-这些检查证明决策包结构和边界一致，不证明任何外部 blocker 已完成，也不构成 OpenAI 审核、法律意见或用户最终验收。
+这些检查证明决策包结构、仓库内 final identity 证据和边界一致，不证明任何外部 blocker 已完成，也不构成 OpenAI 审核、法律意见或用户最终验收。
 
 ## 执行证据
 
 ```text
-SUBMISSION_PREREQUISITES_OK status=awaiting_owner_decisions prerequisites=10 decisions=7 active=Q02-final-plugin-identity digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066
+SUBMISSION_PREREQUISITES_OK status=awaiting_owner_decisions prerequisites=10 decisions=7 active=Q03-public-web-presence digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066
 Ran 8 tests - OK
 Ran 145 tests - OK
-PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted prompts=3 positive=5 negative=3 blockers=10 digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066
+PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted prompts=3 positive=5 negative=3 blockers=9 digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066
 CODEX_PLUGIN_PRODUCTION_PACKAGE_OK builds=2 files=37 skills=7 skill_files=30 tests=8 negatives=13 validator=passed boundaries=6 unchanged=true digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066
 PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=37 steps=17 recovery=5 tests=7 roots=15 purged=true protected_unchanged=true
 REPOSITORY_CHECK_OK public_candidates=157 capabilities=19 behavior_specs=19
@@ -89,4 +94,4 @@ REPOSITORY_CHECK_OK public_candidates=157 capabilities=19 behavior_specs=19
 
 首次全量测试运行在工具的 124 秒上限处终止，没有形成完成结果，因此未计入证据；随后两次完整运行分别通过 145 项测试。一次带不存在的 `--exclusive` 参数的 lifecycle 命令只在参数解析阶段退出，没有启动 fixture，也未计入证据；上方记录来自不带该参数的真实成功运行。
 
-Ruff 静态检查、两个新增 Python 文件的格式检查、`compileall` 与 `git diff --check` 通过。`codex-skills/`、Plugin manifest、package lock、delivery lock 和 upstream framework lock 均未修改；没有安装、Platform 写入、Portal、submission、publish 或 push。
+Ruff 静态检查、`compileall` 与 `git diff --check` 通过。`codex-skills/`、Plugin manifest、delivery lock 和 upstream framework lock 均未修改；package lock 只把 final identity 状态同步为已确认，没有改变 37 文件包摘要。没有安装、Platform 写入、Portal、submission、publish 或 push。

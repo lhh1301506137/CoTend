@@ -34,6 +34,17 @@ EXPECTED_BLOCKER_IDS = [
     "country_or_region_availability",
     "policy_attestations",
 ]
+EXPECTED_IDENTITY_VALUE = {
+    "plugin_id": "cotend",
+    "version": "0.1.0-rc.1",
+    "package_digest": "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+    "confirmed_on": "2026-07-14",
+    "confirmation_scope": (
+        "initial_submission_identity_not_release_or_platform_acceptance"
+    ),
+    "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected",
+}
+EXPECTED_UNRESOLVED_BLOCKER_IDS = EXPECTED_BLOCKER_IDS[1:]
 EXPECTED_AUTHORITY = {
     "repository_contract_only": True,
     "portal_opened": False,
@@ -147,8 +158,10 @@ def _expected_package_binding(contract: dict[str, Any]) -> dict[str, Any]:
         "skill_count": lock["source"]["skill_count"],
         "skill_file_count": lock["source"]["skill_file_count"],
         "source_skill_manifest_sha256": lock["source"]["path_hash_manifest_sha256"],
-        "identity_authority": "candidate_only_not_release",
-        "final_identity_confirmed": False,
+        "identity_authority": "initial_submission_identity_confirmed_not_release",
+        "final_identity_confirmed": lock["authority"][
+            "final_plugin_identity_confirmed"
+        ],
     }
 
 
@@ -295,7 +308,15 @@ def _validate_submission(
     expected_blocker_keys = {"id", "status", "value", "required_before", "owner"}
     for blocker in blockers:
         _exact_keys(blocker, expected_blocker_keys, "submission blocker")
-        if blocker["status"] != "unresolved" or blocker["value"] is not None:
+        if blocker["id"] == "final_plugin_identity_and_version":
+            if (
+                blocker["status"] != "resolved"
+                or blocker["value"] != EXPECTED_IDENTITY_VALUE
+            ):
+                raise SubmissionMaterialError(
+                    "confirmed submission identity evidence drifted"
+                )
+        elif blocker["status"] != "unresolved" or blocker["value"] is not None:
             raise SubmissionMaterialError(
                 "submission blocker was resolved without evidence"
             )
@@ -306,7 +327,7 @@ def _validate_submission(
             raise SubmissionMaterialError("submission blocker ownership drifted")
     if submission["readiness"] != {
         "status": "blocked_not_ready_for_portal_submission",
-        "unresolved_blocker_ids": EXPECTED_BLOCKER_IDS,
+        "unresolved_blocker_ids": EXPECTED_UNRESOLVED_BLOCKER_IDS,
         "portal_submission_ready": False,
     }:
         raise SubmissionMaterialError(
@@ -456,7 +477,9 @@ def validate_submission_materials(
         "positive_cases": len(reviewer_tests["positive_cases"]),
         "negative_cases": len(reviewer_tests["negative_cases"]),
         "starter_prompts": len(submission["starter_prompts"]),
-        "unresolved_blockers": len(submission["blockers"]),
+        "unresolved_blockers": sum(
+            blocker["status"] == "unresolved" for blocker in submission["blockers"]
+        ),
         "package_digest": submission["package"]["path_hash_manifest_sha256"],
     }
 

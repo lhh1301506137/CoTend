@@ -46,8 +46,8 @@ class CodexPluginPackageTests(unittest.TestCase):
         self.assertNotIn("mcpServers", manifest)
         self.assertNotIn("hooks", manifest)
         self.assertEqual(lock["status"], "production_candidate_not_published")
-        self.assertTrue(lock["authority"]["candidate_identity_only"])
-        self.assertFalse(lock["authority"]["final_plugin_identity_confirmed"])
+        self.assertFalse(lock["authority"]["candidate_identity_only"])
+        self.assertTrue(lock["authority"]["final_plugin_identity_confirmed"])
         self.assertFalse(lock["authority"]["release_or_publish_authorized"])
 
     def test_two_builds_are_byte_deterministic(self) -> None:

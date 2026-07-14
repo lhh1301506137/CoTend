@@ -10,11 +10,11 @@ starter_prompts: 3
 relative_links_valid: true
 maintainer_commands: 6_safe_repo_only
 focused_tests: 6
-full_unit_tests: 137
+full_unit_tests: 145
 production_package_regression: passed_8_tests_13_negative_6_boundaries
-submission_material_regression: passed_3_prompts_5_positive_3_negative_10_blockers
+submission_material_regression: passed_3_prompts_5_positive_3_negative_9_blockers
 production_lifecycle_regression: passed_17_normal_5_recovery_15_roots_purged
-repository_check: passed_153_public_candidates_19_capabilities_19_specs
+repository_check: passed_157_public_candidates_19_capabilities_19_specs
 real_user_installation: false
 portal_or_submission: false
 release_publish_push: false
@@ -43,7 +43,7 @@ README 用五步描述正常开发旅程：
 公开状态表区分了：
 
 - 已验证的 7 Skill repository source；
-- 精确 37 文件 candidate package；
+- 精确 37 文件 candidate package；首次提交 ID/version 已确认，但包仍未发布；
 - 完全隔离的 CLI lifecycle；
 - 仅仓库草案的 submission materials；
 - 尚未执行的 reviewer cases；
@@ -74,11 +74,11 @@ python scripts/check_repository.py
 
 ```text
 Ran 6 tests - OK
-Ran 137 tests - OK
+Ran 145 tests - OK
 CODEX_PLUGIN_PRODUCTION_PACKAGE_OK builds=2 files=37 skills=7 skill_files=30 tests=8 negatives=13 validator=passed boundaries=6 unchanged=true
-PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted prompts=3 positive=5 negative=3 blockers=10
+PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted prompts=3 positive=5 negative=3 blockers=9
 PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=37 steps=17 recovery=5 tests=7 roots=15 purged=true protected_unchanged=true
-REPOSITORY_CHECK_OK public_candidates=153 capabilities=19 behavior_specs=19
+REPOSITORY_CHECK_OK public_candidates=157 capabilities=19 behavior_specs=19
 ```
 
 6 项聚焦测试检查：英文与 novice-first 首屏、pre-release/无公开安装声明、7 Skill inventory、3 prompts 同步、所有相对链接存在，以及 maintainer 命令既真实又不包含安装或外部发布动作。
@@ -87,7 +87,7 @@ REPOSITORY_CHECK_OK public_candidates=153 capabilities=19 behavior_specs=19
 
 - 没有安装 Plugin 或写入真实用户 Skills/Marketplace/Desktop；
 - 没有打开 Portal、创建 draft、提交审核或执行 reviewer cases；
-- 没有确认最终 identity/version、logo、publisher 或法律/支持 URL；
+- 已在后续 Q02 决策中确认首次提交 identity/version；没有确认 logo、verified publisher 或法律/支持 URL，也没有验证 Portal 对预发布版本的接受性；
 - 没有 release、publish 或 push。
 
 因此，本证据只关闭“公开仓库首屏与 novice onboarding 缺失”问题，不表示产品已经公开可安装或完成上架。

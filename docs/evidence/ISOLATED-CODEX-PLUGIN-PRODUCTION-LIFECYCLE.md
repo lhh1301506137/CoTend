@@ -8,7 +8,7 @@ metadata:
   codex_version: codex-cli_0.144.1
   candidate_plugin_id: cotend
   candidate_version: 0.1.0-rc.1
-  identity_authority: candidate_only_not_release
+  identity_authority: initial_submission_identity_confirmed_not_release
   package_files: 37
   adopted_skills: 7
   adopted_skill_files: 30
@@ -36,7 +36,7 @@ L44 的精确 `cotend@0.1.0-rc.1` 37 文件生产候选已经在真实 Codex CLI
 
 第二个场景在 `plugin_add` 已成功后注入确定性异常，然后完成 5 步恢复：Plugin remove、Plugin list absent、Plugin Skill discovery absent、Marketplace remove、Marketplace list absent。恢复完成后，正常场景和失败场景的 15 个隔离运行时写入根均被清除。
 
-该结果关闭的是**精确生产候选的隔离 CLI lifecycle** 缺口。候选 ID/version 仍没有最终发布权威；本轮没有触碰真实个人 Plugin 或 Marketplace，也没有验证 Desktop picker、Portal submission、公开安装或发布。
+该结果关闭的是**精确生产候选的隔离 CLI lifecycle** 缺口。`cotend@0.1.0-rc.1` 已确认为首次提交身份，但仍没有 release/publish 授权，也尚未验证 Portal 是否接受 `-rc.1` 预发布版本；本轮没有触碰真实个人 Plugin 或 Marketplace，也没有验证 Desktop picker、Portal submission、公开安装或发布。
 
 ## 精确包与一次性 Marketplace
 
@@ -117,7 +117,7 @@ PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=37 steps=17 recovery=5 t
 - Desktop Plugins Directory 的详情、安装按钮、enable/disable、重启和卸载体验；
 - 当前已打开任务的热更新，既有证据仍要求新任务/刷新 Skill snapshot；
 - Plugin 内自然语言触发、self-prompt 与跨 Skill 委派；
-- 最终 Plugin ID、namespace、正式版本和 verified publisher identity；
+- Portal 对 `0.1.0-rc.1` 预发布版本的接受性，以及 verified publisher identity；若 Portal 拒绝该版本，需要重开 Q02；
 - logo、website/support/privacy/terms、5+3 reviewer tests、Portal submission、审核、地区和 release notes；
 - Public Plugins Directory 的真实公开安装、release、publish 或 push。
 

@@ -382,7 +382,7 @@ def main() -> int:
                 "name": package.PLUGIN_NAME,
                 "version": package.PLUGIN_VERSION,
                 "marketplace": MARKETPLACE_NAME,
-                "identity_authority": "candidate_only_not_release",
+                "identity_authority": "initial_submission_identity_confirmed_not_release",
             },
             "package": {
                 "files": success["preparation"]["package"]["package_files"],

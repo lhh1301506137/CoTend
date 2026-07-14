@@ -47,8 +47,8 @@
     "plugin_installation_performed": false
   },
   "authority": {
-    "candidate_identity_only": true,
-    "final_plugin_identity_confirmed": false,
+    "candidate_identity_only": false,
+    "final_plugin_identity_confirmed": true,
     "release_or_publish_authorized": false
   }
 }

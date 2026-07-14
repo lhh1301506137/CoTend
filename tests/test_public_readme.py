@@ -47,6 +47,7 @@ class PublicReadmeTests(unittest.TestCase):
             "CoTend is not yet available in the Public Plugin Directory.",
             "No supported end-user installation is available yet.",
             "The plugin has not been submitted for review and has not been published.",
+            "initial submission identity and version are confirmed",
             "Do not treat them as a supported end-user installation.",
         ):
             self.assertIn(marker, self.text)

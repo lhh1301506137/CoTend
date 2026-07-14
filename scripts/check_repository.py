@@ -227,7 +227,7 @@ EXPECTED_SUBMISSION_PREREQUISITE_TESTS = {
     "test_decision_graph_is_acyclic_and_one_at_a_time",
     "test_policy_attestations_are_the_final_gate",
     "test_repository_and_external_responsibilities_are_explicit",
-    "test_q01_route_is_recorded_but_external_authority_remains_unset",
+    "test_confirmed_repository_identity_does_not_set_external_authority",
     "test_q01_explains_publisher_mode_tradeoff_in_chinese",
     "test_fourteen_negative_mutations_are_rejected",
 }
@@ -2343,8 +2343,8 @@ def production_plugin_package_errors(
     if not isinstance(output_lock, dict) or output_lock.get("file_count") != 37:
         errors.append("production Plugin package file count mismatch")
     if authority != {
-        "candidate_identity_only": True,
-        "final_plugin_identity_confirmed": False,
+        "candidate_identity_only": False,
+        "final_plugin_identity_confirmed": True,
         "release_or_publish_authorized": False,
     }:
         errors.append("production Plugin package authority boundary drifted")
@@ -2399,7 +2399,7 @@ def production_plugin_package_errors(
         "codex_version": {"codex-cli_0.144.1"},
         "candidate_plugin_id": {"cotend"},
         "candidate_version": {"0.1.0-rc.1"},
-        "identity_authority": {"candidate_only_not_release"},
+        "identity_authority": {"initial_submission_identity_confirmed_not_release"},
         "semantic_sources": {"1"},
         "isolated_builds_compared": {"2"},
         "package_files": {"37"},
@@ -2412,7 +2412,7 @@ def production_plugin_package_errors(
         "marketplace_write": {"false"},
         "plugin_installation": {"false"},
         "release_or_publish": {"false"},
-        "final_namespace_confirmed": {"false"},
+        "final_plugin_identity_confirmed": {"true"},
     }.items():
         if metadata_values(evidence_text, key) != expected:
             errors.append(f"production Plugin package evidence mismatch: {key}")
@@ -2499,7 +2499,7 @@ def production_plugin_lifecycle_errors(
         "codex_version": {"codex-cli_0.144.1"},
         "candidate_plugin_id": {"cotend"},
         "candidate_version": {"0.1.0-rc.1"},
-        "identity_authority": {"candidate_only_not_release"},
+        "identity_authority": {"initial_submission_identity_confirmed_not_release"},
         "package_files": {"37"},
         "adopted_skills": {"7"},
         "adopted_skill_files": {"30"},
@@ -2576,6 +2576,12 @@ def plugin_submission_material_errors(
         "path_hash_manifest_sha256"
     ) != "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066":
         errors.append("Plugin submission package digest drifted")
+    if (
+        package_binding.get("identity_authority")
+        != "initial_submission_identity_confirmed_not_release"
+        or package_binding.get("final_identity_confirmed") is not True
+    ):
+        errors.append("Plugin submission final identity state drifted")
 
     prompts = submission.get("starter_prompts")
     manifest = json.loads(
@@ -2595,17 +2601,37 @@ def plugin_submission_material_errors(
     blockers = submission.get("blockers")
     if not isinstance(blockers, list) or len(blockers) != 10:
         errors.append("Plugin submission external blocker inventory drifted")
-    elif any(
-        not isinstance(item, dict)
-        or item.get("status") != "unresolved"
-        or item.get("value") is not None
-        for item in blockers
-    ):
-        errors.append("Plugin submission blocker was resolved without evidence")
+    else:
+        expected_identity_value = {
+            "plugin_id": "cotend",
+            "version": "0.1.0-rc.1",
+            "package_digest": (
+                "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066"
+            ),
+            "confirmed_on": "2026-07-14",
+            "confirmation_scope": (
+                "initial_submission_identity_not_release_or_platform_acceptance"
+            ),
+            "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected",
+        }
+        identity = blockers[0]
+        if (
+            not isinstance(identity, dict)
+            or identity.get("id") != "final_plugin_identity_and_version"
+            or identity.get("status") != "resolved"
+            or identity.get("value") != expected_identity_value
+        ):
+            errors.append("Plugin submission confirmed identity evidence drifted")
+        if any(
+            not isinstance(item, dict)
+            or item.get("status") != "unresolved"
+            or item.get("value") is not None
+            for item in blockers[1:]
+        ):
+            errors.append("Plugin submission blocker was resolved without evidence")
     if submission.get("readiness") != {
         "status": "blocked_not_ready_for_portal_submission",
         "unresolved_blocker_ids": [
-            "final_plugin_identity_and_version",
             "verified_publisher_identity",
             "apps_management_write_access",
             "production_logo",
@@ -2660,17 +2686,18 @@ def plugin_submission_material_errors(
         "submission_type": {"skills_only"},
         "candidate_plugin_id": {"cotend"},
         "candidate_version": {"0.1.0-rc.1"},
-        "identity_authority": {"candidate_only_not_release"},
+        "identity_authority": {"initial_submission_identity_confirmed_not_release"},
+        "final_plugin_identity_confirmed": {"true"},
         "package_files": {"37"},
         "submission_contract_status": {"draft_not_submitted"},
         "starter_prompts": {"3"},
         "positive_reviewer_cases": {"5"},
         "negative_reviewer_cases": {"3"},
         "reviewer_case_execution": {"contract_only_not_run"},
-        "unresolved_external_blockers": {"10"},
+        "unresolved_external_blockers": {"9"},
         "focused_unit_tests": {"7"},
         "negative_mutations": {"15"},
-        "full_unit_tests": {"131"},
+        "full_unit_tests": {"145"},
         "production_package_regression": {
             "passed_8_tests_13_negative_6_boundaries"
         },
@@ -2678,7 +2705,7 @@ def plugin_submission_material_errors(
             "passed_17_normal_5_recovery_15_roots_purged"
         },
         "repository_check": {
-            "passed_150_public_candidates_19_capabilities_19_specs"
+            "passed_157_public_candidates_19_capabilities_19_specs"
         },
         "ruff_and_compileall": {"passed"},
         "portal_opened": {"false"},
@@ -2691,10 +2718,10 @@ def plugin_submission_material_errors(
     for marker in (
         "恰好 5 个正向和 3 个负向 reviewer case",
         "contract_only_not_run",
-        "10 个未解决 blocker",
+        "9 个未解决 blocker",
         "没有打开 OpenAI Platform 或 submission Portal",
         "PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted",
-        "Ran 131 tests - OK",
+        "Ran 145 tests - OK",
         "PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=37",
         "不表示已经 ready for Portal submission",
     ):
@@ -2786,18 +2813,18 @@ def public_repository_onboarding_errors(
         "relative_links_valid": {"true"},
         "maintainer_commands": {"6_safe_repo_only"},
         "focused_tests": {"6"},
-        "full_unit_tests": {"137"},
+        "full_unit_tests": {"145"},
         "production_package_regression": {
             "passed_8_tests_13_negative_6_boundaries"
         },
         "submission_material_regression": {
-            "passed_3_prompts_5_positive_3_negative_10_blockers"
+            "passed_3_prompts_5_positive_3_negative_9_blockers"
         },
         "production_lifecycle_regression": {
             "passed_17_normal_5_recovery_15_roots_purged"
         },
         "repository_check": {
-            "passed_153_public_candidates_19_capabilities_19_specs"
+            "passed_157_public_candidates_19_capabilities_19_specs"
         },
         "real_user_installation": {"false"},
         "portal_or_submission": {"false"},
@@ -2810,7 +2837,7 @@ def public_repository_onboarding_errors(
         "Public Plugin Directory 尚不可用",
         "没有 Plugin install、Marketplace、Portal、submission、publish 或 push 命令",
         "不表示产品已经公开可安装或完成上架",
-        "Ran 137 tests - OK",
+        "Ran 145 tests - OK",
     ):
         if marker not in evidence_text:
             errors.append(f"public onboarding evidence is missing: {marker}")
@@ -2847,7 +2874,7 @@ def submission_prerequisite_packet_errors(
             "status=awaiting_owner_decisions",
             "prerequisites=10",
             "decisions=7",
-            "active=Q02-final-plugin-identity",
+            "active=Q03-public-web-presence",
             "digest=e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
         ):
             if marker not in result.stdout:
@@ -2868,9 +2895,9 @@ def submission_prerequisite_packet_errors(
         errors.append("submission prerequisite negative mutation count drifted")
 
     for marker in (
-        "10 个真实外部先决条件",
-        "7 个按依赖回答的问题",
-        "唯一等待用户回答",
+        "10 个先决条件、其中 9 个仍未解决",
+        "7 个决策无环",
+        "Q03 是唯一等待用户回答",
         "policy attestations 位于最后",
         "没有打开 OpenAI Platform 或 submission Portal",
         "普通“继续”不回答该问题",

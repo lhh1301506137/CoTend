@@ -43,7 +43,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
         self.assertEqual(result["status"], "awaiting_owner_decisions")
         self.assertEqual(result["prerequisites"], 10)
         self.assertEqual(result["decisions"], 7)
-        self.assertEqual(result["active_decision"], "Q02-final-plugin-identity")
+        self.assertEqual(result["active_decision"], "Q03-public-web-presence")
         self.assertEqual(
             result["package_digest"],
             self.submission["package"]["path_hash_manifest_sha256"],
@@ -72,7 +72,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             if decision["status"] == "awaiting_user_decision":
                 awaiting.append(decision["id"])
             seen.add(decision["id"])
-        self.assertEqual(awaiting, ["Q02-final-plugin-identity"])
+        self.assertEqual(awaiting, ["Q03-public-web-presence"])
         self.assertFalse(
             self.packet["decision_policy"]["ordinary_continue_answers_decision"]
         )
@@ -96,17 +96,25 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             all(len(item["completion_evidence_zh"]) >= 2 for item in by_id.values())
         )
 
-    def test_q01_route_is_recorded_but_external_authority_remains_unset(self) -> None:
+    def test_confirmed_repository_identity_does_not_set_external_authority(
+        self,
+    ) -> None:
+        identity, *external = self.packet["prerequisites"]
+        self.assertEqual(identity["status"], "resolved")
+        self.assertEqual(identity["value"], submission.EXPECTED_IDENTITY_VALUE)
         self.assertTrue(
             all(
                 item["status"] == "unresolved" and item["value"] is None
-                for item in self.packet["prerequisites"]
+                for item in external
             )
         )
-        q01, *remaining = self.packet["decisions"]
+        q01, q02, *remaining = self.packet["decisions"]
         self.assertEqual(q01["status"], "answered")
         self.assertEqual(q01["answer"], "1")
         self.assertEqual(q01["evidence"]["evidence_type"], "user_explicit")
+        self.assertEqual(q02["status"], "answered")
+        self.assertEqual(q02["answer"], "1")
+        self.assertEqual(q02["evidence"]["evidence_type"], "user_explicit")
         self.assertTrue(
             all(
                 decision["answer"] is None and decision["evidence"] is None
@@ -116,11 +124,17 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
         authority = self.packet["authority"]
         self.assertTrue(authority["repository_preparation_only"])
         self.assertTrue(authority["publisher_mode_selected"])
+        self.assertTrue(authority["final_identity_selected"])
         self.assertTrue(
             all(
                 value is False
                 for key, value in authority.items()
-                if key not in {"repository_preparation_only", "publisher_mode_selected"}
+                if key
+                not in {
+                    "repository_preparation_only",
+                    "publisher_mode_selected",
+                    "final_identity_selected",
+                }
             )
         )
 
@@ -162,7 +176,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
                 lambda value: value["prerequisites"].reverse()
             ),
             "resolved_without_evidence": mutate_packet(
-                lambda value: value["prerequisites"][0].__setitem__(
+                lambda value: value["prerequisites"][1].__setitem__(
                     "status", "resolved"
                 )
             ),
@@ -172,10 +186,10 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
                 )
             ),
             "filled_owner_answer": mutate_packet(
-                lambda value: value["decisions"][1].__setitem__("answer", "1")
+                lambda value: value["decisions"][2].__setitem__("answer", "1")
             ),
             "two_active_decisions": mutate_packet(
-                lambda value: value["decisions"][2].__setitem__(
+                lambda value: value["decisions"][3].__setitem__(
                     "status", "awaiting_user_decision"
                 )
             ),
@@ -197,7 +211,7 @@ class SubmissionPrerequisiteTests(unittest.TestCase):
             ),
             "wrong_next_action": mutate_packet(
                 lambda value: value["next_action"].__setitem__(
-                    "decision_id", "Q03-public-web-presence"
+                    "decision_id", "Q04-production-logo"
                 )
             ),
         }

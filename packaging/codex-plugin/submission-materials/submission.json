@@ -19,8 +19,8 @@
     "skill_count": 7,
     "skill_file_count": 30,
     "source_skill_manifest_sha256": "acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b",
-    "identity_authority": "candidate_only_not_release",
-    "final_identity_confirmed": false
+    "identity_authority": "initial_submission_identity_confirmed_not_release",
+    "final_identity_confirmed": true
   },
   "listing": {
     "plugin_name": "CoTend",
@@ -85,8 +85,15 @@
   "blockers": [
     {
       "id": "final_plugin_identity_and_version",
-      "status": "unresolved",
-      "value": null,
+      "status": "resolved",
+      "value": {
+        "plugin_id": "cotend",
+        "version": "0.1.0-rc.1",
+        "package_digest": "e23febd663c4abd82c7de2a2afde5ccd7599454c141669e238b8d1a336a6f066",
+        "confirmed_on": "2026-07-14",
+        "confirmation_scope": "initial_submission_identity_not_release_or_platform_acceptance",
+        "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected"
+      },
       "required_before": "portal_submission",
       "owner": "publisher"
     },
@@ -157,7 +164,6 @@
   "readiness": {
     "status": "blocked_not_ready_for_portal_submission",
     "unresolved_blocker_ids": [
-      "final_plugin_identity_and_version",
       "verified_publisher_identity",
       "apps_management_write_access",
       "production_logo",

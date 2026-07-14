@@ -67,7 +67,7 @@ CoTend is currently a repository-verified pre-release project:
 | Area | Current state |
 |---|---|
 | Source carrier | Seven Codex Skills are adopted in [`codex-skills/`](codex-skills/). |
-| Package candidate | `cotend@0.1.0-rc.1`, 37 deterministic files; candidate identity only. |
+| Package candidate | `cotend@0.1.0-rc.1`, 37 deterministic files; initial submission identity and version are confirmed, but the package remains unpublished. |
 | Isolated lifecycle | Package add, install, discovery, coexistence, remove, recovery, and cleanup are verified in redirected disposable roots. |
 | Submission materials | English listing, three starter prompts, five positive cases, three negative cases, and release-note structure exist as a repository draft. |
 | Public installation | Unavailable. The plugin has not been submitted for review and has not been published. |

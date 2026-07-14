@@ -44,11 +44,17 @@ class PluginSubmissionMaterialTests(unittest.TestCase):
         self.assertEqual(result["status"], "draft_not_submitted")
         self.assertEqual(result["positive_cases"], 5)
         self.assertEqual(result["negative_cases"], 3)
+        self.assertEqual(result["unresolved_blockers"], 9)
         self.assertEqual(
             result["package_digest"],
             package.path_hash_manifest_sha256(contract["expected_package_manifest"]),
         )
         self.assertEqual(self.materials["package"]["file_count"], 37)
+        self.assertTrue(self.materials["package"]["final_identity_confirmed"])
+        self.assertEqual(
+            self.materials["package"]["identity_authority"],
+            "initial_submission_identity_confirmed_not_release",
+        )
 
     def test_listing_and_starter_prompts_match_plugin_manifest(self) -> None:
         manifest = package.validate_contract()["manifest"]
@@ -97,11 +103,18 @@ class PluginSubmissionMaterialTests(unittest.TestCase):
             [blocker["id"] for blocker in self.materials["blockers"]],
             submission.EXPECTED_BLOCKER_IDS,
         )
+        identity, *external = self.materials["blockers"]
+        self.assertEqual(identity["status"], "resolved")
+        self.assertEqual(identity["value"], submission.EXPECTED_IDENTITY_VALUE)
         self.assertTrue(
             all(
                 blocker["status"] == "unresolved" and blocker["value"] is None
-                for blocker in self.materials["blockers"]
+                for blocker in external
             )
+        )
+        self.assertEqual(
+            self.materials["readiness"]["unresolved_blocker_ids"],
+            submission.EXPECTED_UNRESOLVED_BLOCKER_IDS,
         )
         self.assertEqual(
             self.materials["readiness"]["status"],
@@ -152,7 +165,7 @@ class PluginSubmissionMaterialTests(unittest.TestCase):
                 )
             ),
             "resolved_without_evidence": mutate_materials(
-                lambda value: value["blockers"][0].__setitem__("status", "resolved")
+                lambda value: value["blockers"][1].__setitem__("status", "resolved")
             ),
             "package_digest_drift": mutate_materials(
                 lambda value: value["package"].__setitem__(

@@ -68,7 +68,20 @@ EXPECTED_ANSWERED_DECISIONS = {
             "recorded_on": "2026-07-14",
             "scope": "publisher_mode_route_only_not_identity_verification",
         },
-    }
+    },
+    "Q02-final-plugin-identity": {
+        "answer": "1",
+        "evidence": {
+            "evidence_type": "user_explicit",
+            "recorded_on": "2026-07-14",
+            "scope": (
+                "final_plugin_identity_and_version_only_not_submission_or_release"
+            ),
+        },
+    },
+}
+EXPECTED_RESOLVED_PREREQUISITES = {
+    "final_plugin_identity_and_version": submission.EXPECTED_IDENTITY_VALUE,
 }
 EXPECTED_PREREQUISITE_DECISIONS = {
     blocker_id: decision_id
@@ -126,7 +139,7 @@ EXPECTED_CAPABILITIES = {
 EXPECTED_AUTHORITY = {
     "repository_preparation_only": True,
     "publisher_mode_selected": True,
-    "final_identity_selected": False,
+    "final_identity_selected": True,
     "verified_identity_observed": False,
     "apps_management_write_access_observed": False,
     "public_urls_selected": False,
@@ -176,7 +189,7 @@ def _expected_package(contract: dict[str, Any]) -> dict[str, Any]:
         "file_count": package["file_count"],
         "path_hash_manifest_sha256": package["path_hash_manifest_sha256"],
         "source_skill_manifest_sha256": package["source_skill_manifest_sha256"],
-        "identity_authority": "candidate_only_not_release",
+        "identity_authority": "initial_submission_identity_confirmed_not_release",
     }
 
 
@@ -224,7 +237,7 @@ def _validate_decisions(decisions: Any) -> None:
         covered_blockers.extend(decision["blocker_ids"])
         if decision_id in EXPECTED_ANSWERED_DECISIONS:
             expected_status = "answered"
-        elif decision_id == "Q02-final-plugin-identity":
+        elif decision_id == "Q03-public-web-presence":
             expected_status = "awaiting_user_decision"
         else:
             expected_status = "blocked_by_dependencies"
@@ -260,8 +273,8 @@ def _validate_decisions(decisions: Any) -> None:
             _non_empty_chinese(option["impact_zh"], "decision option impact")
         seen.add(decision_id)
 
-    if awaiting != ["Q02-final-plugin-identity"]:
-        raise SubmissionPrerequisiteError("Q02 must be the only active decision")
+    if awaiting != ["Q03-public-web-presence"]:
+        raise SubmissionPrerequisiteError("Q03 must be the only active decision")
     if sorted(covered_blockers) != sorted(submission.EXPECTED_BLOCKER_IDS):
         raise SubmissionPrerequisiteError(
             "decisions do not cover every blocker exactly once"
@@ -299,6 +312,9 @@ def _validate_prerequisites(
         "boundary_zh",
     }
     known = set(canonical_ids)
+    submission_by_id = {
+        blocker["id"]: blocker for blocker in submission_contract["blockers"]
+    }
     for expected_sequence, prerequisite in enumerate(prerequisites, start=1):
         prerequisite = _exact_keys(
             prerequisite, prerequisite_keys, "submission prerequisite"
@@ -306,9 +322,31 @@ def _validate_prerequisites(
         prerequisite_id = prerequisite["id"]
         if prerequisite["sequence"] != expected_sequence:
             raise SubmissionPrerequisiteError("prerequisite sequence drifted")
-        if prerequisite["status"] != "unresolved" or prerequisite["value"] is not None:
+        expected_value = EXPECTED_RESOLVED_PREREQUISITES.get(prerequisite_id)
+        if expected_value is None:
+            if (
+                prerequisite["status"] != "unresolved"
+                or prerequisite["value"] is not None
+            ):
+                raise SubmissionPrerequisiteError(
+                    "prerequisite was resolved without owner or Platform evidence"
+                )
+        elif (
+            prerequisite["status"] != "resolved"
+            or prerequisite["value"] != expected_value
+        ):
             raise SubmissionPrerequisiteError(
-                "prerequisite was resolved without owner or Platform evidence"
+                "confirmed repository prerequisite evidence drifted"
+            )
+        if {
+            "status": prerequisite["status"],
+            "value": prerequisite["value"],
+        } != {
+            "status": submission_by_id[prerequisite_id]["status"],
+            "value": submission_by_id[prerequisite_id]["value"],
+        }:
+            raise SubmissionPrerequisiteError(
+                "prerequisite and submission blocker state drifted"
             )
         if prerequisite["decision_authority"] != "publisher":
             raise SubmissionPrerequisiteError("prerequisite authority drifted")
@@ -404,7 +442,7 @@ def validate_submission_prerequisites(
         raise SubmissionPrerequisiteError("package binding drifted")
     if packet["decision_policy"] != {
         "mode": "one_at_a_time",
-        "current_decision_id": "Q02-final-plugin-identity",
+        "current_decision_id": "Q03-public-web-presence",
         "current_decision_status": "awaiting_user_decision",
         "ordinary_continue_answers_decision": False,
         "auto_fill_owner_facts": False,
@@ -418,12 +456,12 @@ def validate_submission_prerequisites(
     _validate_prerequisites(packet["prerequisites"], submission_contract)
     if packet["next_action"] != {
         "action": "ask_user",
-        "decision_id": "Q02-final-plugin-identity",
+        "decision_id": "Q03-public-web-presence",
         "expected_answer": "explicit_option_1_2_or_3",
         "external_action_permitted": False,
         "ordinary_continue_answers_decision": False,
     }:
-        raise SubmissionPrerequisiteError("next action must remain the Q02 user gate")
+        raise SubmissionPrerequisiteError("next action must remain the Q03 user gate")
 
     return {
         "status": packet["status"],

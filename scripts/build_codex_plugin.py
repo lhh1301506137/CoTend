@@ -324,8 +324,8 @@ def validate_contract() -> dict[str, Any]:
     }:
         raise PluginPackageError("Plugin package build boundary drifted")
     if authority != {
-        "candidate_identity_only": True,
-        "final_plugin_identity_confirmed": False,
+        "candidate_identity_only": False,
+        "final_plugin_identity_confirmed": True,
         "release_or_publish_authorized": False,
     }:
         raise PluginPackageError("Plugin package authority boundary drifted")
