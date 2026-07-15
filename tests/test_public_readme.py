@@ -21,8 +21,11 @@ SUBMISSION_PATH = (
 )
 EXPECTED_COMMANDS = {
     "python scripts/build_codex_plugin.py --output dist/cotend --json",
-    "python scripts/verify_codex_plugin_package.py",
+    "python scripts/verify_codex_plugin_package.py --repository-only",
     "python scripts/verify_plugin_submission_materials.py",
+    "python scripts/prepare_reviewer_fixtures.py",
+    "python scripts/build_release_archive.py --check-tag v0.1.0-rc.1",
+    "python scripts/verify_repository_maturity.py",
     "python -m unittest discover -s tests",
     "python scripts/check_repository.py",
     "python scripts/verify_production_plugin_lifecycle.py",

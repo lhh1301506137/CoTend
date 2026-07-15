@@ -16,6 +16,13 @@
     "private_network_required": false,
     "fixture_policy": "Use a disposable local Git repository containing only the files described by each case."
   },
+  "fixture_kit": {
+    "file": "packaging/codex-plugin/submission-materials/reviewer-fixtures.json",
+    "status": "repository_fixture_kit_ready_model_execution_not_run",
+    "materializer": "scripts/prepare_reviewer_fixtures.py",
+    "case_count": 8,
+    "preflight_count": 5
+  },
   "positive_cases": [
     {
       "id": "P01",

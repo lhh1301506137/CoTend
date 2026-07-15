@@ -88,6 +88,10 @@ class PluginSubmissionMaterialTests(unittest.TestCase):
                 + self.reviewer_tests["negative_cases"]
             )
         )
+        self.assertEqual(
+            self.reviewer_tests["fixture_kit"], submission.EXPECTED_FIXTURE_KIT
+        )
+        self.assertTrue(submission.REVIEWER_FIXTURES_PATH.is_file())
 
     def test_reviewer_fixtures_are_public_and_self_contained(self) -> None:
         context = self.reviewer_tests["reviewer_context"]

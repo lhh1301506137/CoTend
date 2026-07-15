@@ -76,6 +76,14 @@ def parse_args() -> argparse.Namespace:
         description="Verify the isolated CoTend Codex Plugin production candidate."
     )
     parser.add_argument("--evidence", type=Path, default=DEFAULT_EVIDENCE)
+    parser.add_argument(
+        "--repository-only",
+        action="store_true",
+        help=(
+            "Run repository-owned package checks without requiring the Codex-bundled "
+            "Plugin Creator validator."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -105,8 +113,11 @@ def main() -> int:
         print("CODEX_PLUGIN_PACKAGE_NONDETERMINISTIC", file=sys.stderr)
         return 2
 
-    validator = plugin_creator_script("validate_plugin.py")
-    official = package.run_official_validator(first, validator)
+    if args.repository_only:
+        official = {"status": "not_run_repository_only"}
+    else:
+        validator = plugin_creator_script("validate_plugin.py")
+        official = package.run_official_validator(first, validator)
     source_after = source_state()
     if source_before != source_after:
         print("CODEX_PLUGIN_PACKAGE_SOURCE_CHANGED", file=sys.stderr)

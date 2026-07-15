@@ -114,3 +114,7 @@ REPOSITORY_CHECK_OK public_candidates=166 capabilities=19 behavior_specs=19
 - 没有安装 Plugin、修改真实 Desktop/Marketplace、release、publish 或 push。
 
 因此，本证据只关闭“仓库 submission material contract”缺口，不表示已经 ready for Portal submission，更不表示审核通过或公开上架。
+
+## 后续仓库成熟度扩展
+
+2026-07-15 增加了与同一 5+3 contract 逐项绑定的 `reviewer-fixtures.json` 和仓库内 materializer。它可生成 8 个一次性 Git 项目，并验证 5 个前置命令的预期结果，其中 3 个通过、2 个按设计失败。该扩展只证明 reviewer fixture 可重复准备；各 case 的 `execution_status` 仍为 `contract_only_not_run`，没有冒充模型执行或 OpenAI 外部 reviewer 结论。

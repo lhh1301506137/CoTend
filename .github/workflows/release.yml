@@ -1,0 +1,84 @@
+name: Create draft pre-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag
+        required: true
+        default: v0.1.0-rc.1
+        type: string
+      confirmation:
+        description: Type create-draft-release to authorize a draft only
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: draft-release-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RELEASE_TAG: ${{ inputs.tag }}
+      RELEASE_CONFIRMATION: ${{ inputs.confirmation }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Check out repository and tags
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Require explicit draft confirmation
+        shell: bash
+        run: |
+          if [[ "$RELEASE_CONFIRMATION" != "create-draft-release" ]]; then
+            echo "Confirmation must equal create-draft-release." >&2
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.13"
+
+      - name: Verify tag identity and remote existence
+        shell: bash
+        run: |
+          python scripts/build_release_archive.py --check-tag "$RELEASE_TAG"
+          git ls-remote --exit-code --tags origin "refs/tags/$RELEASE_TAG"
+          test "$(git rev-list -n 1 "$RELEASE_TAG")" = "$GITHUB_SHA"
+
+      - name: Run release gates
+        run: |
+          python -m unittest discover -s tests
+          python scripts/check_repository.py
+          python scripts/verify_codex_plugin_package.py --repository-only
+          python scripts/verify_plugin_submission_materials.py
+
+      - name: Refuse to replace an existing release
+        shell: bash
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "A release already exists for $RELEASE_TAG." >&2
+            exit 1
+          fi
+
+      - name: Create draft pre-release
+        shell: bash
+        run: |
+          gh release create "$RELEASE_TAG" \
+            dist/cotend-0.1.0-rc.1.zip \
+            dist/cotend-0.1.0-rc.1.zip.sha256 \
+            --verify-tag \
+            --draft \
+            --prerelease \
+            --latest=false \
+            --title "CoTend $RELEASE_TAG" \
+            --notes-file "docs/releases/$RELEASE_TAG.md"

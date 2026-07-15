@@ -1,4 +1,13 @@
 # Preserve byte identity for directly adopted third-party files on every platform.
+* text=auto
+/.gitattributes text eol=lf
+/.gitignore text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.png binary
 /README.md text eol=lf
 /skills/** text eol=lf
 /LICENSE text eol=lf
@@ -17,4 +26,6 @@
 /packaging/codex-plugin/package.lock.json text eol=lf
 /packaging/codex-plugin/submission-materials/submission.json text eol=lf
 /packaging/codex-plugin/submission-materials/reviewer-tests.json text eol=lf
+/packaging/codex-plugin/submission-materials/reviewer-fixtures.json text eol=lf
 /packaging/codex-plugin/submission-materials/prerequisites.json text eol=lf
+/.github/** text eol=lf

@@ -244,10 +244,13 @@ EXPECTED_REMOTE_GITHUB_MARKETPLACE_TESTS = {
 }
 EXPECTED_PLUGIN_SUBMISSION_FILES = {
     "docs/evidence/CODEX-PLUGIN-SUBMISSION-MATERIAL-CONTRACT.md",
+    "packaging/codex-plugin/submission-materials/reviewer-fixtures.json",
     "packaging/codex-plugin/submission-materials/submission.json",
     "packaging/codex-plugin/submission-materials/reviewer-tests.json",
+    "scripts/prepare_reviewer_fixtures.py",
     "scripts/verify_plugin_submission_materials.py",
     "tests/test_plugin_submission_materials.py",
+    "tests/test_reviewer_fixtures.py",
 }
 EXPECTED_PLUGIN_SUBMISSION_TESTS = {
     "test_valid_contract_binds_exact_production_candidate",
@@ -286,6 +289,61 @@ EXPECTED_PUBLIC_README_TESTS = {
     "test_readme_starter_prompts_match_submission_contract",
     "test_readme_relative_links_resolve",
     "test_readme_maintainer_commands_are_safe_and_real",
+}
+EXPECTED_GITHUB_MATURITY_FILES = {
+    ".github/CODEOWNERS",
+    ".github/dependabot.yml",
+    ".github/ISSUE_TEMPLATE/bug_report.yml",
+    ".github/ISSUE_TEMPLATE/config.yml",
+    ".github/ISSUE_TEMPLATE/feature_request.yml",
+    ".github/PULL_REQUEST_TEMPLATE.md",
+    ".github/workflows/ci.yml",
+    ".github/workflows/release.yml",
+    "CHANGELOG.md",
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+    "PRIVACY.md",
+    "SECURITY.md",
+    "SUPPORT.md",
+    "TERMS.md",
+    "docs/COMPATIBILITY.md",
+    "docs/EXAMPLE-WORKFLOW.md",
+    "docs/GITHUB-REPOSITORY-SETTINGS.md",
+    "docs/MAINTAINER-RELEASE.md",
+    "docs/TROUBLESHOOTING.md",
+    "docs/UPGRADING.md",
+    "docs/evidence/GITHUB-REPOSITORY-MATURITY.md",
+    "docs/releases/v0.1.0-rc.1.md",
+    "scripts/build_release_archive.py",
+    "scripts/verify_repository_maturity.py",
+    "tests/test_release_archive.py",
+    "tests/test_repository_maturity.py",
+}
+EXPECTED_GITHUB_MATURITY_TESTS = {
+    "test_all_relative_markdown_links_resolve",
+    "test_required_public_entry_points_are_present_and_linked",
+    "test_ci_is_cross_platform_and_read_only",
+    "test_release_workflow_is_manual_tag_bound_and_draft_only",
+    "test_release_workflow_rejects_automatic_or_publish_behavior",
+    "test_repository_settings_define_exact_metadata_and_public_url_candidates",
+    "test_static_maturity_contract_preserves_external_boundaries",
+}
+EXPECTED_RELEASE_ARCHIVE_TESTS = {
+    "test_release_metadata_matches_both_manifests_and_notes",
+    "test_two_release_archives_are_byte_deterministic",
+    "test_wrong_release_tag_is_rejected_before_build",
+    "test_archive_content_mutation_is_rejected",
+    "test_output_must_stay_under_dist",
+    "test_output_rejects_simulated_linked_dist_root",
+}
+EXPECTED_REVIEWER_FIXTURE_TESTS = {
+    "test_fixture_contract_matches_five_plus_three_reviewer_cases",
+    "test_materialized_fixtures_are_clean_git_repositories",
+    "test_preflight_results_preserve_pass_and_expected_failure_cases",
+    "test_existing_unowned_output_is_not_overwritten",
+    "test_path_escape_and_private_content_are_rejected",
+    "test_output_rejects_simulated_linked_generation_root",
+    "test_repeated_materialization_is_idempotent_for_working_files",
 }
 EXPECTED_DELIVERY_PRODUCT_FILES = {
     "delivery/codex-artifact.lock.json",
@@ -3261,6 +3319,115 @@ def public_repository_onboarding_errors(
     return errors
 
 
+def github_repository_maturity_errors(
+    evidence_text: str,
+    candidates: set[str],
+) -> list[str]:
+    errors: list[str] = []
+    missing = EXPECTED_GITHUB_MATURITY_FILES - candidates
+    if missing:
+        errors.append(f"GitHub maturity artifacts are missing: {sorted(missing)}")
+        return errors
+
+    test_contracts = (
+        (
+            "tests/test_repository_maturity.py",
+            EXPECTED_GITHUB_MATURITY_TESTS,
+            "GitHub maturity",
+        ),
+        (
+            "tests/test_release_archive.py",
+            EXPECTED_RELEASE_ARCHIVE_TESTS,
+            "release archive",
+        ),
+        (
+            "tests/test_reviewer_fixtures.py",
+            EXPECTED_REVIEWER_FIXTURE_TESTS,
+            "reviewer fixture",
+        ),
+    )
+    for path, expected, label in test_contracts:
+        actual = set(
+            re.findall(r"^\s+def (test_[a-z0-9_]+)\(", read(path), re.MULTILINE)
+        )
+        missing_tests = expected - actual
+        if missing_tests:
+            errors.append(f"{label} tests are missing: {sorted(missing_tests)}")
+
+    ci = read(".github/workflows/ci.yml")
+    for marker in (
+        "permissions:\n  contents: read",
+        "ubuntu-latest",
+        "windows-latest",
+        'python: "3.10"',
+        'python: "3.13"',
+        "python scripts/prepare_reviewer_fixtures.py",
+        "python scripts/verify_codex_plugin_package.py --repository-only",
+        "python scripts/build_release_archive.py --check-tag v0.1.0-rc.1",
+        "python scripts/verify_repository_maturity.py --no-build",
+        "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4",
+        "actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5",
+        "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4",
+    ):
+        if marker not in ci:
+            errors.append(f"CI maturity contract is missing: {marker}")
+    if "contents: write" in ci:
+        errors.append("CI workflow must not request write permission")
+
+    release_workflow = read(".github/workflows/release.yml")
+    trigger = release_workflow.split("permissions:", 1)[0]
+    for marker in (
+        "workflow_dispatch:",
+        "create-draft-release",
+        "git ls-remote --exit-code --tags origin",
+        "--verify-tag",
+        "--draft",
+        "--prerelease",
+        "--latest=false",
+    ):
+        if marker not in release_workflow:
+            errors.append(f"draft release workflow is missing: {marker}")
+    if re.search(r"^\s{2}(?:push|pull_request|schedule):", trigger, re.MULTILINE):
+        errors.append("draft release workflow must remain manual-only")
+    for forbidden in ("git push", "git tag ", "--draft=false", "gh release edit"):
+        if forbidden in release_workflow:
+            errors.append(f"draft release workflow can publish or create tags: {forbidden}")
+
+    fixture_contract = json.loads(
+        read("packaging/codex-plugin/submission-materials/reviewer-fixtures.json")
+    )
+    cases = fixture_contract.get("cases")
+    if (
+        fixture_contract.get("status")
+        != "repository_fixture_kit_ready_model_execution_not_run"
+        or not isinstance(cases, list)
+        or [case.get("id") for case in cases]
+        != ["P01", "P02", "P03", "P04", "P05", "N01", "N02", "N03"]
+    ):
+        errors.append("reviewer fixture maturity contract drifted")
+
+    for marker in (
+        "status: passed_repository_internal_github_maturity",
+        "ci_matrix: 3_jobs_windows_and_ubuntu_python_3_10_and_3_13",
+        "release_archive: deterministic_41_files_with_sha256",
+        "release_workflow: manual_existing_tag_confirmation_gated_draft_only",
+        "reviewer_fixtures: 8_cases_5_preflights_2_expected_failures_model_not_run",
+        "community_entry_points: complete",
+        "public_activation: not_run_requires_separate_authorization",
+    ):
+        if marker not in evidence_text:
+            errors.append(f"GitHub maturity evidence is missing: {marker}")
+
+    attributes = read(".gitattributes")
+    for path in (
+        "/packaging/codex-plugin/submission-materials/reviewer-fixtures.json text eol=lf",
+        "/.github/** text eol=lf",
+    ):
+        if path not in attributes:
+            errors.append(f"GitHub maturity LF contract is missing: {path}")
+    return errors
+
+
 def submission_prerequisite_packet_errors(
     evidence_text: str,
     candidates: set[str],
@@ -4067,6 +4234,19 @@ def main() -> int:
         errors.extend(
             public_repository_onboarding_errors(
                 read(public_onboarding_evidence_path),
+                candidates,
+            )
+        )
+
+    github_maturity_evidence_path = (
+        "docs/evidence/GITHUB-REPOSITORY-MATURITY.md"
+    )
+    if github_maturity_evidence_path not in candidates:
+        errors.append("GitHub repository maturity evidence is missing or ignored")
+    else:
+        errors.extend(
+            github_repository_maturity_errors(
+                read(github_maturity_evidence_path),
                 candidates,
             )
         )

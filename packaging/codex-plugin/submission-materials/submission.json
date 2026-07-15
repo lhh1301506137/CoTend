@@ -64,7 +64,9 @@
     "file": "packaging/codex-plugin/submission-materials/reviewer-tests.json",
     "positive_count": 5,
     "negative_count": 3,
-    "execution_status": "contract_only_not_run"
+    "execution_status": "contract_only_not_run",
+    "fixture_kit": "packaging/codex-plugin/submission-materials/reviewer-fixtures.json",
+    "fixture_kit_status": "repository_fixture_kit_ready_model_execution_not_run"
   },
   "availability": {
     "status": "not_selected",

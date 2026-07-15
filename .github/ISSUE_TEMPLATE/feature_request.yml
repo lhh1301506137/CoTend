@@ -1,0 +1,41 @@
+name: Feature request
+description: Propose a bounded CoTend workflow or product improvement
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the user situation and what currently fails or creates unnecessary work.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe observable behavior, not only an implementation choice.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example workflow
+      description: Use a sanitized example with no private project data.
+    validations:
+      required: true
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Risks and decision boundaries
+      description: Note possible false positives, token cost, destructive effects, or user decisions that must remain explicit.
+    validations:
+      required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: I checked existing issues and this request is not a duplicate.
+          required: true
+        - label: This request does not include secrets or private project content.
+          required: true

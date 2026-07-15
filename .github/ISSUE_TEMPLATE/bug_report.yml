@@ -1,0 +1,57 @@
+name: Bug report
+description: Report a reproducible CoTend failure or regression
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: Do not include secrets, private project data, credentials, or vulnerability details. Use SECURITY.md for security reports.
+  - type: dropdown
+    id: version
+    attributes:
+      label: CoTend version
+      options:
+        - GitHub Open Beta main branch
+        - v0.1.0-rc.1
+        - Other or unknown
+    validations:
+      required: true
+  - type: input
+    id: host
+    attributes:
+      label: Codex version and surface
+      description: Include the CLI or Desktop version and whether this happened in the app or CLI.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Operating system
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Give the smallest safe sequence that reproduces the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include sanitized output and remove private paths or content.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed secrets, personal data, private project content, and vulnerability details.
+          required: true

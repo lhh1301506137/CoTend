@@ -1,5 +1,8 @@
 # CoTend
 
+[![CI](https://github.com/lhh1301506137/CoTend/actions/workflows/ci.yml/badge.svg)](https://github.com/lhh1301506137/CoTend/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
 **Pre-release AI development governance framework for people who build software with AI.**
 
 > CoTend is available as a GitHub Open Beta for Codex. It is not yet available in the Public Plugin Directory and is not a stable release.
@@ -95,11 +98,11 @@ CoTend is currently a repository-verified pre-release project:
 | Source carrier | Seven Codex Skills are adopted in [`skills/`](skills/), which is also the repository-root Plugin contract path. |
 | Package candidate | `cotend@0.1.0-rc.1`, 41 deterministic files including four locked brand assets; initial submission identity and version are confirmed, the repository Logo is locked, and the package remains unpublished. |
 | Isolated lifecycle | Package add, install, discovery, coexistence, remove, recovery, and cleanup are verified in redirected disposable roots. |
-| GitHub Marketplace carrier | Real `lhh1301506137/CoTend` fetch, Git-backed refresh, clean isolated install, seven-Skill discovery, remove, recovery, and cleanup are verified at commit `cdae8a9`. |
+| GitHub Marketplace carrier | Real `lhh1301506137/CoTend` fetch, Git-backed refresh, clean isolated install, seven-Skill discovery, remove, recovery, and cleanup are verified against a recorded public commit. |
 | Submission materials | English listing, three starter prompts, five positive cases, three negative cases, and release-note structure exist as a repository draft. |
 | Public installation | GitHub Open Beta is available through the personal Marketplace commands above. The Plugin has not been submitted to or published in the Public Plugin Directory. |
 | External readiness | Repository Logo assets are ready, but Portal format is not yet verified. Publisher identity, public support and legal URLs, availability, and policy attestations remain unresolved. |
-| Reviewer execution | The five positive and three negative cases are contracts only; they have not been run by an external reviewer. |
+| Reviewer execution | The five positive and three negative cases have a deterministic disposable fixture kit; model behavior remains a reviewer contract and has not been run by an external directory reviewer. |
 | Desktop coverage | Basic picker visibility and new-task refresh have evidence; the complete production Desktop lifecycle is not yet verified. |
 
 The repository source tree and generated `dist/` package are development artifacts. Use the GitHub Marketplace commands instead of copying internal files.
@@ -116,8 +119,11 @@ These commands build and verify local, gitignored artifacts. They do not install
 
 ```powershell
 python scripts/build_codex_plugin.py --output dist/cotend --json
-python scripts/verify_codex_plugin_package.py
+python scripts/verify_codex_plugin_package.py --repository-only
 python scripts/verify_plugin_submission_materials.py
+python scripts/prepare_reviewer_fixtures.py
+python scripts/build_release_archive.py --check-tag v0.1.0-rc.1
+python scripts/verify_repository_maturity.py
 python -m unittest discover -s tests
 python scripts/check_repository.py
 python scripts/verify_production_plugin_lifecycle.py
@@ -125,7 +131,18 @@ python scripts/verify_github_marketplace_carrier.py
 python scripts/verify_remote_github_marketplace.py
 ```
 
-The final three lifecycle commands require the Codex CLI. They redirect runtime write roots into disposable fixtures, reject protected-user-state drift, and clean the isolated roots after the run. The remote verifier also requires network access and checks that the GitHub clone matches the current local HEAD. Run them without concurrent activity that intentionally changes Codex user-state metadata.
+The repository-only package mode is suitable for clean CI runners. On a Codex maintainer workstation, omit `--repository-only` to additionally run the Codex-bundled official Plugin Creator validator. The final three lifecycle commands require the Codex CLI. They redirect runtime write roots into disposable fixtures, reject protected-user-state drift, and clean the isolated roots after the run. The remote verifier also requires network access and checks that the GitHub clone matches the current local HEAD. Run them without concurrent activity that intentionally changes Codex user-state metadata.
+
+CI is configured to run the standard-library checks on Windows and Ubuntu with Python 3.10 and 3.13. Release assets are deterministic ZIP files with a SHA-256 sidecar. The manual release workflow can create only a draft pre-release from an existing approved tag; it cannot publish the draft.
+
+## Documentation
+
+- [Compatibility](docs/COMPATIBILITY.md)
+- [Upgrading](docs/UPGRADING.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Example workflow](docs/EXAMPLE-WORKFLOW.md)
+- [Maintainer release guide](docs/MAINTAINER-RELEASE.md)
+- [Changelog](CHANGELOG.md)
 
 ## Evidence and specifications
 
@@ -140,10 +157,19 @@ The final three lifecycle commands require the Codex CLI. They redirect runtime 
 - [Structured submission draft](packaging/codex-plugin/submission-materials/submission.json)
 - [Reviewer case contract](packaging/codex-plugin/submission-materials/reviewer-tests.json)
 
+## Community and policies
+
+- [Contributing](CONTRIBUTING.md)
+- [Support](SUPPORT.md)
+- [Security](SECURITY.md)
+- [Privacy](PRIVACY.md)
+- [Terms](TERMS.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+
 ## License
 
 CoTend-owned material is licensed under [Apache License 2.0](LICENSE). Bundled third-party material retains its own license and attribution; see [NOTICE](NOTICE), [Third-Party Notices](THIRD-PARTY-NOTICES.md), and [Third-Party Sources](THIRD-PARTY-SOURCES.json).
 
 ## Contributing during pre-release
 
-Keep changes scoped and evidence-backed. Do not weaken human decision boundaries, convert unexecuted cases into success claims, add secrets or private project data, or describe unverified Desktop or Public Directory coverage as complete. Changes to bundled third-party files must preserve their license and source records.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a change. Keep changes scoped and evidence-backed. Do not weaken human decision boundaries, convert unexecuted cases into success claims, add secrets or private project data, or describe unverified Desktop or Public Directory coverage as complete. Changes to bundled third-party files must preserve their license and source records.

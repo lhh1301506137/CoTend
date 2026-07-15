@@ -18,6 +18,7 @@ SUBMISSION_PATH = (
     ROOT / "packaging" / "codex-plugin" / "submission-materials" / "submission.json"
 )
 REVIEWER_TESTS_PATH = SUBMISSION_PATH.with_name("reviewer-tests.json")
+REVIEWER_FIXTURES_PATH = SUBMISSION_PATH.with_name("reviewer-fixtures.json")
 OFFICIAL_SUBMISSION_URL = "https://developers.openai.com/codex/submit-plugins"
 REPOSITORY_URL = "https://github.com/lhh1301506137/CoTend"
 EXPECTED_POSITIVE_IDS = [f"P{number:02d}" for number in range(1, 6)]
@@ -91,6 +92,13 @@ EXPECTED_REVIEW_CONTEXT = {
         "Use a disposable local Git repository containing only the files "
         "described by each case."
     ),
+}
+EXPECTED_FIXTURE_KIT = {
+    "file": REVIEWER_FIXTURES_PATH.relative_to(ROOT).as_posix(),
+    "status": "repository_fixture_kit_ready_model_execution_not_run",
+    "materializer": "scripts/prepare_reviewer_fixtures.py",
+    "case_count": 8,
+    "preflight_count": 5,
 }
 ALLOWED_PUBLIC_URLS = {OFFICIAL_SUBMISSION_URL, REPOSITORY_URL}
 PRIVATE_TEXT_MARKERS = (
@@ -287,6 +295,8 @@ def _validate_submission(
         "positive_count": 5,
         "negative_count": 3,
         "execution_status": "contract_only_not_run",
+        "fixture_kit": REVIEWER_FIXTURES_PATH.relative_to(ROOT).as_posix(),
+        "fixture_kit_status": "repository_fixture_kit_ready_model_execution_not_run",
     }:
         raise SubmissionMaterialError("reviewer test summary drifted")
     if submission["availability"] != {
@@ -410,6 +420,7 @@ def _validate_reviewer_tests(reviewer_tests: dict[str, Any]) -> None:
             "status",
             "package",
             "reviewer_context",
+            "fixture_kit",
             "positive_cases",
             "negative_cases",
         },
@@ -428,6 +439,10 @@ def _validate_reviewer_tests(reviewer_tests: dict[str, Any]) -> None:
         raise SubmissionMaterialError(
             "reviewer context must be public and self-contained"
         )
+    if reviewer_tests["fixture_kit"] != EXPECTED_FIXTURE_KIT:
+        raise SubmissionMaterialError("reviewer fixture kit binding drifted")
+    if not REVIEWER_FIXTURES_PATH.is_file():
+        raise SubmissionMaterialError("reviewer fixture kit is missing")
 
     positive = reviewer_tests["positive_cases"]
     negative = reviewer_tests["negative_cases"]

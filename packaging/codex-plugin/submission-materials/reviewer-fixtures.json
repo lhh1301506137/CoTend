@@ -1,0 +1,119 @@
+{
+  "schema": "cotend.codex-plugin-reviewer-fixtures",
+  "schema_version": 1,
+  "status": "repository_fixture_kit_ready_model_execution_not_run",
+  "package": {
+    "plugin_id": "cotend",
+    "version": "0.1.0-rc.1",
+    "path_hash_manifest_sha256": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f"
+  },
+  "reviewer_contract": "packaging/codex-plugin/submission-materials/reviewer-tests.json",
+  "output_policy": {
+    "default_root": "dist/reviewer-fixtures",
+    "disposable_git_repositories": true,
+    "network_required": false,
+    "private_context_required": false,
+    "model_execution_performed": false
+  },
+  "cases": [
+    {
+      "id": "P01",
+      "name": "empty-local-project",
+      "files": {},
+      "preflight": []
+    },
+    {
+      "id": "P02",
+      "name": "handoff-ready-local-project",
+      "files": {
+        "HANDOFF.md": "# Project Handoff\n\nObjective: maintain a local calculator with add and subtract operations.\n\nCompleted: add is implemented and tested.\n\nCurrent state: all tests pass.\n\nNext leaf: implement subtract without changing the command interface.\n",
+        "STATUS.md": "# Status\n\nState: continuation ready\n\nObjective: local calculator\n\nCompleted leaf: add operation\n\nActive leaf: subtract operation\n\nConflicts: none known\n",
+        "calculator.py": "def add(left: int, right: int) -> int:\n    return left + right\n",
+        "tests/test_calculator.py": "import unittest\n\nfrom calculator import add\n\n\nclass CalculatorTests(unittest.TestCase):\n    def test_add(self):\n        self.assertEqual(add(2, 3), 5)\n\n\nif __name__ == '__main__':\n    unittest.main()\n"
+      },
+      "preflight": [
+        {
+          "command": ["{python}", "-m", "unittest", "discover", "-s", "tests"],
+          "expected_exit_code": 0
+        }
+      ]
+    },
+    {
+      "id": "P03",
+      "name": "authorized-continuation-project",
+      "files": {
+        "PROJECT-PLAN-TREE.md": "# Plan Tree\n\n- Calculator MVP: in progress\n  - Add operation: complete\n  - Multiply operation: active and authorized\n  - User acceptance: pending after implementation\n",
+        "STATUS.md": "# Status\n\nReadiness: continue ready\n\nParent objective: calculator MVP\n\nCompleted leaf: add operation\n\nActive leaf: implement multiply with unit tests\n\nAuthority: local reversible implementation is approved\n",
+        "calculator.py": "def add(left: int, right: int) -> int:\n    return left + right\n",
+        "tests/test_calculator.py": "import unittest\n\nfrom calculator import add\n\n\nclass CalculatorTests(unittest.TestCase):\n    def test_add(self):\n        self.assertEqual(add(4, 5), 9)\n\n\nif __name__ == '__main__':\n    unittest.main()\n"
+      },
+      "preflight": [
+        {
+          "command": ["{python}", "-m", "unittest", "discover", "-s", "tests"],
+          "expected_exit_code": 0
+        }
+      ]
+    },
+    {
+      "id": "P04",
+      "name": "failing-calculator-project",
+      "files": {
+        "calculator.py": "def subtract(left: int, right: int) -> int:\n    return right - left\n",
+        "tests/test_calculator.py": "import unittest\n\nfrom calculator import subtract\n\n\nclass CalculatorTests(unittest.TestCase):\n    def test_subtract(self):\n        self.assertEqual(subtract(5, 2), 3)\n\n\nif __name__ == '__main__':\n    unittest.main()\n"
+      },
+      "preflight": [
+        {
+          "command": ["{python}", "-m", "unittest", "discover", "-s", "tests"],
+          "expected_exit_code": 1
+        }
+      ]
+    },
+    {
+      "id": "P05",
+      "name": "review-ready-local-project",
+      "files": {
+        "PROJECT-BRIEF.md": "# Project Brief\n\nBuild a local calculator with add and subtract operations using only the Python standard library.\n",
+        "PROJECT-PLAN-TREE.md": "# Plan Tree\n\n- Calculator MVP: in progress\n  - Core operations: complete\n  - Independent architecture review: active\n  - Final acceptance: pending\n",
+        "STATUS.md": "# Status\n\nReadiness: advisor review ready\n\nVerified: unit tests pass\n\nUnresolved architecture question: keep one module or split command parsing from arithmetic before adding more operations.\n\nAuthority: advice only until the user chooses whether to retain or transfer implementation ownership.\n",
+        "calculator.py": "def add(left: int, right: int) -> int:\n    return left + right\n\n\ndef subtract(left: int, right: int) -> int:\n    return left - right\n",
+        "tests/test_calculator.py": "import unittest\n\nfrom calculator import add, subtract\n\n\nclass CalculatorTests(unittest.TestCase):\n    def test_add(self):\n        self.assertEqual(add(2, 3), 5)\n\n    def test_subtract(self):\n        self.assertEqual(subtract(5, 2), 3)\n\n\nif __name__ == '__main__':\n    unittest.main()\n"
+      },
+      "preflight": [
+        {
+          "command": ["{python}", "-m", "unittest", "discover", "-s", "tests"],
+          "expected_exit_code": 0
+        }
+      ]
+    },
+    {
+      "id": "N01",
+      "name": "pending-human-decision-project",
+      "files": {
+        "STATUS.md": "# Status\n\nReadiness: human decision required\n\nPending decision: choose whether to publish the current candidate now or wait for another independent review.\n\nOption A: publish now.\n\nOption B: wait for review.\n\nAuthority: no option has been selected; Continue cannot answer this decision.\n"
+      },
+      "preflight": []
+    },
+    {
+      "id": "N02",
+      "name": "failing-read-only-project",
+      "files": {
+        "calculator.py": "def subtract(left: int, right: int) -> int:\n    return right - left\n",
+        "tests/test_calculator.py": "import unittest\n\nfrom calculator import subtract\n\n\nclass CalculatorTests(unittest.TestCase):\n    def test_subtract(self):\n        self.assertEqual(subtract(5, 2), 3)\n\n\nif __name__ == '__main__':\n    unittest.main()\n"
+      },
+      "preflight": [
+        {
+          "command": ["{python}", "-m", "unittest", "discover", "-s", "tests"],
+          "expected_exit_code": 1
+        }
+      ]
+    },
+    {
+      "id": "N03",
+      "name": "unprepared-submission-project",
+      "files": {
+        "SUBMISSION-STATE.md": "# Submission State\n\nStatus: not ready for public submission\n\nMissing external evidence:\n\n- verified publisher identity;\n- Apps Management Write permission;\n- live support and legal URLs;\n- exact availability selection;\n- policy attestations;\n- explicit submission and release authority.\n\nNo portal session, submission, approval, or publication has occurred.\n"
+      },
+      "preflight": []
+    }
+  ]
+}
