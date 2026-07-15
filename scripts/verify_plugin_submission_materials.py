@@ -19,7 +19,7 @@ SUBMISSION_PATH = (
 )
 REVIEWER_TESTS_PATH = SUBMISSION_PATH.with_name("reviewer-tests.json")
 REVIEWER_FIXTURES_PATH = SUBMISSION_PATH.with_name("reviewer-fixtures.json")
-OFFICIAL_SUBMISSION_URL = "https://developers.openai.com/codex/submit-plugins"
+OFFICIAL_SUBMISSION_URL = "https://learn.chatgpt.com/docs/submit-plugins"
 REPOSITORY_URL = "https://github.com/lhh1301506137/CoTend"
 EXPECTED_POSITIVE_IDS = [f"P{number:02d}" for number in range(1, 6)]
 EXPECTED_NEGATIVE_IDS = [f"N{number:02d}" for number in range(1, 4)]
@@ -234,7 +234,7 @@ def _validate_submission(
         raise SubmissionMaterialError("submission must remain a non-submitted v1 draft")
     if submission["official_requirements"] != {
         "source": OFFICIAL_SUBMISSION_URL,
-        "checked_on": "2026-07-14",
+        "checked_on": "2026-07-15",
         "submission_type": "skills_only",
     }:
         raise SubmissionMaterialError("official requirement anchor drifted")

@@ -3,7 +3,7 @@
   "schema_version": 1,
   "status": "prerequisite_resolution_required",
   "official_requirements": {
-    "source": "https://developers.openai.com/codex/submit-plugins",
+    "source": "https://learn.chatgpt.com/docs/submit-plugins",
     "checked_on": "2026-07-15",
     "scope": "pre_submission_decisions_and_external_evidence"
   },

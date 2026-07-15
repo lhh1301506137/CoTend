@@ -80,8 +80,8 @@ submission_reviewer_cases_executed: false
 | Repo Marketplace 位于 `$REPO_ROOT/.agents/plugins/marketplace.json`，Personal Marketplace 位于 `~/.agents/plugins/marketplace.json`。 | 两者适合开发或受控预览，但前置文件获取、路径配置和重启不适合作为公开小白主路径。 | [Marketplace metadata](https://learn.chatgpt.com/docs/build-plugins#marketplace-metadata)、[Install a local plugin manually](https://learn.chatgpt.com/docs/build-plugins#install-a-local-plugin-manually) |
 | Git Marketplace 可由 `codex plugin marketplace add` 添加、升级和删除。 | 可以作为愿意使用终端的技术预览渠道；不能冒充零终端安装。 | [Add a marketplace from the CLI](https://learn.chatgpt.com/docs/build-plugins#add-a-marketplace-from-the-cli) |
 | 本地 Plugin 可以从桌面端分享给同一 ChatGPT workspace 的成员，但不会因此公开。 | Workspace sharing 可做封闭测试，不是面向所有个人用户的公开分发。 | [Share a local plugin with your workspace](https://learn.chatgpt.com/docs/build-plugins#share-a-local-plugin-with-your-workspace) |
-| 公开提交经过 OpenAI 审核；审核通过后由开发者选择发布时间，最终进入 ChatGPT 与 Codex 共用的 Plugin Directory。 | 公开目录适合作为最终渠道，但审核结果和时间不能由 CoTend 预先承诺。 | [Public publishing flow](https://developers.openai.com/codex/submit-plugins#public-publishing-flow) |
-| skills-only 提交需要最终 Skill bundle；提交材料还包括 listing、身份、prompts、5 个正向和 3 个负向测试等。 | CoTend 现有 19 类行为、负向边界和证据体系可以复用为提交测试输入，但仍需按公开审核格式收束。 | [Prepare required materials](https://developers.openai.com/codex/submit-plugins#prepare-required-materials)、[Skills](https://developers.openai.com/codex/submit-plugins#skills)、[Testing](https://developers.openai.com/codex/submit-plugins#testing) |
+| 公开提交经过 OpenAI 审核；审核通过后由开发者选择发布时间，最终进入 ChatGPT 与 Codex 共用的 Plugin Directory。 | 公开目录适合作为最终渠道，但审核结果和时间不能由 CoTend 预先承诺。 | [Public publishing flow](https://learn.chatgpt.com/docs/submit-plugins#public-publishing-flow) |
+| skills-only 提交需要最终 Skill bundle；提交材料还包括 listing、身份、prompts、5 个正向和 3 个负向测试等。 | CoTend 现有 19 类行为、负向边界和证据体系可以复用为提交测试输入，但仍需按公开审核格式收束。 | [Prepare required materials](https://learn.chatgpt.com/docs/submit-plugins#prepare-required-materials)、[Skills](https://learn.chatgpt.com/docs/submit-plugins#skills)、[Testing](https://learn.chatgpt.com/docs/submit-plugins#testing) |
 
 ## 本机执行证据
 

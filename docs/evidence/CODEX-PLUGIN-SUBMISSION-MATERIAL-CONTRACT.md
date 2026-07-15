@@ -39,7 +39,7 @@ push: false
 
 ## 官方字段映射
 
-当前官方 [Submit plugins](https://developers.openai.com/codex/submit-plugins) 页面说明，skills-only Plugin 的提交材料包括公开 listing、最终 Skill bundle、starter prompts、地区、release notes 和政策声明；测试必须恰好为 5 个正向和 3 个负向。正向案例需要 prompt、预期 workflow behavior、result shape 与可复现 fixture；负向案例需要 scenario、safe behavior 和不应完成的理由。
+当前官方 [Submit plugins](https://learn.chatgpt.com/docs/submit-plugins) 页面说明，skills-only Plugin 的提交材料包括公开 listing、最终 Skill bundle、starter prompts、地区、release notes 和政策声明；测试必须恰好为 5 个正向和 3 个负向。正向案例需要 prompt、预期 workflow behavior、result shape 与可复现 fixture；负向案例需要 scenario、safe behavior 和不应完成的理由。
 
 仓库合同按该结构记录：
 

@@ -8,7 +8,7 @@ CoTend 已有一个绑定 `cotend@0.1.0-rc.1`、41 文件生产候选的 repo-on
 
 ## 官方要求锚点
 
-本决策包于 2026-07-15 依据 [OpenAI Submit plugins](https://developers.openai.com/codex/submit-plugins) 复核。官方流程要求提交者准备 listing、bundled skills、starter prompts、5 个正向与 3 个负向测试、国家或地区 availability 和政策声明；创建或提交 draft 需要 Apps Management Write 权限，公开提交还需要已验证的个人或企业开发者身份。Global 步骤要求只选择发布者、产品、支持流程和法律条款均已准备好的国家或地区；policy attestations 只能在 listing、skills、prompts、tests 与 availability 均准确后完成。审核通过后是否 publish 仍是开发者的独立选择。
+本决策包于 2026-07-15 依据当前官方 [OpenAI Submit plugins](https://learn.chatgpt.com/docs/submit-plugins) 页面复核。官方流程要求提交者准备 listing、bundled skills、starter prompts、5 个正向与 3 个负向测试、国家或地区 availability 和政策声明；创建或提交 draft 需要 Apps Management Write 权限，公开提交还需要已验证的个人或企业开发者身份。Global 步骤要求只选择发布者、产品、支持流程和法律条款均已准备好的国家或地区；policy attestations 只能在 listing、skills、prompts、tests 与 availability 均准确后完成。审核通过后是否 publish 仍是开发者的独立选择。CoTend 是 skills-only Plugin，因此不需要 MCP server、domain verification、authentication 或 reviewer demo credentials。
 
 仓库只能准备和验证仓库事实。身份、组织权限、公开 URL 的真实可访问性、Portal 表单中的政策声明和 OpenAI 审核结果必须来自用户、公开网络或 OpenAI Platform，不能由 AI 或测试生成。
 
@@ -53,7 +53,7 @@ Q01 已选择个人身份首发路线，但这不等于身份已经验证；`ver
 
 ## 已回答：Q03 Public Web Presence
 
-用户已明确选择方案 `1`：GitHub 优先承载。该结果只确定后续优先使用公开仓库、Issues 和公开仓库页面或 Pages 的准备路线；当前没有填写或验证 website/support/privacy/terms URL，没有创建 Pages 或修改 GitHub 设置，四个 blocker 继续保持 unresolved/null。
+用户已明确选择方案 `1`：GitHub 优先承载。GitHub 成熟度完成后，仓库主页、Issues、`SUPPORT.md`、`PRIVACY.md` 和 `TERMS.md` 均已公开，2026-07-15 的只读 HTTP probe 全部返回 200。当前推荐候选是仓库主页作为 website、`SUPPORT.md` 作为 support、`PRIVACY.md` 作为 privacy、`TERMS.md` 作为 terms。该结果仍只是可访问性证据：用户尚未确认这四个精确 URL，个人 publisher identity 尚未在 Platform 验证，故四个 blocker 继续保持 unresolved/null，`public_urls_selected=false`。
 
 ## 已回答：Q04 Production Logo
 

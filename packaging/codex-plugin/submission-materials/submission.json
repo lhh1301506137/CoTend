@@ -3,8 +3,8 @@
   "schema_version": 1,
   "status": "draft_not_submitted",
   "official_requirements": {
-    "source": "https://developers.openai.com/codex/submit-plugins",
-    "checked_on": "2026-07-14",
+    "source": "https://learn.chatgpt.com/docs/submit-plugins",
+    "checked_on": "2026-07-15",
     "submission_type": "skills_only"
   },
   "package": {
