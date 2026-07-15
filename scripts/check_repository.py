@@ -3368,9 +3368,9 @@ def github_repository_maturity_errors(
         "python scripts/verify_codex_plugin_package.py --repository-only",
         "python scripts/build_release_archive.py --check-tag v0.1.0-rc.1",
         "python scripts/verify_repository_maturity.py --no-build",
-        "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4",
-        "actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5",
-        "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4",
+        "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0",
+        "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0",
+        "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1",
     ):
         if marker not in ci:
             errors.append(f"CI maturity contract is missing: {marker}")
@@ -3389,6 +3389,8 @@ def github_repository_maturity_errors(
         "git ls-remote --exit-code --tags origin",
         "git cat-file -t",
         "git rev-parse HEAD",
+        "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0",
+        "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0",
         "--verify-tag",
         "--draft",
         "--prerelease",
