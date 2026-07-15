@@ -23,7 +23,11 @@ CoTend does not require a CoTend account, API key, backend, database, or MCP ser
 | Git | Required for repository and reviewer fixtures |
 | Codex CLI | Required only for isolated production and remote Marketplace lifecycle checks |
 
-Repository build, unit-test, package, submission-material, reviewer-fixture, and release-archive checks use the Python standard library. No package installation step is required for those checks.
+The delivered Plugin runtime has no third-party Python dependency. Repository YAML validation uses PyYAML at the exact version recorded in `requirements-ci.txt`; install that maintainer-only dependency before running the full repository checks:
+
+```text
+python -m pip install --disable-pip-version-check --requirement requirements-ci.txt
+```
 
 ## Version policy
 

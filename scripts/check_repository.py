@@ -303,6 +303,7 @@ EXPECTED_GITHUB_MATURITY_FILES = {
     "CODE_OF_CONDUCT.md",
     "CONTRIBUTING.md",
     "PRIVACY.md",
+    "requirements-ci.txt",
     "SECURITY.md",
     "SUPPORT.md",
     "TERMS.md",
@@ -323,6 +324,7 @@ EXPECTED_GITHUB_MATURITY_TESTS = {
     "test_all_relative_markdown_links_resolve",
     "test_required_public_entry_points_are_present_and_linked",
     "test_ci_is_cross_platform_and_read_only",
+    "test_ci_installs_exactly_pinned_yaml_dependency",
     "test_release_workflow_is_manual_tag_bound_and_draft_only",
     "test_release_workflow_rejects_automatic_or_publish_behavior",
     "test_repository_settings_define_exact_metadata_and_public_url_candidates",
@@ -3361,6 +3363,7 @@ def github_repository_maturity_errors(
         "windows-latest",
         'python: "3.10"',
         'python: "3.13"',
+        "python -m pip install --disable-pip-version-check --requirement requirements-ci.txt",
         "python scripts/prepare_reviewer_fixtures.py",
         "python scripts/verify_codex_plugin_package.py --repository-only",
         "python scripts/build_release_archive.py --check-tag v0.1.0-rc.1",
@@ -3373,6 +3376,8 @@ def github_repository_maturity_errors(
             errors.append(f"CI maturity contract is missing: {marker}")
     if "contents: write" in ci:
         errors.append("CI workflow must not request write permission")
+    if read("requirements-ci.txt").strip() != "PyYAML==6.0.3":
+        errors.append("CI dependency file must contain only the exact PyYAML==6.0.3 pin")
 
     release_workflow = read(".github/workflows/release.yml")
     trigger = release_workflow.split("permissions:", 1)[0]
@@ -3413,7 +3418,7 @@ def github_repository_maturity_errors(
         "release_workflow: manual_existing_tag_confirmation_gated_draft_only",
         "reviewer_fixtures: 8_cases_5_preflights_2_expected_failures_model_not_run",
         "community_entry_points: complete",
-        "public_activation: not_run_requires_separate_authorization",
+        "public_activation: read_live_state_from_github_commit_checks_settings_tags_and_releases",
     ):
         if marker not in evidence_text:
             errors.append(f"GitHub maturity evidence is missing: {marker}")

@@ -118,6 +118,7 @@ CoTend project records must not store secrets. Public, destructive, paid, or oth
 These commands build and verify local, gitignored artifacts. They do not install CoTend for the current user, write a Marketplace, open the submission Portal, or publish anything.
 
 ```powershell
+python -m pip install --disable-pip-version-check --requirement requirements-ci.txt
 python scripts/build_codex_plugin.py --output dist/cotend --json
 python scripts/verify_codex_plugin_package.py --repository-only
 python scripts/verify_plugin_submission_materials.py
@@ -133,7 +134,7 @@ python scripts/verify_remote_github_marketplace.py
 
 The repository-only package mode is suitable for clean CI runners. On a Codex maintainer workstation, omit `--repository-only` to additionally run the Codex-bundled official Plugin Creator validator. The final three lifecycle commands require the Codex CLI. They redirect runtime write roots into disposable fixtures, reject protected-user-state drift, and clean the isolated roots after the run. The remote verifier also requires network access and checks that the GitHub clone matches the current local HEAD. Run them without concurrent activity that intentionally changes Codex user-state metadata.
 
-CI is configured to run the standard-library checks on Windows and Ubuntu with Python 3.10 and 3.13. Release assets are deterministic ZIP files with a SHA-256 sidecar. The manual release workflow can create only a draft pre-release from an existing approved tag; it cannot publish the draft.
+CI is configured to run the repository checks on Windows and Ubuntu with Python 3.10 and 3.13. The delivered Plugin runtime has no third-party Python dependency; CI installs the exact maintainer-only PyYAML pin from `requirements-ci.txt` for YAML validation. Release assets are deterministic ZIP files with a SHA-256 sidecar. The manual release workflow can create only a draft pre-release from an existing approved tag; it cannot publish the draft.
 
 ## Documentation
 

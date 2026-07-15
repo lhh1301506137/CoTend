@@ -20,6 +20,7 @@ SUBMISSION_PATH = (
     ROOT / "packaging" / "codex-plugin" / "submission-materials" / "submission.json"
 )
 EXPECTED_COMMANDS = {
+    "python -m pip install --disable-pip-version-check --requirement requirements-ci.txt",
     "python scripts/build_codex_plugin.py --output dist/cotend --json",
     "python scripts/verify_codex_plugin_package.py --repository-only",
     "python scripts/verify_plugin_submission_materials.py",

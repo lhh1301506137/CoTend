@@ -7,7 +7,7 @@ import re
 import shutil
 import uuid
 from dataclasses import dataclass, replace
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -146,7 +146,7 @@ def _is_sha256(value: Any) -> bool:
 
 
 def _utc_now() -> str:
-    return datetime.now(UTC).isoformat()
+    return datetime.now(timezone.utc).isoformat()
 
 
 def _process_liveness(process_id: int) -> str:

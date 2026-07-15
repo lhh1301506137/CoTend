@@ -14,11 +14,12 @@ Small documentation corrections and focused test fixes can go directly to a pull
 
 ## Development setup
 
-Repository checks use Python 3.10 or newer and the standard library. Git is required for lifecycle fixtures. The Codex CLI is only required for the isolated lifecycle commands documented in the README.
+Repository checks use Python 3.10 or newer. The delivered Plugin runtime uses only the Python standard library; YAML-backed maintainer checks use the single version-pinned dependency in `requirements-ci.txt`. Git is required for lifecycle fixtures. The Codex CLI is only required for the isolated lifecycle commands documented in the README.
 
 Run the repository-owned checks from the repository root:
 
 ```text
+python -m pip install --disable-pip-version-check --requirement requirements-ci.txt
 python -m compileall -q scripts src tests
 python -m unittest discover -s tests
 python scripts/check_repository.py

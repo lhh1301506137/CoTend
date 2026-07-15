@@ -1206,7 +1206,7 @@ class DeliveryLifecycleTests(unittest.TestCase):
         unexpected = second.plan("recover")
         self.assertFalse(unexpected["allowed"])
         self.assertIn(
-            extra.relative_to(second_project).as_posix(),
+            extra.relative_to(second_project.resolve(strict=False)).as_posix(),
             unexpected["recovery"]["unexpected_owned_paths"],
         )
         self.assertEqual(extra.read_text(encoding="utf-8"), "preserve me\n")

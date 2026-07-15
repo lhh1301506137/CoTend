@@ -24,6 +24,21 @@ class RepositoryMaturityTests(unittest.TestCase):
         self.assertEqual(result["operating_systems"], 2)
         self.assertEqual(result["python_versions"], 2)
         self.assertEqual(result["matrix_jobs"], 3)
+        self.assertEqual(result["pinned_ci_dependencies"], 1)
+
+    def test_ci_installs_exactly_pinned_yaml_dependency(self) -> None:
+        original = maturity.CI_PATH.read_text(encoding="utf-8")
+        install = (
+            "python -m pip install --disable-pip-version-check "
+            "--requirement requirements-ci.txt"
+        )
+        with self.assertRaises(maturity.RepositoryMaturityError):
+            maturity.validate_ci_workflow(original.replace(install, ""))
+        with self.assertRaises(maturity.RepositoryMaturityError):
+            maturity.validate_ci_workflow(
+                original,
+                requirements_text="PyYAML>=6.0\n",
+            )
 
     def test_release_workflow_is_manual_tag_bound_and_draft_only(self) -> None:
         result = maturity.validate_release_workflow()
@@ -57,12 +72,14 @@ class RepositoryMaturityTests(unittest.TestCase):
         result = maturity.validate_repository_maturity(build_artifacts=False)
         self.assertEqual(
             result["status"],
-            "repository_internal_maturity_ready_public_activation_pending",
+            "repository_internal_maturity_ready_external_state_not_checked",
         )
-        self.assertFalse(result["public_push_performed"])
-        self.assertFalse(result["github_settings_applied"])
-        self.assertFalse(result["tag_created"])
-        self.assertFalse(result["release_created"])
+        self.assertFalse(result["external_state_checked"])
+        self.assertEqual(result["external_state_source"], "GitHub")
+        self.assertIsNone(result["public_push_performed"])
+        self.assertIsNone(result["github_settings_applied"])
+        self.assertIsNone(result["tag_created"])
+        self.assertIsNone(result["release_created"])
         self.assertFalse(result["reviewer_fixtures"]["model_execution_performed"])
 
 

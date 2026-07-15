@@ -21,6 +21,7 @@ import verify_plugin_submission_materials as submission  # noqa: E402
 
 
 CI_PATH = ROOT / ".github" / "workflows" / "ci.yml"
+CI_REQUIREMENTS_PATH = ROOT / "requirements-ci.txt"
 RELEASE_WORKFLOW_PATH = ROOT / ".github" / "workflows" / "release.yml"
 SETTINGS_PATH = ROOT / "docs" / "GITHUB-REPOSITORY-SETTINGS.md"
 EXPECTED_FILES = {
@@ -36,6 +37,7 @@ EXPECTED_FILES = {
     "CODE_OF_CONDUCT.md",
     "CONTRIBUTING.md",
     "PRIVACY.md",
+    "requirements-ci.txt",
     "SECURITY.md",
     "SUPPORT.md",
     "TERMS.md",
@@ -87,9 +89,14 @@ def _require_markers(text: str, markers: tuple[str, ...], label: str) -> None:
         raise RepositoryMaturityError(f"{label} is missing markers: {missing}")
 
 
-def validate_ci_workflow(text: str | None = None) -> dict[str, Any]:
+def validate_ci_workflow(
+    text: str | None = None,
+    requirements_text: str | None = None,
+) -> dict[str, Any]:
     if text is None:
         text = CI_PATH.read_text(encoding="utf-8")
+    if requirements_text is None:
+        requirements_text = CI_REQUIREMENTS_PATH.read_text(encoding="utf-8")
     _require_markers(
         text,
         (
@@ -101,6 +108,7 @@ def validate_ci_workflow(text: str | None = None) -> dict[str, Any]:
             "windows-latest",
             'python: "3.10"',
             'python: "3.13"',
+            "python -m pip install --disable-pip-version-check --requirement requirements-ci.txt",
             "python -m unittest discover -s tests",
             "python scripts/check_repository.py",
             "python scripts/verify_codex_plugin_package.py --repository-only",
@@ -118,7 +126,21 @@ def validate_ci_workflow(text: str | None = None) -> dict[str, Any]:
         raise RepositoryMaturityError("CI workflow must remain read-only")
     if re.search(r"uses:\s+[^\s]+@v\d+\s*$", text, re.MULTILINE):
         raise RepositoryMaturityError("CI actions must be pinned to full commits")
-    return {"operating_systems": 2, "python_versions": 2, "matrix_jobs": 3}
+    requirements = [
+        line.strip()
+        for line in requirements_text.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    if requirements != ["PyYAML==6.0.3"]:
+        raise RepositoryMaturityError(
+            "CI dependencies must contain only the exact PyYAML==6.0.3 pin"
+        )
+    return {
+        "operating_systems": 2,
+        "python_versions": 2,
+        "matrix_jobs": 3,
+        "pinned_ci_dependencies": 1,
+    }
 
 
 def validate_release_workflow(text: str | None = None) -> dict[str, Any]:
@@ -285,7 +307,7 @@ def validate_repository_maturity(*, build_artifacts: bool = False) -> dict[str, 
         fixture_build = fixtures.prepare_fixtures()
         build_result = release.build_release_archive(tag=release.expected_tag())
     return {
-        "status": "repository_internal_maturity_ready_public_activation_pending",
+        "status": "repository_internal_maturity_ready_external_state_not_checked",
         "candidate": f"{package.PLUGIN_NAME}@{package.PLUGIN_VERSION}",
         "tag": release_result["tag"],
         "entry_points": entries,
@@ -302,10 +324,12 @@ def validate_repository_maturity(*, build_artifacts: bool = False) -> dict[str, 
         "artifacts_built": build_artifacts,
         "archive_sha256": None if build_result is None else build_result["archive_sha256"],
         "fixtures_materialized": fixture_build is not None,
-        "public_push_performed": False,
-        "github_settings_applied": False,
-        "tag_created": False,
-        "release_created": False,
+        "external_state_checked": False,
+        "external_state_source": "GitHub",
+        "public_push_performed": None,
+        "github_settings_applied": None,
+        "tag_created": None,
+        "release_created": None,
     }
 
 
@@ -345,7 +369,7 @@ def main() -> int:
             f"status={result['status']} candidate={result['candidate']} "
             f"workflows=2 community={result['entry_points']['community_policies']} "
             f"reviewer_cases={result['reviewer_fixtures']['cases']} "
-            f"tag={result['tag']} public_activation=pending"
+            f"tag={result['tag']} external_state=not_checked"
         )
     return 0
 

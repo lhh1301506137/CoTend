@@ -83,11 +83,17 @@ class ProductionUserResolverTests(unittest.TestCase):
 
     def test_resolves_official_roots_and_home_owned_state(self) -> None:
         layout = self.layout()
-        self.assertEqual(layout.canonical_root, self.home / ".agents" / "skills")
-        self.assertEqual(layout.compatibility_root, self.codex_home / "skills")
+        self.assertEqual(
+            layout.canonical_root,
+            (self.home / ".agents" / "skills").resolve(strict=False),
+        )
+        self.assertEqual(
+            layout.compatibility_root,
+            (self.codex_home / "skills").resolve(strict=False),
+        )
         self.assertEqual(
             layout.state_root,
-            self.home / ".agents" / ".cotend-delivery",
+            (self.home / ".agents" / ".cotend-delivery").resolve(strict=False),
         )
         self.assertFalse(layout.state_root.is_relative_to(self.codex_home))
 
@@ -122,7 +128,7 @@ class ProductionUserResolverTests(unittest.TestCase):
         selected = self.isolation / "environment-codex-home"
         with mock.patch.dict(os.environ, {"CODEX_HOME": str(selected)}):
             layout = resolve_production_user_layout(home=self.home)
-        self.assertEqual(layout.codex_home, selected)
+        self.assertEqual(layout.codex_home, selected.resolve(strict=False))
 
     def test_relative_empty_and_overlapping_roots_are_rejected(self) -> None:
         with self.assertRaisesRegex(DeliveryError, "absolute path"):
