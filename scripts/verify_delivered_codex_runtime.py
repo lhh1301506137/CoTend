@@ -49,7 +49,7 @@ def remove_fixture_tree(path: Path) -> None:
         os.chmod(failed_path, stat.S_IWRITE)
         function(failed_path)
 
-    shutil.rmtree(target, onexc=make_writable_and_retry)
+    shutil.rmtree(target, onerror=make_writable_and_retry)
 
 
 def assert_snapshot_equal(

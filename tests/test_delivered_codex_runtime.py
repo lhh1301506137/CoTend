@@ -5,10 +5,11 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
-for import_root in (ROOT / "src", ROOT / "scripts"):
+for import_root in (ROOT / "scripts", ROOT / "src"):
     if str(import_root) not in sys.path:
         sys.path.insert(0, str(import_root))
 
@@ -27,6 +28,13 @@ class DeliveredCodexRuntimeTests(unittest.TestCase):
     def tearDown(self) -> None:
         if self.fixture.exists():
             bridge.remove_fixture_tree(self.fixture)
+
+    def test_fixture_cleanup_uses_python_310_compatible_callback(self) -> None:
+        with mock.patch.object(bridge.shutil, "rmtree") as rmtree:
+            bridge.remove_fixture_tree(self.fixture)
+        rmtree.assert_called_once()
+        self.assertIn("onerror", rmtree.call_args.kwargs)
+        self.assertNotIn("onexc", rmtree.call_args.kwargs)
 
     def test_unrelated_static_skill_requires_explicit_tolerance(self) -> None:
         carrier.prepare_fixture(self.fixture)

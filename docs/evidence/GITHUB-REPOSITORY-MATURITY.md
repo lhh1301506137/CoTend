@@ -11,12 +11,14 @@ release_workflow: manual_existing_tag_confirmation_gated_draft_only
 reviewer_fixtures: 8_cases_5_preflights_2_expected_failures_model_not_run
 community_entry_points: complete
 full_unit_tests: 188_passed_before_initial_public_ci
-repair_candidate_full_unit_tests: 189_passed_local
+repair_candidate_full_unit_tests: 190_passed_local
 package_verifier_tests: 8_passed_in_repository_only_and_official_local_modes
 repository_check: passed_200_public_candidates_19_capabilities_19_specs
 release_archive_sha256: af277084e947d914c42855b0c8023b730c52a249c32c5a0060f3e5d111c108eb
 first_public_ci_run: failed_and_stopped_before_tag_or_release
 first_public_ci_url: https://github.com/lhh1301506137/CoTend/actions/runs/29378740360
+second_public_ci_run: python_3_13_jobs_passed_python_3_10_failed_and_stopped
+second_public_ci_url: https://github.com/lhh1301506137/CoTend/actions/runs/29379472760
 public_activation: read_live_state_from_github_commit_checks_settings_tags_and_releases
 ```
 
@@ -26,7 +28,7 @@ public_activation: read_live_state_from_github_commit_checks_settings_tags_and_r
 
 ## 已补齐内容
 
-- `CI` workflow 已配置为在 pull request、`main` push 和手动触发时运行，权限为只读；矩阵覆盖 Ubuntu/Python 3.10、Ubuntu/Python 3.13 和 Windows/Python 3.13。所有 GitHub 官方 Action 固定到完整提交，Dependabot 负责提出可审查的更新 PR。首次真实公开运行按门禁在单元测试失败后停止，暴露出未声明 PyYAML 检查依赖、`datetime.UTC` 的 Python 3.10 不兼容和 Windows 8.3/长路径别名断言三个缺口；修复提交显式安装唯一固定版本的维护者依赖，并为另外两项增加跨版本、跨路径兼容修正。当前提交是否通过由 GitHub commit checks 提供实时外部证据，本静态文档不复制易漂移的通过状态。
+- `CI` workflow 已配置为在 pull request、`main` push 和手动触发时运行，权限为只读；矩阵覆盖 Ubuntu/Python 3.10、Ubuntu/Python 3.13 和 Windows/Python 3.13。所有 GitHub 官方 Action 固定到完整提交，Dependabot 负责提出可审查的更新 PR。首次真实公开运行按门禁在单元测试失败后停止，暴露出未声明 PyYAML 检查依赖、`datetime.UTC` 的 Python 3.10 不兼容和 Windows 8.3/长路径别名断言三个缺口；修复提交显式安装唯一固定版本的维护者依赖，并为另外两项增加跨版本、跨路径兼容修正。第二次运行的两个 Python 3.13 job 全部通过，Python 3.10 又暴露出 `shutil.rmtree(onexc=...)` 的 3.12+ 参数依赖；该处已统一为 3.10-3.13 均支持的 `onerror`，并增加独立运行与参数回归测试。当前提交是否通过由 GitHub commit checks 提供实时外部证据，本静态文档不复制易漂移的通过状态。
 - 发布构建器从 41 文件锁定候选生成固定顺序、固定时间戳、固定权限和不压缩的确定性 ZIP，并生成 SHA-256 sidecar。版本、根 manifest、包 manifest、Changelog、Release Notes 和 tag 必须一致。
 - Release workflow 只能手动触发，只接受已存在且指向当前提交的 tag，需要输入精确确认短语，只创建 draft pre-release，不能 publish，也拒绝覆盖已有 Release。
 - 贡献指南、行为规范、安全政策、支持说明、隐私政策、使用条款、Issue Forms、PR 模板和 CODEOWNERS 已形成公开入口。
@@ -54,4 +56,4 @@ python scripts/build_release_archive.py --check-tag v0.1.0-rc.1
 python scripts/verify_repository_maturity.py
 ```
 
-修复前本地执行结果为 188 项完整单元测试通过；修复候选新增一项 CI pin 负向测试后，189 项完整单元测试通过。package verifier 的 8 项聚焦测试在 clean-runner `--repository-only` 和本机官方 Plugin validator 两种模式分别通过，前者明确报告官方 validator 未运行；修复提交加入唯一固定的维护者依赖文件后，仓库检查为 200 个公开候选、19 项能力和 19 份行为规范；5+3 夹具准备通过；41 文件 Release ZIP 的 SHA-256 为 `af277084e947d914c42855b0c8023b730c52a249c32c5a0060f3e5d111c108eb`。生成物仅位于被忽略的 `dist/` 与本地 provenance 根，不进入公开源代码。修复提交的最终三平台结论以 GitHub commit checks 为准。
+修复前本地执行结果为 188 项完整单元测试通过；修复候选加入 CI pin 与 Python 3.10 清理兼容回归后，190 项完整单元测试通过。package verifier 的 8 项聚焦测试在 clean-runner `--repository-only` 和本机官方 Plugin validator 两种模式分别通过，前者明确报告官方 validator 未运行；修复提交加入唯一固定的维护者依赖文件后，仓库检查为 200 个公开候选、19 项能力和 19 份行为规范；5+3 夹具准备通过；41 文件 Release ZIP 的 SHA-256 为 `af277084e947d914c42855b0c8023b730c52a249c32c5a0060f3e5d111c108eb`。生成物仅位于被忽略的 `dist/` 与本地 provenance 根，不进入公开源代码。修复提交的最终三平台结论以 GitHub commit checks 为准。
