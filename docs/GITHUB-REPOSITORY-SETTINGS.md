@@ -17,7 +17,7 @@ This file is the reviewable source for GitHub settings that cannot be enforced b
 
 ## Branch and workflow protection
 
-For `main`, require the `CI` workflow after its first successful public run. Keep force pushes and branch deletion disabled. A solo pre-release maintainer may continue direct commits, but release tags and published release assets must not be moved or replaced.
+After the first successful public CI run, enable basic protection for `main` that rejects force pushes and branch deletion while still allowing the current solo maintainer to make normal fast-forward pushes. Do not require pull requests or status checks until the project adopts a pull-request workflow; at that point, make the three CI jobs required before merge. Release tags and published release assets must not be moved or replaced.
 
 Workflow permissions should default to read-only. The draft-release workflow is the only repository workflow that requests `contents: write`, and it is manual, tag-bound, confirmation-gated, draft-only, and unable to publish.
 
