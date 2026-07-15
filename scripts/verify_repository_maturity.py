@@ -152,7 +152,11 @@ def validate_release_workflow(text: str | None = None) -> dict[str, Any]:
             "workflow_dispatch:",
             "permissions:\n  contents: write",
             "create-draft-release",
+            "ref: ${{ inputs.tag }}",
+            "python -m pip install --disable-pip-version-check --requirement requirements-ci.txt",
             "git ls-remote --exit-code --tags origin",
+            "git cat-file -t",
+            "git rev-parse HEAD",
             "--verify-tag",
             "--draft",
             "--prerelease",
@@ -174,6 +178,9 @@ def validate_release_workflow(text: str | None = None) -> dict[str, Any]:
     return {
         "manual_only": True,
         "existing_tag_required": True,
+        "annotated_tag_required": True,
+        "tag_checkout": True,
+        "pinned_release_dependencies_installed": True,
         "draft_only": True,
         "publish_supported": False,
     }

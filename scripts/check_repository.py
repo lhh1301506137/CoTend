@@ -3384,7 +3384,11 @@ def github_repository_maturity_errors(
     for marker in (
         "workflow_dispatch:",
         "create-draft-release",
+        "ref: ${{ inputs.tag }}",
+        "python -m pip install --disable-pip-version-check --requirement requirements-ci.txt",
         "git ls-remote --exit-code --tags origin",
+        "git cat-file -t",
+        "git rev-parse HEAD",
         "--verify-tag",
         "--draft",
         "--prerelease",

@@ -29,7 +29,7 @@ Review `git status`, `git diff --check`, the full diff, and the candidate archiv
 
 ## 3. Create and push a tag
 
-Create an annotated tag only after the exact commit, tag name, and public destination have been approved. Push the commit and tag as separately visible public actions. The release workflow refuses an absent tag and requires the tag to point to the workflow commit.
+Create an annotated tag only after the exact commit, tag name, and public destination have been approved. Push the commit and tag as separately visible public actions. The latest release workflow checks out the exact input tag, refuses an absent or lightweight tag, and requires the checked-out `HEAD` to equal the tag's peeled commit. This lets maintainers repair release automation without moving an already public candidate tag while still building only the immutable tagged source.
 
 ## 4. Create a draft pre-release
 

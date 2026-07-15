@@ -19,6 +19,8 @@ first_public_ci_run: failed_and_stopped_before_tag_or_release
 first_public_ci_url: https://github.com/lhh1301506137/CoTend/actions/runs/29378740360
 second_public_ci_run: python_3_13_jobs_passed_python_3_10_failed_and_stopped
 second_public_ci_url: https://github.com/lhh1301506137/CoTend/actions/runs/29379472760
+first_draft_workflow_run: failed_missing_pinned_dependency_and_created_no_release
+first_draft_workflow_url: https://github.com/lhh1301506137/CoTend/actions/runs/29379983053
 public_activation: read_live_state_from_github_commit_checks_settings_tags_and_releases
 ```
 
@@ -30,7 +32,7 @@ public_activation: read_live_state_from_github_commit_checks_settings_tags_and_r
 
 - `CI` workflow 已配置为在 pull request、`main` push 和手动触发时运行，权限为只读；矩阵覆盖 Ubuntu/Python 3.10、Ubuntu/Python 3.13 和 Windows/Python 3.13。所有 GitHub 官方 Action 固定到完整提交，Dependabot 负责提出可审查的更新 PR。首次真实公开运行按门禁在单元测试失败后停止，暴露出未声明 PyYAML 检查依赖、`datetime.UTC` 的 Python 3.10 不兼容和 Windows 8.3/长路径别名断言三个缺口；修复提交显式安装唯一固定版本的维护者依赖，并为另外两项增加跨版本、跨路径兼容修正。第二次运行的两个 Python 3.13 job 全部通过，Python 3.10 又暴露出 `shutil.rmtree(onexc=...)` 的 3.12+ 参数依赖；该处已统一为 3.10-3.13 均支持的 `onerror`，并增加独立运行与参数回归测试。当前提交是否通过由 GitHub commit checks 提供实时外部证据，本静态文档不复制易漂移的通过状态。
 - 发布构建器从 41 文件锁定候选生成固定顺序、固定时间戳、固定权限和不压缩的确定性 ZIP，并生成 SHA-256 sidecar。版本、根 manifest、包 manifest、Changelog、Release Notes 和 tag 必须一致。
-- Release workflow 只能手动触发，只接受已存在且指向当前提交的 tag，需要输入精确确认短语，只创建 draft pre-release，不能 publish，也拒绝覆盖已有 Release。
+- Release workflow 只能手动触发，需要输入精确确认短语；最新版 workflow 会 checkout 输入的现有 annotated tag，要求 checkout `HEAD` 等于 tag peel，并从该不可变源码构建。它只创建 draft pre-release，不能 publish，也拒绝覆盖已有 Release。首次 draft 运行因未安装固定维护依赖而在 release gates 停止且未创建 Release；该依赖步骤现已与 CI 统一，修复 workflow 不需要移动公开 tag。
 - 贡献指南、行为规范、安全政策、支持说明、隐私政策、使用条款、Issue Forms、PR 模板和 CODEOWNERS 已形成公开入口。
 - 兼容矩阵、升级与回退、排障、示例工作流、维护者发布手册、Changelog 和 GitHub 设置基线已形成版本化文档。
 - 5 个正向和 3 个负向官方审查案例均绑定到可物化的临时 Git 项目；5 个前置检查中 3 个预期通过、2 个预期失败。该结果只证明夹具准备正确，不冒充模型执行或外部 reviewer 结论。

@@ -34,6 +34,7 @@ jobs:
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag }}
 
       - name: Require explicit draft confirmation
         shell: bash
@@ -48,12 +49,16 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Install pinned release dependencies
+        run: python -m pip install --disable-pip-version-check --requirement requirements-ci.txt
+
       - name: Verify tag identity and remote existence
         shell: bash
         run: |
           python scripts/build_release_archive.py --check-tag "$RELEASE_TAG"
           git ls-remote --exit-code --tags origin "refs/tags/$RELEASE_TAG"
-          test "$(git rev-list -n 1 "$RELEASE_TAG")" = "$GITHUB_SHA"
+          test "$(git cat-file -t "$RELEASE_TAG")" = "tag"
+          test "$(git rev-parse HEAD)" = "$(git rev-list -n 1 "$RELEASE_TAG")"
 
       - name: Run release gates
         run: |

@@ -44,6 +44,9 @@ class RepositoryMaturityTests(unittest.TestCase):
         result = maturity.validate_release_workflow()
         self.assertTrue(result["manual_only"])
         self.assertTrue(result["existing_tag_required"])
+        self.assertTrue(result["annotated_tag_required"])
+        self.assertTrue(result["tag_checkout"])
+        self.assertTrue(result["pinned_release_dependencies_installed"])
         self.assertTrue(result["draft_only"])
         self.assertFalse(result["publish_supported"])
 
@@ -52,6 +55,17 @@ class RepositoryMaturityTests(unittest.TestCase):
         automatic = original.replace("  workflow_dispatch:", "  push:\n  workflow_dispatch:")
         with self.assertRaises(maturity.RepositoryMaturityError):
             maturity.validate_release_workflow(automatic)
+
+        without_tag_checkout = original.replace("          ref: ${{ inputs.tag }}\n", "")
+        with self.assertRaises(maturity.RepositoryMaturityError):
+            maturity.validate_release_workflow(without_tag_checkout)
+
+        install = (
+            "python -m pip install --disable-pip-version-check "
+            "--requirement requirements-ci.txt"
+        )
+        with self.assertRaises(maturity.RepositoryMaturityError):
+            maturity.validate_release_workflow(original.replace(install, ""))
 
         publishing = original + "\n# gh release edit v0.1.0-rc.1 --draft=false\n"
         with self.assertRaises(maturity.RepositoryMaturityError):
