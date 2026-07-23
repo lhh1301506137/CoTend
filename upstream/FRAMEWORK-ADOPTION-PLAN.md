@@ -82,7 +82,8 @@ analysis_language: zh-CN
 - 保留计划树、中文展开理解、决策/知识日志、代码上下文验证、验收测试路由、完成门和发布加固。
 - 保留只诊断不修改的默认边界。
 - 保留模型顾问、试用、接手、回退、里程碑复诊和框架变薄限制。
-- Trellis、CodeGraph、Playwright、Git、Python、PowerShell、Codex、Claude 和 Chrome 继续作为外部运行依赖或平台能力，不复制其实现。
+- CodeGraph、Playwright、Git、Python、PowerShell、Codex、Claude 和 Chrome 继续作为外部运行依赖或平台能力，不复制其实现。
+- Trellis 专属协调分支只作为冻结的 legacy integration 保留到 CoTend 原生等价路径通过；它不是最终 Core 依赖或治理权限。不得先删能力，也不得把 `trellis-*` 机械改名后冒充 CoTend 实现。
 
 ### 第三方文件与许可告知
 

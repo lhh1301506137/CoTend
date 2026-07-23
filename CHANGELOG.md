@@ -2,6 +2,18 @@
 
 All notable changes to CoTend are recorded here. CoTend follows Semantic Versioning for published Plugin candidates.
 
+## [Unreleased]
+
+### Added
+
+- Frozen Trellis decoupling parity contract covering eight governance interfaces, six evidence gates, and the exact current 241-mention/22-file runtime baseline.
+- Repository verification that rejects premature runtime text deletion, missing capability coverage, mechanical renaming, or status advancement without implementation.
+
+### Boundaries
+
+- No Skill behavior, Plugin package identity, release tag, remote repository, or submission state changed in this planning slice.
+- The next Plugin candidate will not advance beyond rc.2 until CoTend-native parity is implemented and verified.
+
 ## [0.1.0-rc.2] - Unreleased
 
 ### Added

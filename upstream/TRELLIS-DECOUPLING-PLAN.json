@@ -1,0 +1,325 @@
+{
+  "schema": "cotend.trellis-decoupling-plan",
+  "schema_version": 1,
+  "status": "baseline_frozen_no_runtime_change",
+  "authority": "product_owner_confirmed_2026-07-24",
+  "decision": "preserve_governance_capabilities_replace_trellis_identity_authority_and_runtime_dependency",
+  "current_candidate": "cotend@0.1.0-rc.2_local_unpublished",
+  "target_candidate": "cotend@0.1.0-rc.3_after_parity",
+  "source_boundary": {
+    "trellis_relationship": "restricted_design_inspiration_and_legacy_runtime_integration",
+    "trellis_source_adoption": "none",
+    "trellis_package_dependency": false,
+    "trellis_runtime_tracked_paths": [],
+    "cotend_core_source": "user_owned_dual_ai_release_plus_cotend_original_adaptation",
+    "allowed_bundled_non_framework_skills": [
+      "grill-me",
+      "karpathy-guidelines"
+    ],
+    "allowed_external_tools": [
+      "CodeGraph",
+      "Playwright",
+      "Git",
+      "Python",
+      "PowerShell"
+    ]
+  },
+  "baseline": {
+    "scope": "skills/",
+    "case_insensitive_term": "trellis",
+    "mention_count": 241,
+    "file_count": 22,
+    "file_mentions": {
+      "skills/cotend-collaboration/SKILL.md": 13,
+      "skills/cotend-collaboration/agents/openai.yaml": 1,
+      "skills/cotend-collaboration/references/acceptance-test-harness.md": 2,
+      "skills/cotend-collaboration/references/authority-and-triggers.md": 3,
+      "skills/cotend-collaboration/references/code-context-harness.md": 10,
+      "skills/cotend-collaboration/references/continuous-and-unattended.md": 4,
+      "skills/cotend-collaboration/references/decision-log.md": 5,
+      "skills/cotend-collaboration/references/framework-change-evaluation.md": 8,
+      "skills/cotend-collaboration/references/idea-to-consensus.md": 4,
+      "skills/cotend-collaboration/references/native-agent-orchestration.md": 6,
+      "skills/cotend-collaboration/references/plan-tree.md": 25,
+      "skills/cotend-collaboration/references/quality-sentinel.md": 2,
+      "skills/cotend-collaboration/references/risk-and-approval.md": 4,
+      "skills/cotend-collaboration/references/runtime-profiles.md": 16,
+      "skills/cotend-collaboration/references/semantic-implementation-closure.md": 2,
+      "skills/cotend-collaboration/references/templates.md": 3,
+      "skills/cotend-collaboration/references/upstream-dependency-review.md": 5,
+      "skills/cotend-init/SKILL.md": 3,
+      "skills/cotend-model-upgrade/SKILL.md": 4,
+      "skills/cotend-model-upgrade/references/packet-templates.md": 3,
+      "skills/cotend-project-init/SKILL.md": 108,
+      "skills/cotend-semantic-alignment/SKILL.md": 10
+    }
+  },
+  "target": {
+    "packaged_runtime_trellis_mentions": 0,
+    "trellis_commands": 0,
+    "trellis_state_paths": 0,
+    "trellis_task_spec_authority": false,
+    "capability_regression_allowed": false,
+    "mechanical_rename_allowed": false,
+    "research_and_provenance_mentions": "retained_with_attribution",
+    "external_framework_policy": "generic_conflict_detection_no_core_activation_or_delegation"
+  },
+  "replacement_order": [
+    "TD08-project-truth-authority",
+    "TD03-requirements-clarification",
+    "TD06-spec-change-and-route-rebase",
+    "TD01-workflow-state-and-mode",
+    "TD02-init-resume-and-before-development",
+    "TD04-implementation-pass",
+    "TD05-verification-pass",
+    "TD07-closeout-archive-and-recovery"
+  ],
+  "capabilities": [
+    {
+      "id": "TD01-workflow-state-and-mode",
+      "trellis_surfaces": [
+        ".trellis/",
+        "trellis.mode",
+        ".trellis/config.yaml"
+      ],
+      "required_outcomes": [
+        "distinguish_current_dormant_conflicting_and_foreign_framework_state",
+        "persist_full_or_adaptive_without_overwriting_project_choice",
+        "preserve_unrelated_project_truth_during_migration"
+      ],
+      "cotend_owners": [
+        "cotend-project-init",
+        "cotend-collaboration",
+        "Plan Tree",
+        "STATUS"
+      ],
+      "native_coverage": "partial",
+      "known_gap": "no_verified_cotend_native_replacement_for_all_trellis_mode_and_config_transitions",
+      "status": "baseline_frozen",
+      "removal_gate": "native_parity_verified"
+    },
+    {
+      "id": "TD02-init-resume-and-before-development",
+      "trellis_surfaces": [
+        "trellis-start",
+        "trellis-before-dev"
+      ],
+      "required_outcomes": [
+        "initialize_update_repair_migrate_or_resume_idempotently",
+        "load_current_truth_and_code_context_before_broad_work",
+        "stop_on_conflict_or_missing_human_decision"
+      ],
+      "cotend_owners": [
+        "cotend-init",
+        "cotend-project-init",
+        "Code Context Harness"
+      ],
+      "native_coverage": "substantial_unified_flow_exists",
+      "known_gap": "trellis_specific_dispatch_and_predevelopment_branches_not_yet_removed_or_parity_tested",
+      "status": "baseline_frozen",
+      "removal_gate": "native_parity_verified"
+    },
+    {
+      "id": "TD03-requirements-clarification",
+      "trellis_surfaces": [
+        "trellis-brainstorm"
+      ],
+      "required_outcomes": [
+        "ask_one_high_value_question_at_a_time",
+        "separate_fuzzy_intake_from_confirmed_product_truth",
+        "record_user_confirmed_decisions"
+      ],
+      "cotend_owners": [
+        "grill-me",
+        "Idea to Consensus",
+        "cotend-semantic-alignment",
+        "PROJECT-DECISION-LOG"
+      ],
+      "native_coverage": "substantial",
+      "known_gap": "remove_active_trellis_branch_without_creating_parallel_semantic_truth",
+      "status": "baseline_frozen",
+      "removal_gate": "native_parity_verified"
+    },
+    {
+      "id": "TD04-implementation-pass",
+      "trellis_surfaces": [
+        "trellis-implement"
+      ],
+      "required_outcomes": [
+        "execute_only_the_authorized_leaf_or_slice",
+        "keep_write_ownership_and_dependencies_explicit",
+        "produce_tests_and_evidence_proportionate_to_risk"
+      ],
+      "cotend_owners": [
+        "CoTend native Implementer role",
+        "Native Agent Orchestration",
+        "Plan Tree"
+      ],
+      "native_coverage": "partial_rule_set_exists",
+      "known_gap": "full_profile_implementer_contract_is_still_named_and_dispatched_through_trellis",
+      "status": "baseline_frozen",
+      "removal_gate": "native_parity_verified"
+    },
+    {
+      "id": "TD05-verification-pass",
+      "trellis_surfaces": [
+        "trellis-check"
+      ],
+      "required_outcomes": [
+        "inspect_diff_specs_tests_and_failure_paths",
+        "fix_in_scope_findings_without_replacing_user_acceptance",
+        "retain_formal_primary_self_review_and_release_boundaries"
+      ],
+      "cotend_owners": [
+        "CoTend native Checker role",
+        "Acceptance Test Harness",
+        "Review and Self Review",
+        "AI UAT"
+      ],
+      "native_coverage": "substantial_components_exist",
+      "known_gap": "full_profile_checker_dispatch_is_still_trellis_named_and_not_verified_as_a_native_pair",
+      "status": "baseline_frozen",
+      "removal_gate": "native_parity_verified"
+    },
+    {
+      "id": "TD06-spec-change-and-route-rebase",
+      "trellis_surfaces": [
+        "trellis-update-spec"
+      ],
+      "required_outcomes": [
+        "separate_l0_l2_product_meaning_from_l3_l4_execution",
+        "rebase_affected_routes_from_a_reliable_boundary",
+        "preserve_superseded_decisions_and_current_truth"
+      ],
+      "cotend_owners": [
+        "cotend-semantic-alignment",
+        "Route Rebase",
+        "Plan Tree",
+        "PROJECT-KNOWLEDGE-CHANGELOG"
+      ],
+      "native_coverage": "substantial",
+      "known_gap": "remove_trellis_spec_authority_and_verify_cotend_only_change_propagation",
+      "status": "baseline_frozen",
+      "removal_gate": "native_parity_verified"
+    },
+    {
+      "id": "TD07-closeout-archive-and-recovery",
+      "trellis_surfaces": [
+        "trellis-finish",
+        "Trellis archive",
+        "Trellis journal"
+      ],
+      "required_outcomes": [
+        "verify_before_local_closeout",
+        "preserve_status_review_decisions_handoff_and_project_truth",
+        "separate_local_commit_from_push_release_and_acceptance"
+      ],
+      "cotend_owners": [
+        "Goal Completion",
+        "STATUS",
+        "REVIEW-LOG",
+        "HANDOFF",
+        "local closeout"
+      ],
+      "native_coverage": "substantial",
+      "known_gap": "remove_trellis_archive_fields_and_revalidate_resume_after_native_closeout",
+      "status": "baseline_frozen",
+      "removal_gate": "native_parity_verified"
+    },
+    {
+      "id": "TD08-project-truth-authority",
+      "trellis_surfaces": [
+        "Trellis task",
+        "Trellis PRD",
+        "Trellis spec",
+        "Trellis coding guidelines"
+      ],
+      "required_outcomes": [
+        "one_recoverable_project_truth_chain",
+        "explicit_goal_stage_leaf_requirements_and_acceptance",
+        "generic_foreign_framework_conflict_detection_without_core_delegation"
+      ],
+      "cotend_owners": [
+        "Plan Tree",
+        "PROJECT-UNDERSTANDING",
+        "PROJECT-DECISION-LOG",
+        "STATUS",
+        "project PRD or spec",
+        "AGENTS.md"
+      ],
+      "native_coverage": "substantial_but_fragmented",
+      "known_gap": "authority_precedence_still_yields_to_active_trellis_and_needs_one_cotend_native_contract",
+      "status": "baseline_frozen",
+      "removal_gate": "native_parity_verified"
+    }
+  ],
+  "gates": [
+    {
+      "id": "G01-baseline-freeze",
+      "required_for": "starting_any_replacement",
+      "evidence": [
+        "exact_runtime_mention_inventory",
+        "eight_capability_outcome_contracts",
+        "no_trellis_source_or_package_dependency"
+      ],
+      "status": "complete"
+    },
+    {
+      "id": "G02-per-capability-native-parity",
+      "required_for": "removing_each_corresponding_trellis_route",
+      "evidence": [
+        "success_blocked_failure_and_stop_scenarios",
+        "native_owner_and_state_transition",
+        "focused_regression_tests"
+      ],
+      "status": "not_started"
+    },
+    {
+      "id": "G03-cumulative-main-journey",
+      "required_for": "declaring_native_workflow_complete",
+      "evidence": [
+        "init_to_implementation_to_check_to_acceptance",
+        "interruption_and_route_rebase",
+        "handoff_and_new_session_recovery"
+      ],
+      "status": "not_started"
+    },
+    {
+      "id": "G04-negative-recovery-and-ownership",
+      "required_for": "removing_legacy_runtime_integration",
+      "evidence": [
+        "foreign_framework_conflict",
+        "unknown_or_drifted_state",
+        "failed_check_and_recovery",
+        "unrelated_files_and_truth_preserved"
+      ],
+      "status": "not_started"
+    },
+    {
+      "id": "G05-zero-runtime-dependency",
+      "required_for": "building_rc3",
+      "evidence": [
+        "zero_trellis_mentions_in_packaged_runtime_skills",
+        "zero_trellis_commands_and_state_paths",
+        "research_and_provenance_mentions_remain_attributed"
+      ],
+      "status": "not_started"
+    },
+    {
+      "id": "G06-real-project-and-rollback",
+      "required_for": "calling_the_change_stable",
+      "evidence": [
+        "real_writable_project_journey",
+        "user_acceptance",
+        "rollback_to_last_verified_candidate"
+      ],
+      "status": "not_started"
+    }
+  ],
+  "this_slice": {
+    "skill_behavior_changed": false,
+    "trellis_route_removed": false,
+    "package_identity_changed": false,
+    "push_release_submission_or_publish": false
+  }
+}

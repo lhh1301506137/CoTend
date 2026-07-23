@@ -2,6 +2,70 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-07-24 冻结 CoTend 原生工作流等价基线
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: workflow_behavior
+change_summary: 确认保留全部治理结果，但逐项用 CoTend 自有 owner 替换 Trellis 身份、命令、状态格式、权限和运行依赖；本切片只冻结八类接口与验收门，不修改 Skill 行为
+intent: 让 CoTend Core 成为唯一开发治理框架，同时避免一次性删除 Trellis 协调导致能力退化
+expected_benefit:
+  - 区分通用治理能力与外部框架专属机制，不为表面差异牺牲成熟流程
+  - 用精确 241 处/22 文件基线阻止先删文字后补功能
+  - 用八类唯一 CoTend owner 和六个门控制渐进替换、主旅程、恢复、零依赖与真实项目验证
+possible_harm:
+  - 冻结期暂时保留现有 Trellis 运行时文字，不能被误读为已经完成解耦
+  - 后续若只检查字符串而不检查行为，仍可能产生隐藏退化
+  - 原生任务/规格权限若设计成第二套真相树，会增加维护和恢复复杂度
+affected_workflows:
+  - project_truth_and_task_spec_authority
+  - init_resume_and_before_development
+  - requirements_and_spec_change
+  - full_adaptive_implementation_and_check
+  - closeout_archive_handoff_and_recovery
+deviations:
+  - v1.65 上游仍支持 active Trellis；CoTend 产品将该分支标为 legacy integration，并在等价证据后移除
+  - Trellis 研究和来源引用保留真实名称，不进入零运行时计数目标
+mechanism_budget:
+  added_context_surface: script_plus_cold_path_contract_and_document
+  ordinary_load_impact: none
+  ceremony_added: low
+  duplication_check: replaces_existing_external_framework_coordination
+  cheaper_alternative_considered: 直接全局改名；因会制造不存在的 cotend 命令并隐藏依赖而拒绝
+  retirement_or_thinning_trigger: G05 通过后把冻结计数逻辑替换为零运行时规则；矩阵转为历史迁移证据
+  expected_failure_prevented: capability_regression_mechanical_rename_hidden_framework_dependency_and_premature_release
+validation_scenarios:
+  - scenario: exact_current_runtime_baseline
+    expected: 当前 241 处 Trellis 分布于精确 22 个 Skill 文件，Skill 行为未改变
+    validation_result_type: executed
+    result: dedicated_verifier_and_six_focused_tests_passed
+  - scenario: premature_text_removal_or_status_advance
+    expected: 删除一处文字、缺失一类能力、提前推进状态或允许机械改名均失败
+    validation_result_type: executed
+    result: focused_negative_mutations_rejected
+  - scenario: final_native_runtime
+    expected: 八类能力等价、完整主旅程和负向恢复通过后，打包运行时 Trellis 为零
+    validation_result_type: deferred
+    result: G02_through_G05_not_started
+real_project_validation:
+  - scenario: native_cotend_writable_project
+    expected: 无 Trellis 依赖完成初始化、开发、检查、验收、交接和恢复
+    validation_result_type: deferred
+    result: G06_not_started
+decision: watch
+rollback_triggers:
+  - 任一 C01-C19 用户结果、停止边界、恢复或验收能力退化
+  - 为通过零字符串检查而删除尚无原生 owner 的路径
+  - 机械改名产生不存在的 CoTend 命令或隐藏 Trellis 后端
+  - 新状态或任务系统与 Plan Tree、STATUS、决策日志形成第二套真相
+review_after: 每个单项原生替换叶、G05 rc.3 候选和 G06 真实项目
+watch_closure:
+  - keep_watch
+  - evidence: upstream/TRELLIS-DECOUPLING-PLAN.json
+```
+
+当前没有修改 8 个 Skill、target artifact、rc.2 package digest 或远端状态。官方 Plugin 身份验证路线暂时停放；本记录不授权任何替换实现、push、release、submission 或 publish。
+
 ## 2026-07-23 累计采用 dual-ai v1.53-v1.65
 
 ```yaml

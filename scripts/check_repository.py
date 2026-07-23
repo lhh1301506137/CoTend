@@ -7,6 +7,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import verify_trellis_decoupling_plan as trellis_decoupling
+
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_CAPABILITIES = {f"C{number:02d}" for number in range(1, 20)}
@@ -1163,11 +1165,11 @@ def reference_study_errors(study_text: str, registry_text: str) -> list[str]:
             errors.append(f"reference study metadata mismatch: {key}")
 
     if metadata_values(registry_text, "implementation_dependency") != {
-        "pinned_dual_ai_release_2026_07_11_3"
+        "pinned_dual_ai_release_2026_07_23_2"
     }:
         errors.append("upstream registry must pin the adopted primary productization source")
     if metadata_values(registry_text, "source_copying") != {
-        "scoped_5_adapted_plus_2_byte_identical_skills"
+        "scoped_6_adapted_plus_2_byte_identical_skills"
     }:
         errors.append("upstream registry must record the scoped primary-source adoption")
 
@@ -1349,7 +1351,7 @@ def productization_truth_errors(
 
     exact_roadmap_metadata = {
         "route_type": {"source_aware_rename_first_productization"},
-        "current_phase": {"P4-codex-project-delivery-and-recovery"},
+        "current_phase": {"P4A-cotend-native-workflow-parity"},
     }
     for key, expected in exact_roadmap_metadata.items():
         if metadata_values(roadmap_text, key) != expected:
@@ -4072,6 +4074,8 @@ def main() -> int:
     capability_map_path = "upstream/CAPABILITY-IMPLEMENTATION-MAP.json"
     adoption_log_path = "upstream/FRAMEWORK-ADOPTION-LOG.md"
     framework_lock_path = "upstream/framework.lock.json"
+    trellis_decoupling_contract_path = "upstream/TRELLIS-DECOUPLING-PLAN.json"
+    trellis_decoupling_document_path = "docs/TRELLIS-DECOUPLING-PARITY-PLAN.md"
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
     if upstream_registry_path not in candidates:
@@ -4084,6 +4088,8 @@ def main() -> int:
         capability_map_path,
         adoption_log_path,
         framework_lock_path,
+        trellis_decoupling_contract_path,
+        trellis_decoupling_document_path,
     ):
         if path not in candidates:
             errors.append(f"upstream adoption artifact is missing or ignored: {path}")
@@ -4220,6 +4226,21 @@ def main() -> int:
                 candidates,
             )
         )
+    if {
+        trellis_decoupling_contract_path,
+        trellis_decoupling_document_path,
+    } <= candidates:
+        try:
+            trellis_decoupling.validate_contract(
+                trellis_decoupling.load_contract(
+                    ROOT / trellis_decoupling_contract_path
+                ),
+                read(trellis_decoupling_document_path),
+                trellis_decoupling.runtime_inventory(ROOT),
+                sorted(candidates),
+            )
+        except trellis_decoupling.TrellisDecouplingPlanError as exc:
+            errors.append(f"Trellis decoupling baseline: {exc}")
 
     github_marketplace_carrier_evidence_path = (
         "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md"

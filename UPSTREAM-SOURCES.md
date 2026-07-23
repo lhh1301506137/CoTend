@@ -2,10 +2,10 @@
 
 ```yaml
 status: active_productization_and_research_registry
-checked_at: 2026-07-15
+checked_at: 2026-07-24
 relationship: primary_user_owned_productization_source_plus_secondary_public_references
-implementation_dependency: pinned_dual_ai_release_2026_07_11_3
-source_copying: scoped_5_adapted_plus_2_byte_identical_skills
+implementation_dependency: pinned_dual_ai_release_2026_07_23_2
+source_copying: scoped_6_adapted_plus_2_byte_identical_skills
 update_policy: manual_pinned_review_before_architecture_adoption_or_release
 ```
 
@@ -82,9 +82,10 @@ declared_license: AGPL-3.0
 observed_cli_version: 0.6.6
 relationship: restricted_design_inspiration
 adoption_status: no_source_adoption
+runtime_disposition: legacy_integration_frozen_for_cotend_native_replacement
 ```
 
-审查重点：项目自有的工作流、规范、任务和 memory 状态，生成的平台集成，上下文注入，更新所有权 hash，以及卸载边界。任何 Trellis 源码、提示词、模板或生成文件都不得进入 CoTend 的 Apache-2.0 实现。
+审查重点：项目自有的工作流、规范、任务和 memory 状态，生成的平台集成，上下文注入，更新所有权 hash，以及卸载边界。任何 Trellis 源码、提示词、模板或生成文件都不得进入 CoTend 的 Apache-2.0 实现。当前从 dual-ai 保留下来的 Trellis 运行时协调属于待替换的产品化缺口，不是最终 external runtime 承诺；等价计划见 [`docs/TRELLIS-DECOUPLING-PARITY-PLAN.md`](docs/TRELLIS-DECOUPLING-PARITY-PLAN.md)。
 
 ## RF03 GitHub Spec Kit
 

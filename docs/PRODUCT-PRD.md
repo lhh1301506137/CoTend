@@ -34,6 +34,8 @@ productization_source: dual-ai
 productization_default: rename_first_preserve_first
 upstream_adoption_status: adopted_verified_repository_source
 source_state: user_owned_upstream_productization_reconciled
+core_framework_ownership: cotend_only
+external_development_framework_policy: reference_or_separate_unbundled_adapter_only
 ```
 
 ## 一句话定位
@@ -51,6 +53,8 @@ source_state: user_owned_upstream_productization_reconciled
 产品化目标不是减少原框架的能力，也不是为了显得“产品化”而增加一层新命令。默认表面保持原有的小白友好程度，高级能力按原有触发语义或经过证据支持的渐进方式出现；方向、权限、证据、恢复、审查、验收和发布边界必须完整保留。
 
 产品化路线包括固定可重建的 dual-ai release、逐项来源与权利分类、现有入口和内部角色映射、最小改名/适配、差异验证、安装生命周期、发布收紧和基于证据的改进。详见 [`docs/PRODUCTIZATION-ROADMAP.md`](PRODUCTIZATION-ROADMAP.md)。
+
+CoTend Core 本身是唯一拥有项目开发治理权的框架。计划、规格、实现、检查、收尾和恢复等通用能力可以与其他成熟框架具有相似结果，但必须由 CoTend 自有来源、命名、状态和执行角色实现。另一套开发框架不得作为 CoTend Core 的自动运行后端、任务/规格最高权限或隐藏依赖；兼容需求只能通过以后单独评估、默认不捆绑的适配器处理。该边界不排斥 CodeGraph、Playwright、Git 等工具，也不排斥 grill-me、karpathy-guidelines 等单用途且正确归属的伴随 Skill。
 
 ## 行为覆盖与验收护栏（已完成）
 
@@ -96,6 +100,8 @@ release 角色盘点和用户确认已经确定仓库源树分层：`cotend-init
 - 默认轻量，按项目复杂度增加治理机制。
 - `Primary AI`、`Reviewer AI` 和 `Advisor AI` 是角色，不绑定某一家模型。
 - 用户是产品 owner、风险授权者和最终验收者。
+- CoTend Core 不向另一套开发框架让出任务、规格、实现或检查权限。
+- 保留成熟治理结果，但不通过机械改名隐藏外部框架依赖。
 - AI 生成的验收证据不等于用户验收。
 - 涉及推送、发布、真实数据、密钥、付费或不可逆操作时必须停下来确认。
 
@@ -122,6 +128,7 @@ Codex 是首个适配器，核心行为不得永久绑定单一平台。首发�
 - 不训练或替代编码模型。
 - 不在首个里程碑开发复杂 IDE、云端协作平台或营销网站。
 - 不把受限、来源不明或未获采用授权的第三方文件、脚本、模板、hooks 或生成内容并入 Apache-2.0 产品。
+- 不把另一套开发框架作为 CoTend Core 的隐藏运行后端，也不把其命令机械改成 CoTend 名称。
 - 不把上游工作区中的个人路径、用户画像、内部历史、真实项目数据或模型谈判材料带入发布物。
 - 不因界面基线已确认而提前冻结运行时、状态布局、安装渠道，或把全部目录入口视为已经实现。
 

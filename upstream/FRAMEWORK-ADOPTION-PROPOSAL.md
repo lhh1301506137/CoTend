@@ -95,7 +95,9 @@ analysis_language: zh-CN
 
 ### External runtime 与 platform capability
 
-Trellis、CodeGraph、Playwright、Git、Python 和 PowerShell 保持 external runtime；Codex、Claude 和 Chrome 保持 platform capability。CoTend 可以检测或调用它们，但不把其源码、二进制、账号状态或平台内部实现并入产品。
+CodeGraph、Playwright、Git、Python 和 PowerShell 保持 external runtime；Codex、Claude 和 Chrome 保持 platform capability。CoTend 可以按产品合同检测或调用它们，但不把其源码、二进制、账号状态或平台内部实现并入产品。
+
+Trellis 与这些单用途工具不同：它本身是端到端开发治理框架。v1.65 adopted source 仍保留其运行时协调分支，但用户已把该状态确认为产品化缺口。当前先冻结八类能力与 241 处/22 文件基线，再由 CoTend 原生 owner 逐项替换；最终 Core 不调用、不激活也不向 Trellis 让出任务/规格权限。该后续处置不否定 `2026.07.23.2` 来源 lock，也不授权在缺少等价证据时提前删除现有能力。
 
 ### Claude 载体
 
@@ -142,7 +144,8 @@ needs_user_decision: []
 deferred:
   - Claude carrier
   - Public Plugin Directory submission and publication
-rejected: []
+rejected:
+  - Trellis_as_final_CoTend_Core_runtime_or_governance_authority
 compatibility_evidence: tagged_integrity_role_mapping_adopted_skill_verifier_and_official_skill_validation
 resulting_CoTend_commit: containing_commit
 framework_lock: upstream/framework.lock.json

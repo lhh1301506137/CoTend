@@ -5,7 +5,7 @@ status: active_user_confirmed
 authority: product_owner_confirmed
 product_baseline_version: 0.1.0
 route_type: source_aware_rename_first_productization
-current_phase: P4-codex-project-delivery-and-recovery
+current_phase: P4A-cotend-native-workflow-parity
 ```
 
 ## 路线原则
@@ -15,6 +15,8 @@ CoTend 不从零重做一个“更小白”的 dual-ai。默认路线是：
 > 固定可重建 release -> 核对来源与权利 -> 盘点现有入口和角色 -> 最小改名与公开清理 -> 验证行为等价 -> 只对证据支持的问题做产品改进 -> 完成安装与发布产品化。
 
 19 类能力和行为契约是覆盖与验收护栏，不是强制重写清单。外部框架只在出现具体问题时提供二级候选做法，不按多数投票决定 CoTend。
+
+CoTend 不为了显得不同而删除计划、规格、实现、检查或收尾等通用治理能力；独立性要求的是 CoTend 自己拥有这些能力的源码、命名、状态和执行权限。另一套开发框架不能成为 Core 的自动后端，机械改名也不构成自有实现。
 
 ## 阶段
 
@@ -64,6 +66,15 @@ Gate：仓库源树的精确角色、名称和 7 Skill 物理集合已由用户�
 Gate：确定性 fixtures 和至少一个真实本地项目都完成端到端验证。
 
 当前进度：仓库源树导入、CoTend 改名、来源与许可证记录、C01-C19 映射、确定性项目级 fixture、Codex 实际发现、三条只读显式调用场景、项目级交付核心的 11 步常规生命周期、5 步 legacy identity migration、6 项进程级并发/强制终止、8 项 snapshot-bound recovery，以及“由交付核心安装后再被 Codex 发现并只读调用”的桥接均已完成；source release 与 `cotend-codex-r000001` / revision `1` 也已分离。真实可写本地项目和完整可写模型旅程仍未完成，因此 P4 Gate 仍未关闭。
+
+### P4A - 冻结并替换外部开发框架运行时
+
+- 冻结当前 Trellis 集成的八类用户结果和精确运行时文本基线，不先删功能。
+- 先把项目真相、需求澄清、规格变化、状态档位、初始化、实现、检查和收尾分别绑定到唯一 CoTend owner。
+- 每个原生替代项通过 success、blocked、failure、stop、恢复和无关文件保护后，才删除对应 Trellis 路径。
+- 最终第一方运行时 Skills 中不保留 Trellis 命令、状态路径或任务/规格权限；竞品研究和来源归属继续保留真实名称。
+
+Gate：[`TRELLIS-DECOUPLING-PARITY-PLAN.md`](TRELLIS-DECOUPLING-PARITY-PLAN.md) 的 G01-G05 全部通过后才构建 rc.3；G06 真实项目和用户验收通过前保持 `watch`。当前只完成 G01，Skill 行为未改变。
 
 ### P5 - 完成保留能力与差异改进
 
@@ -116,6 +127,7 @@ Gate：产品变化由用户证据驱动，而不是为了与竞品不同而变�
 - dual-ai 已经足够小白化，直接改名和最小适配是默认起点。
 - 19 类行为能力必须保留，但不要求重写实现。
 - 外部框架只是二级参考。
+- CoTend Core 是唯一开发治理框架；外部开发框架不得成为隐藏后端或最高权限。
 - 用户原创和许可允许的 release 内容可按 adoption 记录复用；受限、未知和私人材料必须隔离。
 - Codex 首发、英文产品表面、Apache-2.0 自有内容和独立公开仓库继续有效。
 - 仓库内 Codex 源载体当前固定为 8 个 Skill、37 个文件；六个用户原创 Skill 使用已确认的 CoTend 名称，两个 MIT Skill 保留原名与许可证。累计 adoption 覆盖 dual-ai v1.53-v1.65。
