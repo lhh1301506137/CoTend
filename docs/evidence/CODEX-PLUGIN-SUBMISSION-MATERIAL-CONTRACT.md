@@ -6,11 +6,11 @@ evidence_type: executed
 official_requirements_checked: 2026-07-14
 submission_type: skills_only
 candidate_plugin_id: cotend
-candidate_version: 0.1.0-rc.1
+candidate_version: 0.1.0-rc.2
 identity_authority: initial_submission_identity_confirmed_not_release
 final_plugin_identity_confirmed: true
-package_files: 41
-package_manifest_sha256: 18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f
+package_files: 48
+package_manifest_sha256: a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2
 submission_contract_status: draft_not_submitted
 starter_prompts: 3
 positive_reviewer_cases: 5
@@ -19,10 +19,10 @@ reviewer_case_execution: contract_only_not_run
 unresolved_external_blockers: 8
 focused_unit_tests: 7
 negative_mutations: 17
-full_unit_tests: 157
+full_unit_tests: 197
 production_package_regression: passed_8_tests_17_negative_6_boundaries
 production_lifecycle_regression: passed_17_normal_5_recovery_15_roots_purged
-repository_check: passed_166_public_candidates_19_capabilities_19_specs
+repository_check: passed_209_public_candidates_19_capabilities_19_specs
 ruff_and_compileall: passed
 portal_opened: false
 portal_draft_created: false
@@ -33,7 +33,7 @@ push: false
 
 ## 结论
 
-仓库现在包含一份结构化、可机检的 skills-only Plugin 提交材料草案：英文 listing、与 Plugin manifest 完全一致的 3 个 starter prompts、恰好 5 个正向和 3 个负向 reviewer case，以及 initial submission release notes。材料绑定精确 `cotend@0.1.0-rc.1` 41 文件候选和摘要 `18f0b628...d858f`；用户已确认该 ID/version 与 production Logo 用于首次提交，但包仍未提交或发布。
+仓库现在包含一份结构化、可机检的 skills-only Plugin 提交材料草案：英文 listing、与 Plugin manifest 完全一致的 3 个 starter prompts、恰好 5 个正向和 3 个负向 reviewer case，以及 initial submission release notes。材料绑定精确 `cotend@0.1.0-rc.2` 48 文件候选和摘要 `a61b75d...76dc2`；该候选仍未提交或发布。
 
 这不是 Portal export，也没有创建 Portal draft。顶层状态固定为 `draft_not_submitted`，8 个 Portal、审核、发布和 push authority 均保持 false；8 个 reviewer case 全部标为 `contract_only_not_run`，因此不会把合同案例误写成已执行审核或用户验收。
 
@@ -46,7 +46,7 @@ push: false
 | 官方材料 | 当前仓库状态 | 证据边界 |
 |---|---|---|
 | Plugin name、短/长描述、category | 英文草案已固定并与 manifest 一致 | 仅候选文案 |
-| 最终 Skill bundle | 精确 41 文件候选已在前序隔离验证 | 未上传 |
+| 最终 Skill bundle | 精确 48 文件候选已在前序隔离验证 | 未上传 |
 | Starter prompts | 3 条，与 manifest 逐项一致 | 未录入 Portal |
 | Reviewer tests | 5 正向 + 3 负向，字段完整 | contract only，未由 reviewer 执行 |
 | Release notes | initial submission 草案完整 | 未提交 |
@@ -73,7 +73,7 @@ push: false
 
 ## 真实 Blocker
 
-合同跟踪 10 个 blocker。`final_plugin_identity_and_version` 与 `production_logo` 已由用户明确确认并通过仓库集成/回归证据关闭；它们精确绑定 `cotend@0.1.0-rc.1`、41 文件摘要和四个品牌资产哈希，同时明确记录预发布版本与 Logo 的 Portal 实际格式接受性尚未验证。其余 8 个未解决 blocker 是 verified publisher identity、Apps Management Write access、website、support、privacy、terms、country/region availability 和 policy attestations，继续保持 `unresolved/null`。readiness 仍为 `blocked_not_ready_for_portal_submission`。
+合同跟踪 10 个 blocker。`final_plugin_identity_and_version` 与 `production_logo` 已通过仓库集成/回归证据关闭；当前绑定 `cotend@0.1.0-rc.2`、48 文件摘要和四个品牌资产哈希，同时明确记录预发布版本与 Logo 的 Portal 实际格式接受性尚未验证。其余 8 个未解决 blocker 是 verified publisher identity、Apps Management Write access、website、support、privacy、terms、country/region availability 和 policy attestations，继续保持 `unresolved/null`。readiness 仍为 `blocked_not_ready_for_portal_submission`。
 
 其中 source repository URL 只是 manifest 已有的来源链接，不替代官方要求的 website、support、privacy 或 terms URL；候选 `CoTend contributors` 也不冒充 OpenAI Platform 中已验证的 publisher identity。
 
@@ -94,12 +94,12 @@ python scripts/check_repository.py
 结果：
 
 ```text
-PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted prompts=3 positive=5 negative=3 blockers=8 digest=18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f
+PLUGIN_SUBMISSION_MATERIALS_OK status=draft_not_submitted prompts=3 positive=5 negative=3 blockers=8 digest=a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2
 Ran 7 tests - OK
-Ran 157 tests - OK
-CODEX_PLUGIN_PRODUCTION_PACKAGE_OK builds=2 files=41 skills=7 skill_files=30 tests=8 negatives=17 validator=passed boundaries=6 unchanged=true
-PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.1 files=41 steps=17 recovery=5 tests=7 roots=15 purged=true protected_unchanged=true
-REPOSITORY_CHECK_OK public_candidates=166 capabilities=19 behavior_specs=19
+Ran 197 tests - OK
+CODEX_PLUGIN_PRODUCTION_PACKAGE_OK builds=2 files=48 skills=8 skill_files=37 tests=8 negatives=17 validator=passed boundaries=6 unchanged=true
+PRODUCTION_PLUGIN_LIFECYCLE_OK version=0.1.0-rc.2 files=48 steps=17 recovery=5 tests=7 roots=15 purged=true protected_unchanged=true
+REPOSITORY_CHECK_OK public_candidates=209 capabilities=19 behavior_specs=19
 ```
 
 17 类负向变异会拒绝：伪造 submitted/Portal draft、伪造 publisher、占位或嵌入未批准 URL、无证据关闭 blocker、Logo listing 路径或 Logo 哈希漂移、package digest 或 starter prompt 漂移、虚假 availability、5+3 数量变化、必填字段缺失、把案例写成 passed、泄露绝对本地路径，以及用空对象绕过验证。

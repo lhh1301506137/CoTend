@@ -360,22 +360,49 @@ def verify_runtime(
     repository_before = repository_worktree_snapshot()
     head_before = nested_git_head(fixture)
     result: dict[str, Any] = {}
-
-    if discover or live:
-        discovery = carrier.discover_skills(
-            fixture,
-            allow_unrelated_skills=True,
-        )
-        validate_bridge_discovery(
-            discovery,
-            expected_unrelated={UNRELATED_SKILL},
-        )
-        result["discovery"] = discovery
-    if live:
-        scenario = next(
-            item for item in carrier.load_scenarios() if item["id"] == "diagnose-only"
-        )
-        result["live"] = carrier.run_live_scenario(fixture, scenario)
+    runtime_root: Path | None = None
+    try:
+        if discover or live:
+            runtime_root, runtime_fixture = carrier.create_external_runtime_copy(
+                fixture
+            )
+            runtime_before = carrier.file_manifest(
+                runtime_fixture,
+                exclude={"runs"},
+            )
+            result["runtime_isolation"] = {
+                "external_system_temp_project": True,
+                "parent_repository_context_inherited": False,
+            }
+            discovery = carrier.discover_skills(
+                runtime_fixture,
+                allow_unrelated_skills=True,
+            )
+            validate_bridge_discovery(
+                discovery,
+                expected_unrelated={UNRELATED_SKILL},
+            )
+            result["discovery"] = discovery
+            if live:
+                scenario = next(
+                    item
+                    for item in carrier.load_scenarios()
+                    if item["id"] == "diagnose-only"
+                )
+                result["live"] = carrier.run_live_scenario(
+                    runtime_fixture,
+                    scenario,
+                )
+            assert_snapshot_equal(
+                runtime_before,
+                carrier.file_manifest(runtime_fixture, exclude={"runs"}),
+                "external delivered runtime outside run evidence",
+            )
+    finally:
+        if runtime_root is not None:
+            result.setdefault("runtime_isolation", {})[
+                "windows_handle_release_retries"
+            ] = carrier.remove_external_runtime_root(runtime_root)
 
     assert_snapshot_equal(
         fixture_before,

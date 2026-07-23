@@ -28,7 +28,7 @@ class ProductionPluginLifecycleTests(unittest.TestCase):
             fixture.remove_fixture_tree(self.root)
 
     def test_production_identity_is_separate_from_fixture_default(self) -> None:
-        self.assertEqual(production.PRODUCTION_IDENTITY.plugin_version, "0.1.0-rc.1")
+        self.assertEqual(production.PRODUCTION_IDENTITY.plugin_version, "0.1.0-rc.2")
         self.assertEqual(
             production.PRODUCTION_IDENTITY.marketplace_name,
             "cotend-production-candidate-local",
@@ -62,7 +62,7 @@ class ProductionPluginLifecycleTests(unittest.TestCase):
         scenario.mkdir()
         result = production.materialize_scenario(scenario)
         package_result = package.verify_package(result["plugin_root"])
-        self.assertEqual(package_result["package_files"], 41)
+        self.assertEqual(package_result["package_files"], 48)
         self.assertEqual(
             package_result["package_manifest_sha256"],
             production.EXPECTED_PACKAGE_DIGEST,

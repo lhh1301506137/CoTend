@@ -37,9 +37,9 @@ EXPECTED_BLOCKER_IDS = [
 ]
 EXPECTED_IDENTITY_VALUE = {
     "plugin_id": "cotend",
-    "version": "0.1.0-rc.1",
-    "package_digest": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
-    "confirmed_on": "2026-07-14",
+    "version": "0.1.0-rc.2",
+    "package_digest": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
+    "confirmed_on": "2026-07-23",
     "confirmation_scope": (
         "initial_submission_identity_not_release_or_platform_acceptance"
     ),
@@ -277,8 +277,8 @@ def _validate_submission(
         "bundle_type": "skills_only",
         "bundle_status": "production_candidate_locally_verified",
         "bundle_source": "packaging/codex-plugin/package.lock.json",
-        "skill_count": 7,
-        "skill_file_count": 30,
+        "skill_count": 8,
+        "skill_file_count": 37,
         "upload_performed": False,
         "mcp_server_required": False,
     }:

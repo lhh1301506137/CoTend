@@ -11,7 +11,7 @@ update_policy: manual_pinned_review_before_architecture_adoption_or_release
 
 本台账同时区分 CoTend 的用户原创产品化母体和外部设计参考。只有 `UP01` 是首要产品化来源；RF01-RF06 仍只是二级比较证据，不能按竞品多数做法改变 CoTend。
 
-当前仓库已从固定 release 采用 7 个 Codex Skill、30 个文件：五个用户原创 Skill 做 CoTend 适配，两个 MIT Skill 按 release 字节复用。采用范围、来源、许可证与更新边界由 adoption log、framework lock 和自动验证共同约束；未列入记录的 upstream 文件仍不得成为实现输入。
+当前仓库已从固定 release 采用 8 个 Codex Skill、37 个文件：六个用户原创 Skill 做 CoTend 适配，两个 MIT Skill 按 release 字节复用。采用范围、来源、许可证与更新边界由 adoption log、framework lock 和自动验证共同约束；未列入记录的 upstream 文件仍不得成为实现输入。
 
 ## UP01 dual-ai 分享包
 
@@ -19,8 +19,8 @@ update_policy: manual_pinned_review_before_architecture_adoption_or_release
 role: primary_productization_source
 product_relationship: user_owned_upstream_framework
 source: public_distribution_location_pending
-reviewed_release: 2026.07.11.3
-release_anchor: dual-ai-share-2026.07.11.3
+reviewed_release: 2026.07.23.2
+release_anchor: dual-ai-share-2026.07.23.2
 declared_license_scope: Apache-2.0_for_user_owned_content_with_separate_MIT_components
 relationship: rename_first_preserve_first_adopted_source
 adoption_status: repository_source_adopted_verified
@@ -29,7 +29,7 @@ codex_role_map: upstream/CODEX-SKILL-ROLE-MAP.json
 adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md
 adoption_plan: upstream/FRAMEWORK-ADOPTION-PLAN.md
 capability_map: upstream/CAPABILITY-IMPLEMENTATION-MAP.json
-adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption
+adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-23-2-v1-65-adoption
 adopted_skill_verifier: scripts/verify_adopted_skill_set.py
 mapping_status: codex_skill_source_set_adopted_live_delivery_pending
 final_framework_lock: upstream/framework.lock.json

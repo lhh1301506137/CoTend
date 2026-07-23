@@ -26,7 +26,7 @@ Autonomy ordering is `low < medium < dev_high`; `critical` is not on the autonom
 
 ## Default Risk Selection
 
-Default to `dev_high` for confirmed personal/local/prototype projects that meet the listed data, payment, and exposure constraints. This is the normal fast path, not an exceptional escalation.
+Default to `dev_high` for the user's confirmed personal/local/prototype projects. This is the normal fast path, not an exceptional escalation.
 
 Use `medium` instead when the project stage, local-only status, data scope, payment/cost exposure, or public/release posture is not yet known. Once inspection confirms the local personal conditions, upgrade the recorded authorization to `dev_high` without asking again.
 
@@ -68,15 +68,15 @@ Use this for user approval, user acceptance, scope expansion, product direction 
 ## Your Decision Is Needed
 
 **Current stage/step**:
-**What the project is doing**:
+**What the project is doing now**:
 **Why you are needed now**:
 **What you need to decide/approve/accept**:
-**What this enables**:
-**Impact**:
+**Why this matters**:
+**Affected scope**:
 **Risk tier**:
-**Recommendation**: 1 Approve / 2 Decline / 3 Explain more
+**Recommendation**: 1 approve / 2 decline / 3 explain more first
 **What happens after approval**:
-**Alternative if declined**:
+**Safer alternative if declined**:
 ```
 
 Keep it short and non-technical. If exact commands, destructive targets, costs, secrets, or public exposure are involved, include exact path/command, backup/rollback status, and verification plan.
@@ -87,7 +87,7 @@ Keep it short and non-technical. If exact commands, destructive targets, costs, 
 continuous_risk_authorization:
   status: active | disabled
   max_continuous_risk: low | medium | dev_high
-  authorization_basis: default_v1.52_dev_high_local | temporary_v1.52_medium_until_classified | user_explicit_dev_high | user_restricted_low
+  authorization_basis: default_personal_local_dev_high | temporary_medium_until_classified | user_explicit_dev_high | user_restricted_low
   authorized_by_user_phrase:
   scope:
   project_stage:
@@ -114,3 +114,5 @@ local_closeout_authorization:
     - destructive_or_irreversible_real_data
     - scope_expansion_or_user_acceptance
 ```
+
+Existing project records using the v1.52 through v1.61 `default_*_dev_high_local` / `temporary_*_medium_until_classified` labels, including `default_v1.61_dev_high_local` and `temporary_v1.61_medium_until_classified`, remain accepted historical aliases. Prefer the stable `default_personal_local_dev_high` / `temporary_medium_until_classified` values when creating or materially refreshing the record. Delegation maturity never raises this risk authorization or bypasses Human Rejoin.

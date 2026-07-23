@@ -9,10 +9,10 @@ Use these labels consistently in Plan Tree, expanded understanding, knowledge ch
 | Canonical label | Accepted aliases | Meaning |
 |---|---|---|
 | `user_confirmed` | none | The user explicitly confirmed this understanding, plan, risk posture, or decision. |
-| `primary_ai_auto_within_scope` | `codex_auto_within_scope` | The primary AI updated a low-level leaf/detail inside an already user-confirmed parent scope. |
+| `primary_ai_auto_within_scope` | `codex_auto_within_scope` | The primary AI updated an L3/L4 leaf/detail inside individually user-confirmed current-MVP L0-L2 ancestors. It never confirms a descendant. |
 | `primary_ai_observed_fact` | `codex_observed_fact` | Code, tests, docs, verification, or environment evidence was observed; this is evidence, not user consensus. |
 | `primary_ai_proposed_delta` | `codex_proposed_delta`, `codex_inferred` | The primary AI proposes or infers a higher-level understanding/plan change; user confirmation is required before it becomes active truth. |
-| `advisor_recommended` | none | Claude, Gemini, CodexSelf, or another reviewer recommended a change; user confirmation is required before it becomes active truth. |
+| `advisor_recommended` | none | An identified advisor/reviewer model, formal self-review pass, or human advisor recommended a change; user confirmation is required before it becomes active truth. Carrier brand alone does not identify the model. |
 | `pending_user_confirmation` | `proposed_pending_user`, `needs_user_confirmation`, `codex_draft` | A draft or proposal is waiting for user confirmation and is not yet binding. |
 | `superseded` | none | Older understanding, route, or decision is no longer active truth but remains auditable. |
 | `rejected` | none | Decision-log terminal state for an option or recommendation the user rejected. Do not use it as an active Plan Tree state. |
@@ -26,7 +26,7 @@ Alias transition:
 
 ## Critical / Never-Unattended Stop List
 
-Stop for the user before any of these actions. No continue token (including `继续`), `dev_high` setting, review checkpoint, or local closeout authorization can cross this list.
+Stop for the user before any of these actions. No `继续` token, `dev_high` setting, review checkpoint, or local closeout authorization can cross this list.
 
 - `git push`, deploy, release, publish, public upload, package sharing, package publish, store submission, or making a project reachable by others.
 - Force-push, history rewrite, remote branch/tag deletion, or changing shared history.
@@ -46,8 +46,8 @@ These mechanisms answer "who decides", "what counts as evidence", or "what must 
 
 - Critical / Never-Unattended Stop List.
 - Authority labels and `user_confirmed` as highest authority.
-- High-level understanding confirmation gates.
-- Continue-token semantics: `continue` and localized aliases such as `继续` never expand scope, approve review, accept a product, deploy, push, publish, or answer pending human-only questions.
+- Protected current-MVP L0-L2 semantic baseline and high-level understanding confirmation gates. Confirmation never inherits from an ancestor to an L1/L2 descendant; full and Adaptive profiles preserve this boundary identically.
+- `继续` semantics: it never expands scope, approves review, accepts a product, deploys, pushes, publishes, or answers pending human-only questions.
 - Done Gate.
 - AI UAT is not user acceptance.
 - Release Hardening triggers.
@@ -55,8 +55,51 @@ These mechanisms answer "who decides", "what counts as evidence", or "what must 
 - Framework Change Evaluation cold path.
 - Decision-log existence and write obligation; formats may thin, the obligation must not.
 - Framework-thinning reverse review and final user confirmation.
+- Explicit control-Skill handback: a directly invoked control operation reports and returns control once before unrelated product development resumes; ordinary confirmed Plan Tree continuation remains automatic.
 
 Any proposal to thin these items is a `boundary_probe` calibration signal. Record it as evidence about the model's calibration; do not accept it as a thinning recommendation.
+
+Applied to Route Rebase, the unchanged `继续` boundary means a bare resume token never chooses a material L0-L2 Route Rebase candidate; that candidate remains a pending human-only question until exact Semantic Alignment confirmation.
+
+## Explicit Control-Skill Handback
+
+Treat an operation as explicit when the user directly invokes or clearly requests one of these bounded control flows:
+
+- `cotend-init` or `cotend-project-init` initialization/update/repair/resume;
+- a formal `cotend-collaboration` review rather than its implicit always-on governance;
+- Diagnose Only read-only investigation;
+- Semantic Alignment writable baseline, rebaseline, realignment, or explicit semantic-change flow;
+- Model Upgrade advisor/takeover evaluation.
+
+After the explicit control flow completes its currently authorized result, report that result and return control to the user before starting unrelated product development. Nested delegation such as `cotend-init -> cotend-project-init` produces one outer handback, not one prompt per internal Skill.
+
+Use the strongest already-pending decision as the handback. Diagnose repair authorization, model-role/advisor/takeover choice, a material review disposition that requires the user, conflict resolution, high-level truth or Route Rebase confirmation, Done Gate, release/risk approval, or another human-only decision satisfies the handback; do not append a second generic question.
+
+When no stronger decision is pending, use one generic handback that asks only whether to resume the same already-confirmed route. In that narrow case a bare `继续` is explicit approval to resume that route, even when no unattended window was pre-seeded. It does not select option `1`, change scope or risk, approve a review, accept the product, accept an advisor recommendation, release, push, deploy, publish, or answer any specialized pending question.
+
+Do not trigger this handback for implicit/default `cotend-collaboration` loading, internal Skill delegation, ordinary checkpointing, or ordinary Plan Tree selection of the next L3/L4 leaf inside a confirmed current-MVP L0-L2 baseline. The handback is an explicit-operation event boundary, not a per-step approval gate.
+
+## Semantic Alignment Triggers
+
+Route explicit writable project/feature meaning work directly to `$cotend-semantic-alignment`; do not run or require Init first:
+
+- generic/contextual scope: `语义对齐`, `理解对齐`, or equivalent selects Semantic Alignment and resolves full versus scoped from the named target and active conversation; if neither establishes scope, ask one scope question before drafting;
+- full scope: `完整语义对齐`, `全项目语义对齐`, `重新理解整个项目`, `项目整体做偏了`, `完全更新项目语义`, or equivalent;
+- scoped: `对这个功能进行语义对齐`, `对这个模块进行理解对齐`, `重新对齐 AI 对这个模块的理解`, `这个功能不是我想要的，请重新对齐`, `功能一直是半成品，需要重新对齐`, or equivalent;
+- explicit change: the user knowingly replaces a confirmed product goal, main chain, important feature responsibility, user-visible result, or MVP/final shape.
+
+Apply this precedence to mixed natural language; never route from one keyword alone:
+
+1. Explicit withholding such as `先别改`, `别改代码`, `不要更新`, `只诊断`, or `只检查` always routes directly to `$cotend-diagnose-only`, even if `对齐` or `修复` also appears.
+2. Without withholding, explicit mutation such as `重新对齐`, `更新并修复`, `对齐并修复`, `确认后更新`, or `修正这个理解` routes directly to Semantic Alignment; L0-L2 changes still wait for the exact confirmation packet.
+3. Otherwise, evaluative wording such as `看看 AI 对这个模块的理解是否正确`, `检查 AI 对这个模块的理解是否正确`, `AI 对这个模块理解得对不对`, `看看`, `检查`, `是否正确`, `对不对`, or `有没有理解偏` routes directly to `$cotend-diagnose-only`. These cues outrank generic `理解对齐` / `语义对齐` wording and must not modify truth or implementation.
+4. Bare generic `理解对齐` / `语义对齐` remains a writable Semantic Alignment request, subject to protected confirmation.
+
+The evaluation terms in item 3 require semantic/product-understanding context or an existing Diagnose Only cue. A bare `看看`, `检查`, `是否正确`, or `对不对` about formatting, tests, code, or another ordinary task must follow that task's normal route; never classify semantic intent from one word alone.
+
+Determine scope before applying that read-only boundary. `完整/全项目 ... 先检查` remains a full-project read-only diagnosis; a named-feature check remains scoped. Read-only wording must not silently narrow full scope, and local wording must not silently widen it.
+
+`$cotend-init <semantic request>` performs Init only. It reports the standing baseline, leaves the appended request unclassified and unexecuted, and names the independently invoked direct next action; it must not load, call, delegate, or wrap Semantic Alignment or Diagnose Only. Plain Init reports baseline state but never forces a full rebaseline. After `fresh_init`, a shallow-identified idea/requirements intake plus an affected `absent | partial | stale | conflict` baseline emits the canonical optional `semantic_onboarding_handoff` to direct `$cotend-semantic-alignment new_baseline`; it does not inspect product meaning or start that flow. Reply `1` starts only the independent control flow and confirms no L0-L2 content. A local request may recommend L1/L0 expansion when evidence requires it, but cannot silently widen its scope.
 
 ## Chrome Escalation Triggers
 
@@ -81,13 +124,14 @@ Use `decision_worthy_topics` as the canonical label set for deciding whether a u
 
 | Label | Record when the user's answer or accepted recommendation affects... |
 |---|---|
-| `root_or_mvp_goal` | final goal, MVP shape, stage goal, or feature meaning |
+| `root_or_mvp_goal` | L0-L2 product meaning: final goal, MVP shape, capability/main-chain outcome, stage goal, or important feature responsibility/result |
 | `scope_boundary` | what is in/out of scope, temporary/prototype status, or active truth boundaries |
 | `priority_or_route` | next high-value leaf, route, sequencing, milestone, or plan-tree alignment |
 | `ux_taste_or_acceptance` | UX taste, product acceptance criteria, done/acceptance mode, or AI UAT interpretation |
 | `risk_or_release` | risk tier, release/public posture, privacy/data/payment/cost/security boundary, or stop-boundary handling |
 | `model_role_or_review` | primary/reviewer/advisor role, premium-model takeover, review gate, or external review scope |
-| `continuation_authority` | unattended window, bare continue-token meaning, local closeout authorization, or future resume behavior |
+| `continuation_authority` | unattended window, bare `继续` meaning, local closeout authorization, or future resume behavior |
+| `delegation_maturity` | whether one narrow low-risk decision category stays per-decision or moves to user-confirmed execute-then-report delegation, including refusal, scope, cooldown, or restoration |
 | `advisor_or_grill_answer` | answer to a grill-me, Trellis brainstorm, advisor, takeover, milestone, or Done Gate question when the answer also affects one of the substantive decision topics above |
 | `user_interruption_or_new_idea` | a midstream user doubt, correction, or new idea changes priority, scope, route, acceptance, risk, model role, or future continuation |
 | `supersession_or_rejection` | a prior decision is superseded, narrowed, rejected, or re-opened |
@@ -104,6 +148,7 @@ Record a decision when any of these matches a `decision_worthy_topics` label:
 - a prior decision is superseded, narrowed, or rejected;
 - a decision explains why the next Plan Tree leaf is the highest-value next step;
 - Done Gate, AI UAT, milestone re-entry, risk gate, or release gate changes the next mode.
+- a delegation-maturity offer is accepted, declined, narrowed, restored, or re-opened; compact eligibility samples follow `references/delegation-maturity.md` and do not become authority by themselves.
 
 Do not log every tiny implementation choice. Leaf-level technical choices may be logged only when they affect future continuation, review, or user control.
 

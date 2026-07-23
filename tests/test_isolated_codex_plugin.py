@@ -34,6 +34,28 @@ class IsolatedCodexPluginTests(unittest.TestCase):
         with self.assertRaises(plugin_fixture.PluginFixtureError):
             plugin_fixture.assert_fixture_path(self.fixture, ROOT, "escape")
 
+    def test_external_project_root_guard_and_cleanup(self) -> None:
+        with self.assertRaises(plugin_fixture.PluginFixtureError):
+            plugin_fixture.guarded_external_project_root(
+                Path(tempfile.gettempdir())
+            )
+        with self.assertRaises(plugin_fixture.PluginFixtureError):
+            plugin_fixture.guarded_external_project_root(
+                Path(tempfile.gettempdir()) / "unowned-project-root"
+            )
+
+        root = plugin_fixture.create_external_project_root()
+        try:
+            marker = root / "project" / "marker.txt"
+            marker.parent.mkdir()
+            marker.write_text("owned fixture\n", encoding="utf-8")
+            retries = plugin_fixture.remove_external_project_root(root)
+            self.assertIsInstance(retries, int)
+            self.assertFalse(root.exists())
+        finally:
+            if root.exists():
+                plugin_fixture.remove_external_project_root(root)
+
     def test_isolated_environment_redirects_every_write_root(self) -> None:
         injected = {
             "EXAMPLE_API_KEY": "must-not-pass",
@@ -101,8 +123,8 @@ class IsolatedCodexPluginTests(unittest.TestCase):
     def test_static_fixture_and_twelve_negative_mutations(self) -> None:
         plugin_fixture.materialize_fixture_payload(self.fixture)
         result = plugin_fixture.verify_static(self.fixture, run_official=False)
-        self.assertEqual(result["skills"], 7)
-        self.assertEqual(result["skill_files"], 30)
+        self.assertEqual(result["skills"], 8)
+        self.assertEqual(result["skill_files"], 37)
         self.assertEqual(result["undeclared_capabilities"], 0)
         negative = plugin_fixture.run_negative_mutations(self.fixture)
         self.assertEqual(negative["passed"], 12)

@@ -1,32 +1,32 @@
 # GitHub Marketplace 仓库根载体验证证据
 
-> 范围说明：本文记录首次 push 之前的 L54 本地载体验证，因此下方远端字段保持当时真实的 `not_run`。真实 GitHub 后续验证现已通过，见 [REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md](REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md)。
+> 范围说明：本文记录当前候选的本地根载体验证，因此远端字段保持本轮真实的 `not_run`。已公开 `rc.1` 的真实 GitHub 历史验证见 [REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md](REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md)；它不能替代尚未推送的 `rc.2` 远端重验。
 
 ```yaml
 status: passed_isolated_github_marketplace_root_carrier
 evidence_type: executed
-evidence_date: 2026-07-15
+evidence_date: 2026-07-23
 codex_version: codex-cli_0.144.1
 repository_carrier: present_and_valid
 root_plugin_manifest: .codex-plugin/plugin.json
 root_marketplace_manifest: .agents/plugins/marketplace.json
 marketplace_name: cotend
 marketplace_source: url_relative_root
-candidate_version: 0.1.0-rc.1
+candidate_version: 0.1.0-rc.2
 semantic_source: skills/
 semantic_sources: 1
-source_skill_manifest_sha256: acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b
-package_manifest_sha256: 18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f
+source_skill_manifest_sha256: ce3253e553f1a95ec81858b2b1e2429a771816e7477516da779b1a99e0c2c0de
+package_manifest_sha256: a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2
 allowed_manifest_path_rewrites: 3
-adopted_skills: 7
-adopted_skill_files: 30
+adopted_skills: 8
+adopted_skill_files: 37
 normal_lifecycle_steps: 15
 failure_recovery_steps: 5
 write_roots_redirected: 15
 protected_user_boundaries: 8
 focused_tests: 12
-full_unit_tests: 157
-repository_check: passed_166_public_candidates_19_capabilities_19_specs
+full_unit_tests: 197
+repository_check: passed_209_public_candidates_19_capabilities_19_specs
 official_validator: passed
 local_marketplace_repeat_add: idempotent_success
 local_marketplace_upgrade: local_path_not_configured_as_git_marketplace
@@ -42,15 +42,15 @@ release_publish_push: false
 
 CoTend 仓库根现在包含一个可被 Codex 识别的 Plugin manifest 和一个 Personal Marketplace manifest。Marketplace 名为 `cotend`，Plugin source 使用 `url: "./"` 指向仓库根；根 Plugin manifest 与生产候选 manifest 的语义元数据完全一致，只对三个品牌资产相对路径做机械变换。两者共同复用根 `skills/`，没有复制或链接第二份 Skill 树。
 
-本轮在一次性本地 Git Marketplace、15 个完全重定向的运行时写入根和独立系统临时项目目录中执行。官方 Plugin Creator validator 通过；真实 Codex CLI 完成 15 步正常生命周期、5 步注入失败恢复，并在 app-server 中发现 7 个 `cotend:<skill>` Plugin Skill。与项目级 standalone Skills 共存时，两组各 7 项；卸载后 Plugin Skill 消失，standalone Skill 不受影响。
+本轮在一次性本地 Git Marketplace、15 个完全重定向的运行时写入根和独立系统临时项目目录中执行。官方 Plugin Creator validator 通过；真实 Codex CLI 完成 15 步正常生命周期、5 步注入失败恢复，并在 app-server 中发现 8 个 `cotend:<skill>` Plugin Skill。与项目级 standalone Skills 共存时，两组各 8 项；卸载后 Plugin Skill 消失，standalone Skill 不受影响。
 
 这证明仓库根载体在本地隔离环境中可安装、发现、移除、重装和恢复。它不证明 GitHub 远端 `owner/repo` 拉取、Git-backed upgrade、洁净新手安装、Desktop 重启可见性或公开发布已经通过。
 
 ## 唯一语义源与摘要
 
-首次隔离夹具尝试把 Plugin `skills` 指向 `./codex-skills/`，官方 validator 明确拒绝该结构。L54 因此把 CoTend 仓库内唯一 Skill 源机械迁移到根 `skills/`，30 个 Skill 文件的相对 path/hash 摘要保持 `acbd6d...ba1b`，没有修改 Skill 字节，也没有改写固定上游 release 内仍真实存在的 `codex-skills/` 来源路径。
+首次隔离夹具尝试把 Plugin `skills` 指向 `./codex-skills/`，官方 validator 明确拒绝该结构。CoTend 因此把仓库内唯一 Skill 源承载在根 `skills/`；当前 37 个 Skill 文件的相对 path/hash 摘要为 `ce3253...c0de`，没有复制第二份 Skill 树，也没有改写固定上游 release 内仍真实存在的来源路径。
 
-包内 `THIRD-PARTY-SOURCES.json` 的目标路径随仓库载体迁移而更新，因此完整 41 文件包摘要受控重算为 `18f0b6...d858f`。根 manifest 由生产 manifest 机械派生，唯一允许的差异是 `composerIcon`、`logo` 和 `logoDark` 指向仓库内锁定资产的位置；其他字段漂移会被测试和仓库检查器拒绝。
+完整 48 文件包摘要为 `a61b75...76dc2`。根 manifest 由生产 manifest 机械派生，唯一允许的差异是 `composerIcon`、`logo` 和 `logoDark` 指向仓库内锁定资产的位置；其他字段漂移会被测试和仓库检查器拒绝。
 
 ## 正常生命周期
 
@@ -85,9 +85,9 @@ python scripts/verify_github_marketplace_carrier.py
 
 ```text
 Ran 12 tests - OK
-GITHUB_MARKETPLACE_CARRIER_OK version=0.1.0-rc.1 steps=15 recovery=5 skills=7 roots=15 purged=true protected_unchanged=true remote_git=not_run
-Ran 157 tests - OK
-REPOSITORY_CHECK_OK public_candidates=166 capabilities=19 behavior_specs=19
+GITHUB_MARKETPLACE_CARRIER_OK version=0.1.0-rc.2 steps=15 recovery=5 skills=8 roots=15 purged=true protected_unchanged=true remote_git=not_run
+Ran 197 tests - OK
+REPOSITORY_CHECK_OK public_candidates=209 capabilities=19 behavior_specs=19
 ```
 
 详细 JSON、逐命令输出和一次性 Git fixture 只保存在 gitignored 私有证据目录；公开证据不携带本机绝对路径或用户配置内容。

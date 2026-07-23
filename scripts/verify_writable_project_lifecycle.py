@@ -168,7 +168,11 @@ def prepare_fixture(fixture: Path) -> Path:
             if path.exists():
                 remove_fixture_tree(path)
     support = fixture / "support"
-    shutil.copytree(TEMPLATE_ROOT, support)
+    shutil.copytree(
+        TEMPLATE_ROOT,
+        support,
+        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+    )
     project = fixture / PROJECTS_DIR / FRESH_PROJECT
     shutil.copytree(support / "project-template", project)
     shutil.copy2(support / "AGENTS.md", project / "AGENTS.md")
@@ -325,10 +329,15 @@ def verify_static(fixture: Path) -> dict[str, Any]:
         metadata = protected_snapshot[key]
         if set(metadata) - {"exists", "size", "mtime_ns"}:
             raise LifecycleError(f"{key} must remain stat-only")
-    actual_template_files = set(carrier.file_manifest(support))
+    actual_template_files = set(
+        carrier.file_manifest(support, exclude={"__pycache__"})
+    )
     if actual_template_files != EXPECTED_TEMPLATE_FILES:
         raise LifecycleError("writable lifecycle support inventory drift")
-    if carrier.file_manifest(TEMPLATE_ROOT) != carrier.file_manifest(support):
+    if carrier.file_manifest(
+        TEMPLATE_ROOT,
+        exclude={"__pycache__"},
+    ) != carrier.file_manifest(support, exclude={"__pycache__"}):
         raise LifecycleError(
             "copied lifecycle support differs from repository template"
         )
@@ -336,8 +345,8 @@ def verify_static(fixture: Path) -> dict[str, Any]:
     installed = project / ".agents" / "skills"
     if carrier.file_manifest(installed) != carrier.file_manifest(carrier.SOURCE_ROOT):
         raise LifecycleError("fixture Skill files differ from repository source")
-    if len(carrier.file_manifest(installed)) != 30:
-        raise LifecycleError("fixture must contain exactly 30 Skill files")
+    if len(carrier.file_manifest(installed)) != 37:
+        raise LifecycleError("fixture must contain exactly 37 Skill files")
     discovered_skills = {path.name for path in installed.iterdir() if path.is_dir()}
     if discovered_skills != carrier.EXPECTED_SKILLS:
         raise LifecycleError("fixture Skill directory inventory drift")
@@ -511,7 +520,7 @@ def validate_project_result(
         require_markers(
             project / "STATUS.md",
             (
-                "cotend-collaboration-v1.52",
+                "cotend-collaboration-v1.65",
                 "auto_mode: fresh_init",
                 "adoption_profile: lite",
                 "readiness: continue_ready",
@@ -528,7 +537,7 @@ def validate_project_result(
     if scenario_id == "current-resume":
         require_markers(
             project / "STATUS.md",
-            ("cotend-collaboration-v1.52", "adoption_profile: lite"),
+            ("cotend-collaboration-v1.65", "adoption_profile: lite"),
         )
     elif scenario_id == "pending-decision":
         require_markers(

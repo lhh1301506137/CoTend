@@ -38,7 +38,7 @@ class ReleaseArchiveTests(unittest.TestCase):
             Path(first["archive_path"]).read_bytes(),
             Path(second["archive_path"]).read_bytes(),
         )
-        self.assertEqual(first["package_files"], 41)
+        self.assertEqual(first["package_files"], 48)
 
     def test_wrong_release_tag_is_rejected_before_build(self) -> None:
         with self.assertRaises(release.ReleaseArchiveError):

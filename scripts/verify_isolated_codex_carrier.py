@@ -29,21 +29,22 @@ EXPECTED_SKILLS = {
     "cotend-init",
     "cotend-model-upgrade",
     "cotend-project-init",
+    "cotend-semantic-alignment",
     "grill-me",
     "karpathy-guidelines",
 }
 EXPECTED_INTERFACES = {
     "cotend-collaboration": (
         "CoTend Collaboration",
-        "CodexSelf-first AI review",
+        "Carrier-aware actual-model collaboration",
     ),
     "cotend-diagnose-only": (
         "CoTend Diagnose Only",
-        "Read-only root-cause analysis",
+        "Root cause, drift, or completion evidence",
     ),
     "cotend-init": (
         "CoTend Init",
-        "Auto init/update workflow",
+        "Init workflow and route idea baseline",
     ),
     "cotend-model-upgrade": (
         "CoTend Model Upgrade",
@@ -51,7 +52,11 @@ EXPECTED_INTERFACES = {
     ),
     "cotend-project-init": (
         "CoTend Project Init",
-        "Route and init AI workflow",
+        "Init workflow and route idea baseline",
+    ),
+    "cotend-semantic-alignment": (
+        "CoTend Semantic Alignment",
+        "Align product intent and repair semantic drift",
     ),
 }
 LIVE_SCENARIO_IDS = {"init-delegation", "pending-decision", "diagnose-only"}
@@ -298,7 +303,7 @@ def verify_static(
     }
     if source_manifest != managed_manifest:
         raise CarrierError("installed Skill files differ from repository source")
-    if len(managed_manifest) != 30:
+    if len(managed_manifest) != 37:
         raise CarrierError(f"expected 30 managed Skill files, found {len(managed_manifest)}")
 
     for skill in sorted(EXPECTED_SKILLS):

@@ -40,7 +40,7 @@ class CodexPluginPackageTests(unittest.TestCase):
         manifest = contract["manifest"]
         lock = contract["lock"]
         self.assertEqual(manifest["name"], "cotend")
-        self.assertEqual(manifest["version"], "0.1.0-rc.1")
+        self.assertEqual(manifest["version"], "0.1.0-rc.2")
         self.assertEqual(manifest["skills"], "./skills/")
         self.assertEqual(manifest["interface"]["brandColor"], "#139C98")
         self.assertEqual(
@@ -67,10 +67,10 @@ class CodexPluginPackageTests(unittest.TestCase):
         first_manifest = package.path_hash_manifest(first)
         second_manifest = package.path_hash_manifest(second)
         self.assertEqual(first_manifest, second_manifest)
-        self.assertEqual(len(first_manifest), 41)
+        self.assertEqual(len(first_manifest), 48)
         self.assertEqual(
             package.path_hash_manifest_sha256(first_manifest),
-            "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
+            "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
         )
 
     def test_output_must_stay_in_repository_build_roots(self) -> None:
@@ -178,7 +178,7 @@ class CodexPluginPackageTests(unittest.TestCase):
     def test_n3_display_metadata_and_prompt_limits_are_preserved(self) -> None:
         output = self.build("display")
         result = package.verify_package(output)
-        self.assertEqual(result["friendly_display_names"], 5)
+        self.assertEqual(result["friendly_display_names"], 6)
         self.assertEqual(result["relative_notice_links"], 4)
         self.assertEqual(result["brand_assets"], 4)
         manifest = json.loads(

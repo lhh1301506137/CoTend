@@ -1,6 +1,6 @@
 # Continuous, Unattended, And Delegated Mission Development
 
-Use when the user asks Codex to keep going, sends repeated or pre-seeded continue tokens (including `继续`), authorizes a batch/mission, is away/asleep, or when work accumulates into batches.
+Use when the user asks Codex to keep going, sends repeated or pre-seeded `继续`, authorizes a batch/mission, is away/asleep, or when work accumulates into batches.
 
 ## Activation Requirements
 
@@ -75,24 +75,27 @@ When `preflight_baseline` is degraded or not run, record why before starting. Th
 
 ## Resume Tokens
 
-- Interpret `continue` or `继续` as a resume token only when unattended mode is active or the token is explicitly pre-seeded.
+- Interpret `继续` as a resume token when unattended mode is active or explicitly pre-seeded. The sole non-unattended exception is the generic explicit control-Skill handback defined below and in `authority-and-triggers.md`.
 - Each token continues the same authorized unattended window from the latest checkpoint.
-- Consume a token only after closing the current checkpoint and confirming the next step stays inside the authorized risk tier.
+- Consume a token only after closing the current checkpoint, confirming the next step stays inside the authorized risk tier, and preserving any required semantic implementation closure gate.
 - Tokens never widen scope, approve review, accept the product, push, deploy, dismiss review debt, or cross a stop boundary.
-- If a pending human-decision question exists, including Done Gate, release, critical, baseline confirmation, user interruption/new idea reconciliation, or product-direction approval, a bare continue token, including `继续`, does not choose any option or accept the recommended answer. Re-present the question. If unrelated work remains inside the already authorized unattended scope, it may continue while the question stays pending.
-- The user may explicitly pre-authorize a choice by mapping a continue token to a named option; without that explicit mapping, never infer consent from a resume token.
+- Tokens may continue in-scope repair leaves under an open material node, but they cannot move to the next important L2/main-chain node while `semantic_implementation_closure.next_step_allowed` is `no`.
+- For an active material Route Rebase, tokens may continue `applying` / `revalidating` work only when no human gate is pending and only from the canonical reliable resume boundary. They cannot revive the previous path or jump to a later `current_next_leaf`.
+- If a pending "Your Decision Is Needed" question exists, including a high-level Route Rebase confirmation, Done Gate, release, critical, Baseline confirmation, user interruption/new idea reconciliation, or product-direction approval, a bare `continue` or `继续` does not choose any option or accept the recommended answer. Re-present the question. If unrelated work remains inside the already authorized unattended scope, it may continue only with dependency-isolation evidence while the question stays pending.
+- The user may explicitly pre-authorize a choice with wording such as `继续=同意推荐项`; without that explicit mapping, never infer consent from a resume token.
+- One narrow non-unattended exception exists for the generic explicit control-Skill handback defined in `authority-and-triggers.md`: when the completed Skill has no specialized pending decision and asks only whether to resume the same confirmed route, a direct bare `continue` or `继续` satisfies that handback. It still cannot answer a "Your Decision Is Needed" question, select option `1`, widen scope/risk, approve review, accept the product or advisor advice, or cross any stop boundary.
 
 ## Local Closeout Authorization
 
 Use this only when the project status explicitly records `local_closeout_authorization.status: active`.
 
-A continue token may include local closeout work only when all conditions hold:
+`继续` may include local closeout work only when all conditions hold:
 
 - the user explicitly enabled local closeout authorization for this project, milestone, or unattended window;
 - the completed work stays inside the current agreed scope/task and authorized risk tier;
 - the working tree contains no unrelated or user-owned changes;
 - no secrets, private data, large generated files, public artifacts, or ignored local-only config are staged;
-- required tests/checks/smoke verification and CodexSelf/self-review passed or are recorded as intentionally not applicable;
+- required tests/checks/smoke verification and the actual primary model's formal self-review passed or are recorded as intentionally not applicable;
 - no unresolved user-only decision, Done Gate acceptance, release boundary, scope expansion, P0/P1, or `critical` risk appeared.
 
 Allowed local closeout actions:
@@ -110,6 +113,7 @@ Use the canonical Critical / Never-Unattended Stop List in `authority-and-trigge
 Create `review_pending` or valid `self_reviewed` checkpoints when:
 
 - a runnable/verifiable vertical slice is complete;
+- an important current-MVP L2/main-chain boundary is ready for semantic implementation closure;
 - the material diff becomes large enough that reviewer context or rollback confidence would degrade, typically about 8+ material files or about 1000 meaningful changed lines by the Checkpoint Measurement Method;
 - about 5 task units accumulate under one unattended window;
 - verification fails unclearly;

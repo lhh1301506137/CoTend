@@ -1,12 +1,12 @@
-# CoTend Codex 技能首次采用与适配计划
+# CoTend Codex 技能累计更新与适配计划
 
-> 范围说明：本文固定首次采用 release 与其 containing-commit lock，顶部 `plugin_or_marketplace_carrier` 是该采用提交当时的交付边界，不随之后的分发验证改写。当前 GitHub Open Beta 状态以 [`FRAMEWORK-ADOPTION-LOG.md`](FRAMEWORK-ADOPTION-LOG.md#github-open-beta-remote-validation) 和远端生命周期证据为准。
+> 范围说明：本文固定当前累计采用 release 与其 containing-commit lock。历史 rc.1 与首次 GitHub Open Beta 证据保持不变；rc.2 的远端状态只能在用户授权推送后更新。
 
 ```yaml
 status: implemented_verified
 authority: implementation_record
-candidate_release: 2026.07.11.3
-release_anchor: dual-ai-share-2026.07.11.3
+candidate_release: 2026.07.23.2
+release_anchor: dual-ai-share-2026.07.23.2
 target_platform: Codex
 target_source_carrier: skills/
 live_install_target: not_authorized
@@ -19,20 +19,20 @@ analysis_language: zh-CN
 
 ## 目标
 
-在 CoTend 仓库内建立第一套可验证的 Codex 技能源树，直接产品化已验证的 `dual-ai` 发布版，而不是重新设计一套工作流。实现完成后，仓库应包含五个 CoTend 用户原创技能和两个保持第三方身份的 MIT 伴随技能；默认入口、内部委派、治理核心、停止边界、证据、恢复和模型生命周期保持行为等价。
+把 CoTend 从已采用的 v1.52 基线累计更新到 v1.65，完整吸收 v1.53-v1.65，而不是只摘取最近两次变更。实现完成后，仓库应包含六个 CoTend 用户原创 Skill 和两个保持第三方身份的 MIT 伴随 Skill；默认入口、独立语义入口、渐进模块、运行档位、原生代理编排、路线重基、语义实现闭环、停止边界、证据、恢复和模型生命周期保持产品化语义等价。
 
-首次采用时仓库使用 `codex-skills/` 与上游发布目录同构。L54 在不改变 30 个文件字节的前提下，把 CoTend 当前唯一源迁移为根 `skills/`，以满足官方 Plugin contract；上游固定 release 内部仍使用 `codex-skills/`。该仓库源不是用户全局 `$CODEX_HOME/skills`，不授权修改本机已安装技能。
+仓库当前唯一源为根 `skills/`，满足官方 Plugin contract；上游固定 release 内部仍使用 `codex-skills/`。该仓库源不是用户全局 `$CODEX_HOME/skills`，本次更新不授权修改本机已安装 Skill、推送或发布。
 
 ## 固定输入
 
 | 输入 | 固定值 |
 |---|---|
-| 发布版 | `2026.07.11.3` |
-| 附注标签 | `dual-ai-share-2026.07.11.3` |
-| 发布提交 | `71e45d9ebeff4d9d61c180711c25267b9fe31549` |
-| 包目录树 | `a70231e0445d9795a00212e8e6c53c149bfbc431` |
-| 清单 SHA-256 | `919fe34254b51619ddca1d010445281d4f7ceec958ee8cfd1958eaccb02bd006` |
-| Codex 技能文件 | 7 个技能目录，共 30 个文件 |
+| 发布版 | `2026.07.23.2` |
+| 附注标签 | `dual-ai-share-2026.07.23.2` |
+| 发布提交 | `6b0dc0a80e35dd1296a17d0ecdb8f1bacc785a00` |
+| 包目录树 | `71c49b0463528fb8a2b3deabace6bfb942a67b6c` |
+| 清单 SHA-256 | `5dd76ae856f596176583fd73681c4ec9c8a365aa84313715a727ecd28182081a` |
+| Codex 技能文件 | 8 个技能目录，共 37 个文件 |
 | 来源与许可证 | `THIRD-PARTY-SOURCES.json`、`THIRD-PARTY-NOTICES.md`、两个独立 MIT 文本 |
 
 实现必须从附注标签的 Git 对象重建或读取输入，不以可变工作树、ZIP 文件名或修改时间作为来源真相。
@@ -41,11 +41,12 @@ analysis_language: zh-CN
 
 | 标记发布版中的源技能 | 文件数 | 源目录树 | CoTend 目标 | 计划状态 | 处理方式 |
 |---|---:|---|---|---|---|
-| `dual-ai-init` | 2 | `cb233ade310c37e0cd038ff5752eeced92a303f0` | `skills/cotend-init/` | `adapted` | 直接改名；更新入口、委派、回退路径和界面元数据。 |
-| `dual-ai-project-init` | 2 | `1f2fdd44e90f31fec310eaf78b02e48de4fed53c` | `skills/cotend-project-init/` | `adapted` | 保留自动模式；更新品牌、协议、技能引用、迁移与输出标识。 |
-| `dual-ai-collaboration` | 19 | `b75114a7e0fd2027943ed98217a0f9d581cbdae9` | `skills/cotend-collaboration/` | `adapted` | 保留共享治理核心与全部参考模块；更新自引用、协议标识和产品品牌。 |
-| `diagnose-only` | 2 | `88dc2e47dba438720a336c38103308aeae3d635e` | `skills/cotend-diagnose-only/` | `adapted` | 保持只读诊断；更新前置元数据、默认提示词和内部路由名称。 |
-| `dual-model-upgrade` | 3 | `dfb25bd4464e0266b665af138a5f3902b44ce281` | `skills/cotend-model-upgrade/` | `adapted` | 保留顾问/试用/接手/回退/复诊；更新协议、数据包族和治理引用。 |
+| `dual-ai-init` | 2 | `10d067b679fb810be4a449a047c13d2747b48259` | `skills/cotend-init/` | `adapted` | 保留薄入口；普通初始化只报告语义状态和独立下一动作。 |
+| `dual-ai-project-init` | 2 | `e71864611f7ec7ef0a9a4cc6314083da86ff9068` | `skills/cotend-project-init/` | `adapted` | 保留 Auto Mode；增加档位持久化、语义绑定检查和路线重基恢复。 |
+| `dual-ai-collaboration` | 23 | `f1387d19a8c2dba2738b886276e6d1987602e332` | `skills/cotend-collaboration/` | `adapted` | 保留渐进治理核心和 21 个参考模块；移除私有维护者默认与机器路径。 |
+| `diagnose-only` | 2 | `06e8b6bd4c2f916d80e57544edd7bd4ec1db60f5` | `skills/cotend-diagnose-only/` | `adapted` | 保持只读诊断与可写语义入口的清晰分界。 |
+| `dual-ai-semantic-alignment` | 3 | `df5e63b3cd8ff315ac09973666a71eb20825f094` | `skills/cotend-semantic-alignment/` | `adapted` | 新增独立可写语义入口及零依赖内容寻址 helper。 |
+| `dual-model-upgrade` | 3 | `940081225626250a6680cef9499f9b14003147da` | `skills/cotend-model-upgrade/` | `adapted` | 保留完整模型生命周期，升级到数据包族 v1.11。 |
 | `grill-me` | 1 | `70df660726ef12349a40dc0353a681c82414fe95` | `skills/grill-me/` | `adopted` | 从标记发布包字节复用，不添加 CoTend 前缀，不改变语义。 |
 | `karpathy-guidelines` | 1 | `e119339197d600aa39a24fd7a95c946800c9c949` | `skills/karpathy-guidelines/` | `adopted` | 从标记发布包字节复用，不添加 CoTend 前缀，不改变语义。 |
 
@@ -57,6 +58,7 @@ analysis_language: zh-CN
 - `dual-ai-project-init` -> `cotend-project-init`
 - `dual-ai-collaboration` -> `cotend-collaboration`
 - `diagnose-only` -> `cotend-diagnose-only`
+- `dual-ai-semantic-alignment` -> `cotend-semantic-alignment`
 - `dual-model-upgrade` -> `cotend-model-upgrade`
 - `grill-me` 与 `karpathy-guidelines` 保持原名。
 - 目录名、SKILL 前置元数据、`agents/openai.yaml`、默认提示词、显式技能引用、参考路径和回退路径必须同时更新。
@@ -64,8 +66,8 @@ analysis_language: zh-CN
 
 ### 协议与版本世代
 
-- 活动协议标识使用 `cotend-collaboration-v1.52`，保留上游行为世代 `v1.52`，不伪装成重新从 v1.0 发明的协议。
-- 模型数据包族使用 `cotend-model-upgrade-v1.7`，保留 `v1.7` 兼容世代。
+- 活动协议标识使用 `cotend-collaboration-v1.65`，完整继承上游行为世代。
+- 模型数据包族使用 `cotend-model-upgrade-v1.11`。
 - CoTend 产品发布版本与上述行为世代分开管理；本叶不决定首个公开产品版本号。
 - `dual-ai-*` 只可出现在上游来源记录、明确的旧项目迁移检测或迁移说明中，不得继续作为活动产品输出、默认提示词、主调用名或新项目协议值。
 - 旧名称迁移兼容必须是输入侧允许清单：识别后写出 CoTend 新真相，不长期双写两套活动协议。
@@ -92,9 +94,9 @@ analysis_language: zh-CN
 
 ## 实施批次
 
-1. 从附注标签读取 30 个 Codex 技能文件并核对每个源目录树。
-2. 首次采用时在 `codex-skills/` 落位并适配 30 个文件；L54 后仅把当前仓库载体路径迁移为根 `skills/`，上游读取路径不变。
-3. 机械更新五个目录、前置元数据、agent 元数据、委派、自引用、回退路径、协议与数据包族。
+1. 从附注标签读取 37 个 Codex Skill 文件并核对每个源目录树。
+2. 在根 `skills/` 落位并适配 37 个文件，上游读取路径仍为发布包 `codex-skills/`。
+3. 机械更新六个目录、前置元数据、agent 元数据、委派、自引用、回退路径、协议与数据包族。
 4. 逐文件语义审查高风险文本，不用无上下文全局替换修改旧版迁移、来源或第三方归属。
 5. 增加许可证、许可告知、来源记录和已采用技能集验证器。
 6. 执行官方 `skill-creator` 的 `quick_validate.py`、前置/agent 元数据检查、委派图检查、第三方字节检查和旧品牌允许清单扫描。
@@ -103,7 +105,7 @@ analysis_language: zh-CN
 
 ## 实施结果
 
-- 根 `skills/` 已包含 7 个 Skill 目录和 30 个文件；五个用户原创 Skill 已完成 CoTend 品牌与 Codex 元数据适配，迁移前后 path/hash manifest 不变。
+- 根 `skills/` 已包含 8 个 Skill 目录和 37 个文件；六个用户原创 Skill 已完成 CoTend 品牌、公开默认和 Codex 元数据适配。
 - 两个 MIT Skill 与固定 release 中的对应文件保持字节一致，独立许可证、notice 和机器可读来源记录已落位。
 - C01-C19 已映射到实际 Skill 文件；C16 只完成仓库源树部分，live 安装与交付生命周期继续延后。
 - adoption log 与 `upstream/framework.lock.json` 使用 `containing_commit` 约定进入同一采用提交。
@@ -113,10 +115,10 @@ analysis_language: zh-CN
 
 实现至少必须通过：
 
-- 标记发布版、清单和七个源目录树重新验证；
-- 7/7 技能通过官方 `quick_validate.py`；
-- 5/5 CoTend 前置元数据名称与目录一致；
-- 5/5 `agents/openai.yaml` 与 SKILL.md 触发语义一致；
+- 标记发布版、清单和八个源目录树重新验证；
+- 8/8 Skill 通过官方 `quick_validate.py`；
+- 6/6 CoTend 前置元数据名称与目录一致；
+- 6/6 `agents/openai.yaml` 与 SKILL.md 触发语义一致；
 - `cotend-init -> cotend-project-init -> cotend-collaboration` 委派链唯一且可重建；
 - `cotend-diagnose-only` 仍默认只读，修复必须另获授权；
 - `cotend-model-upgrade` 仍覆盖顾问/试用/接手/回退/里程碑复诊；
@@ -124,7 +126,7 @@ analysis_language: zh-CN
 - 活动产品文本中无未进入允许清单的 `dual-ai` 技能 ID、协议值、回退路径或默认提示词；
 - 不存在私有路径、维护日志、密钥、缓存、用户项目状态或未声明第三方文件；
 - 仓库检查器、已采用技能集验证器、Python 编译、负向变异和 `git diff --check` 通过；
-- 本首次采用合同把真实 Codex 安装与菜单/触发验证标记为后续独立门；之后只能由相应授权和独立执行证据更新分发状态，不能改写采用输入或历史 lock。
+- 本累计采用合同不授权真实用户目录更新、rc.2 推送或 Public Plugin Directory 提交；这些状态只能由相应授权和独立执行证据更新。
 
 ## 框架变更评估
 

@@ -1,8 +1,8 @@
 {
   "schema": "cotend.third-party-source-registry",
   "schema_version": 1,
-  "adopted_source_release": "2026.07.11.3",
-  "release_anchor": "dual-ai-share-2026.07.11.3",
+  "adopted_source_release": "2026.07.23.2",
+  "release_anchor": "dual-ai-share-2026.07.23.2",
   "components": [
     {
       "component": "grill-me",

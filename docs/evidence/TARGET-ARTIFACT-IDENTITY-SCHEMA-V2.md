@@ -2,19 +2,23 @@
 
 ```yaml
 status: passed_with_scope_limitations
-validation_date: 2026-07-12
-source_release_id: 2026.07.11.3
+validation_date: 2026-07-23
+source_release_id: 2026.07.23.2
 source_framework_lock: upstream/framework.lock.json
-source_framework_lock_changed: false
+source_framework_lock_changed: true
 target_artifact_lock: delivery/codex-artifact.lock.json
-target_artifact_id: cotend-codex-r000001
-target_revision: 1
-target_manifest_sha256: f8ed51e76a19fb26debcb998fb2c5f8505908f5d73d4cf5351ea52a1c915c049
-framework_protocol: cotend-collaboration-v1.52
+current_target_artifact_id: cotend-codex-r000002
+current_target_revision: 2
+current_target_manifest_sha256: 0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b
+predecessor_target_artifact_id: cotend-codex-r000001
+predecessor_target_revision: 1
+predecessor_source_release_id: 2026.07.11.3
+predecessor_framework_protocol: cotend-collaboration-v1.52
+framework_protocol: cotend-collaboration-v1.65
 receipt_schema: 2_with_schema_1_read_and_migration
 checkpoint_schema: 2_with_schema_1_snapshot_read
-managed_skills: 7
-managed_files: 30
+managed_skills: 8
+managed_files: 37
 real_project_or_global_write: false
 ```
 
@@ -25,18 +29,19 @@ real_project_or_global_write: false
 本次验证把来源采用与目标产物拆成两个独立身份面：
 
 - `upstream/framework.lock.json` 继续固定 upstream release、来源树、协议和采用锚点；
-- `delivery/codex-artifact.lock.json` 固定 Codex target lineage、单调 revision、目标 manifest 和 legacy receipt mapping；
+- `delivery/codex-artifact.lock.json` 固定 Codex target lineage、单调 revision、目标 manifest 和受信 predecessor/legacy receipt mapping；
 - schema v2 receipt 同时记录 source release、target artifact/revision、protocol 和 manifest；
 - future product version 保持 `null`，内部 revision 不冒充公开 CoTend 版本。
 
 ## 已执行验证
 
-- `executed`：`Artifact.from_repository()` 交叉校验两个锁，返回 source release `2026.07.11.3`、target `cotend-codex-r000001` / revision `1` 和 30 文件精确 manifest。
+- `executed`：`Artifact.from_repository()` 交叉校验两个锁，返回 source release `2026.07.23.2`、target `cotend-codex-r000002` / revision `2` 和 37 文件精确 manifest。
 - `executed`：新安装写入 schema v2 receipt；install、update、repair、enable、disable、uninstall 和 rollback 既有行为继续通过。
 - `executed`：合法 schema v1 receipt 被分类为 `identity_migration_available`。迁移默认 dry-run；apply 只重写 adapter receipt，并建立 `preserve_existing` checkpoint，不在 checkpoint 中复制或替换 Skill payload。
 - `executed`：identity migration rollback 恢复逐字段相同的 schema v1 receipt，并在操作前验证现场 payload 仍与 checkpoint manifest 相同。
 - `executed`：mapped legacy payload 损坏时，repair 只有在 receipt 预期文件身份与 target 完全一致时才组合修复和迁移；未映射 identity 保持 incompatible。
-- `executed`：更低 revision 返回 `downgrade_candidate`，普通 update 被阻止且零写入；更高 revision 的协议冲突和同 revision 不同字节返回 incompatible。
+- `executed`：更低 revision 返回 `downgrade_candidate`，普通 update 被阻止且零写入；未映射的更高 revision 协议冲突和同 revision 不同字节返回 incompatible。
+- `executed`：精确锁定的 `r000001 / v1.52 / 7 Skill / 30 文件` predecessor 回执被识别为 `update_available`，实际更新补入 `cotend-semantic-alignment` 和 4 个新增协作参考文件，最终回执绑定 `r000002 / v1.65 / 8 Skill / 37 文件`。
 - `executed`：schema v1 snapshot checkpoint 仍可读取；schema v2 checkpoint 缺少显式 `payload_mode` 时被拒绝。
 - `executed`：32 项交付核心单元测试和 3 项 delivered-runtime 单元测试全部通过。
 - `executed`：CLI 级 11 步常规生命周期、5 步 legacy identity migration 和 8 类负向/故障恢复通过。
@@ -46,10 +51,10 @@ real_project_or_global_write: false
 ## 关键不变量
 
 - 相同 target artifact ID 必须对应相同 platform、lineage、revision、source provenance、protocol 和 manifest。
-- 只有同 platform、同 lineage、同 protocol 的更高 revision 才是 `update_available`。
+- 同 platform、同 lineage、同 protocol 的更高 revision 可成为 `update_available`；跨协议更新只允许命中 target lock 中精确绑定旧 protocol、manifest、artifact ID 和 revision 的受信 predecessor。
 - 更低 revision 是 `downgrade_candidate`；当前实现不自动执行 downgrade。
 - source release 变化本身不等于 target update；目标字节或目标身份演进必须产生新的 target revision。
-- legacy migration 必须命中 target lock 中的精确 mapping；未知或冲突 identity 不会按 ID 不同而自动更新。
+- legacy migration 或跨协议 predecessor update 必须命中 target lock 中的精确 mapping；未知或冲突 identity 不会按 ID 不同而自动更新。
 - identity migration 不修改 Skill payload、用户项目文件、无关 Skill、全局配置、认证或 upstream source lock。
 
 ## 可复现命令
@@ -71,4 +76,4 @@ python scripts/verify_adopted_skill_set.py --upstream-repo <path-to-pinned-upstr
 - 本次 L28 身份迁移本身未验证并发；后续 `docs/evidence/DELIVERY-CONCURRENCY-AND-INTERRUPTION.md` 已证明项目级多进程排他和强制终止检测，L30 又在 disposable fixture 中证明每次精确确认的遗留锁释放与 checkpoint 回滚。自动 unattended recovery、通用 force unlock、断电恢复和真实项目恢复仍未实现。
 - 未实现或授权自动 downgrade。
 - 未选择最终 Plugin、Marketplace、安装器或公开产品版本。
-- 本次只解决 target identity 和 delivery migration；默认英文运行时缺口仍等待 upstream 通用语义审查，不因新 artifact identity 自动关闭。
+- 本次继续只解决 target identity、受信 predecessor update 和 delivery migration；它不自动证明真实用户目录升级、Desktop 热更新或远端 Marketplace 跨版本刷新。

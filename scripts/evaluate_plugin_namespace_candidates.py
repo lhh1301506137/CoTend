@@ -26,6 +26,7 @@ SHORT_NAME_MAP = {
     "cotend-init": "init",
     "cotend-model-upgrade": "model-upgrade",
     "cotend-project-init": "project-init",
+    "cotend-semantic-alignment": "semantic-alignment",
 }
 USER_OWNED_SKILLS = tuple(SHORT_NAME_MAP)
 COMPANION_SKILLS = tuple(

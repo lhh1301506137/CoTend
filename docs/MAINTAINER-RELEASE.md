@@ -15,7 +15,7 @@ This guide prepares a release candidate without weakening CoTend's public-action
   python scripts/verify_codex_plugin_package.py --repository-only
   python scripts/verify_plugin_submission_materials.py
   python scripts/prepare_reviewer_fixtures.py
-  python scripts/build_release_archive.py --check-tag v0.1.0-rc.1
+  python scripts/build_release_archive.py --check-tag v0.1.0-rc.2
   python scripts/verify_repository_maturity.py
   ```
 

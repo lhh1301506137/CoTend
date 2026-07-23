@@ -4,8 +4,8 @@
   "status": "contract_only_not_run",
   "package": {
     "plugin_id": "cotend",
-    "version": "0.1.0-rc.1",
-    "path_hash_manifest_sha256": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f"
+    "version": "0.1.0-rc.2",
+    "path_hash_manifest_sha256": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2"
   },
   "reviewer_context": {
     "plugin_specific_authentication_required": false,

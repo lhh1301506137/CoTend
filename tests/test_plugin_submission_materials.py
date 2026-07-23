@@ -49,7 +49,7 @@ class PluginSubmissionMaterialTests(unittest.TestCase):
             result["package_digest"],
             package.path_hash_manifest_sha256(contract["expected_package_manifest"]),
         )
-        self.assertEqual(self.materials["package"]["file_count"], 41)
+        self.assertEqual(self.materials["package"]["file_count"], 48)
         self.assertTrue(self.materials["package"]["final_identity_confirmed"])
         self.assertEqual(
             self.materials["package"]["identity_authority"],

@@ -26,6 +26,22 @@ P0/P1 bypass budgets and surface immediately.
 
 Spec drift, hardcoded special cases, temporary branches becoming architecture, approvals without evidence, repeated symptom patching, declining UX/maintainability/coherence. These trigger investigation, not automatic alert.
 
+When repeated rework, low-value cycles, review disagreement, or implementation/product-surface mismatch suggests direction rather than local code quality, route to Triggered Semantic Reconciliation in `plan-tree.md`. Start with the active path and recent changes; run deep intent comparison only after the signal or a high-value boundary justifies it. Do not add a second Sentinel truth file or force full-project rereads on ordinary steps.
+
+## Harness Ratchet
+
+When the same AI/process failure happens twice in one task/project, or once with high impact, do more than repair the current output. Check whether a small durable prevention would reduce recurrence. Signals include a skipped required Skill/module/Trellis phase/review/verification step, a returning bug/finding class, a handoff that omits material intent/risk/acceptance evidence, a misclassified risk/release/`继续` boundary, repeated symptom patching, or the user/reviewer correcting the same workflow misunderstanding again.
+
+Choose the smallest owner-aligned prevention:
+
+- project-specific rule -> active PRD/STATUS, `.trellis/spec/`, or `AGENTS.md`;
+- missing check -> existing test/smoke/lint/type-check/script/checklist;
+- collaboration/process miss -> existing STATUS/review/quality/handoff surface;
+- cross-project recurring failure -> propose a framework change through Framework Change Evaluation;
+- one-off or low-confidence event -> record `watching` without adding a rule.
+
+Do not turn every mistake into a global instruction. Tighten the harness only for recurrence, high impact, or cheap evidence-backed prevention; reuse an existing owner instead of creating a parallel mechanism.
+
 ## State
 
 Statuses: `open`, `watching`, `resolved`, `dismissed_by_user`, `deferred_until`, `escalated`.

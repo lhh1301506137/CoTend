@@ -56,7 +56,7 @@ AI UAT never equals user acceptance.
 
 ## User Acceptance Walkthrough
 
-When a slice, milestone, MVP, or Done Gate reaches a point where the user should accept or reject product behavior, provide a 3-10 step walkthrough in the recorded project language, or English when none is recorded:
+When a slice, milestone, MVP, or Done Gate reaches a point where the user should accept or reject product behavior, provide a 3-10 step walkthrough in the project's recorded user-facing language, or English by default:
 
 - where to open or start the product;
 - what to click/type/do;

@@ -35,6 +35,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
             "cotend-init": "init",
             "cotend-model-upgrade": "model-upgrade",
             "cotend-project-init": "project-init",
+            "cotend-semantic-alignment": "semantic-alignment",
         }
         self.assertEqual(namespace.SHORT_NAME_MAP, expected)
         self.assertEqual(
@@ -53,28 +54,29 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         inventory = namespace.identifier_inventory(
             namespace.base.SOURCE_SKILLS_ROOT, namespace.USER_OWNED_SKILLS
         )
-        self.assertEqual(inventory["occurrences"], 77)
-        self.assertEqual(inventory["files"], 15)
+        self.assertEqual(inventory["occurrences"], 176)
+        self.assertEqual(inventory["files"], 21)
         self.assertEqual(
             inventory["by_identifier"],
             {
-                "cotend-collaboration": 36,
-                "cotend-diagnose-only": 9,
-                "cotend-init": 7,
-                "cotend-model-upgrade": 8,
-                "cotend-project-init": 17,
+                "cotend-collaboration": 69,
+                "cotend-diagnose-only": 25,
+                "cotend-init": 12,
+                "cotend-model-upgrade": 11,
+                "cotend-project-init": 15,
+                "cotend-semantic-alignment": 44,
             },
         )
         self.assertEqual(
             inventory["by_category"],
             {
-                "agent_self_prompt": 5,
-                "explicit_invocation": 5,
+                "agent_self_prompt": 6,
+                "explicit_invocation": 65,
                 "fallback_path": 2,
-                "frontmatter_name": 5,
-                "plain_reference": 31,
-                "protocol_or_version": 7,
-                "reference_path": 22,
+                "frontmatter_name": 6,
+                "plain_reference": 32,
+                "protocol_or_version": 13,
+                "reference_path": 52,
             },
         )
 
@@ -144,9 +146,9 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
             )
 
         preserve = results["N1-preserve"]
-        self.assertEqual(preserve["skills"], 7)
-        self.assertEqual(preserve["skill_files"], 30)
-        self.assertEqual(preserve["package_files"], 36)
+        self.assertEqual(preserve["skills"], 8)
+        self.assertEqual(preserve["skill_files"], 37)
+        self.assertEqual(preserve["package_files"], 43)
         self.assertEqual(transforms["N1-preserve"], [])
         self.assertTrue(preserve["source_comparison"]["byte_identical"])
         self.assertEqual(preserve["source_comparison"]["moved_path_count"], 0)
@@ -155,28 +157,28 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         )
         self.assertEqual(
             preserve["residual_source_identifier_inventory"]["occurrences"],
-            77,
+            176,
         )
         self.assertEqual(preserve["residual_migration_review_required"], 0)
-        self.assertEqual(preserve["plugin_sensitive_reference_count"], 12)
+        self.assertEqual(preserve["plugin_sensitive_reference_count"], 73)
 
         short = results["N2-short"]
-        self.assertEqual(short["skills"], 7)
-        self.assertEqual(short["skill_files"], 30)
-        self.assertEqual(short["package_files"], 36)
-        self.assertEqual(len(transforms["N2-short"]), 10)
-        self.assertEqual(short["source_comparison"]["moved_path_count"], 28)
+        self.assertEqual(short["skills"], 8)
+        self.assertEqual(short["skill_files"], 37)
+        self.assertEqual(short["package_files"], 43)
+        self.assertEqual(len(transforms["N2-short"]), 12)
+        self.assertEqual(short["source_comparison"]["moved_path_count"], 35)
         self.assertEqual(
-            short["source_comparison"]["byte_changed_file_count"], 10
+            short["source_comparison"]["byte_changed_file_count"], 12
         )
         self.assertFalse(short["source_comparison"]["byte_identical"])
         self.assertEqual(
             short["residual_source_identifier_inventory"]["occurrences"],
-            67,
+            164,
         )
-        self.assertEqual(short["residual_migration_review_required"], 60)
-        self.assertEqual(short["plugin_sensitive_reference_count"], 7)
-        self.assertEqual(len(short["target_entrypoints"]), 5)
+        self.assertEqual(short["residual_migration_review_required"], 151)
+        self.assertEqual(short["plugin_sensitive_reference_count"], 67)
+        self.assertEqual(len(short["target_entrypoints"]), 6)
         self.assertEqual(
             {item["canonical_name"] for item in short["target_entrypoints"]},
             {
@@ -185,6 +187,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
                 "cotend:init",
                 "cotend:model-upgrade",
                 "cotend:project-init",
+                "cotend:semantic-alignment",
             },
         )
         candidate_root = self.evaluation_root / "N2-short"
@@ -344,7 +347,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         overlay = namespace.display_led_overlay(n1_result)
         self.assertEqual(overlay["physical_package"], "N1-preserve")
         self.assertEqual(overlay["additional_package_bytes"], 0)
-        self.assertEqual(overlay["friendly_display_name_count"], 5)
+        self.assertEqual(overlay["friendly_display_name_count"], 6)
         self.assertTrue(overlay["display_names_unique"])
         self.assertTrue(overlay["canonical_double_prefix_remains"])
         self.assertEqual(

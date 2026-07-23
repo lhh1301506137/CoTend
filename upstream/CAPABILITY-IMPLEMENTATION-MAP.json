@@ -2,8 +2,8 @@
   "schema": "cotend.capability-implementation-map",
   "schema_version": 1,
   "status": "adopted_verified",
-  "source_release": "2026.07.11.3",
-  "source_anchor": "dual-ai-share-2026.07.11.3",
+  "source_release": "2026.07.23.2",
+  "source_anchor": "dual-ai-share-2026.07.23.2",
   "target_platform": "Codex",
   "skill_set_path": "skills/",
   "capability_count": 19,
@@ -15,6 +15,7 @@
       "coverage_status": "mapped",
       "owners": [
         "skills/cotend-project-init/SKILL.md",
+        "skills/cotend-semantic-alignment/SKILL.md",
         "skills/cotend-collaboration/references/idea-to-consensus.md",
         "skills/grill-me/SKILL.md"
       ]
@@ -37,6 +38,7 @@
       "coverage_status": "mapped",
       "owners": [
         "skills/cotend-project-init/SKILL.md",
+        "skills/cotend-semantic-alignment/SKILL.md",
         "skills/cotend-collaboration/references/plan-tree.md",
         "skills/cotend-collaboration/references/templates.md"
       ]

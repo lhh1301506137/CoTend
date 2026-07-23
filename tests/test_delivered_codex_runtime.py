@@ -46,8 +46,8 @@ class DeliveredCodexRuntimeTests(unittest.TestCase):
             self.fixture,
             allow_unrelated_skills=True,
         )
-        self.assertEqual(result["skills"], 7)
-        self.assertEqual(result["files"], 30)
+        self.assertEqual(result["skills"], 8)
+        self.assertEqual(result["files"], 37)
         self.assertEqual(result["unrelated_skills"], [bridge.UNRELATED_SKILL])
 
     def test_delivery_preflight_uses_receipt_and_exact_artifact(self) -> None:

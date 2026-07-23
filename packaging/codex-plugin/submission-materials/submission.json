@@ -9,16 +9,16 @@
   },
   "package": {
     "plugin_id": "cotend",
-    "version": "0.1.0-rc.1",
+    "version": "0.1.0-rc.2",
     "package_status": "production_candidate_not_published",
     "package_lock": "packaging/codex-plugin/package.lock.json",
     "manifest": "packaging/codex-plugin/cotend/.codex-plugin/plugin.json",
-    "manifest_sha256": "36655662ebeca0cd89b8525bdb91318cd859ce11535a58e94d1c99933ddb0fc5",
-    "file_count": 41,
-    "path_hash_manifest_sha256": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
-    "skill_count": 7,
-    "skill_file_count": 30,
-    "source_skill_manifest_sha256": "acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b",
+    "manifest_sha256": "e4faeb216b1dc003e93422f0aa8266a947957dfc91d9f286e2cd119dfb3b5dfa",
+    "file_count": 48,
+    "path_hash_manifest_sha256": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
+    "skill_count": 8,
+    "skill_file_count": 37,
+    "source_skill_manifest_sha256": "ce3253e553f1a95ec81858b2b1e2429a771816e7477516da779b1a99e0c2c0de",
     "identity_authority": "initial_submission_identity_confirmed_not_release",
     "final_identity_confirmed": true
   },
@@ -50,8 +50,8 @@
     "bundle_type": "skills_only",
     "bundle_status": "production_candidate_locally_verified",
     "bundle_source": "packaging/codex-plugin/package.lock.json",
-    "skill_count": 7,
-    "skill_file_count": 30,
+    "skill_count": 8,
+    "skill_file_count": 37,
     "upload_performed": false,
     "mcp_server_required": false
   },
@@ -75,7 +75,7 @@
   "release_notes": {
     "status": "draft_not_submitted",
     "submission_kind": "initial_submission",
-    "what_plugin_does": "CoTend packages seven skills that help people govern AI-assisted software development from project initialization and continuation through diagnosis, review, and model handoff.",
+    "what_plugin_does": "CoTend packages eight skills that help people govern AI-assisted software development from project initialization and semantic alignment through continuation, diagnosis, review, and model handoff.",
     "initial_or_update": "Initial submission.",
     "changes_since_prior_submitted_version": "Not applicable. This is the initial submission.",
     "reviewer_setup": "No CoTend account, backend, API key, demo credentials, or private network is required. Use the disposable local fixtures described in reviewer-tests.json."
@@ -90,9 +90,9 @@
       "status": "resolved",
       "value": {
         "plugin_id": "cotend",
-        "version": "0.1.0-rc.1",
-        "package_digest": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
-        "confirmed_on": "2026-07-14",
+        "version": "0.1.0-rc.2",
+        "package_digest": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
+        "confirmed_on": "2026-07-23",
         "confirmation_scope": "initial_submission_identity_not_release_or_platform_acceptance",
         "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected"
       },

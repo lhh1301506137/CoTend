@@ -28,6 +28,7 @@ FIRST_PARTY = (
     "cotend-init",
     "cotend-model-upgrade",
     "cotend-project-init",
+    "cotend-semantic-alignment",
 )
 COMPANIONS = ("grill-me", "karpathy-guidelines")
 
@@ -125,8 +126,8 @@ class IsolatedUserSkillDeliveryTests(unittest.TestCase):
         return Artifact.from_directory(
             source,
             source_release_id=self.artifact.source_release_id,
-            artifact_id="cotend-codex-r000002",
-            revision=2,
+            artifact_id="cotend-codex-r000003",
+            revision=3,
             protocol=self.artifact.protocol,
         )
 

@@ -118,14 +118,14 @@ Gate：产品变化由用户证据驱动，而不是为了与竞品不同而变�
 - 外部框架只是二级参考。
 - 用户原创和许可允许的 release 内容可按 adoption 记录复用；受限、未知和私人材料必须隔离。
 - Codex 首发、英文产品表面、Apache-2.0 自有内容和独立公开仓库继续有效。
-- 仓库内 Codex 源载体固定为 7 个 Skill、30 个文件；五个用户原创 Skill 使用已确认的 CoTend 名称，两个 MIT Skill 保留原名与许可证。
+- 仓库内 Codex 源载体当前固定为 8 个 Skill、37 个文件；六个用户原创 Skill 使用已确认的 CoTend 名称，两个 MIT Skill 保留原名与许可证。累计 adoption 覆盖 dual-ai v1.53-v1.65。
 - 渠道职责采用三层路线：项目 `.agents/skills` 服务开发回归，Marketplace 服务技术预览，Public Plugins Directory 是最终 novice 发布目标。
 
 ## 当前待验证或未确认
 
-- Desktop 技能选择器的 `/cotend` 七条列表标题、可见说明截断、新任务刷新和 `CoTend Init` 非发送 chip 已验证；当前任务热更新未通过。详情、其他查询/排序、canonical placement 和自然语言触发仍待验证。项目级 CLI 发现与显式调用已验证。
+- Desktop 技能选择器对 rc.1 的 `/cotend` 七条列表标题、可见说明截断、新任务刷新和 `CoTend Init` 非发送 chip 已验证；当前任务热更新未通过。rc.2 新增的 Semantic Alignment 第八入口、详情、其他查询/排序、canonical placement 和自然语言触发仍待验证。当前 8 Skill 项目级与 Plugin CLI 发现已验证。
 - 英文首发表面的默认输出遵循；L26 已证明 recorded-English 路径通过，但无项目语言记录时在清除父任务环境后仍返回中文。独立 target artifact revision 已建立，但语言优先级/adapter fallback 属于 upstream 共享行为，仍需等待正式上游审计与 release 回流后再适配，不能因具备新 target ID 就先行修改 Skill。
-- GitHub Open Beta 已固定 `cotend@0.1.0-rc.1`、preserve namespace 和真实 `owner/repo` CLI 安装路径；最终稳定版 identity/version、Public Directory listing、详情/canonical placement、token 插入与模型介导委派证据仍待验证，真实项目及可写 live 旅程尚未完成。
+- GitHub Open Beta 已公开 `cotend@0.1.0-rc.1`、preserve namespace 和真实 `owner/repo` CLI 安装路径；当前 `cotend@0.1.0-rc.2` 48 文件候选只完成本地验证，尚未获准推送或做远端升级重验。最终稳定版 identity/version、Public Directory listing、详情/canonical placement、token 插入与模型介导委派证据仍待验证，v1.65 真实项目及可写 live 旅程尚未完成。
 - 项目状态的最小物理布局。
 - GitHub Open Beta 之后的跨版本升级、真实用户/Desktop 生命周期、审核和 Public Directory 发布执行顺序。
 

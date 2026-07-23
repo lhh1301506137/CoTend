@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from unittest import mock
 
@@ -15,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from cotend_delivery import Artifact, DeliveryError, DeliveryManager  # noqa: E402
+from cotend_delivery.core import LegacyReceiptMapping  # noqa: E402
 
 
 def file_sha256(path: Path) -> str:
@@ -71,8 +73,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         return Artifact.from_directory(
             source,
             source_release_id=self.artifact.source_release_id,
-            artifact_id="cotend-codex-r000002",
-            revision=2,
+            artifact_id="cotend-codex-r000003",
+            revision=3,
             protocol=self.artifact.protocol,
         )
 
@@ -135,11 +137,11 @@ class DeliveryLifecycleTests(unittest.TestCase):
         return updated
 
     def test_artifact_identity_dry_run_and_idempotent_install(self) -> None:
-        self.assertEqual(len(self.artifact.skills), 7)
-        self.assertEqual(len(self.artifact.files), 30)
-        self.assertEqual(self.artifact.source_release_id, "2026.07.11.3")
-        self.assertEqual(self.artifact.artifact_id, "cotend-codex-r000001")
-        self.assertEqual(self.artifact.revision, 1)
+        self.assertEqual(len(self.artifact.skills), 8)
+        self.assertEqual(len(self.artifact.files), 37)
+        self.assertEqual(self.artifact.source_release_id, "2026.07.23.2")
+        self.assertEqual(self.artifact.artifact_id, "cotend-codex-r000002")
+        self.assertEqual(self.artifact.revision, 2)
         before = tree_manifest(self.project)
 
         preview = self.manager.execute("install", self.artifact)
@@ -152,7 +154,7 @@ class DeliveryLifecycleTests(unittest.TestCase):
         self.assertEqual(state["installation"], "complete")
         self.assertEqual(state["enablement"], "enabled")
         self.assertEqual(state["candidate_relation"], "same_as_current")
-        self.assertEqual(state["managed_files"], 30)
+        self.assertEqual(state["managed_files"], 37)
         receipt = self.load_receipt()
         self.assertEqual(receipt["schema_version"], 2)
         self.assertEqual(receipt["source_release_id"], self.artifact.source_release_id)
@@ -225,6 +227,97 @@ class DeliveryLifecycleTests(unittest.TestCase):
         )
         self.assert_protected_unchanged()
 
+    def test_locked_r1_predecessor_updates_across_protocol_and_inventory(self) -> None:
+        self.install()
+        removed_files = {
+            "cotend-collaboration/references/delegation-maturity.md",
+            "cotend-collaboration/references/native-agent-orchestration.md",
+            "cotend-collaboration/references/runtime-profiles.md",
+            "cotend-collaboration/references/semantic-implementation-closure.md",
+        }
+        predecessor_files = {
+            relative: digest
+            for relative, digest in self.artifact.files.items()
+            if not relative.startswith("cotend-semantic-alignment/")
+            and relative not in removed_files
+        }
+        predecessor_skills = [
+            skill
+            for skill in self.artifact.skills
+            if skill != "cotend-semantic-alignment"
+        ]
+        self.assertEqual(len(predecessor_skills), 7)
+        self.assertEqual(len(predecessor_files), 30)
+        predecessor_manifest = hashlib.sha256(
+            json.dumps(
+                predecessor_files,
+                ensure_ascii=True,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+
+        shutil.rmtree(
+            self.project / ".agents" / "skills" / "cotend-semantic-alignment"
+        )
+        for relative in removed_files:
+            (self.project / ".agents" / "skills" / relative).unlink()
+        receipt = self.load_receipt()
+        receipt.update(
+            {
+                "source_release_id": "2026.07.11.3",
+                "artifact_id": "cotend-codex-r000001",
+                "target_revision": 1,
+                "protocol": "cotend-collaboration-v1.52",
+                "skills": predecessor_skills,
+                "files": predecessor_files,
+                "manifest_sha256": predecessor_manifest,
+            }
+        )
+        self.manager.receipt_path.write_text(
+            json.dumps(receipt, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        candidate = replace(
+            self.artifact,
+            legacy_receipt_mappings=(
+                *self.artifact.legacy_receipt_mappings,
+                LegacyReceiptMapping(
+                    receipt_schema_version=1,
+                    artifact_id="2026.07.11.3",
+                    protocol="cotend-collaboration-v1.52",
+                    manifest_sha256=predecessor_manifest,
+                    target_artifact_id="cotend-codex-r000001",
+                    target_revision=1,
+                ),
+            ),
+        )
+
+        before = self.manager.inspect(candidate)
+        self.assertEqual(before["installation"], "complete")
+        self.assertEqual(before["candidate_relation"], "update_available")
+        updated = self.manager.execute("update", candidate, apply=True)
+        self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
+        self.assertEqual(updated["state_after"]["managed_files"], 37)
+        current_receipt = self.load_receipt()
+        self.assertEqual(current_receipt["artifact_id"], "cotend-codex-r000002")
+        self.assertEqual(current_receipt["target_revision"], 2)
+        self.assertEqual(current_receipt["protocol"], "cotend-collaboration-v1.65")
+        self.assertTrue(
+            (
+                self.project
+                / ".agents"
+                / "skills"
+                / "cotend-semantic-alignment"
+                / "SKILL.md"
+            ).is_file()
+        )
+        for relative in removed_files:
+            self.assertTrue(
+                (self.project / ".agents" / "skills" / relative).is_file()
+            )
+        self.assert_protected_unchanged()
+
     def test_same_artifact_id_with_different_bytes_is_blocked(self) -> None:
         self.install()
         updated_artifact = self.make_updated_artifact()
@@ -266,8 +359,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         candidate = Artifact.from_directory(
             self.artifact.root,
             source_release_id=self.artifact.source_release_id,
-            artifact_id="cotend-codex-r000002",
-            revision=2,
+            artifact_id="cotend-codex-r000003",
+            revision=3,
             protocol="cotend-collaboration-v99",
         )
 
@@ -404,6 +497,32 @@ class DeliveryLifecycleTests(unittest.TestCase):
         self.assertIn("receipt_invalid", state["diagnostics"])
         with self.assertRaisesRegex(DeliveryError, "migrate_identity is blocked"):
             self.manager.execute("migrate_identity", self.artifact, apply=True)
+        self.assert_protected_unchanged()
+
+    def test_receipt_rejects_unknown_managed_skill(self) -> None:
+        self.install()
+        receipt = self.load_receipt()
+        receipt["skills"].append("unknown-skill")
+        receipt["files"]["unknown-skill/SKILL.md"] = "0" * 64
+        receipt["manifest_sha256"] = hashlib.sha256(
+            json.dumps(
+                receipt["files"],
+                ensure_ascii=True,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+        self.manager.receipt_path.write_text(
+            json.dumps(receipt, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+        state = self.manager.inspect(self.artifact)
+        self.assertFalse(state["receipt_valid"])
+        self.assertIn("receipt_invalid", state["diagnostics"])
+        with self.assertRaisesRegex(DeliveryError, "uninstall is blocked") as caught:
+            self.manager.execute("uninstall", apply=True)
+        self.assertEqual(caught.exception.code, "operation_blocked")
         self.assert_protected_unchanged()
 
     def test_legacy_checkpoint_rejects_schema_v2_operation(self) -> None:

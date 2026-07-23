@@ -2,7 +2,7 @@
   "schema": "cotend.codex-skill-role-map",
   "schema_version": 1,
   "status": "adopted_verified",
-  "candidate_release": "2026.07.11.3",
+  "candidate_release": "2026.07.23.2",
   "platform": "Codex",
   "launch_adapter": true,
   "public_interface_authority": "codex_skill_source_set_adopted_live_delivery_pending",
@@ -17,11 +17,11 @@
     "FRAMEWORK-INTRO.md",
     "THIRD-PARTY-SOURCES.json"
   ],
-  "skill_count": 7,
+  "skill_count": 8,
   "skills": [
     {
       "source_skill_id": "dual-ai-init",
-      "source_tree": "cb233ade310c37e0cd038ff5752eeced92a303f0",
+      "source_tree": "10d067b679fb810be4a449a047c13d2747b48259",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "unified_visible_entry",
@@ -47,7 +47,7 @@
     },
     {
       "source_skill_id": "dual-ai-project-init",
-      "source_tree": "1f2fdd44e90f31fec310eaf78b02e48de4fed53c",
+      "source_tree": "e71864611f7ec7ef0a9a4cc6314083da86ff9068",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "internal_auto_mode_engine",
@@ -56,6 +56,7 @@
       "uses": [
         "dual-ai-collaboration",
         "diagnose-only",
+        "dual-ai-semantic-alignment",
         "grill-me",
         "karpathy-guidelines"
       ],
@@ -77,7 +78,7 @@
     },
     {
       "source_skill_id": "dual-ai-collaboration",
-      "source_tree": "b75114a7e0fd2027943ed98217a0f9d581cbdae9",
+      "source_tree": "f1387d19a8c2dba2738b886276e6d1987602e332",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "shared_governance_core",
@@ -85,6 +86,7 @@
       "delegates_to": [],
       "used_by": [
         "dual-ai-project-init",
+        "dual-ai-semantic-alignment",
         "dual-model-upgrade"
       ],
       "role_evidence": [
@@ -106,7 +108,7 @@
     },
     {
       "source_skill_id": "diagnose-only",
-      "source_tree": "88dc2e47dba438720a336c38103308aeae3d635e",
+      "source_tree": "06e8b6bd4c2f916d80e57544edd7bd4ec1db60f5",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "contextual_read_only_diagnosis",
@@ -128,8 +130,37 @@
       ]
     },
     {
+      "source_skill_id": "dual-ai-semantic-alignment",
+      "source_tree": "df5e63b3cd8ff315ac09973666a71eb20825f094",
+      "source_relationship": "user_owned_original",
+      "license": "Apache-2.0",
+      "current_role": "direct_writable_semantic_alignment",
+      "current_visibility": "explicit_and_natural_language_direct_entry",
+      "delegates_to": [],
+      "uses": [
+        "dual-ai-collaboration",
+        "diagnose-only",
+        "grill-me"
+      ],
+      "role_evidence": [
+        "the Skill is the only writable L0-L2 semantic entry",
+        "plain Init reports semantic state but cannot execute alignment",
+        "the bundled zero-dependency helper binds exact user-confirmed semantic contracts"
+      ],
+      "adoption_status": "adapted",
+      "implementation_mode": "platform_adaptation",
+      "target_skill_id": "cotend-semantic-alignment",
+      "naming_status": "user_confirmed",
+      "preserve": [
+        "direct writable entry",
+        "charter-first per-node confirmation",
+        "content-addressed semantic contract freshness",
+        "read-only intent routing to Diagnose Only"
+      ]
+    },
+    {
       "source_skill_id": "dual-model-upgrade",
-      "source_tree": "dfb25bd4464e0266b665af138a5f3902b44ce281",
+      "source_tree": "940081225626250a6680cef9499f9b14003147da",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "advanced_model_role_lifecycle",
@@ -214,17 +245,17 @@
     "role_layers_confirmed": true,
     "user_owned_skill_names_confirmed": true,
     "final_names_confirmed": true,
-    "final_names_scope": "five_user_owned_ids_plus_preserved_third_party_identity",
+    "final_names_scope": "six_user_owned_ids_plus_preserved_third_party_identity",
     "physical_skill_count_confirmed": true,
     "physical_skill_count_scope": "repository_codex_skill_source_set",
-    "confirmed_codex_skill_count": 7,
+    "confirmed_codex_skill_count": 8,
     "third_party_bundling_confirmed": true,
     "codex_skill_set_decisions_complete": true,
     "actual_adoption_authorized": true,
     "repository_source_carrier": "skills/",
     "repository_source_implemented": true,
     "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption",
+    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-23-2-v1-65-adoption",
     "live_install_authorized": false,
     "live_install_performed": false,
     "plugin_or_marketplace_carrier": "github_root_candidate_local_verified",

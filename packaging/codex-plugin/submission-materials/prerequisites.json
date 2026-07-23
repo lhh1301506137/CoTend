@@ -14,10 +14,10 @@
   },
   "package": {
     "plugin_id": "cotend",
-    "version": "0.1.0-rc.1",
-    "file_count": 41,
-    "path_hash_manifest_sha256": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
-    "source_skill_manifest_sha256": "acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b",
+    "version": "0.1.0-rc.2",
+    "file_count": 48,
+    "path_hash_manifest_sha256": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
+    "source_skill_manifest_sha256": "ce3253e553f1a95ec81858b2b1e2429a771816e7477516da779b1a99e0c2c0de",
     "identity_authority": "initial_submission_identity_confirmed_not_release"
   },
   "decision_policy": {
@@ -92,7 +92,7 @@
       "blocker_ids": [
         "final_plugin_identity_and_version"
       ],
-      "question_zh": "是否把当前 cotend@0.1.0-rc.1 候选作为首次提交身份与版本，还是先调整？",
+      "question_zh": "是否把当前 cotend@0.1.0-rc.2 候选作为首次提交身份与版本，还是先调整？",
       "why_it_matters_zh": "最终身份会决定 manifest、package lock、logo、公开页面和后续更新兼容性，候选值本身不等于发布授权；OpenAI Platform 对预发布版本的实际接受尚未验证。",
       "recommended_option_id": "1",
       "options": [
@@ -115,8 +115,8 @@
       "answer": "1",
       "evidence": {
         "evidence_type": "user_explicit",
-        "recorded_on": "2026-07-14",
-        "scope": "final_plugin_identity_and_version_only_not_submission_or_release"
+        "recorded_on": "2026-07-23",
+        "scope": "confirmed_cotend_identity_carried_to_required_rc2_revision_not_submission_or_release"
       }
     },
     {
@@ -324,9 +324,9 @@
       "status": "resolved",
       "value": {
         "plugin_id": "cotend",
-        "version": "0.1.0-rc.1",
-        "package_digest": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
-        "confirmed_on": "2026-07-14",
+        "version": "0.1.0-rc.2",
+        "package_digest": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
+        "confirmed_on": "2026-07-23",
         "confirmation_scope": "initial_submission_identity_not_release_or_platform_acceptance",
         "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected"
       },
@@ -343,7 +343,7 @@
         "manifest、package lock、submission contract 与重建产物保持一致",
         "package、submission、lifecycle 与全仓回归通过"
       ],
-      "boundary_zh": "cotend@0.1.0-rc.1 已确认用于首次提交，但仍是未发布候选；若 OpenAI Platform 不接受预发布版本，必须重新打开 Q02，且当前决定不构成发布授权。"
+      "boundary_zh": "cotend@0.1.0-rc.2 已确认用于首次提交候选，但仍未发布；若 OpenAI Platform 不接受预发布版本，必须重新打开 Q02，且当前决定不构成提交或发布授权。"
     },
     {
       "id": "verified_publisher_identity",

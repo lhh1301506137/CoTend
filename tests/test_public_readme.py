@@ -25,7 +25,7 @@ EXPECTED_COMMANDS = {
     "python scripts/verify_codex_plugin_package.py --repository-only",
     "python scripts/verify_plugin_submission_materials.py",
     "python scripts/prepare_reviewer_fixtures.py",
-    "python scripts/build_release_archive.py --check-tag v0.1.0-rc.1",
+    "python scripts/build_release_archive.py --check-tag v0.1.0-rc.2",
     "python scripts/verify_repository_maturity.py",
     "python -m unittest discover -s tests",
     "python scripts/check_repository.py",
@@ -65,12 +65,12 @@ class PublicReadmeTests(unittest.TestCase):
         self.assertNotIn("Install CoTend from the Public Plugin Directory", self.text)
         self.assertNotIn("CoTend is production-ready", self.text)
 
-    def test_readme_skill_catalog_matches_seven_packaged_skills(self) -> None:
+    def test_readme_skill_catalog_matches_packaged_skills(self) -> None:
         section = self.text.split("<!-- skill-catalog-start -->", 1)[1].split(
             "<!-- skill-catalog-end -->", 1
         )[0]
         ids = re.findall(r"^\| [^|]+ \| `([^`]+)` \|", section, re.MULTILINE)
-        self.assertEqual(len(ids), 7)
+        self.assertEqual(len(ids), 8)
         self.assertEqual(set(ids), set(package.EXPECTED_SKILLS))
         self.assertIn("`CoTend Init` is the normal start or resume entry", self.text)
 

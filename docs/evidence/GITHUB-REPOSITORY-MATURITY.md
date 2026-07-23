@@ -59,3 +59,11 @@ python scripts/verify_repository_maturity.py
 ```
 
 修复前本地执行结果为 188 项完整单元测试通过；修复候选加入 CI pin 与 Python 3.10 清理兼容回归后，190 项完整单元测试通过。package verifier 的 8 项聚焦测试在 clean-runner `--repository-only` 和本机官方 Plugin validator 两种模式分别通过，前者明确报告官方 validator 未运行；修复提交加入唯一固定的维护者依赖文件后，仓库检查为 200 个公开候选、19 项能力和 19 份行为规范；5+3 夹具准备通过；41 文件 Release ZIP 的 SHA-256 为 `af277084e947d914c42855b0c8023b730c52a249c32c5a0060f3e5d111c108eb`。生成物仅位于被忽略的 `dist/` 与本地 provenance 根，不进入公开源代码。修复提交的最终三平台结论以 GitHub commit checks 为准。
+
+## 2026-07-23 rc.2 本地重验
+
+上述 metadata 与外部 CI URL 是 rc.1 的不可变历史证据。dual-ai v1.53-v1.65 adoption 后，本地未发布候选已更新为 `cotend@0.1.0-rc.2`：8 个 Skill、37 个 Skill 文件、48 个包文件；确定性 ZIP SHA-256 为 `b28e63c83ad80e5885594574a46b19fb901af92cc38fe2110448d1b8ee122547`，包 manifest SHA-256 为 `a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2`。
+
+本轮执行 197 项完整单元测试、官方 8/8 Skill quick validator、生产包、17+5 生产生命周期、15+5 GitHub 根载体、隔离 Plugin 17 步与 12 个负向用例、已交付运行时 7 个负向用例、5+3 提交材料和 209 个公开候选仓库检查，全部通过。`python scripts/build_release_archive.py --check-tag v0.1.0-rc.2 --json` 也通过。
+
+rc.2 尚未推送，因此没有把 rc.1 的 GitHub commit checks、远端 Marketplace lifecycle、tag 或 Release 结果继承给当前候选。推送后必须基于精确 rc.2 commit 重新读取 CI、远端安装和 release 状态。

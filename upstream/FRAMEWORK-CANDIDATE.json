@@ -3,42 +3,43 @@
   "schema_version": 1,
   "status": "adopted_verified",
   "candidate_only": false,
-  "verified_at": "2026-07-12",
-  "release_id": "2026.07.11.3",
-  "previous_release": "2026.07.11.2",
-  "framework_protocol_version": "1.52",
-  "dual_model_upgrade_version": "1.7",
+  "verified_at": "2026-07-23",
+  "release_id": "2026.07.23.2",
+  "previous_release": "2026.07.21.5",
+  "framework_protocol_version": "1.65",
+  "dual_model_upgrade_version": "1.11",
   "package_schema_version": 2,
-  "source_framework_commit": "5496073e19e239ef19eb055f2b470185fab25d3a",
+  "source_framework_commit": "4233d7439fc9d9b787803b3df7cdbe9d57ce9323",
   "source_distribution": {
     "status": "public_location_pending",
     "automatic_update": false
   },
   "release_anchor": {
     "type": "annotated_git_tag",
-    "tag": "dual-ai-share-2026.07.11.3",
-    "tag_object": "cef8add414a6d9704d3f58785a128bc56f44b263",
-    "release_commit": "71e45d9ebeff4d9d61c180711c25267b9fe31549",
-    "package_tree": "a70231e0445d9795a00212e8e6c53c149bfbc431",
+    "tag": "dual-ai-share-2026.07.23.2",
+    "tag_object": "b8df9fc4c1c30694e3574410a44e7c72de779e07",
+    "release_commit": "6b0dc0a80e35dd1296a17d0ecdb8f1bacc785a00",
+    "package_tree": "71c49b0463528fb8a2b3deabace6bfb942a67b6c",
     "publisher_identity_authenticated": false
   },
   "integrity": {
     "manifest": "SHA256SUMS",
-    "manifest_sha256": "919fe34254b51619ddca1d010445281d4f7ceec958ee8cfd1958eaccb02bd006",
-    "manifest_entries": 65,
-    "provenance_covered_files": 66,
+    "manifest_sha256": "5dd76ae856f596176583fd73681c4ec9c8a365aa84313715a727ecd28182081a",
+    "manifest_entries": 72,
+    "provenance_covered_files": 73,
     "verification": "passed"
   },
   "carriers": {
     "codex": {
       "path": "codex-skills/",
-      "skill_count": 7,
+      "skill_count": 8,
       "skill_trees": {
-        "diagnose-only": "88dc2e47dba438720a336c38103308aeae3d635e",
-        "dual-ai-collaboration": "b75114a7e0fd2027943ed98217a0f9d581cbdae9",
-        "dual-ai-init": "cb233ade310c37e0cd038ff5752eeced92a303f0",
-        "dual-ai-project-init": "1f2fdd44e90f31fec310eaf78b02e48de4fed53c",
-        "dual-model-upgrade": "dfb25bd4464e0266b665af138a5f3902b44ce281",
+        "diagnose-only": "06e8b6bd4c2f916d80e57544edd7bd4ec1db60f5",
+        "dual-ai-collaboration": "f1387d19a8c2dba2738b886276e6d1987602e332",
+        "dual-ai-init": "10d067b679fb810be4a449a047c13d2747b48259",
+        "dual-ai-project-init": "e71864611f7ec7ef0a9a4cc6314083da86ff9068",
+        "dual-ai-semantic-alignment": "df5e63b3cd8ff315ac09973666a71eb20825f094",
+        "dual-model-upgrade": "940081225626250a6680cef9499f9b14003147da",
         "grill-me": "70df660726ef12349a40dc0353a681c82414fe95",
         "karpathy-guidelines": "e119339197d600aa39a24fd7a95c946800c9c949"
       }
@@ -48,8 +49,8 @@
       "skill_count": 3,
       "skill_trees": {
         "diagnose-only": "aad84ae9d9c87af3cbfc314aee0c8ca5cb4dc1fb",
-        "dual-ai-collaboration": "763c86580049cea239e75a389ded79ec8a41d845",
-        "dual-model-upgrade": "97a57692f31b0d3ccfb07cd2cacea38292d1770e"
+        "dual-ai-collaboration": "d1db330ce6be2f899b738e118eafcc69abcdf55b",
+        "dual-model-upgrade": "bb9c4287294e6e79ebc0894442659c4e7ca74bd1"
       },
       "adoption_status": "deferred_non_launch_adapter"
     }
@@ -122,14 +123,18 @@
       "skills/cotend-collaboration/references/code-context-harness.md",
       "skills/cotend-collaboration/references/continuous-and-unattended.md",
       "skills/cotend-collaboration/references/decision-log.md",
+      "skills/cotend-collaboration/references/delegation-maturity.md",
       "skills/cotend-collaboration/references/framework-change-evaluation.md",
       "skills/cotend-collaboration/references/goal-completion.md",
       "skills/cotend-collaboration/references/idea-to-consensus.md",
+      "skills/cotend-collaboration/references/native-agent-orchestration.md",
       "skills/cotend-collaboration/references/plan-tree.md",
       "skills/cotend-collaboration/references/quality-sentinel.md",
       "skills/cotend-collaboration/references/release-hardening.md",
       "skills/cotend-collaboration/references/review-and-self-review.md",
       "skills/cotend-collaboration/references/risk-and-approval.md",
+      "skills/cotend-collaboration/references/runtime-profiles.md",
+      "skills/cotend-collaboration/references/semantic-implementation-closure.md",
       "skills/cotend-collaboration/references/skill-authoring-quality-gate.md",
       "skills/cotend-collaboration/references/templates.md",
       "skills/cotend-collaboration/references/upstream-dependency-review.md",
@@ -141,10 +146,13 @@
       "skills/cotend-model-upgrade/agents/openai.yaml",
       "skills/cotend-model-upgrade/references/packet-templates.md",
       "skills/cotend-project-init/SKILL.md",
-      "skills/cotend-project-init/agents/openai.yaml"
+      "skills/cotend-project-init/agents/openai.yaml",
+      "skills/cotend-semantic-alignment/SKILL.md",
+      "skills/cotend-semantic-alignment/agents/openai.yaml",
+      "skills/cotend-semantic-alignment/scripts/semantic-contract.mjs"
     ],
     "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption",
+    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-23-2-v1-65-adoption",
     "final_framework_lock_exists": true,
     "required_before_lock": []
   }

@@ -31,14 +31,14 @@ Release posture is a user decision. Use:
 ## Your Decision Is Needed
 
 **Current stage/step**: Release Hardening
-**What the project is doing**:
-**Why you are needed now**: The project may move from local/prototype use to other users or public exposure, so earlier local shortcuts must be tightened.
+**What the project is doing now**:
+**Why you are needed now**: The project is moving from local/prototype use toward other users or public exposure, so local shortcuts must be tightened.
 **What you need to decide/approve/accept**:
-**What this enables**:
-**Impact**:
-**Recommendation**: 1 Start release cleanup / 2 Stay local and continue development / 3 Explain more
+**Why this matters**:
+**Affected scope**:
+**Recommendation**: 1 start release preparation / 2 stay local and continue development / 3 explain more first
 **What happens after approval**:
-**Alternative if declined**:
+**Safer alternative if declined**:
 ```
 
 Do not deploy/publish or make the app reachable by others without explicit user approval.

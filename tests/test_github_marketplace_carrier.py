@@ -66,8 +66,8 @@ class GitHubMarketplaceCarrierTests(unittest.TestCase):
         result = carrier.materialize_scenario(self.root)
         plugin_root = result["marketplace_root"]
         verified = carrier.verify_carrier_root(plugin_root)
-        self.assertEqual(verified["skills"], 7)
-        self.assertEqual(verified["skill_files"], 30)
+        self.assertEqual(verified["skills"], 8)
+        self.assertEqual(verified["skill_files"], 37)
         self.assertTrue(verified["source_bytes_identical"])
         self.assertFalse((plugin_root / "codex-skills").exists())
         self.assertTrue((plugin_root / "skills").is_dir())

@@ -2,6 +2,87 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-07-23 累计采用 dual-ai v1.53-v1.65
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: high_impact
+change_summary: 从已采用的 v1.52 基线完整复核并产品化适配 dual-ai v1.53-v1.65，新增独立可写 Semantic Alignment，并同步运行档位、原生 agent 编排、委派成熟度、路线重基、语义实现闭环和交付来源新鲜度
+intent: 让 CoTend 继续以 dual-ai 为共享框架权威，同时保持面向普通用户的 Full 默认、公开身份、低认知入口和既有安装升级兼容
+expected_benefit:
+  - 普通 Init 只完成初始化与报告，语义写入由唯一独立入口负责，降低隐式改写产品含义的风险
+  - 运行档位与项目采用档位分离，已有选择跨更新保留，没有选择时才使用 CoTend 的 Full 产品默认
+  - 重要路线具备可验证的语义闭环、动态重基和实现新鲜度，不依赖聊天记忆宣称完成
+  - 原生 agent 与委派机制按收益和成熟度启用，不改变用户对产品含义、风险、验收和发布的裁决权
+  - v1.52 的已安装交付可通过精确 predecessor lock 更新到 v1.65，而非要求破坏性重装
+possible_harm:
+  - 新增独立语义入口可能让用户误以为普通 Init 失去初始化能力，或把两个入口当成必须连续调用
+  - Full 默认、运行档位持久化和委派建议若实现错误，可能覆盖用户既有项目选择
+  - 跨协议交付映射若不精确，可能错误接管未知或用户修改过的旧安装
+  - 新增冷路径参考若被无条件加载，会增加普通任务上下文和流程负担
+affected_workflows:
+  - init_update_repair_migrate_resume
+  - writable_semantic_alignment_and_read_only_diagnosis
+  - runtime_profile_and_native_agent_orchestration
+  - plan_tree_route_rebase_and_semantic_implementation_closure
+  - review_handoff_model_upgrade_and_delivery_update
+deviations:
+  - dual-ai 私有产品默认是 Adaptive；CoTend 面向普通用户，在没有会话或项目选择时保持 Full，且不导入维护者私有默认
+  - dual-ai 未指定语言时使用维护者约定；CoTend 继续遵循项目记录语言，否则默认英文
+  - 公开 Model Upgrade 不携带私有模型、维护者路径、个人角色分配或 Claude 已同步声明
+mechanism_budget:
+  added_context_surface: mixed
+  ordinary_load_impact: low
+  ceremony_added: low
+  duplication_check: replaces_existing
+  cheaper_alternative_considered: 只摘取 v1.64-v1.65 的 Semantic Alignment 变动；因会遗漏 v1.53-v1.63 的依赖行为、运行档位、agent 编排、路线重基和交付新鲜度而拒绝
+  retirement_or_thinning_trigger: 真实项目持续证明某项可逆参考没有减少偏航或提高证据质量时，按 Adaptive 机制预算合并或移除该冷路径；用户裁决与停止边界不参与削薄
+  expected_failure_prevented: partial_release_adoption_hidden_semantic_writes_profile_overwrite_parent_repository_discovery_false_positive_and_unmapped_legacy_update
+validation_scenarios:
+  - scenario: immutable_upstream_release_and_complete_range
+    expected: 固定 2026.07.23.2 的 tag、release/source commit、package tree、72 项 manifest 和 v1.53-v1.65 全范围可重建
+    validation_result_type: executed
+    result: upstream_candidate_and_201_commit_16_release_consumer_range_passed
+  - scenario: adopted_skill_source_and_official_skill_contract
+    expected: 8 个 Skill、37 个文件、19 类能力、第三方字节和官方 Skill 格式一致
+    validation_result_type: executed
+    result: adopted_set_and_8_of_8_official_quick_validate_passed
+  - scenario: ordinary_init_and_writable_semantic_owner
+    expected: Init 只报告；Semantic Alignment 独立可写，canonical digest、冲突拒绝和 decision-log 绑定可验证
+    validation_result_type: executed
+    result: four_semantic_contract_tests_and_repository_trigger_checks_passed
+  - scenario: legacy_v1_52_delivery_update
+    expected: 只有与 predecessor lock 精确匹配的 7 Skill/30 文件安装可跨协议更新为 8 Skill/37 文件；漂移或未知安装停止
+    validation_result_type: executed
+    result: locked_predecessor_update_and_negative_delivery_matrix_passed
+  - scenario: isolated_plugin_and_delivered_runtime
+    expected: 8 个 Plugin Skill 与 8 个项目 Skill 或 1 个用户 Skill 共存，父仓库命名空间不污染外部项目，卸载与回滚保持无关内容
+    validation_result_type: executed
+    result: plugin_17_steps_12_negative_carrier_4_negative_and_delivered_runtime_7_negative_passed
+  - scenario: current_release_candidate
+    expected: rc.2 的 48 文件包、生命周期、GitHub 根载体、5+3 reviewer contract 和确定性 ZIP 均绑定同一摘要
+    validation_result_type: executed
+    result: local_unpublished_candidate_passed_remote_and_portal_not_run
+real_project_validation:
+  - scenario: v1_65_writable_project_end_to_end
+    expected: 普通用户从 Init、语义确认、计划执行、验收、交接到新会话恢复完成一条真实主链
+    validation_result_type: deferred
+    result: 下一次真实 CoTend 项目使用时复核；既有 expense-splitter UAT 只证明 v1.52 基线
+decision: watch
+rollback_triggers:
+  - 普通 Init 在未直接调用 Semantic Alignment 时写入 L0-L2 产品含义
+  - 更新覆盖已持久化的 Full/Adaptive 选择或维护者私有默认进入公开产品
+  - 未精确匹配 predecessor lock 的旧安装被自动接管
+  - 新冷路径让普通小任务持续增加无收益确认、重复记录或上下文负担
+  - 8 Skill 的安装、发现、卸载、回滚或旧版更新破坏用户自有 Skill
+review_after: 首次 v1.65 真实可写项目纵向验证或任一 rollback trigger 出现
+watch_closure:
+  - keep_watch
+  - evidence: immutable_release_lock_complete_range_source_and_delivery_lifecycle
+```
+
+本轮完成的是本地 CoTend 产品化采用与 `0.1.0-rc.2` 候选验证。它不授权 push、GitHub Release、Public Plugin Directory submission、Portal draft、publish、真实用户全局安装或 Claude v1.65 同步。
+
 ## 2026-07-12 首个 Codex Skill 源树采用
 
 ```yaml

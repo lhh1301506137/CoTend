@@ -203,3 +203,45 @@ github_release_or_public_directory: not_performed
 ```
 
 L55 在 15 个重定向写入根和独立临时项目中，从真实公开仓库完成 Marketplace add/list、远端 commit 绑定、同 revision refresh、Plugin install/remove、7 Skill discovery 和故障恢复。隔离 Git 禁用 credential helper 与交互提示；网络只允许直连或经结构验证的无凭据回环代理，正式运行使用后者。该结果开放 GitHub Open Beta CLI 路径，但不改变 `framework.lock.json` 中固定 release 的采用身份，也不证明跨版本升级、真实用户写入、完整 Desktop 生命周期或 Public Directory 上架。
+
+## release-2026-07-23-2-v1-65-adoption
+
+```yaml
+status: adopted_verified
+source_release: 2026.07.23.2
+source_tag: dual-ai-share-2026.07.23.2
+source_release_commit: 6b0dc0a80e35dd1296a17d0ecdb8f1bacc785a00
+source_framework_commit: 4233d7439fc9d9b787803b3df7cdbe9d57ce9323
+source_package_tree: 71c49b0463528fb8a2b3deabace6bfb942a67b6c
+source_manifest_sha256: 5dd76ae856f596176583fd73681c4ec9c8a365aa84313715a727ecd28182081a
+framework_protocol: cotend-collaboration-v1.65
+model_upgrade_packet_family: cotend-model-upgrade-v1.11
+adopted_version_range: v1.53_to_v1.65_complete
+skill_count: 8
+skill_file_count: 37
+source_skill_manifest_sha256: ce3253e553f1a95ec81858b2b1e2429a771816e7477516da779b1a99e0c2c0de
+target_artifact_id: cotend-codex-r000002
+target_revision: 2
+plugin_candidate: cotend@0.1.0-rc.2
+plugin_package_files: 48
+plugin_package_sha256: a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2
+resulting_CoTend_commit: containing_commit
+live_install_performed: false
+push_release_or_publish: not_performed
+```
+
+### 采用结论
+
+本次不是只采用“语义基线与普通 Init 拆分”这一项，而是完整复核并产品化适配 `v1.53` 到 `v1.65` 的连续行为变化。CoTend 当前来源树为 **8 个 Skill、37 个文件**：新增独立可写的 `cotend-semantic-alignment`，协作核心增加运行时配置、原生 agent 编排、委派成熟度和语义实现闭环等渐进参考；普通 `cotend-init` 继续只做初始化与报告，不在同一控制流内嵌执行 Semantic Alignment 或 Diagnose Only。
+
+CoTend 的公开默认配置保持 `Full`，但只在用户没有既有选择时应用。用户级配置在升级中持久保留，优先级为 session > project > user profile > product default；不得读取、导入或推断私有 Dual owner default。运行时身份与用户配置选择分离，Claude 载体仍只记录其实际 `v1.52 / Model Upgrade 1.7` 能力，不伪造与 Codex 的等价状态。
+
+`grill-me` 与 `karpathy-guidelines` 继续按固定上游 tree 逐字节采用并保留 MIT 归属。其余六个用户原创 Skill 进行 CoTend 品牌、公开默认、平台路径和用户语言适配，不携带私有维护者路径、内部 owner profile 或私有维护会话状态。
+
+### 当前验证边界
+
+- 已复验 annotated tag、release commit、package tree、72 项 manifest、73 个包文件和 8 个源 Skill tree。
+- 已验证 8/37 目标清单、21 个 collaboration 渐进引用、六个 CoTend 自有入口、两个 MIT companion 原字节、公开残留规则、framework lock、target lock 与 candidate/role/capability 映射一致。
+- 已验证旧 `cotend-codex-r000001 / v1.52 / 7 Skill / 30 文件` 回执可升级为 `r000002 / v1.65 / 8 Skill / 37 文件`，新增 Skill 与参考文件被补齐，用户文件保持不变。
+- 已验证 `cotend.semantic-contract.v1` helper 的确定性摘要、验证、decision-log 唯一绑定、摘要不匹配和 Unicode 规范化歧义拒绝。
+- `cotend@0.1.0-rc.2` 只是本地未发布候选。现有远程 GitHub `rc.1` 验证仍是历史证据；真实远端跨版本升级、Desktop 新任务可见性、Portal 提交、release、publish 和 push 均未在本次执行。

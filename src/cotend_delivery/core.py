@@ -18,12 +18,13 @@ EXPECTED_SKILLS = (
     "cotend-init",
     "cotend-model-upgrade",
     "cotend-project-init",
+    "cotend-semantic-alignment",
     "grill-me",
     "karpathy-guidelines",
 )
-FIRST_PARTY_SKILLS = EXPECTED_SKILLS[:5]
-SHAREABLE_COMPANION_SKILLS = EXPECTED_SKILLS[5:]
-EXPECTED_FILE_COUNT = 30
+FIRST_PARTY_SKILLS = EXPECTED_SKILLS[:6]
+SHAREABLE_COMPANION_SKILLS = EXPECTED_SKILLS[6:]
+EXPECTED_FILE_COUNT = 37
 RECEIPT_SCHEMA = "cotend.delivery-receipt"
 CHECKPOINT_SCHEMA = "cotend.delivery-checkpoint"
 TARGET_LOCK_SCHEMA = "cotend.target-artifact-lock"
@@ -285,6 +286,15 @@ class LegacyReceiptMapping:
         return (
             receipt.get("schema_version") == self.receipt_schema_version
             and receipt.get("artifact_id") == self.artifact_id
+            and receipt.get("protocol") == self.protocol
+            and receipt.get("manifest_sha256") == self.manifest_sha256
+        )
+
+    def matches_target(self, receipt: dict[str, Any]) -> bool:
+        return (
+            receipt.get("schema_version") != LEGACY_SCHEMA_VERSION
+            and receipt.get("artifact_id") == self.target_artifact_id
+            and receipt.get("target_revision") == self.target_revision
             and receipt.get("protocol") == self.protocol
             and receipt.get("manifest_sha256") == self.manifest_sha256
         )
@@ -580,10 +590,20 @@ class Artifact:
                 or not mapping.artifact_id
                 or not mapping.protocol
                 or not _is_sha256(mapping.manifest_sha256)
-                or mapping.target_artifact_id != artifact_id
-                or mapping.target_revision != revision
-                or mapping.protocol != protocol
-                or mapping.manifest_sha256 != manifest_sha256
+                or isinstance(mapping.target_revision, bool)
+                or not isinstance(mapping.target_revision, int)
+                or mapping.target_revision < 1
+                or mapping.target_revision > revision
+                or mapping.target_artifact_id
+                != _target_artifact_id(lineage, mapping.target_revision)
+                or (
+                    mapping.target_revision == revision
+                    and (
+                        mapping.target_artifact_id != artifact_id
+                        or mapping.protocol != protocol
+                        or mapping.manifest_sha256 != manifest_sha256
+                    )
+                )
                 or key in legacy_keys
             ):
                 raise DeliveryError(
@@ -980,6 +1000,64 @@ class DeliveryManager:
             warnings=tuple(sorted(warnings)),
         )
 
+    def _component_plan_for_update(
+        self,
+        artifact: Artifact,
+        receipt: dict[str, Any],
+    ) -> _ComponentPlan:
+        if self.scope == "project":
+            return self._component_plan_for_install(artifact)
+
+        previous = self._component_plan_from_receipt(receipt)
+        previous_skills = set(receipt["skills"])
+        components: dict[str, dict[str, Any]] = {}
+        owned = set(previous.owned_skills) | set(FIRST_PARTY_SKILLS)
+        warnings: list[str] = []
+
+        for skill in FIRST_PARTY_SKILLS:
+            if skill not in previous_skills:
+                collisions = [
+                    f"{label}:{skill}"
+                    for label, root in self.skill_roots
+                    if (root / skill).exists() or _is_linklike(root / skill)
+                ]
+                if collisions:
+                    raise DeliveryError(
+                        "unowned_collision",
+                        "A newly introduced CoTend Skill name already exists",
+                        details={"paths": sorted(collisions)},
+                    )
+            components[skill] = {"disposition": "owned"}
+
+        for skill in SHAREABLE_COMPANION_SKILLS:
+            prior = previous.components.get(skill)
+            if prior is not None:
+                components[skill] = prior
+                continue
+            portable_digest = self._portable_candidate_digest(artifact, skill)
+            locations, duplicate_warnings = self._scan_companion(
+                skill,
+                portable_digest,
+            )
+            warnings.extend(duplicate_warnings)
+            if locations:
+                components[skill] = {
+                    "disposition": "external_shared",
+                    "portable_manifest_sha256": portable_digest,
+                    "observed_roots": locations,
+                }
+            else:
+                owned.add(skill)
+                components[skill] = {"disposition": "owned"}
+
+        owned_skills = tuple(skill for skill in EXPECTED_SKILLS if skill in owned)
+        return _ComponentPlan(
+            owned_skills=owned_skills,
+            owned_files=self._files_for_skills(artifact.files, owned_skills),
+            components=components,
+            warnings=tuple(sorted(warnings)),
+        )
+
     def _component_plan_from_receipt(self, receipt: dict[str, Any]) -> _ComponentPlan:
         owned_skills = self._receipt_owned_skills(receipt)
         components = receipt.get("components") or {
@@ -1001,7 +1079,7 @@ class DeliveryManager:
         issues: list[str] = []
         warnings: list[str] = []
         current: dict[str, dict[str, Any]] = {}
-        for skill in EXPECTED_SKILLS:
+        for skill in receipt["skills"]:
             component = receipt["components"][skill]
             disposition = component["disposition"]
             if disposition == "owned":
@@ -1770,11 +1848,25 @@ class DeliveryManager:
             raise DeliveryError("receipt_invalid", "Receipt target boundary is invalid")
         skills = value.get("skills")
         files = value.get("files")
-        if not isinstance(skills, list) or skills != list(EXPECTED_SKILLS):
+        if (
+            not isinstance(skills, list)
+            or not skills
+            or len(skills) != len(set(skills))
+            or any(
+                not isinstance(skill, str)
+                or re.fullmatch(r"[a-z0-9][a-z0-9-]*", skill) is None
+                for skill in skills
+            )
+        ):
             raise DeliveryError("receipt_invalid", "Receipt Skill inventory is invalid")
-        if not isinstance(files, dict) or len(files) != EXPECTED_FILE_COUNT:
-            raise DeliveryError("receipt_invalid", "Receipt file inventory is invalid")
         skill_set = set(skills)
+        if (
+            not skill_set.issubset(EXPECTED_SKILLS)
+            or skills != [skill for skill in EXPECTED_SKILLS if skill in skill_set]
+        ):
+            raise DeliveryError("receipt_invalid", "Receipt Skill inventory is invalid")
+        if not isinstance(files, dict) or not files:
+            raise DeliveryError("receipt_invalid", "Receipt file inventory is invalid")
         for path, digest in files.items():
             if not isinstance(path, str) or not isinstance(digest, str):
                 raise DeliveryError("receipt_invalid", "Receipt file entry is invalid")
@@ -1783,7 +1875,7 @@ class DeliveryManager:
                 raise DeliveryError("receipt_invalid", "Receipt file hash is invalid")
         if value.get("manifest_sha256") != _manifest_digest(files):
             raise DeliveryError("receipt_invalid", "Receipt manifest digest is invalid")
-        if not all(f"{skill}/SKILL.md" in files for skill in EXPECTED_SKILLS):
+        if not all(f"{skill}/SKILL.md" in files for skill in skills):
             raise DeliveryError("receipt_invalid", "Receipt is missing a Skill entry point")
         if not isinstance(value.get("artifact_id"), str) or not value["artifact_id"]:
             raise DeliveryError("receipt_invalid", "Receipt artifact identity is missing")
@@ -1846,10 +1938,12 @@ class DeliveryManager:
             if (
                 not isinstance(owned_skills, list)
                 or len(owned_skills) != len(set(owned_skills))
-                or any(skill not in EXPECTED_SKILLS for skill in owned_skills)
-                or not set(FIRST_PARTY_SKILLS).issubset(set(owned_skills))
+                or any(skill not in skill_set for skill in owned_skills)
+                or not {
+                    skill for skill in skills if skill.startswith("cotend-")
+                }.issubset(set(owned_skills))
                 or owned_skills
-                != [skill for skill in EXPECTED_SKILLS if skill in set(owned_skills)]
+                != [skill for skill in skills if skill in set(owned_skills)]
             ):
                 raise DeliveryError(
                     "receipt_invalid",
@@ -1861,14 +1955,14 @@ class DeliveryManager:
                     "receipt_invalid",
                     "User receipt owned file inventory is invalid",
                 )
-            if not isinstance(components, dict) or set(components) != set(EXPECTED_SKILLS):
+            if not isinstance(components, dict) or set(components) != skill_set:
                 raise DeliveryError(
                     "receipt_invalid",
                     "User receipt component inventory is invalid",
                 )
             component_owned: list[str] = []
             root_labels = {label for label, _ in self.skill_roots}
-            for skill in EXPECTED_SKILLS:
+            for skill in skills:
                 component = components[skill]
                 if not isinstance(component, dict):
                     raise DeliveryError(
@@ -1949,6 +2043,20 @@ class DeliveryManager:
             None,
         )
 
+    @staticmethod
+    def _target_mapping(
+        receipt: dict[str, Any],
+        candidate: Artifact,
+    ) -> LegacyReceiptMapping | None:
+        return next(
+            (
+                mapping
+                for mapping in candidate.legacy_receipt_mappings
+                if mapping.matches_target(receipt)
+            ),
+            None,
+        )
+
     def _candidate_relation(
         self,
         receipt: dict[str, Any],
@@ -1957,11 +2065,16 @@ class DeliveryManager:
         if candidate is None:
             return "none", []
         if receipt["schema_version"] == LEGACY_SCHEMA_VERSION:
+            mapping = self._legacy_mapping(receipt, candidate)
+            if mapping is None:
+                return "incompatible", ["legacy_identity_unmapped"]
             if (
-                self._legacy_mapping(receipt, candidate) is not None
+                mapping.target_revision == candidate.revision
                 and receipt["files"] == candidate.files
             ):
                 return "identity_migration_available", []
+            if mapping.target_revision < candidate.revision:
+                return "update_available", []
             return "incompatible", ["legacy_identity_unmapped"]
 
         if self.scope == "user":
@@ -1978,6 +2091,7 @@ class DeliveryManager:
                         f"external_shared_candidate_incompatible:{skill}"
                     ]
 
+        predecessor = self._target_mapping(receipt, candidate)
         exact_identity = (
             receipt["platform"] == candidate.platform
             and receipt["source_release_id"] == candidate.source_release_id
@@ -1997,6 +2111,13 @@ class DeliveryManager:
                     return "identity_migration_available", [
                         "production_receipt_binding_required"
                     ]
+                if (
+                    predecessor is not None
+                    and predecessor.target_revision < candidate.revision
+                ):
+                    return "update_available", [
+                        "production_receipt_binding_applied_during_update"
+                    ]
                 return "incompatible", [
                     "production_receipt_binding_requires_current_artifact"
                 ]
@@ -2015,6 +2136,11 @@ class DeliveryManager:
             or receipt["artifact_lineage"] != candidate.lineage
         ):
             return "incompatible", ["artifact_lineage_conflict"]
+        if (
+            predecessor is not None
+            and predecessor.target_revision < candidate.revision
+        ):
+            return "update_available", []
         if receipt["protocol"] != candidate.protocol:
             return "incompatible", ["protocol_incompatible"]
         if receipt["target_revision"] == candidate.revision:
@@ -3740,16 +3866,7 @@ class DeliveryManager:
         staged.mkdir(parents=True)
         previous = self._load_receipt(required=False)
         if previous:
-            previous_plan = self._component_plan_from_receipt(previous)
-            component_plan = _ComponentPlan(
-                owned_skills=previous_plan.owned_skills,
-                owned_files=self._files_for_skills(
-                    artifact.files,
-                    previous_plan.owned_skills,
-                ),
-                components=previous_plan.components,
-                warnings=previous_plan.warnings,
-            )
+            component_plan = self._component_plan_for_update(artifact, previous)
         else:
             component_plan = self._component_plan_for_install(artifact)
         if previous and self.scope == "user":

@@ -29,15 +29,16 @@ Do not install global tools or add project-local dev dependencies automatically.
 
 Project-local generated indexes are different: for active Trellis-managed, `standard`, `full`, large, unfamiliar, cross-module, architecture-heavy, or review-heavy projects, a CodeGraph index may be created automatically when `codegraph` is already installed and the canonical project root is clear. Generated indexes must be ignored/untracked unless the user explicitly wants them committed.
 
-## CodeGraph Availability And Configuration
-
-If CodeGraph CLI works but its MCP integration is unavailable, use the CLI or a recorded fallback. Do not edit global Codex configuration, telemetry settings, model providers, relay/base URLs, tokens, or other MCP entries automatically. Explain the missing capability and request approval before following a supported setup procedure.
+## CodeGraph MCP Configuration
 
 Rules:
 
-- Each large project needs its own local `.codegraph/` index, initialized or refreshed with the supported CodeGraph command from that project root.
+- Use the provider's documented setup/status flow. User-level MCP configuration changes require approval.
+- A repair must affect only the CodeGraph MCP entry and must not alter model providers, relay/base URLs, auth tokens, other MCP servers, other carriers, or project files.
+- Each large project needs its own local `.codegraph/` index via `codegraph init .` from that project root.
 - `.codegraph/` is project-local state and must be ignored/untracked unless the user explicitly wants otherwise.
-- If the current Codex workspace root is a parent folder, target the canonical project path explicitly for checks/queries and record that root in the initialization report.
+- Keep CodeGraph telemetry disabled for this local-first framework unless the user explicitly opts in. After install/upgrade, check `codegraph telemetry status`; if it is enabled, run `codegraph telemetry off` and record that privacy boundary in the init/update summary.
+- If the current Codex workspace root is a parent folder, use `codegraph` CLI `-p <canonical project path>` for checks/queries and record the canonical project root in the initialization report.
 
 ## Default For Active Trellis / Large Projects
 
@@ -46,11 +47,11 @@ If a user initializes a project with active Trellis / CoTend collaboration, assu
 For these projects:
 
 - Prefer `provider: codegraph`.
-- If CodeGraph CLI/MCP is installed, initialize a missing project index or refresh an existing one with the supported CodeGraph command from the canonical project root before broad development/review.
+- If CodeGraph CLI/MCP is installed but the project index is missing, run `codegraph init .` from the canonical project root before broad development/review.
 - After initialization, run `codegraph status .` or an equivalent MCP status check and record `provider_status: available`, `freshness: fresh`, and the canonical project root.
 - Ensure `.codegraph/` is ignored/untracked. If `.gitignore` exists and lacks the entry, add `.codegraph/` when safe. If no `.gitignore` exists, create one only when the canonical project root is clear and the project appears to be a normal git/code project. If `.codegraph/` is already tracked, stop and ask the user.
-- Treat telemetry and MCP integration as global tool configuration. Report their state when relevant, but require user approval before changing them.
-- If CodeGraph is installed but MCP is missing, use the CLI or a recorded fallback. If CodeGraph is not installed/configured, recommend supported one-time setup at the next human checkpoint.
+- Check `codegraph telemetry status` after install/upgrade. Disable telemetry with `codegraph telemetry off` unless the user has explicitly chosen to keep it enabled.
+- If CodeGraph is installed but MCP is missing after a config switch, use or recommend the documented MCP setup flow. If CodeGraph is not installed/configured, recommend one-time global setup at the next human checkpoint.
 - If the root is ambiguous, points to a parent/multi-project folder, appears unexpectedly huge, or cannot be safely recorded, stop and ask the user to confirm the canonical project root.
 - If the user is away/unattended and indexing cannot be safely initialized, continue only within the current authorized scope using `rg_fallback`, record `fallback_reason`, and surface setup in the wake-up summary.
 - If the task is genuinely tiny and local, `rg_fallback` is allowed, but record `required: no`.
@@ -87,7 +88,7 @@ Do not use code graph findings to silently expand scope. Scope expansion still n
 
 ## Review Use
 
-For CodexSelf/Claude/Gemini review:
+For formal self-review or an identified external-model review:
 
 - derive review scope from active truth + diff + code context, not from Primary AI's `review_request` alone;
 - use the graph/map to look for missed callers, tests, configs, public surfaces, and deleted/generated files;

@@ -30,13 +30,14 @@ DEFAULT_OUTPUT = (
     / "cotend"
 )
 PLUGIN_NAME = "cotend"
-PLUGIN_VERSION = "0.1.0-rc.1"
+PLUGIN_VERSION = "0.1.0-rc.2"
 EXPECTED_SKILLS = (
     "cotend-collaboration",
     "cotend-diagnose-only",
     "cotend-init",
     "cotend-model-upgrade",
     "cotend-project-init",
+    "cotend-semantic-alignment",
     "grill-me",
     "karpathy-guidelines",
 )
@@ -46,6 +47,7 @@ EXPECTED_DISPLAY_NAMES = {
     "cotend-init": "CoTend Init",
     "cotend-model-upgrade": "CoTend Model Upgrade",
     "cotend-project-init": "CoTend Project Init",
+    "cotend-semantic-alignment": "CoTend Semantic Alignment",
 }
 PACKAGE_SUPPORT_FILES = {
     "LICENSE": ROOT / "LICENSE",
@@ -331,9 +333,9 @@ def source_skill_manifest() -> dict[str, str]:
     if actual_directories != EXPECTED_SKILLS:
         raise PluginPackageError("repository Skill directory inventory drifted")
     manifest = path_hash_manifest(SOURCE_SKILLS_ROOT)
-    if len(manifest) != 30:
+    if len(manifest) != 37:
         raise PluginPackageError(
-            f"expected 30 repository Skill files, found {len(manifest)}"
+            f"expected 37 repository Skill files, found {len(manifest)}"
         )
     for skill in EXPECTED_SKILLS:
         if f"{skill}/SKILL.md" not in manifest:
@@ -403,7 +405,7 @@ def validate_contract() -> dict[str, Any]:
         "revision": target.get("revision"),
         "target_manifest_sha256": target.get("manifest_sha256"),
         "skill_count": len(EXPECTED_SKILLS),
-        "skill_file_count": 30,
+        "skill_file_count": 37,
         "path_hash_manifest_sha256": path_hash_manifest_sha256(
             source_skill_manifest()
         ),

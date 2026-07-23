@@ -4,7 +4,7 @@
 metadata:
   status: passed_isolated_fixture_phase_a
   evidence_type: executed
-  evidence_date: 2026-07-12
+  evidence_date: 2026-07-23
   codex_version: codex-cli_0.144.1
   fixture_plugin_id: cotend
   fixture_version: 0.0.0-dev.1+codex.fixture
@@ -12,18 +12,18 @@ metadata:
   plugin_identity_authority: fixture_only_not_release
   phase_a_steps: 17
   negative_cases: 12
-  adopted_skills: 7
-  adopted_skill_files: 30
-  package_files: 36
+  adopted_skills: 8
+  adopted_skill_files: 37
+  package_files: 43
   protected_user_metadata: unchanged_stat_only
-  tracked_production_plugin: none
+  tracked_production_plugin: cotend@0.1.0-rc.2_local_unpublished
 ```
 
 ## 结论
 
-当前 7 个 Codex Skills 可以作为一个纯 Skills Plugin 被本机 Codex CLI 安装、发现、移除和重装。验证使用 disposable fixture、隔离进程环境和本地 Marketplace source；最终清理后，隔离环境中没有已安装的 fixture Plugin，也没有保留已配置的 fixture Marketplace。
+当前 8 个 Codex Skills 可以作为一个纯 Skills Plugin 被本机 Codex CLI 安装、发现、移除和重装。验证使用 disposable fixture、隔离进程环境、本地 Marketplace source 和系统临时目录中的独立项目根；最终清理后，隔离环境中没有已安装的 fixture Plugin，也没有保留已配置的 fixture Marketplace。
 
-本结果只证明当时 Codex 平台上的分发适配可行，不确认公开 Plugin ID、公开版本、最终命名空间、Marketplace listing 或正式发布包。执行本证据时，仓库以 `codex-skills/` 为唯一 Skill 语义源，尚未加入 tracked `.codex-plugin/plugin.json`；L54 后续已把唯一源机械迁移到 `skills/` 并单独验证仓库根载体，本历史证据不承担该结论。
+本结果证明当前 v1.65 源树在 Codex CLI 上的隔离分发适配可行，不确认 rc.2 已被推送、Public Plugin Directory listing、Portal 审核或正式发布。fixture 继续使用不可冒充 release 的 `0.0.0-dev.1+codex.fixture` 身份；仓库内另有 `cotend@0.1.0-rc.2` 本地未发布候选，两者不能混同。
 
 ## 隔离边界
 
@@ -32,13 +32,14 @@ metadata:
 - 真实用户 Codex 与 Agents 根目录、config、auth、plugins 和 skills 只比较存在性、类型、大小与修改时间；验证器不打开、哈希或复制其内容。
 - 所有 Plugin 命令关闭 remote Plugin 功能，只接受 fixture 内的 local Marketplace source；代理设置为本地失败端点。
 - Plugin 命令、官方 scaffold、官方 validator 和 app-server discovery 前后，受保护用户元数据均未变化。
-- `codex-skills/`、两个交付/来源 lock 和 Git HEAD 前后未变化。
+- `skills/`、两个交付/来源 lock 和 Git HEAD 前后未变化。
+- 发现和生命周期使用系统临时目录下带唯一前缀的独立项目根，避免继承 CoTend 父仓库的 Plugin 命名空间；清理器只删除自己创建且通过路径与 symlink 守卫的根。
 
 ## 静态包结果
 
 - 官方 Plugin validator：`passed`。
-- Skills：7 个目录、30 个文件，与仓库源逐字节一致。
-- Plugin package：36 个文件，包括 manifest、Skills、Apache-2.0 文件、NOTICE、第三方 notices 和两个 MIT 文本。
+- Skills：8 个目录、37 个文件，与仓库源逐字节一致。
+- Plugin package：43 个文件，包括 manifest、Skills、Apache-2.0 文件、NOTICE、第三方 notices 和两个 MIT 文本。
 - manifest 只声明 `skills`，没有 hooks、apps、MCP、assets 或 scripts。
 - 候选版本明确带有 fixture prerelease/build 标识，不冒充公开版本。
 
@@ -73,10 +74,11 @@ metadata:
 - `cotend:cotend-init`
 - `cotend:cotend-model-upgrade`
 - `cotend:cotend-project-init`
+- `cotend:cotend-semantic-alignment`
 - `cotend:grill-me`
 - `cotend:karpathy-guidelines`
 
-Plugin 入口的实际 scope 为 `user`。同一项目存在 standalone Skills 时，以上 7 个 namespaced 入口与 7 个原名 `repo` scope 入口同时可见；移除 Plugin 后，7 个 `repo` 入口保持不变。由此可知，最终用户界面不能假设安装后仍以 `$cotend-init` 作为精确 Plugin 名称，正式界面决策必须基于 `cotend:<skill>` 的实际平台行为继续评估。
+Plugin 入口的实际 scope 为 `user`。同一项目存在 standalone Skills 时，以上 8 个 namespaced 入口与 8 个原名 `repo` scope 入口同时可见；移除 Plugin 后，8 个 `repo` 入口保持不变。由此可知，最终用户界面不能假设安装后仍以 `$cotend-init` 作为精确 Plugin 名称，正式界面决策必须基于 `cotend:<skill>` 的实际平台行为继续评估。
 
 ## 负向矩阵
 
@@ -109,7 +111,7 @@ python scripts/verify_isolated_codex_plugin.py --prepare --negative-mutations --
 
 ```text
 ISOLATED_CODEX_PLUGIN_PREFLIGHT_OK roots=15
-ISOLATED_CODEX_PLUGIN_STATIC_OK skills=7 skill_files=30 package_files=36
+ISOLATED_CODEX_PLUGIN_STATIC_OK skills=8 skill_files=37 package_files=43
 ISOLATED_CODEX_PLUGIN_NEGATIVE_MUTATIONS_OK cases=12
-ISOLATED_CODEX_PLUGIN_PHASE_A_OK steps=17 plugin_skills=7 coexistence=7
+ISOLATED_CODEX_PLUGIN_PHASE_A_OK steps=17 plugin_skills=8 coexistence=8
 ```

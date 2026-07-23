@@ -73,9 +73,10 @@ EXPECTED_ANSWERED_DECISIONS = {
         "answer": "1",
         "evidence": {
             "evidence_type": "user_explicit",
-            "recorded_on": "2026-07-14",
+            "recorded_on": "2026-07-23",
             "scope": (
-                "final_plugin_identity_and_version_only_not_submission_or_release"
+                "confirmed_cotend_identity_carried_to_required_rc2_revision_"
+                "not_submission_or_release"
             ),
         },
     },

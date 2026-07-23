@@ -154,12 +154,17 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
             "dual-ai-collaboration** owns collaboration governance",
         ),
         "dual-ai-collaboration": (
-            "dual-ai-collaboration** owns collaboration governance",
-            "must decide whether Trellis should be active",
+            "Dual owns collaboration, authority, risk, review",
+            "Only `trellis.mode: active` controls workflow",
         ),
         "diagnose-only": (
             "Default: **read-only investigation**",
             "Do not change files",
+        ),
+        "dual-ai-semantic-alignment": (
+            "Independent Entry And Minimum Truth",
+            "dual-ai.semantic-contract.v1",
+            "scripts/semantic-contract.mjs",
         ),
         "dual-model-upgrade": (
             "advisor_only",

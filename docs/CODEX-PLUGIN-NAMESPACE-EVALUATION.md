@@ -7,15 +7,20 @@ recommendation: N3_display_led_preserve_first
 candidate_baseline_confirmed: true
 production_namespace_confirmed: false
 production_package_authorized: candidate_contract_only
+current_candidate: cotend@0.1.0-rc.2_local_unpublished
+current_candidate_skills: 8
 desktop_surface_verified: partial_picker_and_non_sending_chip
 desktop_hot_update_verified: false
 desktop_new_task_refresh_verified: true
 desktop_visible_entry_count: 7
+desktop_visible_entry_count_scope: historical_rc1_before_semantic_alignment
 desktop_non_sending_chip_verified: true
 desktop_interaction_verified: partial
 model_behavior_verified: false
 shared_behavior_change_authorized: false
 ```
+
+2026-07-23 的 v1.65 adoption 在 preserve-first 基线上新增 `cotend-semantic-alignment`，当前本地 rc.2 因而包含 8 个入口。该增量没有改写既有 Skill ID 或 Plugin ID，隔离 CLI 已发现 `cotend:cotend-semantic-alignment`；本文的两候选物理比较和 Desktop 七入口截图仍是 rc.1 历史证据，第八入口的 Desktop 渲染尚未执行，不能从 CLI 结果推断。
 
 ## 要回答的问题
 

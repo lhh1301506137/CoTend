@@ -60,7 +60,7 @@ jobs:
         run: python scripts/prepare_reviewer_fixtures.py
 
       - name: Build deterministic release archive
-        run: python scripts/build_release_archive.py --check-tag v0.1.0-rc.1
+        run: python scripts/build_release_archive.py --check-tag v0.1.0-rc.2
 
       - name: Verify GitHub repository maturity
         run: python scripts/verify_repository_maturity.py --no-build
@@ -69,9 +69,9 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && matrix.python == '3.13'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: cotend-0.1.0-rc.1
+          name: cotend-0.1.0-rc.2
           path: |
-            dist/cotend-0.1.0-rc.1.zip
-            dist/cotend-0.1.0-rc.1.zip.sha256
+            dist/cotend-0.1.0-rc.2.zip
+            dist/cotend-0.1.0-rc.2.zip.sha256
           if-no-files-found: error
           retention-days: 14

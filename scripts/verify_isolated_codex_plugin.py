@@ -10,6 +10,7 @@ import shutil
 import stat
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from dataclasses import dataclass
@@ -23,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE_SKILLS_ROOT = ROOT / "skills"
 PRIVATE_ROOT = ROOT / ".private-provenance"
 DEFAULT_FIXTURE = PRIVATE_ROOT / "L31-isolated-codex-plugin"
+EXTERNAL_PROJECT_PREFIX = "cotend-L31-projects-"
 PLUGIN_ID = "cotend"
 PLUGIN_VERSION = "0.0.0-dev.1+codex.fixture"
 MARKETPLACE_NAME = "cotend-fixture-local"
@@ -32,10 +34,11 @@ EXPECTED_SKILLS = (
     "cotend-init",
     "cotend-model-upgrade",
     "cotend-project-init",
+    "cotend-semantic-alignment",
     "grill-me",
     "karpathy-guidelines",
 )
-EXPECTED_FILE_COUNT = 30
+EXPECTED_FILE_COUNT = 37
 PACKAGE_SUPPORT_FILES = {
     "LICENSE": ROOT / "LICENSE",
     "NOTICE": ROOT / "NOTICE",
@@ -147,6 +150,54 @@ def guarded_fixture(path: Path) -> Path:
     if not relative.parts:
         raise PluginFixtureError("fixture cannot be the private fixture root")
     return resolved
+
+
+def guarded_external_project_root(path: Path) -> Path:
+    temp_root = Path(tempfile.gettempdir()).resolve()
+    resolved = path.expanduser().resolve()
+    try:
+        relative = resolved.relative_to(temp_root)
+    except ValueError as exc:
+        raise PluginFixtureError(
+            "external Plugin fixture project root must stay under system temp"
+        ) from exc
+    if len(relative.parts) != 1 or not relative.name.startswith(
+        EXTERNAL_PROJECT_PREFIX
+    ):
+        raise PluginFixtureError(
+            "external Plugin fixture project root identity is invalid"
+        )
+    return resolved
+
+
+def create_external_project_root() -> Path:
+    return guarded_external_project_root(
+        Path(tempfile.mkdtemp(prefix=EXTERNAL_PROJECT_PREFIX))
+    )
+
+
+def remove_external_project_root(
+    path: Path,
+    *,
+    timeout_seconds: float = 45.0,
+) -> int:
+    root = guarded_external_project_root(path)
+    if not root.exists():
+        return 0
+    reject_symlink_tree(root, label="external L31 project fixture")
+    deadline = time.monotonic() + timeout_seconds
+    retries = 0
+    while root.exists():
+        try:
+            shutil.rmtree(root)
+        except OSError as exc:
+            if getattr(exc, "winerror", None) not in {5, 32}:
+                raise
+            if time.monotonic() >= deadline:
+                raise
+            retries += 1
+            time.sleep(0.1)
+    return retries
 
 
 def assert_fixture_path(fixture: Path, path: Path, label: str) -> Path:
@@ -1527,9 +1578,21 @@ def main() -> int:
                 f"cases={evidence['negative_mutations']['passed']}"
             )
         if args.phase_a:
-            evidence["phase_a"] = run_phase_a(
-                fixture, env, protected_before, source_before
-            )
+            projects_root = create_external_project_root()
+            try:
+                for name in ("project-empty", "project-with-standalone-skills"):
+                    shutil.copytree(fixture / name, projects_root / name)
+                evidence["phase_a"] = run_phase_a(
+                    fixture,
+                    env,
+                    protected_before,
+                    source_before,
+                    projects_root=projects_root,
+                )
+            finally:
+                evidence["external_project_cleanup_retries"] = (
+                    remove_external_project_root(projects_root)
+                )
             print(
                 "ISOLATED_CODEX_PLUGIN_PHASE_A_OK "
                 f"steps={evidence['phase_a']['step_count']} "

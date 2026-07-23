@@ -4,24 +4,24 @@
   "status": "production_candidate_not_published",
   "plugin": {
     "name": "cotend",
-    "version": "0.1.0-rc.1",
+    "version": "0.1.0-rc.2",
     "manifest": "packaging/codex-plugin/cotend/.codex-plugin/plugin.json",
-    "manifest_sha256": "36655662ebeca0cd89b8525bdb91318cd859ce11535a58e94d1c99933ddb0fc5"
+    "manifest_sha256": "e4faeb216b1dc003e93422f0aa8266a947957dfc91d9f286e2cd119dfb3b5dfa"
   },
   "source": {
     "carrier": "skills/",
     "artifact_lock": "delivery/codex-artifact.lock.json",
-    "artifact_id": "cotend-codex-r000001",
-    "revision": 1,
-    "target_manifest_sha256": "f8ed51e76a19fb26debcb998fb2c5f8505908f5d73d4cf5351ea52a1c915c049",
-    "skill_count": 7,
-    "skill_file_count": 30,
-    "path_hash_manifest_sha256": "acbd6d6668d0e8fc34ea7585db5c758cc09a9ea08756f7a52b84f4a5b841ba1b"
+    "artifact_id": "cotend-codex-r000002",
+    "revision": 2,
+    "target_manifest_sha256": "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b",
+    "skill_count": 8,
+    "skill_file_count": 37,
+    "path_hash_manifest_sha256": "ce3253e553f1a95ec81858b2b1e2429a771816e7477516da779b1a99e0c2c0de"
   },
   "package": {
     "output_directory_name": "cotend",
-    "file_count": 41,
-    "path_hash_manifest_sha256": "18f0b62852ebe1f7afbd43bcbff50706aacd1d66ae6edeb4c5b133d53fdd858f",
+    "file_count": 48,
+    "path_hash_manifest_sha256": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
     "support_files": [
       "LICENSE",
       "NOTICE",

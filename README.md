@@ -71,9 +71,9 @@ These starter prompts describe the main workflows:
 
 For an independent stronger-model review or possible takeover, ask CoTend to prepare a model handoff. CoTend keeps prior conclusions separate from verified facts so the receiving model can reason independently, then returns the advisor-or-takeover choice to you.
 
-## How the seven Skills fit together
+## How the eight Skills fit together
 
-You are not expected to manage seven commands in ordinary use. `CoTend Init` is the normal start or resume entry; the other Skills are delegated, contextual, advanced, or supporting capabilities.
+You are not expected to manage eight commands in ordinary use. `CoTend Init` is the normal start or resume entry; the other Skills are delegated, contextual, advanced, or supporting capabilities.
 
 <!-- skill-catalog-start -->
 | Display name | Skill ID | Role |
@@ -82,23 +82,26 @@ You are not expected to manage seven commands in ordinary use. `CoTend Init` is 
 | CoTend Project Init | `cotend-project-init` | Delegated Auto Mode engine that classifies project state and prepares governance. |
 | CoTend Collaboration | `cotend-collaboration` | Shared governance core for plans, evidence, review, risk, acceptance, and continuation. |
 | CoTend Diagnose Only | `cotend-diagnose-only` | Contextual read-only root-cause analysis when edits are not authorized. |
+| CoTend Semantic Alignment | `cotend-semantic-alignment` | Direct writable entry for confirming or repairing product meaning before affected implementation continues. |
 | CoTend Model Upgrade | `cotend-model-upgrade` | Advanced advisor, trial, takeover, rollback, and milestone handoff workflow. |
 | Grill Me | `grill-me` | MIT-licensed clarification companion for resolving a plan one decision at a time. |
 | Karpathy Guidelines | `karpathy-guidelines` | MIT-licensed implementation-discipline companion for simpler, verifiable code changes. |
 <!-- skill-catalog-end -->
 
-The five CoTend-owned Skills use the `cotend-` prefix. The two bundled companions retain their upstream identities and license notices.
+The six CoTend-owned Skills use the `cotend-` prefix. The two bundled companions retain their upstream identities and license notices.
 
 ## Current availability
 
 CoTend is currently a repository-verified pre-release project:
 
+The initial submission identity and version are confirmed for repository preparation only; this does not authorize a Portal submission, release, push, or publication.
+
 | Area | Current state |
 |---|---|
-| Source carrier | Seven Codex Skills are adopted in [`skills/`](skills/), which is also the repository-root Plugin contract path. |
-| Package candidate | `cotend@0.1.0-rc.1`, 41 deterministic files including four locked brand assets; initial submission identity and version are confirmed, the repository Logo is locked, and the package remains unpublished. |
+| Source carrier | Eight Codex Skills are adopted in [`skills/`](skills/), which is also the repository-root Plugin contract path. |
+| Package candidate | `cotend@0.1.0-rc.2`, 48 deterministic files including the Semantic Alignment helper and four locked brand assets; the repository Logo is locked, and this candidate remains unpublished. |
 | Isolated lifecycle | Package add, install, discovery, coexistence, remove, recovery, and cleanup are verified in redirected disposable roots. |
-| GitHub Marketplace carrier | Real `lhh1301506137/CoTend` fetch, Git-backed refresh, clean isolated install, seven-Skill discovery, remove, recovery, and cleanup are verified against a recorded public commit. |
+| GitHub Marketplace carrier | Real `lhh1301506137/CoTend` fetch, Git-backed refresh, clean isolated install, eight-Skill discovery, remove, recovery, and cleanup must be revalidated against the public commit after rc.2 is pushed. |
 | Submission materials | English listing, three starter prompts, five positive cases, three negative cases, and release-note structure exist as a repository draft. |
 | Public installation | GitHub Open Beta is available through the personal Marketplace commands above. The Plugin has not been submitted to or published in the Public Plugin Directory. |
 | External readiness | Repository Logo assets are ready, but Portal format is not yet verified. Publisher identity, public support and legal URLs, availability, and policy attestations remain unresolved. |
@@ -123,7 +126,7 @@ python scripts/build_codex_plugin.py --output dist/cotend --json
 python scripts/verify_codex_plugin_package.py --repository-only
 python scripts/verify_plugin_submission_materials.py
 python scripts/prepare_reviewer_fixtures.py
-python scripts/build_release_archive.py --check-tag v0.1.0-rc.1
+python scripts/build_release_archive.py --check-tag v0.1.0-rc.2
 python scripts/verify_repository_maturity.py
 python -m unittest discover -s tests
 python scripts/check_repository.py

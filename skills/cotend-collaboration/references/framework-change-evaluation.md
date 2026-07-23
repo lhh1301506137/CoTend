@@ -13,7 +13,7 @@ This module judges framework changes, not product features.
 Load this module before marking a framework change stable when the work changes any of:
 
 - `cotend-collaboration`, `cotend-init`, `cotend-project-init`, `cotend-model-upgrade`, or their references;
-- default risk tier, authorization, continue-token behavior, local closeout, commit/archive, or stop-boundary behavior;
+- default risk tier, authorization, `继续`, local closeout, commit/archive, or stop-boundary behavior;
 - Plan Tree, Trellis active/dormant, CodeGraph/Code Context Harness, review, handoff, Done Gate, Quality Sentinel, AI UAT, or Release Hardening routing;
 - Claude/Gemini/external reviewer sync rules or share packages;
 - project framework initialization/update behavior;
@@ -92,7 +92,7 @@ Apply this budget check:
 - Record the smallest useful validation scenario; do not expand every template when a reference rule is enough.
 - Name a retirement/thinning trigger for scaffolding rules, such as model upgrade review, repeated zero-findings, real-project evidence that the rule causes ceremony, or replacement by a deterministic script/tool.
 
-Do not thin constitutional boundaries: user confirmation authority, Critical / Never-Unattended Stop List, continue-token non-consent, final user acceptance, AI UAT not being user acceptance, evidence labeling, decision-log authority, and release/public approval. Those answer "who decides" and do not disappear when models improve.
+Do not thin constitutional boundaries: user confirmation authority, Critical / Never-Unattended Stop List, `继续` non-consent, final user acceptance, AI UAT not being user acceptance, evidence labeling, decision-log authority, and release/public approval. Those answer "who decides" and do not disappear when models improve.
 
 ## Validation Scenarios
 
@@ -117,7 +117,7 @@ When the implementation differs from agreed wording, external-review recommendat
 - Dormant Trellis: `.trellis/` presence alone does not force active Trellis.
 - Active Trellis: Trellis remains the binding task/spec substrate.
 - Plan Tree baseline: new or inferred root/MVP/active leaf asks the user before product implementation.
-- Ordinary continue: normal development does not load cold-path framework evaluation.
+- Ordinary `继续`: normal development does not load cold-path framework evaluation.
 - Local closeout: verified in-scope local commit/archive is allowed only inside recorded authorization.
 - Risk boundary: `critical` still stops; dev_high still requires confirmed personal/local/prototype posture.
 - External sync: Claude/share package sync remains deferred until user/stability decision.
@@ -142,7 +142,7 @@ Prefer `revise`, `rollback`, or `watch` if the change causes:
 - ordinary small tasks to require new ceremony;
 - repeated unnecessary confirmation prompts;
 - Plan Tree/Trellis/STATUS truth conflicts;
-- lower continuity for ordinary continue tokens;
+- lower continuity for `继续`;
 - Codex choosing process maintenance over product progress;
 - external reviewer sync or share package drift;
 - user correction of the same new rule more than once.
@@ -156,7 +156,7 @@ Do not call a behavior-changing protocol stable merely because the files validat
 - rollback triggers are named;
 - the decision is `keep`, or the user accepts `watch`.
 
-For Claude/Gemini/share packages, keep Codex-side changes as the active draft until the user asks to sync or confirms the version is stable.
+For Claude/Gemini/CoTend consumer packages, keep Codex-side changes as the active draft until the user explicitly names a consumer and asks to sync it. A stable version may serve as an immutable target, but stability alone does not authorize a consumer handoff. Use the consumer range handoff cold path rather than requiring one package per intermediate Dual version.
 
 ## Watch Closure
 
@@ -176,5 +176,5 @@ When this module is used, include in the final answer:
 - change class;
 - evaluation decision;
 - validation performed;
-- whether Claude/share package sync is still pending;
+- consumer sync status only when the current task is a named consumer sync, adoption review, or release decision where that state is material;
 - user action needed, if any.

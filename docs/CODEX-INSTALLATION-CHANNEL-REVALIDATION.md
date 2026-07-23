@@ -1,26 +1,28 @@
 # Codex 安装与分发渠道复验
 
 ```yaml
-status: active_channel_role_revalidation_pending
+status: three_layer_channel_confirmed_rc2_local_revalidated
 authority: research_evidence_only
-checked_at: 2026-07-13
+checked_at: 2026-07-23
 local_codex_cli: 0.144.1
 target_product: CoTend
 target_user: novice_AI_developer
 channel_decision: three_layer_baseline_confirmed
-latest_revalidation: direct_user_Skills_secondary_confirmed_and_isolated_adapter_passed
+latest_revalidation: v1_65_8_skill_rc2_isolated_plugin_delivery_and_root_carrier_passed
 direct_user_install_performed: false
 research_round_plugin_created: false
 subsequent_fixture_plugin_created: true_ignored_disposable_only
 subsequent_fixture_installation: passed_isolated_only
 subsequent_fixture_marketplace: added_and_removed_isolated_only
-production_plugin_created: false
+production_plugin_created: true_local_unpublished_candidate_0.1.0-rc.2
 public_submission_performed: false
 submission_material_contract: passed_repo_only_draft_not_submitted
 submission_reviewer_cases_executed: false
 ```
 
 ## 结论摘要
+
+当前候选已从本文最初评估时的 7 Skills/rc.1 更新为 8 Skills/37 个 Skill 文件和 `cotend@0.1.0-rc.2` 48 文件包。新增 `cotend-semantic-alignment` 不改变三层渠道结论，也不重新打开 preserve-first namespace；本地隔离 Plugin、项目交付运行时和仓库根载体已重验。下文保留的 7 Skill、rc.1 和 Desktop 七入口数据是当时真实历史证据，不代表 rc.2 已推送或第八入口已完成 Desktop 重验。
 
 当前 Codex 已经具备此前尚未证实的可用 Plugin 分发面：Plugin 可以包含一个或多个 Skills，ChatGPT 桌面端的 Work 或 Codex 可以通过图形化 Plugins Directory 浏览、安装、启用和卸载 Plugin，Codex CLI 也提供稳定的 Plugin 与 Marketplace 命令。Skills 仍是工作流的编写格式，Plugin 则是跨仓库安装分发单元。
 

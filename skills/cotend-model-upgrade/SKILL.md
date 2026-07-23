@@ -1,24 +1,28 @@
 ---
 name: cotend-model-upgrade
 description: >-
-  Use when a project should benefit from a stronger or more expensive model without wasting tokens. Prepare evidence-backed project review packets, takeover-ready context packs, premium-model advisor reviews, takeover value proposals, user-approved premium takeover paths, primary-model replacement decisions, framework thinning reviews, guidance consolidation, PROJECT-DECISION-LOG aware advisor questions, and milestone re-entry loops with MILESTONE-REPORT.md. Triggers include model upgrade, Claude/Fable/Codex higher model advisor, expensive model review, premium model handoff, takeover value proposal, confirmed new primary development model, framework overhead after model upgrade, Claude takes over development, Codex resumes from advisor guidance, milestone review, or return to advisor after a handoff trigger.
+  Use when a project may benefit from a stronger model or a carrier runs a different actual model. Separate carrier/provider/model/configuration/role identity; classify reviewer-only, advisor, primary-trial, confirmed-primary, and rollback changes; prepare evidence-backed advisor or takeover packets; produce non-authorizing Full/Adaptive recommendations without changing the user's persistent profile; distinguish published capability from current-product behavior and real-project evidence; and run cold-path framework thinning or restoration review.
+metadata:
+  short-description: "Premium model project handoff"
 ---
 
 # CoTend Model Upgrade
 
-Version: 1.7
+Version: 1.11
 
-Use this skill to coordinate a cost-efficient current model and a stronger premium model on the same project, including one-shot advice, user-approved takeover, milestone re-entry advisor rounds, and cold-path framework thinning review after the user confirms a new primary development model.
+Compatibility baseline: `cotend-collaboration-v1.65`.
 
-It is not the CoTend governance core. It may reuse existing project records such as `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, `PROJECT-DECISION-LOG.md`, `COLLAB-*`, `PLAN-CHANGELOG.md`, PRDs/specs, Trellis state, CodeGraph summaries, UAT notes, and source files, but it can also run in projects that do not use those files.
+Use this skill to coordinate a cost-efficient current model and a stronger premium model on the same project, including one-shot advice, user-approved takeover, milestone re-entry advisor rounds, non-authorizing runtime-profile recommendations, and cold-path framework thinning review after the user confirms a new primary development model.
+
+It is not the CoTend governance framework itself. It may reuse existing project records such as `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, `PROJECT-DECISION-LOG.md`, `COLLAB-*`, `PLAN-CHANGELOG.md`, PRDs/specs, Trellis state, CodeGraph summaries, UAT notes, and source files, but it can also run in projects that do not use those files.
 
 ## Default Roles
 
 ```yaml
 model_roles:
-  current_primary: Codex
-  premium_model: Claude
-  executor_after_advice: Codex
+  current_primary: <runtime_identity from cotend-collaboration/references/review-and-self-review.md>
+  candidate_or_reviewer: <runtime_identity>
+  executor_after_advice: same_as_current_primary | <runtime_identity>
   user: final_product_authority
 ```
 
@@ -36,27 +40,33 @@ Before treating a stronger model as the new primary developer, classify the user
 ```yaml
 model_role_decision:
   status: advisor_only | trial_evaluation | new_primary_confirmed | primary_model_reverted_or_downgraded
+  change_scope: reviewer_only | advisor_only | primary_candidate | primary_replacement | primary_rollback
   confirmed_by_user: true | false
-  confirmed_model:
-  previous_primary_model:
+  target_identity: <runtime_identity>
+  previous_primary_identity: <runtime_identity | not_applicable>
   confirmation_date:
   trial_observations:
     -
+  runtime_profile_before_decision: full | adaptive | unknown
 ```
 
-- `advisor_only`: the stronger model is an advisor/reviewer only. Its framework-thinning comments are `advisor_recommended` and cannot start a formal thinning review.
-- `trial_evaluation`: the stronger model is being tried or evaluated. Same-family upgrades such as GPT 5.5 to GPT 5.6 default here until the user explicitly confirms the new primary. Trial observations may be carried into a later formal review, but usage duration does not imply replacement.
-- `new_primary_confirmed`: the user explicitly confirms this model is now the main development model. Only this status, with `confirmed_by_user: true`, may trigger formal `framework_thinning_review`.
-- `primary_model_reverted_or_downgraded`: the primary model is rolled back, downgraded, or replaced by a less capable/cheaper model. Run reactivation review for any previously thinned mechanisms using their recorded `reactivation_condition`.
+- `advisor_only`: the target model is an advisor only. It does not change the current primary runtime profile; framework-thinning comments are `advisor_recommended` and cannot start formal thinning.
+- `trial_evaluation`: the target model is being tried. With `change_scope: reviewer_only`, update only the reviewer assignment. With `change_scope: primary_candidate`, preserve the user's current runtime profile while evaluating the candidate. Usage duration does not imply replacement.
+- `new_primary_confirmed`: the user explicitly confirms the exact carrier/provider/model/configuration as the main development identity. Only this status with `change_scope: primary_replacement` and `confirmed_by_user: true` may trigger formal `framework_thinning_review`; it may also refresh an advisory runtime-profile recommendation.
+- `primary_model_reverted_or_downgraded`: the primary identity is rolled back, downgraded, or replaced. Use `change_scope: primary_rollback` and run reactivation review for previously thinned mechanisms. Preserve the runtime profile unless the user separately changes it.
 
-When the user's wording is ambiguous, ask one plain-language question:
+Legacy `confirmed_model` / `previous_primary_model` fields remain readable aliases in historical packets. New packets must use `target_identity` / `previous_primary_identity` so a carrier name cannot masquerade as the actual model.
+
+When the user explicitly selects a model only for review, such as "this review uses Kimi K3 in Claude Desktop", classify it directly as `trial_evaluation + reviewer_only`. Do not ask whether to replace the primary unless the user also raises primary development. On first use, require the carrier/model smoke from `cotend-collaboration/references/review-and-self-review.md`.
+
+When the user invokes Model Upgrade and has not already made the role explicit in the current request or a current user-confirmed record, proactively ask one plain-language question before evaluating takeover, thinning, or a runtime-profile recommendation:
 
 ```markdown
-## Confirm The Model Role
+## Model Role Confirmation Is Needed
 
-**Current question**: Should the stronger model advise, enter a trial, or formally replace the primary development model?
-**Recommendation**: 1 Start with trial/evaluation / 2 Advisor only / 3 Confirm a new primary and begin framework-thinning review
-**Explanation**: Only option 3 allows the confirmed new primary to evaluate reversible framework scaffolding for thinning. Safety boundaries and final user authority never become weaker.
+**Current question**: Should the stronger model act only as advisor, be evaluated in a trial, or formally replace the Primary?
+**Recommendation**: 1 trial/evaluation without changing the Primary / 2 advisor only / 3 confirm Primary replacement and assess reversible scaffolding
+**Explanation**: None of these choices automatically changes A/Full. Option 3 confirms only the exact Primary identity and permits an assessment of reversible framework mechanisms and a profile recommendation. The user still selects A/Full separately, and that selection persists across versions. The assessment distinguishes published capability, current-product behavior, and real-project evidence without weakening constitutional boundaries. Only a Primary model/configuration change restores project delegation maturity to `ask_each_time`; reviewer-only changes do not.
 ```
 
 ## Modes
@@ -69,6 +79,32 @@ Default to `advisor_guided` unless the user explicitly asks for takeover.
 | `primary_takeover` | The user wants the premium model to directly become the active developer for a high-value phase. | Current model creates a takeover packet; premium model onboards, asks the user key questions, develops, verifies, and writes a return handoff. |
 
 `framework_thinning_review` is not a third mode. It is a cold-path subflow triggered by `model_role_decision.status: new_primary_confirmed` or `primary_model_reverted_or_downgraded`.
+
+## Runtime Profile Recommendation
+
+The canonical runtime profiles and selector live in `cotend-collaboration/references/runtime-profiles.md`. Model Upgrade supplies role and capability evidence; it must not create a second selector or duplicate the Skill tree.
+
+Model Upgrade may produce a recommendation when the user asks, when native/framework orchestration overlap is being evaluated, or when a confirmed Primary change makes prior advice stale. The recommendation never gates selection. Advisor, trial, unknown, replacement, and rollback states all preserve the current profile unless the user separately changes it.
+
+The assessment must separate three evidence layers:
+
+1. `published_model_capability`: official/public claims and evaluations. This can support a hypothesis, not user-specific approval.
+2. `current_product_behavior`: behavior actually observed in the current product/runtime, such as native agent orchestration. Name who observed it and what was observed; model self-description alone is insufficient.
+3. `real_project_evidence`: executed task evidence about duplicate context/implementation, agent value, missed scope, inline checking, tests, review findings, rework, and rollback signals. Missing evidence may justify a reversible `watch` canary, never a claim of proven long-term savings.
+
+Write `RUNTIME-PROFILE-ASSESSMENT.md` using `references/packet-templates.md`. The historical filename is retained for packet compatibility, but new files declare `review_authority: advisory_recommended` and `selection_authority: user_only`. It must include:
+
+- confirmed primary carrier/provider/model/role/configuration and freshness;
+- native orchestration capability and the framework mechanism that would overlap;
+- which fixed dispatch work Adaptive avoids and which checks/evidence remain mandatory;
+- positive and negative optional-agent scenarios;
+- expected net benefit with confidence and evidence pointers;
+- verification plan, watch metrics, and conditions that should prompt a user-facing switch recommendation;
+- exact Constitution inheritance from `cotend-collaboration/references/authority-and-triggers.md` with no overrides.
+
+Allowed recommendation results are `recommend_adaptive`, `recommend_full`, `neutral`, `needs_more_evidence`, and `not_applicable`. Evidence strength controls confidence, not permission. A persuasive self-evaluation may support a hypothesis but never selects or invalidates a profile.
+
+Report the current profile unchanged beside the recommendation. Model role, model identity, historical consent, delegation maturity, Model Upgrade output, and generic machine preferences cannot write project configuration. CoTend defaults to Full only when no prior choice exists and preserves an existing user/project selection across framework and model updates.
 
 Do not let premium-model suggestions silently replace user-confirmed product truth. New premium-model ideas become active only after user confirmation or after the current model verifies they are purely technical, scoped, and non-product-directional.
 
@@ -171,6 +207,8 @@ The first formal review may evaluate only reversible scaffold changes. Initial c
 - Plan Tree progressive load-policy granularity -> `widen_threshold` or `cold_path_only` candidate for strong long-context models.
 - Output ritual fields, such as repeated `loaded_protocol_modules` declarations -> on-demand declaration or merge candidate.
 
+The fixed Trellis `trellis-implement -> trellis-check` chain is evaluated through the runtime-profile assessment, not by deleting review/checking. When platform-native orchestration creates overlap, Adaptive may replace only the unconditional child-agent dispatch with direct implementation plus inline check/tests. The full chain remains available as the public/default fallback.
+
 First-round actions allowed:
 
 ```yaml
@@ -203,13 +241,13 @@ model_capability_boundary:
   known_failure_modes:
     -
   calibration_material_read:
-    - current framework adoption and review-chain records
+    - v1.51 review-chain records
     - recent framework-change evaluation records
 ```
 
 `still_unreliable_for` must be non-empty. A model that claims it has no remaining unreliable areas fails the review.
 
-Before a formal thinning review, the new primary model must read the current framework adoption/review-chain records and recent `FRAMEWORK-CHANGE-EVAL.md` entries, then list them in `calibration_material_read`.
+Before a formal thinning review, the new primary model must read the v1.51 review-chain records and recent `FRAMEWORK-CHANGE-EVAL.md` entries, then list them in `calibration_material_read`.
 
 ### Candidate Schema
 
@@ -255,12 +293,13 @@ When `new_primary_confirmed`, add or update an entry in `UPSTREAM-SOURCES.md` fo
 
 ## Workflow Decision
 
-1. Classify `model_role_decision` when the user mentions model upgrade, primary-model replacement, trial use, or framework overhead after a model change.
-2. If the current model is invoked before opening the premium model, choose `review_depth`, refresh **Baseline Context Pack** when needed, then run **Packet Preparation**.
-3. If the premium model is invoked with a prepared packet, run **Premium Advisor**, **Premium Takeover**, and/or **Framework Thinning Review** based on the user-selected mode and model-role decision.
-4. If the current model is invoked after premium outputs exist, run **Consolidation And Execution**.
-5. If a prior advisor round exists and the user is returning at a milestone or recall trigger, run **Milestone Re-Entry Preparation** instead of a fresh full packet when the previous packet is still trustworthy.
-6. If the user is still deciding between advisor and takeover, recommend `advisor_guided` as the cost-efficient default and explain when takeover is worth it.
+1. Classify `model_role_decision` when the user mentions model upgrade, primary-model replacement, trial use, runtime-profile recommendation, or framework overhead after a model change. Ask the role question unless current user-confirmed evidence already answers it.
+2. Preserve the selected runtime profile for advisor/trial/unknown/replacement/rollback cases. Produce a recommendation only when the user asks or current evidence makes it useful.
+3. If the current model is invoked before opening the premium model, choose `review_depth`, refresh **Baseline Context Pack** when needed, then run **Packet Preparation**.
+4. If the premium model is invoked with a prepared packet, run **Premium Advisor**, **Premium Takeover**, Runtime Profile Eligibility Assessment, and/or **Framework Thinning Review** based on the user-selected mode and model-role decision.
+5. If the current model is invoked after premium outputs exist, run **Consolidation And Execution**.
+6. If a prior advisor round exists and the user is returning at a milestone or recall trigger, run **Milestone Re-Entry Preparation** instead of a fresh full packet when the previous packet is still trustworthy.
+7. If the user is still deciding between advisor and takeover, recommend `advisor_guided` as the cost-efficient default and explain when takeover is worth it.
 
 Use `references/packet-templates.md` when writing packet files, advisor outputs, takeover plans, return handoffs, or consolidation summaries.
 
@@ -370,19 +409,21 @@ For `primary_takeover`, also write `TAKEOVER-PACKET.md` with current work state,
 Rules:
 
 - Keep summaries compact. Prefer pointers to files over copying large content.
-- Stamp packets with `packet_version: cotend-model-upgrade-v1.7` and `generated_at_commit` when git is available so the advisor can check freshness.
+- Stamp packets with `packet_version: cotend-model-upgrade-v1.11` and `generated_at_commit` when git is available so the advisor can check freshness.
 - Include `model_role_decision` in `ADVISOR-PACKET.md` when the user is evaluating a model replacement, running a trial model, confirming a new primary development model, reverting/downgrading the primary model, or asking whether the framework can become thinner after a model change.
+- Include `runtime_profile_assessment_request` whenever the user asks which profile is recommended for the current setup, reports overlapping native/framework orchestration, or reverts/downgrades a model.
 - Separate `user_confirmed`, `current_model_inference`, `direct_code_evidence`, `advisor_request`, and `unknown`.
 - Include enough evidence for the premium model to challenge the packet. Do not ask it to trust the summary.
 - Point to `MODEL-UPGRADE/BASELINE/` from `ADVISOR-PACKET.md` when baseline files exist.
 - If `framework_thinning_review` is triggered, list `FRAMEWORK-THINNING-REVIEW.md` as a desired output and ask the premium/new primary model to add a short pointer to `EXECUTION-HANDOFF.md`.
+- If runtime-profile assessment is triggered, list `RUNTIME-PROFILE-ASSESSMENT.md` as a desired output and require a concise pointer in `EXECUTION-HANDOFF.md`.
 - If the user may ask the premium model to take over, do not produce only a narrow slice packet. Include a takeover-ready baseline and deep-read checklist.
 - Do not rewrite active project docs during packet preparation unless the user explicitly asks. Packet files are separate artifacts.
 - Do not start large new implementation while preparing the packet.
 
 ## Premium Advisor
 
-Owner: premium model, usually Claude.
+Owner: the actual premium/advisor model recorded in `runtime_identity`; the carrier may be Claude Desktop without the model being Anthropic Claude.
 
 Start by reading `ADVISOR-PACKET.md`, then `REVIEW-SCOPE.md`.
 
@@ -443,6 +484,8 @@ At `review_depth: takeover_ready`, write the full set:
 
 If `framework_thinning_review` is triggered, also write `FRAMEWORK-THINNING-REVIEW.md` and include only a concise pointer summary in `EXECUTION-HANDOFF.md`. This extra output does not replace any takeover-ready required file.
 
+If runtime-profile assessment is triggered, also write `RUNTIME-PROFILE-ASSESSMENT.md`. Preserve the historical filename for packet compatibility, but use the v1.11 advisory schema: `selection_authority: user_only`, one recommendation result, separate evidence layers, and `profile_changed_by_assessment: no`. Reviewer, advisor, trial, replacement, and rollback states all preserve the selected profile.
+
 `ADVISOR-REVIEW.md` is optional at takeover depth. If written, keep it to 15 lines or fewer as a user-readable pointer summary only. It must not duplicate the independent thesis, strongest challenge, detailed strengths/risks, or must/should/could guidance; those belong in `EXECUTION-HANDOFF.md`.
 
 At takeover depth, advisor output across the file set must mark:
@@ -464,7 +507,7 @@ At takeover depth, advisor output across the file set must mark:
 
 The single authority for independent thesis, strongest challenge, detailed strengths/risks, and must/should/could guidance is `EXECUTION-HANDOFF.md`. Other files may carry short local verdicts or references only.
 
-User-facing decision sections, including `TAKEOVER-VALUE-PROPOSAL.md` recommendation text and the final `EXECUTION-HANDOFF.md` decision menu, must use the recorded project language, or English when none is recorded. Machine-readable field names and status values stay English.
+User-facing decision sections, including `TAKEOVER-VALUE-PROPOSAL.md` recommendation text and the final `EXECUTION-HANDOFF.md` decision menu, must use the project's recorded user-facing language, or English by default. Machine-readable field names and status values stay English.
 
 At slice depth, the required minimum is: the three verdicts, independent thesis, strongest challenge, classified recommendations, evidence checked, questions for the user, packet-quality notes, and user-confirmed answers.
 
@@ -506,11 +549,12 @@ Read premium outputs in this order:
 1. `CONSENSUS-DELTA.md`
 2. `CONSENSUS-REVIEW.md`
 3. `TAKEOVER-VALUE-PROPOSAL.md`
-4. `FRAMEWORK-THINNING-REVIEW.md` when present
-5. `EXECUTION-HANDOFF.md`
-6. `UNDERSTANDING-AUDIT.md`
-7. Optional thin `ADVISOR-REVIEW.md` when present
-8. `RETURN-HANDOFF.md` when takeover occurred
+4. `RUNTIME-PROFILE-ASSESSMENT.md` when present
+5. `FRAMEWORK-THINNING-REVIEW.md` when present
+6. `EXECUTION-HANDOFF.md`
+7. `UNDERSTANDING-AUDIT.md`
+8. Optional thin `ADVISOR-REVIEW.md` when present
+9. `RETURN-HANDOFF.md` when takeover occurred
 
 Then:
 
@@ -519,7 +563,8 @@ Then:
 - Classify recommendations as `accepted`, `needs_user_confirmation`, `needs_code_validation`, `rejected`, or `deferred`.
 - If the advisor marked `packet_status: packet_incomplete`, do not execute dependent recommendations. Ask Codex to regenerate the packet with the missing information list, then rerun advisor review or continue only with explicitly low-confidence independent advice.
 - Treat `FRAMEWORK-THINNING-REVIEW.md` as `advisor_recommended` only. Do not edit framework files from it until a challenge review, `FRAMEWORK-CHANGE-EVAL.md`, explicit user confirmation, implementation, and validation are complete.
-- If the model role is `primary_model_reverted_or_downgraded`, inspect prior thinning records and re-enable any mechanism whose `reactivation_condition` applies before continuing high-risk unattended development.
+- Treat `RUNTIME-PROFILE-ASSESSMENT.md` as an advisory recommendation, not project-selection truth. Never edit A/Full because of its result.
+- If the model role is `primary_model_reverted_or_downgraded`, preserve the selected profile, inspect prior thinning records, and re-enable any mechanism whose `reactivation_condition` applies before continuing high-risk unattended development. If Full appears safer, recommend it plainly and wait for the user's profile decision.
 - Present the user-facing cost/benefit decision separately from the executor plan. Do not collapse "Claude would take over" into an instruction to proceed.
 - Read Packet Quality Feedback from `EXECUTION-HANDOFF.md` and use it to improve the next packet.
 - Convert accepted guidance into vertical slices with validation and a clear milestone boundary.
@@ -546,5 +591,6 @@ The packet should let a premium model quickly know:
 - how guidance should flow back into executable work.
 - when to return to the premium model for a cheap re-entry round, and when repeated re-entry indicates takeover may be cheaper.
 - when a confirmed new primary model may make reversible scaffold mechanisms thinner, and which constitution/interface mechanisms remain non-negotiable.
+- which profile the evidence recommends, what duplicate orchestration A may avoid, what remains mandatory in both profiles, how the recommendation will be validated, and which observations should prompt a new user decision rather than an automatic switch.
 
 The premium model should improve judgment and direction, not merely restate the current model's summary.

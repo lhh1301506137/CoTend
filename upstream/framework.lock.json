@@ -2,27 +2,28 @@
   "schema": "cotend.framework-lock",
   "schema_version": 1,
   "status": "adopted_verified",
-  "release_id": "2026.07.11.3",
-  "framework_protocol": "cotend-collaboration-v1.52",
-  "model_upgrade_packet_family": "cotend-model-upgrade-v1.7",
+  "release_id": "2026.07.23.2",
+  "framework_protocol": "cotend-collaboration-v1.65",
+  "model_upgrade_packet_family": "cotend-model-upgrade-v1.11",
   "source_release": {
-    "tag": "dual-ai-share-2026.07.11.3",
-    "tag_object": "cef8add414a6d9704d3f58785a128bc56f44b263",
-    "release_commit": "71e45d9ebeff4d9d61c180711c25267b9fe31549",
-    "source_framework_commit": "5496073e19e239ef19eb055f2b470185fab25d3a",
-    "package_tree": "a70231e0445d9795a00212e8e6c53c149bfbc431",
-    "manifest_sha256": "919fe34254b51619ddca1d010445281d4f7ceec958ee8cfd1958eaccb02bd006"
+    "tag": "dual-ai-share-2026.07.23.2",
+    "tag_object": "b8df9fc4c1c30694e3574410a44e7c72de779e07",
+    "release_commit": "6b0dc0a80e35dd1296a17d0ecdb8f1bacc785a00",
+    "source_framework_commit": "4233d7439fc9d9b787803b3df7cdbe9d57ce9323",
+    "package_tree": "71c49b0463528fb8a2b3deabace6bfb942a67b6c",
+    "manifest_sha256": "5dd76ae856f596176583fd73681c4ec9c8a365aa84313715a727ecd28182081a"
   },
   "target_platform": "Codex",
   "source_carrier": "skills/",
-  "skill_count": 7,
-  "skill_file_count": 30,
+  "skill_count": 8,
+  "skill_file_count": 37,
   "source_skill_trees": {
-    "diagnose-only": "88dc2e47dba438720a336c38103308aeae3d635e",
-    "dual-ai-collaboration": "b75114a7e0fd2027943ed98217a0f9d581cbdae9",
-    "dual-ai-init": "cb233ade310c37e0cd038ff5752eeced92a303f0",
-    "dual-ai-project-init": "1f2fdd44e90f31fec310eaf78b02e48de4fed53c",
-    "dual-model-upgrade": "dfb25bd4464e0266b665af138a5f3902b44ce281",
+    "diagnose-only": "06e8b6bd4c2f916d80e57544edd7bd4ec1db60f5",
+    "dual-ai-collaboration": "f1387d19a8c2dba2738b886276e6d1987602e332",
+    "dual-ai-init": "10d067b679fb810be4a449a047c13d2747b48259",
+    "dual-ai-project-init": "e71864611f7ec7ef0a9a4cc6314083da86ff9068",
+    "dual-ai-semantic-alignment": "df5e63b3cd8ff315ac09973666a71eb20825f094",
+    "dual-model-upgrade": "940081225626250a6680cef9499f9b14003147da",
     "grill-me": "70df660726ef12349a40dc0353a681c82414fe95",
     "karpathy-guidelines": "e119339197d600aa39a24fd7a95c946800c9c949"
   },
@@ -52,6 +53,12 @@
       "implementation_mode": "platform_adaptation"
     },
     {
+      "source": "dual-ai-semantic-alignment",
+      "target": "cotend-semantic-alignment",
+      "disposition": "adapted",
+      "implementation_mode": "platform_adaptation"
+    },
+    {
       "source": "dual-model-upgrade",
       "target": "cotend-model-upgrade",
       "disposition": "adapted",
@@ -71,7 +78,7 @@
     }
   ],
   "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-  "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-11-3-initial-adoption",
+  "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-23-2-v1-65-adoption",
   "provenance_records": [
     "upstream/FRAMEWORK-CANDIDATE.json",
     "upstream/CODEX-SKILL-ROLE-MAP.json",
