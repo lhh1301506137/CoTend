@@ -32,6 +32,7 @@ NEGATIVE_CASES = 17
 
 
 def source_state() -> dict[str, Any]:
+    contract = package.validate_contract()
     return {
         "git_head": subprocess.run(
             ["git", "rev-parse", "HEAD"],
@@ -40,9 +41,13 @@ def source_state() -> dict[str, Any]:
             capture_output=True,
             text=True,
         ).stdout.strip(),
-        "skills": package.path_hash_manifest_sha256(
+        "repository_skills": package.path_hash_manifest_sha256(
             package.source_skill_manifest()
         ),
+        "locked_package_skills": package.path_hash_manifest_sha256(
+            contract["source_manifest"]
+        ),
+        "locked_package_source_commit": contract["source_commit"],
         "target_artifact_lock": package.sha256_file(package.TARGET_ARTIFACT_LOCK),
         "framework_lock": package.sha256_file(
             ROOT / "upstream" / "framework.lock.json"

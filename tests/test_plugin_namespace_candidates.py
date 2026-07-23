@@ -59,22 +59,22 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         self.assertEqual(
             inventory["by_identifier"],
             {
-                "cotend-collaboration": 69,
+                "cotend-collaboration": 68,
                 "cotend-diagnose-only": 25,
                 "cotend-init": 12,
                 "cotend-model-upgrade": 11,
                 "cotend-project-init": 15,
-                "cotend-semantic-alignment": 44,
+                "cotend-semantic-alignment": 45,
             },
         )
         self.assertEqual(
             inventory["by_category"],
             {
                 "agent_self_prompt": 6,
-                "explicit_invocation": 65,
+                "explicit_invocation": 66,
                 "fallback_path": 2,
                 "frontmatter_name": 6,
-                "plain_reference": 32,
+                "plain_reference": 31,
                 "protocol_or_version": 13,
                 "reference_path": 52,
             },
@@ -160,7 +160,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
             176,
         )
         self.assertEqual(preserve["residual_migration_review_required"], 0)
-        self.assertEqual(preserve["plugin_sensitive_reference_count"], 73)
+        self.assertEqual(preserve["plugin_sensitive_reference_count"], 74)
 
         short = results["N2-short"]
         self.assertEqual(short["skills"], 8)
@@ -177,7 +177,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
             164,
         )
         self.assertEqual(short["residual_migration_review_required"], 151)
-        self.assertEqual(short["plugin_sensitive_reference_count"], 67)
+        self.assertEqual(short["plugin_sensitive_reference_count"], 68)
         self.assertEqual(len(short["target_entrypoints"]), 6)
         self.assertEqual(
             {item["canonical_name"] for item in short["target_entrypoints"]},

@@ -17,21 +17,16 @@ Plan Tree is an auditable navigation system, not a new product truth source.
 - Normal development reads only the index plus the active path summaries, not every node document or expanded understanding file.
 - Do not create a separate "understanding tree". Use Plan Tree as the only tree, and link expanded understanding docs from the relevant nodes.
 
-Truth priority remains:
+Resolve truth by role through the canonical CoTend Project Truth Authority contract in `authority-and-triggers.md`: user-confirmed semantics own L0-L2 meaning, a linked current PRD/brief/spec owns detailed requirements inside that meaning, Plan Tree (or one explicitly mapped equivalent) owns route navigation, the decision log owns user decisions, STATUS is a projection, and code/tests/reviews prove current reality. No external framework identity or active flag changes that ownership.
 
-1. latest user-confirmed intent;
-2. active PRD/spec/Trellis task when binding;
-3. `STATUS.md`, review logs, accepted decisions;
-4. Plan Tree as the route map linking goals to executable leaves.
-
-If Plan Tree conflicts with active truth, update or supersede Plan Tree before implementation. Do not let an old tree override the user or active PRD/spec.
+If Plan Tree conflicts with protected meaning or a current detailed requirement, update, supersede, or rebase the affected Plan Tree route before implementation. Do not let an old tree override the user, and do not create a second route tree merely to preserve an external framework layout.
 
 ## When Required
 
 Require or refresh Plan Tree when any is true:
 
 - project profile is `standard` or `full` and the goal has more than one meaningful stage;
-- Trellis is active and multiple tasks/PRDs need a global route map;
+- multiple tasks/PRDs need a global route map, including projects with external-framework artifacts;
 - user asks for continuous/unattended development beyond one small slice;
 - Codex chooses a "highest-value next step";
 - a proposed next step does not clearly fit the current plan/vertical slice;
@@ -330,7 +325,7 @@ A nonsemantic L3/L4 route change that crosses an existing risk, acceptance, rele
 
 ### Directed Impact And Reliable Recovery
 
-For a material L3/L4 rebase, the Primary follows declared Plan Tree/Trellis dependencies, the previous/candidate/resulting paths, actual runtime/data/interface entrypoints, and linked tests/status/completion evidence. For a confirmed L0-L2 change, Semantic Alignment performs the same directed expansion after its protected write. Stop at a boundary with positive isolation evidence; do not substitute an undirected whole-repository scan.
+For a material L3/L4 rebase, the Primary follows declared CoTend route dependencies plus classified external links, the previous/candidate/resulting paths, actual runtime/data/interface entrypoints, and linked tests/status/completion evidence. For a confirmed L0-L2 change, Semantic Alignment performs the same directed expansion after its protected write. Stop at a boundary with positive isolation evidence; do not substitute an undirected whole-repository scan.
 
 Classify every discovered item with the canonical disposition owned by `templates.md`. A route artifact may be reusable, but an old `done` node or supported completion conclusion does not inherit across changed responsibility, boundary, runtime path, or evidence premise. Reopen the node or require rework/revalidation as the disposition demands. The rebase may mark completion evidence for refresh or invalidation; only `acceptance-test-harness.md` may derive the actual `capability_completion_claim` result.
 
@@ -344,13 +339,13 @@ Set `reliable_resume_boundary` to the earliest boundary whose protected meaning,
 - `blocked`: keep the affected route at its reliable boundary and report the unresolved blocker; unaffected isolated routes may continue.
 - `closed`: bind navigation to the resulting path and retain the decision plus superseded relationship in existing history.
 
-Persist an active packet in an existing Plan Tree node, active Trellis task/PRD, `STATUS.md`, `PROJECT-DECISION-LOG.md`, or `PROJECT-KNOWLEDGE-CHANGELOG.md`. Do not create `ROUTE-REBASE.md`, a branch ledger, or another task tree. Once closed, detailed impact rows may leave the current cockpit, but the resulting path, decision, reliable-boundary outcome, and superseded history must remain recoverable.
+Persist an active packet in an existing CoTend-owned Plan Tree node, `STATUS.md`, `PROJECT-DECISION-LOG.md`, `PROJECT-KNOWLEDGE-CHANGELOG.md`, or one explicitly mapped existing route owner. Link classified external task/PRD evidence without making it the packet owner. Do not create `ROUTE-REBASE.md`, a branch ledger, or another task tree. Once closed, detailed impact rows may leave the current cockpit, but the resulting path, decision, reliable-boundary outcome, and superseded history must remain recoverable.
 
 ## Truth, Navigation, And Existing Semantic Assets
 
 Plan Tree remains the one route index. Existing capability trees, glossaries, domain models, taxonomies, expanded-understanding records, and equivalent semantic assets must be classified by actual authority and currency, not filename or detail. Link or absorb applicable material into the existing Plan Tree/understanding surfaces; keep historical AI inference historical and route protected conflicts to direct Semantic Alignment. Do not create a second Plan Tree, capability tree, glossary, or semantic baseline.
 
-When direct Semantic Alignment applies confirmed meaning, it owns the dynamic pre-write impact inventory and post-write closure. Plan Tree participates as one discovered surface, together with affected node/understanding indexes, `STATUS`, active PRD/Trellis truth, decision/changelog records, and any existing scoped carrier of `active_truth_sources`, `current`, `active`, or `next` pointers. Each discovered surface is classified `update | supersede | no_change | historical_only`; missing non-required surfaces are not created for the inventory.
+When direct Semantic Alignment applies confirmed meaning, it owns the dynamic pre-write impact inventory and post-write closure. Plan Tree participates as one discovered surface, together with affected node/understanding indexes, `STATUS`, active PRD/brief/spec, classified external-framework evidence, decision/changelog records, and any existing scoped carrier of `active_truth_sources`, `current`, `active`, or `next` pointers. Each discovered surface is classified `update | supersede | no_change | historical_only`; missing non-required surfaces are not created for the inventory.
 
 After the write, no affected active pointer may resolve to a superseded term, node, route, or truth source. Repair it, mark the reference explicitly historical, or keep the affected route blocked. Scoped realignment checks only affected protected meaning, navigation surfaces, and their links; it does not force a repository-wide L3/L4 scan.
 
@@ -504,7 +499,7 @@ If `status: needs_reconciliation`, do not implement plan-external work yet.
 
 Before trusting an existing `current_next_leaf`, resolve any active `route_rebase_ref` by the lifecycle above. Pending high-level confirmation preserves the candidate and blocks only its affected path; applying/revalidating state resumes at the reliable boundary; blocked state cannot be bypassed by selecting a later leaf.
 
-Before selecting a new important `current_next_leaf`, inspect the current material node's `semantic_implementation_closure` from its existing node/Trellis/STATUS/review carrier. If the closure module triggers and `next_step_allowed` is not `yes`, keep that node active and select only in-scope repair leaves. A future downstream implementation is not required merely to close the current boundary, but the current output contract must be verified as defined by the closure owner.
+Before selecting a new important `current_next_leaf`, inspect the current material node's `semantic_implementation_closure` from its CoTend-owned node/STATUS/review carrier or explicitly mapped route owner. External-framework records may supply classified evidence but cannot own closure. If the closure module triggers and `next_step_allowed` is not `yes`, keep that node active and select only in-scope repair leaves. A future downstream implementation is not required merely to close the current boundary, but the current output contract must be verified as defined by the closure owner.
 
 ## Post-Init Consistency Self-Check
 
@@ -515,7 +510,7 @@ The goal is to catch control-plane drift and route into Triggered Semantic Recon
 Check:
 
 - **Semantic baseline coverage**: record `coverage / authority / currency / consistency`, derive `status` by the canonical rule, verify each required current-MVP L0-L2 node has its own explicit user-confirmation evidence, verify every new/materially changed node has one verified decision-log contract binding, and verify no ancestor confirmation or contract was inherited by a descendant. Complete AI-inferred coverage is not `confirmed`. Report `legacy_unbound` separately and apply its staged high-value-trigger migration rather than freezing unrelated paths.
-- **Plan Tree vs Trellis current task**: when `trellis_mode: active`, compare `PROJECT-PLAN-TREE.md` active node/current next leaf and linked task fields with `task.py current` or the active Trellis task record. If they disagree, set `plan_tree_alignment.status: needs_reconciliation` unless the active task is only a framework/control-plane maintenance task that should not become the product leaf.
+- **Plan Tree vs linked external task**: when an external-framework task is linked, compare its scope and pointers with the CoTend active node/current next leaf. Classify aligned content `reference_only`, stale content `historical`, and disagreement `conflict`. An L0-L2 conflict stops affected work for direct Semantic Alignment; an L3/L4 conflict triggers CoTend route reconciliation. The external task never becomes route owner, and a framework/control-plane maintenance task never becomes the product leaf merely because it is current there.
 - **Understanding README freshness**: when `PROJECT-UNDERSTANDING/README.md` exists, verify its current confirmation/active-route wording does not contradict `PROJECT-PLAN-TREE.md` and active node docs. Stale README wording is a warning at minimum.
 - **Decision log coverage**: when grill-me, Trellis brainstorm, user correction, advisor question, model-role choice, risk gate, release gate, acceptance decision, or continuation choice matched canonical `decision_worthy_topics`, verify `PROJECT-DECISION-LOG.md` exists and has an entry. Missing coverage is a repair item; accepted `1` answers count as user-confirmed decisions.
 - **Knowledge/change coverage**: when Plan Tree, node docs, expanded understanding docs, active route, evidence links, advisor recommendations, or consensus status changed, verify the material change is covered by either a decision entry's `resulting_changes` or a `PROJECT-KNOWLEDGE-CHANGELOG.md` entry. Missing coverage is a repair item; if the missing coverage would change root/MVP/stage/feature meaning, keep it pending user confirmation.
@@ -534,7 +529,7 @@ post_init_consistency:
   checked:
     - semantic_baseline_coverage
     - semantic_contract_binding
-    - plan_tree_current_leaf_vs_trellis_current_task
+    - plan_tree_current_leaf_vs_linked_external_task
     - understanding_readme_freshness
     - decision_log_coverage
     - knowledge_changelog_coverage
@@ -582,7 +577,7 @@ Stop for user confirmation before product implementation when any is true:
 - root goal, MVP goal, main-chain/stage outcome, important-feature responsibility/result, or another protected L0-L2 meaning is inferred rather than clearly user-confirmed;
 - reconciliation changes protected scope, product promise, user-visible acceptance, or L0-L2 dependencies; changing only an L3/L4 route, priority, dependency, active node, or next leaf inside unchanged protected semantics remains AI-owned;
 - a changelog entry changes or proposes changes to root/MVP/stage/feature understanding;
-- Trellis/PRD/STATUS conflict requires choosing between incompatible L0-L2 meanings, scope, or user-visible outcomes;
+- external-framework/PRD/STATUS conflict requires choosing between incompatible L0-L2 meanings, scope, or user-visible outcomes;
 - the user explicitly asks to "敲定" the plan tree before continuing.
 
 Use this concise confirmation shape:
@@ -647,18 +642,16 @@ Low-level automatic leaf updates should usually link existing expanded understan
 
 Low-level automatic updates must still add a knowledge changelog entry when they affect future onboarding, active leaf acceptance, linked evidence, or route state. They may continue without asking only when the entry is marked `primary_ai_auto_within_scope` or `primary_ai_observed_fact`.
 
-## Trellis Integration
+## External Framework Integration
 
-When Trellis is active:
+When another development framework is present:
 
-- Trellis task/PRD/spec remains the binding workflow substrate.
-- Plan Tree links to Trellis tasks, node docs, and expanded understanding docs; it does not duplicate full PRD/spec content.
-- If Trellis and Plan Tree disagree, resolve through active truth and Trellis state first, then update Plan Tree.
+- Plan Tree or one explicitly mapped existing equivalent remains the CoTend route owner.
+- Link useful external tasks, PRDs, specs, node docs, and expanded understanding; do not duplicate their full content.
+- Classify every applicable external carrier through `reference_only | historical | conflict` before using it.
+- Resolve disagreement through the CoTend authority contract and affected semantic level, never through external framework state first.
 
-When Trellis is dormant or absent:
-
-- Plan Tree may carry the main route map for standard/full projects.
-- Keep detailed requirements in PRD/spec/STATUS, node docs, or expanded understanding docs, not inside the compact tree index.
+When no external framework is present, use the same authority chain. Keep detailed requirements in PRD/spec/brief, node docs, or expanded understanding rather than inside the compact tree index; STATUS remains a projection, not a replacement requirements owner.
 
 ## Checkpoint Updates
 

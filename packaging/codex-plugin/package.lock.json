@@ -10,6 +10,7 @@
   },
   "source": {
     "carrier": "skills/",
+    "source_commit": "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
     "artifact_lock": "delivery/codex-artifact.lock.json",
     "artifact_id": "cotend-codex-r000002",
     "revision": 2,

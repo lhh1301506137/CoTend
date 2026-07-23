@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import functools
 import hashlib
+import io
 import json
 import os
 import re
@@ -11,7 +13,7 @@ import subprocess
 import sys
 import tempfile
 import xml.etree.ElementTree as ET
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 
@@ -85,6 +87,7 @@ SEMVER_RE = re.compile(
     r"(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?"
     r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$"
 )
+FULL_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 class PluginPackageError(RuntimeError):
@@ -97,6 +100,10 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _is_linklike(path: Path) -> bool:
@@ -343,13 +350,144 @@ def source_skill_manifest() -> dict[str, str]:
     return manifest
 
 
-def expected_package_manifest() -> dict[str, str]:
+def _run_git(
+    args: list[str],
+    *,
+    input_bytes: bytes | None = None,
+) -> subprocess.CompletedProcess[bytes]:
+    try:
+        return subprocess.run(
+            ["git", *args],
+            cwd=ROOT,
+            input=input_bytes,
+            capture_output=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise PluginPackageError("Git history query failed") from exc
+
+
+def validate_historical_source_commit(commit: Any) -> str:
+    if not isinstance(commit, str) or FULL_COMMIT_RE.fullmatch(commit) is None:
+        raise PluginPackageError(
+            "Plugin package source commit must be a full lowercase Git commit"
+        )
+    exists = _run_git(["cat-file", "-e", f"{commit}^{{commit}}"])
+    if exists.returncode != 0:
+        raise PluginPackageError("Plugin package source commit is unavailable")
+    ancestor = _run_git(["merge-base", "--is-ancestor", commit, "HEAD"])
+    if ancestor.returncode != 0:
+        raise PluginPackageError(
+            "Plugin package source commit is not an ancestor of repository HEAD"
+        )
+    return commit
+
+
+@functools.lru_cache(maxsize=4)
+def _historical_source_skill_entries(
+    commit: str,
+) -> tuple[tuple[str, bytes], ...]:
+    commit = validate_historical_source_commit(commit)
+    listed = _run_git(["ls-tree", "-r", "-z", commit, "--", "skills"])
+    if listed.returncode != 0:
+        raise PluginPackageError("historical Skill tree cannot be listed")
+    objects: list[tuple[str, bytes]] = []
+    for raw in listed.stdout.split(b"\0"):
+        if not raw:
+            continue
+        try:
+            metadata, raw_path = raw.split(b"\t", 1)
+            mode, object_type, object_id = metadata.decode("ascii").split()
+            repository_path = PurePosixPath(raw_path.decode("utf-8"))
+        except (ValueError, UnicodeDecodeError) as exc:
+            raise PluginPackageError(
+                "historical Skill tree contains an invalid Git entry"
+            ) from exc
+        if (
+            mode not in {"100644", "100755"}
+            or object_type != "blob"
+            or not repository_path.parts
+            or repository_path.parts[0] != "skills"
+            or repository_path.is_absolute()
+            or ".." in repository_path.parts
+        ):
+            raise PluginPackageError(
+                "historical Skill tree contains a link or unsafe entry"
+            )
+        relative = PurePosixPath(*repository_path.parts[1:]).as_posix()
+        objects.append((relative, object_id.encode("ascii")))
+
+    batch = _run_git(
+        ["cat-file", "--batch"],
+        input_bytes=b"".join(object_id + b"\n" for _, object_id in objects),
+    )
+    if batch.returncode != 0:
+        raise PluginPackageError("historical Skill blobs cannot be read")
+    stream = io.BytesIO(batch.stdout)
+    entries: list[tuple[str, bytes]] = []
+    for relative, expected_object_id in objects:
+        header = stream.readline().rstrip(b"\n").split()
+        if (
+            len(header) != 3
+            or header[0] != expected_object_id
+            or header[1] != b"blob"
+        ):
+            raise PluginPackageError("historical Skill blob identity drifted")
+        try:
+            size = int(header[2])
+        except ValueError as exc:
+            raise PluginPackageError("historical Skill blob size is invalid") from exc
+        payload = stream.read(size)
+        if len(payload) != size or stream.read(1) != b"\n":
+            raise PluginPackageError("historical Skill blob payload is truncated")
+        entries.append((relative, payload))
+    if stream.read():
+        raise PluginPackageError("historical Skill batch contains trailing data")
+
+    actual_directories = tuple(
+        sorted({PurePosixPath(relative).parts[0] for relative, _ in entries})
+    )
+    if actual_directories != EXPECTED_SKILLS:
+        raise PluginPackageError("historical Skill directory inventory drifted")
+    if len(entries) != 37:
+        raise PluginPackageError(
+            f"expected 37 historical Skill files, found {len(entries)}"
+        )
+    relative_paths = {relative for relative, _ in entries}
+    for skill in EXPECTED_SKILLS:
+        if f"{skill}/SKILL.md" not in relative_paths:
+            raise PluginPackageError(
+                f"historical Skill is missing SKILL.md: {skill}"
+            )
+    return tuple(entries)
+
+
+def historical_source_skill_manifest(commit: str) -> dict[str, str]:
+    return {
+        relative: sha256_bytes(payload)
+        for relative, payload in _historical_source_skill_entries(commit)
+    }
+
+
+def _locked_source_commit() -> str:
+    lock = load_json_object(PACKAGE_LOCK_PATH, "Plugin package lock")
+    source = lock.get("source")
+    if not isinstance(source, dict):
+        raise PluginPackageError("Plugin package source lock is invalid")
+    return validate_historical_source_commit(source.get("source_commit"))
+
+
+def expected_package_manifest(
+    source_manifest: dict[str, str] | None = None,
+) -> dict[str, str]:
     validate_brand_assets()
+    if source_manifest is None:
+        source_manifest = historical_source_skill_manifest(_locked_source_commit())
     manifest = {
         ".codex-plugin/plugin.json": sha256_file(MANIFEST_SOURCE),
     }
     manifest.update(
-        {f"skills/{relative}": digest for relative, digest in source_skill_manifest().items()}
+        {f"skills/{relative}": digest for relative, digest in source_manifest.items()}
     )
     manifest.update(
         {relative: sha256_file(source) for relative, source in PACKAGE_SUPPORT_FILES.items()}
@@ -398,22 +536,61 @@ def validate_contract() -> dict[str, Any]:
     target = artifact_lock.get("target")
     if not isinstance(target, dict):
         raise PluginPackageError("target artifact lock target is invalid")
+    if (
+        target.get("platform") != "Codex"
+        or target.get("lineage") != "cotend-codex"
+        or target.get("artifact_id") != "cotend-codex-r000003"
+        or target.get("revision") != 3
+        or not isinstance(target.get("manifest_sha256"), str)
+        or len(target["manifest_sha256"]) != 64
+    ):
+        raise PluginPackageError("current target artifact identity drifted")
+    source_commit = validate_historical_source_commit(source.get("source_commit"))
+    locked_source_manifest = historical_source_skill_manifest(source_commit)
+    predecessor_targets = artifact_lock.get("predecessor_targets")
+    if not isinstance(predecessor_targets, list):
+        raise PluginPackageError("target artifact predecessor inventory is invalid")
+    package_predecessor = next(
+        (
+            item
+            for item in predecessor_targets
+            if isinstance(item, dict)
+            and item.get("artifact_id") == source.get("artifact_id")
+            and item.get("revision") == source.get("revision")
+        ),
+        None,
+    )
+    if package_predecessor != {
+        "platform": "Codex",
+        "lineage": "cotend-codex",
+        "artifact_id": "cotend-codex-r000002",
+        "revision": 2,
+        "source_release_id": "2026.07.23.2",
+        "framework_protocol": "cotend-collaboration-v1.65",
+        "manifest_sha256": (
+            "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b"
+        ),
+    }:
+        raise PluginPackageError(
+            "Plugin package source is not a trusted target predecessor"
+        )
     expected_source = {
         "carrier": "skills/",
+        "source_commit": source_commit,
         "artifact_lock": "delivery/codex-artifact.lock.json",
-        "artifact_id": target.get("artifact_id"),
-        "revision": target.get("revision"),
-        "target_manifest_sha256": target.get("manifest_sha256"),
+        "artifact_id": package_predecessor["artifact_id"],
+        "revision": package_predecessor["revision"],
+        "target_manifest_sha256": package_predecessor["manifest_sha256"],
         "skill_count": len(EXPECTED_SKILLS),
         "skill_file_count": 37,
         "path_hash_manifest_sha256": path_hash_manifest_sha256(
-            source_skill_manifest()
+            locked_source_manifest
         ),
     }
     if source != expected_source:
         raise PluginPackageError("Plugin package source lock drifted")
 
-    expected_files = expected_package_manifest()
+    expected_files = expected_package_manifest(locked_source_manifest)
     expected_package = {
         "output_directory_name": PLUGIN_NAME,
         "file_count": len(expected_files),
@@ -454,7 +631,9 @@ def validate_contract() -> dict[str, Any]:
     return {
         "manifest": manifest,
         "lock": lock,
-        "source_manifest": source_skill_manifest(),
+        "source_commit": source_commit,
+        "source_manifest": locked_source_manifest,
+        "repository_source_manifest": source_skill_manifest(),
         "expected_package_manifest": expected_files,
     }
 
@@ -540,6 +719,10 @@ def verify_package(package_root: Path) -> dict[str, Any]:
         "relative_notice_links": len(relative_notice_links),
         "brand_assets": len(PACKAGE_BRAND_ASSETS),
         "source_bytes_identical": True,
+        "source_commit": contract["source_commit"],
+        "repository_source_ahead": (
+            contract["source_manifest"] != contract["repository_source_manifest"]
+        ),
         "source_manifest_sha256": path_hash_manifest_sha256(
             contract["source_manifest"]
         ),
@@ -549,10 +732,15 @@ def verify_package(package_root: Path) -> dict[str, Any]:
     }
 
 
-def _materialize_package(package_root: Path) -> None:
+def _materialize_package(package_root: Path, contract: dict[str, Any]) -> None:
     (package_root / ".codex-plugin").mkdir(parents=True)
     shutil.copy2(MANIFEST_SOURCE, package_root / ".codex-plugin" / "plugin.json")
-    shutil.copytree(SOURCE_SKILLS_ROOT, package_root / "skills")
+    for relative, payload in _historical_source_skill_entries(
+        contract["source_commit"]
+    ):
+        target = package_root / "skills" / Path(PurePosixPath(relative))
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
     for relative, source in PACKAGE_SUPPORT_FILES.items():
         target = package_root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -567,12 +755,12 @@ def _materialize_package(package_root: Path) -> None:
 
 def build_package(output: Path = DEFAULT_OUTPUT) -> dict[str, Any]:
     output = guarded_output(output)
-    validate_contract()
+    contract = validate_contract()
     output.parent.mkdir(parents=True, exist_ok=True)
     temp_root = Path(tempfile.mkdtemp(prefix=".cotend-build-", dir=output.parent))
     temp_package = temp_root / PLUGIN_NAME
     try:
-        _materialize_package(temp_package)
+        _materialize_package(temp_package, contract)
         summary = verify_package(temp_package)
         if output.exists():
             try:

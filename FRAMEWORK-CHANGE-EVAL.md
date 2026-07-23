@@ -2,6 +2,79 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-07-24 L62 原生项目真相权限
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: workflow_behavior
+change_summary: 仅把 TD08 项目含义、需求、活动路线、决定、状态、现实证据和编码约束的最终权限迁移到 CoTend Core；外部开发框架 artifact 只可归类为 reference_only、historical 或 conflict
+intent: 在不提前删除其余 Trellis 兼容路线的前提下，让 CoTend 成为项目真相的唯一治理 owner
+expected_benefit:
+  - 消除外部开发框架对项目真相和活动路线的隐式所有权
+  - 保持单一真相链，不创建平行任务树、规格树或状态树
+  - 对齐、过时、浅层冲突、深层冲突和未知依赖均有确定停止与恢复行为
+possible_harm:
+  - 只完成 TD08 时，运行时仍会保留 TD01-TD07 的 Trellis 兼容提及，容易被误读为完整解耦
+  - 当前根 Skill 已推进到 r3，而本地 rc.2 必须继续由历史 r2 source commit 重建
+  - 过渡期历史构建依赖完整 Git 历史，浅克隆或源码压缩包不能重建 rc.2
+affected_workflows:
+  - project_semantics_and_requirements
+  - active_route_and_decision_authority
+  - status_reality_and_coding_constraints
+  - external_framework_artifact_classification
+  - target_artifact_update_and_historical_package_rebuild
+deviations:
+  - 来源 release 与 framework.lock 保持 v1.65，不把本产品 overlay 伪装成新的 dual-ai 版本
+  - 当前根载体推进为 cotend-codex-r000003；cotend@0.1.0-rc.2 和 r2 均保持不可变
+  - 只替换 TD08；TD01-TD07 继续按冻结矩阵进入后续独立叶
+mechanism_budget:
+  added_context_surface: one_authority_reference_one_public_contract_one_small_verifier
+  ordinary_load_impact: authority_reference_loaded_with_collaboration_core
+  ceremony_added: none_for_aligned_projects
+  duplication_check: replaces_external_authority_without_second_truth_tree
+  cheaper_alternative_considered: 只改 Trellis 名称；因会隐藏权限依赖且不能证明冲突恢复而拒绝
+  retirement_or_thinning_trigger: G05 后移除过渡历史构建与兼容计数，只保留最终零依赖规则
+  expected_failure_prevented: split_brain_stale_external_truth_silent_route_override_and_rc2_identity_rewrite
+validation_scenarios:
+  - scenario: native_authority_matrix
+    expected: 无外部 artifact、对齐、过时、L0-L2 冲突、L3-L4 冲突和未知依赖均由 CoTend 决定权限与停止范围
+    validation_result_type: executed
+    result: six_scenarios_and_negative_contract_tests_passed
+  - scenario: exact_td08_inventory_change
+    expected: 只允许登记的八个 TD08 authority surface 改变，其他冻结基线保持可追踪
+    validation_result_type: executed
+    result: current_174_mentions_21_files_and_8_changed_paths_verified
+  - scenario: immutable_rc2_rebuild
+    expected: rc.2 从固定历史 commit 重建，并保持 package 与 ZIP 摘要
+    validation_result_type: executed
+    result: historical_source_commit_and_digest_reproducibility_passed
+  - scenario: r2_to_r3_delivery
+    expected: 可信 r2 回执被识别为可更新并确定升级到当前 r3，未知或篡改身份仍被拒绝
+    validation_result_type: executed
+    result: locked_predecessor_to_current_target_update_passed
+real_project_validation:
+  - scenario: native_cotend_writable_project
+    expected: 完整 TD01-TD08 替换后，在无 Trellis 环境完成端到端项目
+    validation_result_type: deferred
+    result: G06_not_started
+decision: watch
+rollback_triggers:
+  - 外部 artifact 再次获得项目含义、活动路线或编码约束的最终权限
+  - 冲突处理同时写入两套真相，或浅层冲突继续执行受影响工作
+  - L62 修改扩散到尚未验证的 TD01-TD07 路线
+  - r3 覆盖 r2 身份，或 rc.2 无法重建原 package 与 ZIP 摘要
+review_after: L63_TD03_and_each_later_native_replacement_leaf
+watch_closure:
+  - keep_watch
+  - evidence: docs/evidence/NATIVE-PROJECT-TRUTH-TARGET-R3.md
+```
+
+本次不执行真实用户安装、push、tag、Release、Portal、submission、publish 或身份验证。`G02` 当前只完成 `1/8`，因此不能把 L62 表述为 CoTend 已完全移除 Trellis。
+
+权限迁移后的判断顺序是固定的：先读取用户确认的产品含义和需求，再读取项目决策与活动路线，最后用代码、测试和运行结果校验状态。外部开发框架留下的任务、规格或状态文件只能补充证据，不能覆盖这条链。如果两者冲突，浅层冲突停止受影响范围并等待用户裁决，执行层冲突则由 CoTend 从最近可靠边界重新规划；两种情况都不得同时维护两套“当前真相”。
+
+版本处理同样遵守不可改写原则。当前根 Skill 的行为变化属于 r3，但此前已验证的 r2 与 rc.2 仍代表原字节。过渡构建通过固定历史提交重现旧 Skill，而不是在仓库中复制第二份源码；因此完整 Git 历史是明确、可测试且可在后续候选中退休的临时成本。
+
 ## 2026-07-24 冻结 CoTend 原生工作流等价基线
 
 ```yaml

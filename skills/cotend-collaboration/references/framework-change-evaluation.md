@@ -115,7 +115,7 @@ When the implementation differs from agreed wording, external-review recommendat
 - Fresh project init: framework creates the right minimal files and does not force heavy flow.
 - Legacy framework update: old docs/skills are reconciled without losing active truth.
 - Dormant Trellis: `.trellis/` presence alone does not force active Trellis.
-- Active Trellis: Trellis remains the binding task/spec substrate.
+- Active external framework: its aligned task/spec artifacts remain linkable `reference_only` evidence, while CoTend retains project-meaning and route authority.
 - Plan Tree baseline: new or inferred root/MVP/active leaf asks the user before product implementation.
 - Ordinary `继续`: normal development does not load cold-path framework evaluation.
 - Local closeout: verified in-scope local commit/archive is allowed only inside recorded authorization.
@@ -141,7 +141,7 @@ Prefer `revise`, `rollback`, or `watch` if the change causes:
 
 - ordinary small tasks to require new ceremony;
 - repeated unnecessary confirmation prompts;
-- Plan Tree/Trellis/STATUS truth conflicts;
+- Plan Tree/external-framework/STATUS truth conflicts that the CoTend authority contract does not classify and contain;
 - lower continuity for `继续`;
 - Codex choosing process maintenance over product progress;
 - external reviewer sync or share package drift;

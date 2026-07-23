@@ -245,3 +245,24 @@ CoTend 的公开默认配置保持 `Full`，但只在用户没有既有选择时
 - 已验证旧 `cotend-codex-r000001 / v1.52 / 7 Skill / 30 文件` 回执可升级为 `r000002 / v1.65 / 8 Skill / 37 文件`，新增 Skill 与参考文件被补齐，用户文件保持不变。
 - 已验证 `cotend.semantic-contract.v1` helper 的确定性摘要、验证、decision-log 唯一绑定、摘要不匹配和 Unicode 规范化歧义拒绝。
 - `cotend@0.1.0-rc.2` 只是本地未发布候选。现有远程 GitHub `rc.1` 验证仍是历史证据；真实远端跨版本升级、Desktop 新任务可见性、Portal 提交、release、publish 和 push 均未在本次执行。
+
+## cotend-native-overlay-L62-TD08
+
+```yaml
+status: native_parity_verified_for_project_truth_authority
+source_framework_release_unchanged: 2026.07.23.2
+source_framework_lock_changed: false
+product_overlay: TD08-project-truth-authority
+historical_runtime_baseline: 241_mentions_22_files
+current_runtime_inventory: 174_mentions_21_files
+current_target_artifact_id: cotend-codex-r000003
+current_target_revision: 3
+predecessor_target_artifact_id: cotend-codex-r000002
+plugin_candidate: cotend@0.1.0-rc.2_immutable
+plugin_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1
+push_release_or_publish: not_performed
+```
+
+L62 是 CoTend 产品 overlay，不是新的 dual-ai 来源 release：项目含义、详细需求、活动路线、用户决定、STATUS 投影、现实证据和本地编码约束不再向外部开发框架身份让权。对齐、过时、L0-L2 冲突、L3-L4 冲突和未知依赖均由 CoTend 原生场景验证；其余 TD01-TD07 继续保留既有兼容路由。
+
+根 `skills/` 因行为变化推进为同 lineage target r3。此前 r2 与本地未发布 rc.2 不被重写；rc.2 构建器从最初验证提交读取 8 Skills/37 文件，保持原 48 文件 package 与 ZIP 摘要。该过渡构建需要完整 Git 历史，且不构成 rc.3、push、release、submission 或 publish 授权。

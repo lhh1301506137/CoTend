@@ -118,20 +118,21 @@ When updating an existing project:
 - Do not duplicate equivalent files. If the project already uses other names for `STATUS.md`, `REVIEW-LOG.md`, or `QUALITY-SIGNALS.md`, record the mapping and keep using it.
 - Migrate only current state needed for future work: active goal, active truth, Plan Tree/route map, any active canonical Route Rebase reference/reliable boundary, node docs, expanded understanding docs when present, decision log entries when present, knowledge changelog entries when present, project stage, risk authorization, last review boundary, pending review debt, next slice, CodeGraph provider status, Done Gate state, and release blockers.
 - Preserve explicit legacy confirmation evidence, but never retroactively label AI-written legacy docs or current code `user_confirmed`. Mark unsupported current-MVP L0-L2 meaning as proposed/legacy-unverified and report baseline `partial`, `stale`, or `conflict` as evidence requires.
-- If old rules conflict with current protocol, prefer latest user intent, then current `cotend-collaboration`, then Trellis project state. Record the conflict and resolution.
+- If old rules conflict with current protocol, prefer latest user intent and the current CoTend Project Truth Authority contract. Classify external-framework state as `reference_only`, `historical`, or `conflict`; it cannot override CoTend meaning or route authority. Record the conflict and resolution.
 - Clean up only framework/control-plane clutter, not product code. Product code changes still require the normal dynamic route and verification.
 
 ## Framework Coordination Contract
 
-Initialize projects with this authority order:
+Initialize projects with the role-based authority contract in `cotend-collaboration/references/authority-and-triggers.md`:
 
-1. **Trellis** owns project workflow state only when `trellis.mode: active`: task lifecycle, PRD/spec truth, task context, implement/check/update-spec/commit/finish phases, and project-local coding guidelines. A present `.trellis/` directory may be `dormant` historical context rather than binding workflow state.
+1. **CoTend Project Truth Authority** owns product meaning, detailed requirement authority, route navigation, user decisions, status projection, current-reality evidence, and the boundary around project-local constraints. It never delegates those roles from framework identity or active state.
 2. **cotend-collaboration** owns collaboration governance: role assignment, risk authorization, continuous/unattended checkpoints, user interruption/new idea reconciliation, review/self-review gates, handoff scope, Acceptance/Test Harness, Quality Sentinel, AI UAT, Done Gate, intent drift review, Release Hardening, and human rejoin explanations.
-3. **Karpathy guidelines** own coding behavior inside the selected workflow: surgical changes, simplicity, assumptions, and verifiable success criteria.
-4. **grill-me** owns clarification style for fuzzy requirements. In active Trellis projects, use it as the questioning style inside `trellis-brainstorm` / PRD creation; in dormant/non-Trellis projects, use it as the normal consensus-clarification style. User-facing decisions from grill/advisor questions must be recorded in `PROJECT-DECISION-LOG.md` when they match the canonical decision-worthy topics in `cotend-collaboration/references/authority-and-triggers.md`.
-5. **Code Context Harness** owns codebase structure discovery: CodeGraph is strongly preferred for active Trellis/standard/full/large projects; repo maps, language-server indexes, and `rg` are fallback layers. It helps Codex choose what to read/review while staying grounded in active product truth.
+3. **External development-framework artifacts**, including active Trellis files, are classified `reference_only`, `historical`, or `conflict`. A later compatibility capability may still invoke its implementation/check/update/finish procedure, but its task, PRD, spec, state, or coding guideline never becomes CoTend Core authority.
+4. **Karpathy and project coding guidelines** own coding behavior only inside higher user, safety, confirmed-product, and authorized-route boundaries.
+5. **grill-me** owns clarification style for fuzzy requirements. Existing external brainstorm records may be linked as classified evidence; user-facing decisions must be recorded in `PROJECT-DECISION-LOG.md` when they match canonical decision-worthy topics.
+6. **Code Context Harness** owns codebase structure discovery. It helps the Primary choose what to read/review but never owns product truth or route selection.
 
-In active Trellis projects, Trellis is the durable project substrate and CoTend governance is layered on top. Record this mapping when initializing:
+When Trellis compatibility is active, record its remaining procedure mapping without granting it project-truth authority:
 
 - `trellis-implement` = implementation worker under the active Primary AI.
 - `trellis-check` = Trellis spec/quality checker; it may fix issues but does not replace the actual primary model's formal self-review unless the project explicitly records it as the formal reviewer.
@@ -148,7 +149,7 @@ Record exactly one:
 
 | Mode | Meaning | Action |
 |---|---|---|
-| `active` | Trellis exists or is explicitly requested, matches active truth, and adds net value. | Use Trellis task/spec lifecycle and read relevant Trellis context before development. |
+| `active` | Trellis exists or is explicitly requested, its applicable artifacts are classified, and its remaining compatibility procedures add net value. | Link aligned context as `reference_only`; use only the still-supported compatibility procedures. CoTend retains truth and route authority. |
 | `dormant` | `.trellis/` exists but is stale, over-initialized, too heavy for this project/stage, or not current truth. | Keep `.trellis/` as historical context; do not delete it; do not run Trellis phases by default. |
 | `recommended` | Trellis is absent but the project likely needs strict task/spec substrate. | Explain recommendation; continue non-Trellis unless the user approves activation. |
 | `not_needed` | Trellis is absent and the project is light or already sufficiently governed. | Use non-Trellis lite/standard/full according to project needs. |
@@ -170,14 +171,14 @@ trellis:
   reactivation_condition:
 ```
 
-Do not delete `.trellis/` automatically. Do not let dormant Trellis docs override current active truth. If platform breadcrumbs or hooks still mention Trellis while `trellis.mode: dormant`, treat those breadcrumbs as environmental context, not routing authority, unless the user explicitly reactivates Trellis. If dormant Trellis contains useful lessons, summarize them into `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, or the active PRD/spec instead of keeping Trellis as a hidden binding source.
+Do not delete `.trellis/` automatically. Classify dormant Trellis docs as `historical`; active artifacts still require `reference_only | historical | conflict` classification and never override CoTend truth. Platform breadcrumbs or hooks are environmental context, not routing authority. If dormant Trellis contains useful lessons, link or summarize them into the current CoTend carriers without making Trellis a hidden binding source.
 
 ## Harness Ratchet
 
 Initialize a lightweight harness feedback loop:
 
 - Treat repeated AI/process failures as candidates for durable prevention, not just one-off fixes.
-- Prefer project-local constraints first: active Trellis spec, `AGENTS.md`, `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, tests, smoke scripts, or checklist updates.
+- Prefer project-local constraints first: `AGENTS.md`, current CoTend-linked PRD/spec, `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, tests, smoke scripts, or checklist updates. An external spec may be linked as classified evidence but cannot own the constraint boundary.
 - Propose global skill changes only when the failure is cross-project, high-impact, or clearly caused by the global workflow itself.
 - Do not add rules for every isolated mistake. Mark uncertain candidates as `watching`.
 
@@ -191,7 +192,7 @@ Provider preference:
 
 1. CodeGraph-like CLI/MCP/symbol graph with project index when available. This is expected for Trellis/large projects.
 2. Aider-style repo map / language server / ctags-like symbol index when available.
-3. `rg`, project tree, active Trellis specs when binding, package scripts, and direct file reads as a recorded fallback.
+3. `rg`, project tree, classified linked specs, package scripts, and direct file reads as a recorded fallback.
 
 Do not install global tools automatically or add project-local dev dependencies without approval. Global tool installation, MCP setup, package dependency changes, and public/share/release boundary changes require user approval.
 
@@ -358,7 +359,7 @@ Do not start large product development until this workflow is complete.
 2. Decide Trellis mode.
    - Inspect `.trellis/` presence, Trellis task/spec freshness, existing `STATUS.md` / `REVIEW-LOG.md` / `QUALITY-SIGNALS.md` / `COLLAB-*`, active truth, current development stage, review debt, planned feature horizon, and the agreed final/MVP product shape.
    - Set `trellis.mode: active | dormant | recommended | not_needed | needs_user_decision`.
-   - If `mode: active`, run/read Trellis startup context, including workflow, active task, package/spec indexes, and relevant guidelines.
+   - If `mode: active`, run/read only the still-supported Trellis compatibility startup context, classify task/spec/guideline artifacts, and bind the resulting work to the CoTend route owner.
    - If `mode: dormant`, preserve `.trellis/` as historical context, record why it is not binding, suppress stale Trellis breadcrumbs as environmental noise, and use non-Trellis routing unless explicitly reactivated.
    - If `mode: recommended`, explain why Trellis would help but continue non-Trellis unless the user approves activation.
    - If `mode: not_needed`, say Trellis is not needed for the current project/stage.
@@ -382,7 +383,7 @@ Do not start large product development until this workflow is complete.
    - If equivalent project-local names already exist, use them instead of duplicating files.
 
 5. Identify active truth.
-   - List active PRD/spec/STATUS/active-Trellis docs and old/superseded/dormant Trellis docs.
+   - List current CoTend PRD/spec/STATUS/route records, then classify applicable external-framework docs as `reference_only`, `historical`, or `conflict`.
    - Separate explicit user-confirmed intent, original idea evidence, AI-written requirements/Plan Tree, and current implementation/product behavior. The latter two are not automatic user authority.
    - If multiple documents conflict, mark the conflict. A framework-setup conflict may use one concise Init-owned question; an L0-L2 meaning conflict is report-only during Init and points to direct `$cotend-semantic-alignment`, without drafting a confirmation packet or advancing semantic state.
 
@@ -457,7 +458,7 @@ Do not start large product development until this workflow is complete.
     - Premium-model advisor or takeover recommendations that affect understanding/route must be logged as `advisor_recommended` or `primary_ai_proposed_delta`, not merged into user consensus until the user confirms. If the advisor asks the user a product/architecture/model-role question and the user answers, record that answer in `PROJECT-DECISION-LOG.md`.
     - If existing capability trees, glossaries, domain models, taxonomies, expanded understanding, or equivalent semantic assets are encountered in the active route, preserve their real authority and link/reuse them through the existing Plan Tree/understanding surfaces. File existence is not confirmation; Init must not create a parallel semantic asset or resolve a protected conflict itself.
     - Accepted aliases from `cotend-collaboration/references/authority-and-triggers.md` remain valid during migration. Report them as migration suggestions, not initialization failures, unless the project has already adopted a stricter schema.
-    - In active Trellis projects, record Trellis task links in Plan Tree/node docs; do not duplicate full PRD/spec content.
+    - In projects with Trellis artifacts, classify and record useful task/PRD/spec links in Plan Tree/node docs; do not duplicate full content or treat the links as route authority.
     - Before declaring the project `continue_ready`, run the Plan Tree Post-Init Consistency Self-Check, including multidimensional `semantic_baseline_coverage`, triggered semantic-contract binding verification, active truth/navigation pointer closure, and material Route Rebase continuity when referenced. Fix safe control-plane drift when clearly in scope; never repair product meaning or re-sign a contract without user confirmation.
     - Run the Triggered Semantic Reconciliation depth needed to report Init safety: check protected lineage first, then inspect the active path/recent decisions and changes for init/update/resume/repair. Run deeper comparison only when an anomaly or possible self-consistent wrong baseline is needed to classify `stale` / `conflict`; report the result without drafting replacement meaning. Include the standing baseline and four-state reconciliation result when reconciliation runs.
 
@@ -503,7 +504,7 @@ Do not start large product development until this workflow is complete.
     - Record only the framework-setup decision that Init owns. Product-semantic decisions and protected truth are recorded by the independent direct Alignment flow.
 
 18. Configure Harness Ratchet.
-    - If initializing a new project, record where repeated process/quality failures should be captured (`STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, active Trellis task/spec files, or project convention).
+    - If initializing a new project, record the CoTend-owned or explicitly mapped project carrier where repeated process/quality failures should be captured (`STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, or project convention). External task/spec files may be linked as evidence but do not become the default owner.
     - If repairing an old project, scan recent status/review/task records for repeated misses and propose the smallest durable prevention.
     - Do not update global skills from project-local evidence unless the user asks or the failure is clearly cross-project.
 
@@ -515,7 +516,7 @@ Do not start large product development until this workflow is complete.
     - For each active Trellis/standard/full/large project, initialize or refresh an isolated project-local index with `codegraph init .` from the canonical project root when `codegraph` is installed and the root is clear. Do not reuse another project's `.codegraph/`.
     - Ensure `.codegraph/` is ignored/untracked; add `.codegraph/` to the canonical root `.gitignore` when safe. If `.codegraph/` is already tracked, the root is ambiguous, or `.gitignore` cannot be safely updated, stop with Human Rejoin instead of silently falling back.
     - Record that code context is a scope hint, not product truth.
-    - For active Trellis projects, run it after reading active task/PRD/spec so file discovery stays tied to `full_goal`, `mvp`, or `stage_goal`. For dormant Trellis, run it after reading current non-Trellis active truth; dormant Trellis files are optional history only.
+    - For projects with active Trellis compatibility, run it after the CoTend goal/route owner is resolved and applicable external task/PRD/spec artifacts are classified, so discovery stays tied to `full_goal`, `mvp`, or `stage_goal`. Dormant Trellis files are optional history only.
 
 ## Required Initialization Report
 
@@ -539,7 +540,7 @@ Never omit these from the user-facing report when present:
 - active material Route Rebase status, authority gate, reliable resume boundary, resulting-path state, blockers, and whether `继续` is valid for the affected route;
 - decision log status when user/grill/advisor decisions affect active direction, next leaf, model role, risk, release, or acceptance;
 - unresolved user interruption/new idea reconciliation when it affects active direction, route, risk, acceptance, or continuation authority;
-- post-init consistency self-check failures or warnings, especially stale understanding README text, missing decision-log or changelog coverage, broken links, metadata format drift, Trellis current-task mismatch, or unreliable commit anchors;
+- post-init consistency self-check failures or warnings, especially stale understanding README text, missing decision-log or changelog coverage, broken links, metadata format drift, linked external-task conflict, or unreliable commit anchors;
 - Trellis active/dormant/recommended/not_needed/needs_user_decision state and conflicts;
 - effective runtime profile, persistence/source/version inheritance, Trellis dispatch mapping, the separate project adoption profile, and an effective delegation-maturity level on every report (`ask_each_time` / `no_record_default` when absent);
 - current risk authorization, `dev_high` basis, local closeout state, and critical/release stop boundaries;

@@ -16,11 +16,11 @@ Invoke this Skill directly. Do not run, require, or load `cotend-init` or `coten
 Read only the minimum project truth needed for the requested scope, in this order:
 
 1. the user's current request and latest explicit decisions;
-2. the binding Trellis task/PRD/spec when current workflow evidence says Trellis is active;
-3. existing active `STATUS.md`, PRD/brief, `PROJECT-PLAN-TREE.md`, target node/understanding docs, and relevant decision/knowledge records;
+2. verified user-confirmed semantic contracts and their linked current requirement carriers;
+3. existing active PRD/brief/spec, `PROJECT-PLAN-TREE.md` or mapped route record, target node/understanding docs, `STATUS.md`, and relevant decision/knowledge records;
 4. representative product behavior, code, tests, or UI needed to compare intended and actual meaning.
 
-The presence of `.trellis/` alone does not make stale task state binding. Missing Plan Tree or understanding records are not an Init prerequisite and do not block this Skill. Classify the request as `new_baseline`, then create or update the minimum canonical Plan Tree/understanding/decision surfaces only after the required L0-L2 confirmation. Never create a second truth tree.
+Classify applicable external-framework artifacts as `reference_only`, `historical`, or `conflict`; none becomes binding from framework identity or active state. Missing Plan Tree or understanding records are not an Init prerequisite and do not block this Skill. Classify the request as `new_baseline`, then create or update the minimum canonical Plan Tree/understanding/decision surfaces only after the required L0-L2 confirmation. Never create a second truth tree.
 
 ## Required Context
 
@@ -35,7 +35,7 @@ Load `../cotend-collaboration/references/acceptance-test-harness.md` only when i
 
 For a fuzzy idea or intake artifact entering `new_baseline`, also load `../cotend-collaboration/references/idea-to-consensus.md` as a preparatory evidence/question module. This Skill retains sole ownership of protected L0-L2 confirmation and persistence; the preparatory module must not write a parallel baseline.
 
-Use the active Trellis brainstorm/PRD when Trellis is binding; never create a parallel requirements source.
+Link an aligned external-framework brainstorm/PRD as `reference_only` evidence when useful; never create a parallel requirements source or grant it protected confirmation authority.
 
 Read-only semantic-drift requests do not enter this Skill. If it was explicitly invoked despite edit-withholding wording, make no semantic or product changes, report direct `$cotend-diagnose-only <same scope>` as the independent next action, return control, and do not load or call Diagnose Only from inside this Skill.
 
@@ -100,7 +100,7 @@ Use this authority order and keep the categories separate:
 
 1. latest explicit user intent and linked user-confirmed decisions;
 2. original idea/intake files and earlier explicit user statements, interpreted in light of later decisions;
-3. active PRD/spec/Trellis truth and Plan Tree/understanding records;
+3. active PRD/spec/brief and Plan Tree/understanding records under the CoTend Project Truth Authority contract;
 4. current product behavior, code, tests, and UI as evidence of what exists, never automatic evidence of what the user wanted;
 5. historical AI inference, advisor proposals, and generated plans, preserved under their actual non-user authority labels;
 6. the current AI reconstruction as a proposal only.
@@ -117,12 +117,12 @@ Within the requested scope, discover existing semantic assets by their role and 
 
 Classify each discovered asset as exactly one of:
 
-- `active_truth`: currently binding under the project's existing truth priority;
+- `active_truth`: currently binding under the canonical CoTend Project Truth Authority contract;
 - `user_confirmed_evidence`: linked evidence for exact confirmed nodes, without automatically replacing the active owner;
 - `historical_ai_inference`: preserved context with no user-confirmed authority;
 - `conflict`: an applicable meaning that disagrees with active/user-confirmed evidence.
 
-Prefer linking or absorbing useful content into the existing Plan Tree, node, understanding, PRD/Trellis, decision, or changelog surfaces. Preserve the asset's actual authority and currency. File existence, detail, or internal consistency never upgrades it to `user_confirmed`. Do not create a second capability tree, glossary, taxonomy, domain model, semantic baseline, or truth hierarchy merely because one naming convention is missing. Conflicting protected L0-L2 meaning returns to the exact normal confirmation packet.
+Prefer linking or absorbing useful content into the existing Plan Tree, node, understanding, PRD/spec/brief, decision, or changelog surfaces. Preserve the asset's actual authority and currency. File existence, detail, external-framework active state, or internal consistency never upgrades it to `user_confirmed`. Do not create a second capability tree, glossary, taxonomy, domain model, semantic baseline, or truth hierarchy merely because one naming convention is missing. Conflicting protected L0-L2 meaning returns to the exact normal confirmation packet.
 
 ## Truth And Navigation Closure
 
@@ -130,7 +130,7 @@ After the required L0-L2 packet is confirmed and before writing, dynamically enu
 
 - Plan Tree index, affected node docs, and understanding index/docs;
 - `STATUS.md` or its project-local equivalent;
-- active PRD/brief and binding Trellis task/PRD/spec;
+- active PRD/brief/spec and any classified, linked external-framework artifact;
 - decision and knowledge/changelog records;
 - any existing in-scope file that carries `active_truth_sources`, `current`, `active`, or `next` route/capability pointers.
 
@@ -156,7 +156,7 @@ The user confirms only the protected L0-L2 delta. The Primary owns the later imp
 
 After exact confirmation, move the packet to `applying`, perform the protected truth write, and expand the affected set only along evidence-backed links:
 
-1. declared Plan Tree/Trellis/PRD dependencies and the previous/candidate/resulting active paths;
+1. declared CoTend route/PRD dependencies, classified external links, and the previous/candidate/resulting active paths;
 2. affected truth/navigation links and actual active code, data, API/interface, and runtime entrypoints;
 3. tests, user/status documentation, and completion claims/evidence that support those paths.
 

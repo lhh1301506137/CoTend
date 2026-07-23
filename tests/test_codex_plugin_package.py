@@ -55,6 +55,14 @@ class CodexPluginPackageTests(unittest.TestCase):
         self.assertNotIn("hooks", manifest)
         self.assertEqual(lock["status"], "production_candidate_not_published")
         self.assertEqual(lock["schema_version"], 2)
+        self.assertEqual(
+            lock["source"]["source_commit"],
+            "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
+        )
+        self.assertEqual(contract["source_commit"], lock["source"]["source_commit"])
+        self.assertNotEqual(
+            contract["source_manifest"], contract["repository_source_manifest"]
+        )
         self.assertEqual(len(lock["package"]["brand_assets"]), 4)
         self.assertNotIn("assets", lock["package"]["forbidden_components"])
         self.assertFalse(lock["authority"]["candidate_identity_only"])
@@ -72,6 +80,22 @@ class CodexPluginPackageTests(unittest.TestCase):
             package.path_hash_manifest_sha256(first_manifest),
             "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
         )
+
+    def test_rc2_build_uses_locked_historical_skills_not_current_r3(self) -> None:
+        output = self.build("historical-source")
+        contract = package.validate_contract()
+        packaged = package.path_hash_manifest(output / "skills")
+        self.assertEqual(packaged, contract["source_manifest"])
+        self.assertNotEqual(packaged, contract["repository_source_manifest"])
+        result = package.verify_package(output)
+        self.assertTrue(result["repository_source_ahead"])
+        self.assertEqual(result["source_commit"], contract["source_commit"])
+
+    def test_historical_source_commit_must_be_full_available_ancestor(self) -> None:
+        for value in ("37e657f", "G" * 40, "0" * 40):
+            with self.subTest(value=value):
+                with self.assertRaises(package.PluginPackageError):
+                    package.validate_historical_source_commit(value)
 
     def test_output_must_stay_in_repository_build_roots(self) -> None:
         outside = Path(tempfile.gettempdir()).resolve() / package.PLUGIN_NAME

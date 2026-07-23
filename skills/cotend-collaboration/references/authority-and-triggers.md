@@ -24,6 +24,34 @@ Alias transition:
 - Historical logs, archived Trellis tasks, and old handoffs do not need mechanical renames.
 - When validating metadata, report accepted aliases as migration suggestions, not failures, unless a local project has already adopted a stricter schema.
 
+## CoTend Project Truth Authority
+
+This is the canonical authority contract for project meaning, detailed requirements, active routes, current reality, and project-local constraints. CoTend Core never delegates this authority to another development framework. Framework identity, directory presence, an `active` flag, file age, detail, or internal consistency cannot promote a carrier by itself.
+
+Resolve authority by the question being answered:
+
+| Question | Canonical owner | Allowed carriers |
+|---|---|---|
+| What product meaning and current-MVP L0-L2 outcome did the user authorize? | Latest explicit user intent plus exact verified `user_confirmed` semantic contracts. | User messages, decision-log entries, and the linked confirmed node/understanding or PRD/brief text. |
+| What detailed requirement or acceptance rule applies inside that meaning? | The current requirement carrier that is linked to the confirmed baseline and has not been superseded or contradicted. | Existing PRD, brief, spec, node/understanding doc, or a project-mapped equivalent. |
+| What goal, stage, route, and leaf is active? | One CoTend Plan Tree, or one explicitly mapped existing equivalent route record when a separate tree would be duplicate ceremony. | Plan Tree/node records and linked task records. |
+| What user-facing decision changed the route, meaning, risk, acceptance, or continuation authority? | `PROJECT-DECISION-LOG.md` or its explicit project-local equivalent. | A decision record with the real authority label and affected surfaces. |
+| What is the concise current cockpit? | `STATUS.md` or its explicit project-local equivalent, as a projection rather than an independent source of product meaning. | Status fields linked back to the owners above. |
+| What currently exists or passed? | Direct product, code, test, review, runtime, and environment evidence. | Evidence records under `primary_ai_observed_fact`; existence never proves intended meaning or user acceptance. |
+| Which local coding constraint applies? | Project-local instructions inside the higher user, safety, product-meaning, and authorized-route boundaries. | `AGENTS.md`, repository conventions, toolchain rules, and linked coding guidance. |
+
+Preserve one recoverable chain. Link existing carriers instead of copying their full contents. Do not create a second truth tree, second semantic baseline, or parallel PRD merely because another framework or filename convention exists. A carrier may answer more than one question only when its roles and authority are explicit; it does not thereby gain authority over every question.
+
+Classify artifacts owned by another development framework as exactly one of:
+
+- `reference_only`: current and aligned evidence that may be linked without becoming a CoTend route or semantic owner;
+- `historical`: stale, superseded, dormant, or out-of-scope context retained for recovery or audit;
+- `conflict`: applicable content that disagrees with current CoTend meaning, requirements, route, risk, or constraints.
+
+Never activate, update, or obey an external framework merely to resolve this classification. For a protected L0-L2 conflict, stop only affected work, preserve both sides as evidence, and report direct `$cotend-semantic-alignment <affected scope>`; the user must decide the semantic delta. For an L3/L4 route or implementation conflict inside unchanged confirmed ancestors, the Primary reconciles or rebases the affected CoTend route, records the evidence and resulting pointer changes, and continues only from the first reliable boundary. Unknown dependency impact blocks the affected path until classified; unrelated confirmed paths may continue.
+
+When migrating a project that previously delegated authority to another framework, keep useful files in place and reclassify/link them. Migration must not mass-copy content, rewrite historical authority labels, silently discard user decisions, or make the external framework a CoTend Core backend.
+
 ## Critical / Never-Unattended Stop List
 
 Stop for the user before any of these actions. No `继续` token, `dev_high` setting, review checkpoint, or local closeout authorization can cross this list.

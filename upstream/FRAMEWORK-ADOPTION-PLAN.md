@@ -83,7 +83,7 @@ analysis_language: zh-CN
 - 保留只诊断不修改的默认边界。
 - 保留模型顾问、试用、接手、回退、里程碑复诊和框架变薄限制。
 - CodeGraph、Playwright、Git、Python、PowerShell、Codex、Claude 和 Chrome 继续作为外部运行依赖或平台能力，不复制其实现。
-- Trellis 专属协调分支只作为冻结的 legacy integration 保留到 CoTend 原生等价路径通过；它不是最终 Core 依赖或治理权限。不得先删能力，也不得把 `trellis-*` 机械改名后冒充 CoTend 实现。
+- Trellis 专属协调分支只作为逐项迁移的 legacy integration 保留到对应 CoTend 原生等价路径通过；它不是最终 Core 依赖或治理权限。TD08 项目真相权限已由原生合同和行为场景关闭，其余 TD01-TD07 保留到各自 gate。不得先删能力，也不得把 `trellis-*` 机械改名后冒充 CoTend 实现。
 
 ### 第三方文件与许可告知
 

@@ -124,7 +124,7 @@ A separate session using the same model improves context independence but is not
 
 ## Lightweight Long-Task View
 
-Do not create a permanent `WORK-PACKET-LEDGER.md` or another truth tree. Derive a concise view from the active Trellis task, Plan Tree, STATUS, review records, and current agent state only when a material long task benefits from it:
+Do not create a permanent `WORK-PACKET-LEDGER.md` or another truth tree. Derive a concise view from the CoTend route owner, classified external task references, STATUS, review records, and current agent state only when a material long task benefits from it:
 
 ```yaml
 agent_work_view:
@@ -159,6 +159,6 @@ Do not encode a community article's provider, WebSocket setting, fixed first-eve
 - parallel writes without disjoint ownership and one integration owner;
 - central final testing as a replacement for packet-level verification;
 - fresh-context review described as user acceptance or different-model evidence without identity proof;
-- a second permanent work ledger that competes with Trellis, Plan Tree, STATUS, or review truth;
+- a second permanent work ledger that competes with the CoTend route owner, STATUS, decision, or review records;
 - blind retry of an ambiguous side-effecting task.
 - using the optional-agent net-benefit gate to cancel the Full profile's fixed implement/check quality chain, or using the fixed pair to justify further low-benefit subdivision.

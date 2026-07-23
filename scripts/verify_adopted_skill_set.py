@@ -91,7 +91,7 @@ REQUIRED_MARKERS = {
     ),
     "cotend-collaboration": (
         "Protocol version: `cotend-collaboration-v1.65`",
-        "CoTend owns collaboration, authority, risk, review",
+        "CoTend Core never grants project-truth authority",
         "through `cotend-project-init` Auto Mode",
         "`$cotend-diagnose-only` owns read-only checks",
     ),
@@ -558,19 +558,34 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         "target": {
             "platform": "Codex",
             "lineage": "cotend-codex",
-            "artifact_id": "cotend-codex-r000002",
-            "revision": 2,
+            "artifact_id": "cotend-codex-r000003",
+            "revision": 3,
             "manifest_sha256": carrier_manifest,
         },
         "product": {"version": None},
         "skill_count": 8,
         "skill_file_count": 37,
+        "predecessor_targets": [
+            {
+                "platform": "Codex",
+                "lineage": "cotend-codex",
+                "artifact_id": "cotend-codex-r000002",
+                "revision": 2,
+                "source_release_id": "2026.07.23.2",
+                "framework_protocol": "cotend-collaboration-v1.65",
+                "manifest_sha256": (
+                    "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b"
+                ),
+            }
+        ],
         "legacy_receipt_mappings": [
             {
                 "receipt_schema_version": 1,
                 "artifact_id": lock.get("release_id"),
                 "protocol": lock.get("framework_protocol"),
-                "manifest_sha256": carrier_manifest,
+                "manifest_sha256": (
+                    "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b"
+                ),
                 "target_artifact_id": "cotend-codex-r000002",
                 "target_revision": 2,
             },

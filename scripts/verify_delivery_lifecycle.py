@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import time
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 from unittest import mock
@@ -18,6 +19,8 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from cotend_delivery import Artifact, DeliveryError, DeliveryManager  # noqa: E402
+
+import build_codex_plugin as plugin_package  # noqa: E402
 
 
 PRIVATE_ROOT = ROOT / ".private-provenance"
@@ -100,7 +103,7 @@ def prepare_project(path: Path) -> Path:
 
 
 def make_updated_artifact(fixture: Path, baseline: Artifact) -> Artifact:
-    source = fixture / "artifacts" / "candidate-v2"
+    source = fixture / "artifacts" / "candidate-r4"
     shutil.copytree(ROOT / "skills", source)
     changed = source / "cotend-init" / "SKILL.md"
     changed.write_text(
@@ -110,10 +113,48 @@ def make_updated_artifact(fixture: Path, baseline: Artifact) -> Artifact:
     return Artifact.from_directory(
         source,
         source_release_id=baseline.source_release_id,
-        artifact_id="cotend-codex-r000003",
-        revision=3,
+        artifact_id="cotend-codex-r000004",
+        revision=4,
         protocol=baseline.protocol,
     )
+
+
+def make_predecessor_artifact(fixture: Path, current: Artifact) -> Artifact:
+    lock = json.loads(
+        (ROOT / "packaging" / "codex-plugin" / "package.lock.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    source_lock = lock.get("source")
+    if not isinstance(source_lock, dict) or not isinstance(
+        source_lock.get("source_commit"), str
+    ):
+        raise LifecycleError("Plugin package historical source lock is invalid")
+    source_commit = source_lock["source_commit"]
+    source = fixture / "artifacts" / "predecessor-r2"
+    source.mkdir(parents=True)
+    for relative, payload in plugin_package._historical_source_skill_entries(
+        source_commit
+    ):
+        target = source / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
+    predecessor = Artifact.from_directory(
+        source,
+        source_release_id=current.source_release_id,
+        artifact_id="cotend-codex-r000002",
+        revision=2,
+        protocol=current.protocol,
+    )
+    legacy_mappings = tuple(
+        mapping
+        for mapping in current.legacy_receipt_mappings
+        if mapping.target_artifact_id == predecessor.artifact_id
+        and mapping.target_revision == predecessor.revision
+    )
+    if not legacy_mappings:
+        raise LifecycleError("r2 predecessor has no trusted legacy receipt mapping")
+    return replace(predecessor, legacy_receipt_mappings=legacy_mappings)
 
 
 def write_legacy_receipt(
@@ -438,37 +479,37 @@ def verify_positive_lifecycle(
 
 def verify_identity_migration_lifecycle(
     fixture: Path,
-    baseline: Artifact,
+    predecessor: Artifact,
 ) -> dict[str, Any]:
     project = prepare_project(fixture / "projects" / "identity-migration")
     manager = DeliveryManager(project)
-    skills = set(baseline.skills)
+    skills = set(predecessor.skills)
     protected = tree_snapshot(project, managed_skills=skills)
     steps: list[str] = []
 
-    run_cli("install", project, apply=True)
-    legacy_receipt = write_legacy_receipt(manager, baseline)
+    manager.execute("install", predecessor, apply=True)
+    legacy_receipt = write_legacy_receipt(manager, predecessor)
     payload_before = tree_snapshot(manager.enabled_root)
     before_preview = tree_snapshot(project)
-    state = manager.inspect(baseline)
+    state = manager.inspect(predecessor)
     if state["candidate_relation"] != "identity_migration_available":
         raise LifecycleError("mapped legacy receipt was not offered identity migration")
     steps.append("legacy_detected")
 
-    preview = run_cli("migrate_identity", project)
+    preview = manager.execute("migrate_identity", predecessor)
     if preview.get("status") != "planned" or preview.get("applied") is not False:
         raise LifecycleError("identity migration did not default to dry-run")
     if tree_snapshot(project) != before_preview:
         raise LifecycleError("identity migration dry-run changed the project")
     steps.append("migration_dry_run")
 
-    run_cli("migrate_identity", project, apply=True)
+    manager.execute("migrate_identity", predecessor, apply=True)
     migrated = require_state(
         manager,
-        baseline,
+        predecessor,
         installation="complete",
         enablement="enabled",
-        artifact_id=baseline.artifact_id,
+        artifact_id=predecessor.artifact_id,
     )
     receipt = json.loads(manager.receipt_path.read_text(encoding="utf-8"))
     checkpoint = json.loads(
@@ -485,8 +526,8 @@ def verify_identity_migration_lifecycle(
     assert_protected_unchanged(project, skills, protected)
     steps.append("migration")
 
-    run_cli("rollback", project, apply=True)
-    restored = manager.inspect(baseline)
+    manager.execute("rollback", predecessor, apply=True)
+    restored = manager.inspect(predecessor)
     if (
         restored["candidate_relation"] != "identity_migration_available"
         or json.loads(manager.receipt_path.read_text(encoding="utf-8")) != legacy_receipt
@@ -498,8 +539,8 @@ def verify_identity_migration_lifecycle(
 
     managed = manager.enabled_root / "cotend-init" / "SKILL.md"
     managed.write_text("damaged mapped legacy payload\n", encoding="utf-8")
-    run_cli("repair", project, apply=True)
-    repaired = manager.inspect(baseline)
+    manager.execute("repair", predecessor, apply=True)
+    repaired = manager.inspect(predecessor)
     if (
         repaired["installation"] != "complete"
         or repaired["candidate_relation"] != "same_as_current"
@@ -509,7 +550,7 @@ def verify_identity_migration_lifecycle(
         != 2
     ):
         raise LifecycleError("mapped legacy repair did not migrate to schema v2")
-    assert_payload(project, baseline, enabled=True)
+    assert_payload(project, predecessor, enabled=True)
     assert_protected_unchanged(project, skills, protected)
     steps.append("damaged_repair_and_migration")
 
@@ -534,6 +575,7 @@ def verify_negative_guards(
     fixture: Path,
     baseline: Artifact,
     updated: Artifact,
+    predecessor: Artifact,
 ) -> dict[str, Any]:
     skills = set(baseline.skills)
     passed: list[str] = []
@@ -710,9 +752,9 @@ def verify_negative_guards(
     )
     preserved_protected = tree_snapshot(preserved_project, managed_skills=skills)
     preserved_manager = DeliveryManager(preserved_project)
-    run_cli("install", preserved_project, apply=True)
-    write_legacy_receipt(preserved_manager, baseline)
-    run_cli("migrate_identity", preserved_project, apply=True)
+    preserved_manager.execute("install", predecessor, apply=True)
+    write_legacy_receipt(preserved_manager, predecessor)
+    preserved_manager.execute("migrate_identity", predecessor, apply=True)
     preserved_receipt = preserved_manager.receipt_path.read_bytes()
     managed = preserved_manager.enabled_root / "cotend-init" / "SKILL.md"
     managed.write_text("payload drift after identity migration\n", encoding="utf-8")
@@ -749,8 +791,8 @@ def run_concurrency_worker(
     candidate = Artifact.from_directory(
         source,
         source_release_id=baseline.source_release_id,
-        artifact_id="cotend-codex-r000003",
-        revision=3,
+        artifact_id="cotend-codex-r000004",
+        revision=4,
         protocol=baseline.protocol,
     )
     manager = DeliveryManager(project)
@@ -1326,15 +1368,17 @@ def main() -> int:
         if not fixture.is_dir():
             raise LifecycleError("fixture is missing; run with --prepare")
         baseline = Artifact.from_repository(ROOT)
+        predecessor = make_predecessor_artifact(fixture, baseline)
         updated = make_updated_artifact(fixture, baseline)
         evidence: dict[str, Any] = {
             "schema": "cotend.delivery-lifecycle-evidence",
             "baseline_artifact": baseline.artifact_id,
+            "identity_migration_artifact": predecessor.artifact_id,
             "protocol": baseline.protocol,
             "positive": verify_positive_lifecycle(fixture, baseline, updated),
             "identity_migration": verify_identity_migration_lifecycle(
                 fixture,
-                baseline,
+                predecessor,
             ),
         }
         print(
@@ -1347,7 +1391,12 @@ def main() -> int:
             f"steps={len(evidence['identity_migration']['steps'])}"
         )
         if args.negative_mutations:
-            evidence["negative"] = verify_negative_guards(fixture, baseline, updated)
+            evidence["negative"] = verify_negative_guards(
+                fixture,
+                baseline,
+                updated,
+                predecessor,
+            )
             print(
                 "DELIVERY_LIFECYCLE_NEGATIVE_OK "
                 f"cases={evidence['negative']['count']}"
@@ -1377,6 +1426,7 @@ def main() -> int:
     except (
         DeliveryError,
         LifecycleError,
+        plugin_package.PluginPackageError,
         OSError,
         subprocess.SubprocessError,
         json.JSONDecodeError,

@@ -1,11 +1,12 @@
 {
   "schema": "cotend.trellis-decoupling-plan",
-  "schema_version": 1,
-  "status": "baseline_frozen_no_runtime_change",
+  "schema_version": 2,
+  "status": "native_replacement_in_progress",
   "authority": "product_owner_confirmed_2026-07-24",
   "decision": "preserve_governance_capabilities_replace_trellis_identity_authority_and_runtime_dependency",
   "current_candidate": "cotend@0.1.0-rc.2_local_unpublished",
   "target_candidate": "cotend@0.1.0-rc.3_after_parity",
+  "development_target_artifact": "cotend-codex-r000003",
   "source_boundary": {
     "trellis_relationship": "restricted_design_inspiration_and_legacy_runtime_integration",
     "trellis_source_adoption": "none",
@@ -52,6 +53,35 @@
       "skills/cotend-model-upgrade/references/packet-templates.md": 3,
       "skills/cotend-project-init/SKILL.md": 108,
       "skills/cotend-semantic-alignment/SKILL.md": 10
+    }
+  },
+  "current_runtime": {
+    "scope": "skills/",
+    "case_insensitive_term": "trellis",
+    "mention_count": 174,
+    "file_count": 21,
+    "file_mentions": {
+      "skills/cotend-collaboration/SKILL.md": 7,
+      "skills/cotend-collaboration/agents/openai.yaml": 1,
+      "skills/cotend-collaboration/references/acceptance-test-harness.md": 2,
+      "skills/cotend-collaboration/references/authority-and-triggers.md": 3,
+      "skills/cotend-collaboration/references/code-context-harness.md": 7,
+      "skills/cotend-collaboration/references/continuous-and-unattended.md": 4,
+      "skills/cotend-collaboration/references/decision-log.md": 5,
+      "skills/cotend-collaboration/references/framework-change-evaluation.md": 5,
+      "skills/cotend-collaboration/references/native-agent-orchestration.md": 4,
+      "skills/cotend-collaboration/references/plan-tree.md": 7,
+      "skills/cotend-collaboration/references/quality-sentinel.md": 2,
+      "skills/cotend-collaboration/references/risk-and-approval.md": 4,
+      "skills/cotend-collaboration/references/runtime-profiles.md": 16,
+      "skills/cotend-collaboration/references/semantic-implementation-closure.md": 2,
+      "skills/cotend-collaboration/references/templates.md": 3,
+      "skills/cotend-collaboration/references/upstream-dependency-review.md": 5,
+      "skills/cotend-init/SKILL.md": 3,
+      "skills/cotend-model-upgrade/SKILL.md": 4,
+      "skills/cotend-model-upgrade/references/packet-templates.md": 3,
+      "skills/cotend-project-init/SKILL.md": 86,
+      "skills/cotend-semantic-alignment/SKILL.md": 1
     }
   },
   "target": {
@@ -247,10 +277,16 @@
         "project PRD or spec",
         "AGENTS.md"
       ],
-      "native_coverage": "substantial_but_fragmented",
-      "known_gap": "authority_precedence_still_yields_to_active_trellis_and_needs_one_cotend_native_contract",
-      "status": "baseline_frozen",
-      "removal_gate": "native_parity_verified"
+      "native_coverage": "verified_native_contract",
+      "known_gap": "none_within_TD08_authority_scope; cumulative journey and real-project acceptance remain",
+      "status": "native_parity_verified",
+      "removal_gate": "native_parity_verified",
+      "evidence": [
+        "docs/PROJECT-TRUTH-AUTHORITY.md",
+        "skills/cotend-collaboration/references/authority-and-triggers.md",
+        "scripts/verify_native_project_truth_authority.py",
+        "tests/test_native_project_truth_authority.py"
+      ]
     }
   ],
   "gates": [
@@ -272,7 +308,7 @@
         "native_owner_and_state_transition",
         "focused_regression_tests"
       ],
-      "status": "not_started"
+      "status": "in_progress_1_of_8"
     },
     {
       "id": "G03-cumulative-main-journey",
@@ -317,8 +353,12 @@
     }
   ],
   "this_slice": {
-    "skill_behavior_changed": false,
-    "trellis_route_removed": false,
+    "skill_behavior_changed": true,
+    "trellis_route_removed": true,
+    "removed_capability_ids": [
+      "TD08-project-truth-authority"
+    ],
+    "target_artifact_changed": true,
     "package_identity_changed": false,
     "push_release_submission_or_publish": false
   }

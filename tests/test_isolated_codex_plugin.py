@@ -120,6 +120,71 @@ class IsolatedCodexPluginTests(unittest.TestCase):
                 available=False,
             )
 
+    def test_discovery_separates_namespaced_repo_duplicate_by_path(self) -> None:
+        project = self.fixture / "project"
+        plugin_source = self.fixture / "plugin-source"
+        standalone_source = self.fixture / "standalone-source"
+        source_bytes = (
+            plugin_fixture.SOURCE_SKILLS_ROOT
+            / "cotend-init"
+            / "SKILL.md"
+        ).read_bytes()
+        plugin_skill = plugin_source / "cotend-init" / "SKILL.md"
+        standalone_skill = standalone_source / "cotend-init" / "SKILL.md"
+        project_skill = (
+            project / ".agents" / "skills" / "cotend-init" / "SKILL.md"
+        )
+        for path in (plugin_skill, standalone_skill, project_skill):
+            path.parent.mkdir(parents=True)
+            path.write_bytes(source_bytes)
+        identity = plugin_fixture.PluginLifecycleIdentity(
+            plugin_id="cotend",
+            plugin_version="test",
+            marketplace_name="test",
+            expected_skills=("cotend-init",),
+        )
+        result = {
+            "data": [
+                {
+                    "errors": [],
+                    "skills": [
+                        {
+                            "name": "cotend:cotend-init",
+                            "scope": "repo",
+                            "enabled": True,
+                            "path": str(project_skill),
+                        },
+                        {
+                            "name": "cotend:cotend-init",
+                            "scope": "user",
+                            "enabled": True,
+                            "path": str(plugin_skill),
+                        },
+                    ],
+                }
+            ]
+        }
+        with mock.patch.object(
+            plugin_fixture,
+            "app_server_request",
+            return_value=result,
+        ):
+            discovered = plugin_fixture.discover_skills(
+                self.fixture,
+                {},
+                project,
+                expect_plugin=True,
+                expect_standalone=True,
+                identity=identity,
+                plugin_source_root=plugin_source,
+                standalone_source_root=standalone_source,
+            )
+        self.assertEqual(discovered["plugin_skill_count"], 1)
+        self.assertEqual(discovered["standalone_skill_count"], 1)
+        self.assertEqual(discovered["plugin_scopes"], ["user"])
+        self.assertEqual(discovered["standalone_scopes"], ["repo"])
+        self.assertEqual(discovered["standalone_names"], ["cotend-init"])
+
     def test_static_fixture_and_twelve_negative_mutations(self) -> None:
         plugin_fixture.materialize_fixture_payload(self.fixture)
         result = plugin_fixture.verify_static(self.fixture, run_official=False)

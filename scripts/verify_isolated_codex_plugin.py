@@ -1170,6 +1170,8 @@ def discover_skills(
     expect_standalone: bool,
     identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY,
     cwd_boundary: Path | None = None,
+    plugin_source_root: Path = SOURCE_SKILLS_ROOT,
+    standalone_source_root: Path = SOURCE_SKILLS_ROOT,
 ) -> dict[str, Any]:
     result = app_server_request(
         fixture,
@@ -1193,16 +1195,31 @@ def discover_skills(
         f"{identity.plugin_id}:{skill}" for skill in identity.expected_skills
     }
     expected_standalone_names = set(identity.expected_skills)
-    plugin_items = {
-        item.get("name"): item
-        for item in skills
-        if item.get("name") in expected_plugin_names
-    }
+    project_root = project.resolve()
+    plugin_groups: dict[str, list[dict[str, Any]]] = {}
+    standalone_groups: dict[str, list[dict[str, Any]]] = {}
+    for item in skills:
+        if not isinstance(item, dict):
+            continue
+        name = str(item.get("name", ""))
+        path = Path(str(item.get("path", ""))).resolve()
+        if path.is_relative_to(project_root):
+            standalone_name = (
+                name.split(":", 1)[1]
+                if name.startswith(f"{identity.plugin_id}:")
+                else name
+            )
+            if standalone_name in expected_standalone_names:
+                standalone_groups.setdefault(standalone_name, []).append(item)
+        elif name in expected_plugin_names:
+            plugin_groups.setdefault(name, []).append(item)
+    if any(len(items) != 1 for items in plugin_groups.values()):
+        raise PluginFixtureError("duplicate Plugin Skill discovery entries")
+    if any(len(items) != 1 for items in standalone_groups.values()):
+        raise PluginFixtureError("duplicate standalone Skill discovery entries")
+    plugin_items = {name: items[0] for name, items in plugin_groups.items()}
     standalone_items = {
-        item.get("name"): item
-        for item in skills
-        if item.get("name") in expected_standalone_names
-        and Path(str(item.get("path", ""))).resolve().is_relative_to(project.resolve())
+        name: items[0] for name, items in standalone_groups.items()
     }
     if set(plugin_items) != (expected_plugin_names if expect_plugin else set()):
         raise PluginFixtureError(
@@ -1231,22 +1248,26 @@ def discover_skills(
         assert_fixture_path(fixture, path, f"discovered Plugin Skill {name}")
         source_name = str(name).split(":", 1)[1]
         if not path.is_file() or sha256(path) != sha256(
-            SOURCE_SKILLS_ROOT / source_name / "SKILL.md"
+            plugin_source_root / source_name / "SKILL.md"
         ):
             raise PluginFixtureError(f"discovered Plugin Skill bytes mismatch: {name}")
         if item.get("enabled") is not True:
             raise PluginFixtureError(f"discovered Plugin Skill is disabled: {name}")
+        if item.get("scope") != "user":
+            raise PluginFixtureError(f"discovered Plugin Skill scope mismatch: {name}")
         plugin_scopes.add(str(item.get("scope")))
     standalone_scopes: set[str] = set()
     for name, item in standalone_items.items():
         path = Path(str(item.get("path", ""))).resolve()
         expected_path = project / ".agents" / "skills" / str(name) / "SKILL.md"
         if path != expected_path.resolve() or sha256(path) != sha256(
-            SOURCE_SKILLS_ROOT / str(name) / "SKILL.md"
+            standalone_source_root / str(name) / "SKILL.md"
         ):
             raise PluginFixtureError(f"standalone Skill bytes mismatch: {name}")
         if item.get("enabled") is not True:
             raise PluginFixtureError(f"standalone Skill is disabled: {name}")
+        if item.get("scope") != "repo":
+            raise PluginFixtureError(f"standalone Skill scope mismatch: {name}")
         standalone_scopes.add(str(item.get("scope")))
     return {
         "plugin_skill_count": len(plugin_items),
@@ -1268,6 +1289,8 @@ def run_phase_a(
     identity: PluginLifecycleIdentity = FIXTURE_LIFECYCLE_IDENTITY,
     fail_after_step: str | None = None,
     projects_root: Path | None = None,
+    plugin_source_root: Path = SOURCE_SKILLS_ROOT,
+    standalone_source_root: Path = SOURCE_SKILLS_ROOT,
 ) -> dict[str, Any]:
     fixture = guarded_fixture(fixture)
     marketplace_root = fixture / "source-marketplace"
@@ -1346,6 +1369,8 @@ def run_phase_a(
         expect_standalone=False,
         identity=identity,
         cwd_boundary=cwd_boundary,
+        plugin_source_root=plugin_source_root,
+        standalone_source_root=standalone_source_root,
     )
     assert_protected_unchanged(protected_before)
     mark("discovery_installed")
@@ -1357,6 +1382,8 @@ def run_phase_a(
         expect_standalone=True,
         identity=identity,
         cwd_boundary=cwd_boundary,
+        plugin_source_root=plugin_source_root,
+        standalone_source_root=standalone_source_root,
     )
     assert_protected_unchanged(protected_before)
     mark("discovery_coexistence")
@@ -1389,6 +1416,8 @@ def run_phase_a(
         expect_standalone=False,
         identity=identity,
         cwd_boundary=cwd_boundary,
+        plugin_source_root=plugin_source_root,
+        standalone_source_root=standalone_source_root,
     )
     removed_coexist = discover_skills(
         fixture,
@@ -1398,6 +1427,8 @@ def run_phase_a(
         expect_standalone=True,
         identity=identity,
         cwd_boundary=cwd_boundary,
+        plugin_source_root=plugin_source_root,
+        standalone_source_root=standalone_source_root,
     )
     assert_protected_unchanged(protected_before)
     mark("discovery_after_remove")
@@ -1419,6 +1450,8 @@ def run_phase_a(
         expect_standalone=False,
         identity=identity,
         cwd_boundary=cwd_boundary,
+        plugin_source_root=plugin_source_root,
+        standalone_source_root=standalone_source_root,
     )
     assert_protected_unchanged(protected_before)
     mark("discovery_after_reinstall")
@@ -1451,6 +1484,8 @@ def run_phase_a(
         expect_standalone=False,
         identity=identity,
         cwd_boundary=cwd_boundary,
+        plugin_source_root=plugin_source_root,
+        standalone_source_root=standalone_source_root,
     )
     assert_protected_unchanged(protected_before)
     mark("final_discovery_absent")

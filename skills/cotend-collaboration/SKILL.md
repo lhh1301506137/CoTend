@@ -49,15 +49,11 @@ This body is the always-needed governance and routing core. Detailed contracts l
 
 - Initialize, update, repair, migrate, or resume a downstream project through `cotend-project-init` Auto Mode. It decides fresh/legacy/repair/current/blocked state and returns control once.
 - Route a direct writable semantic request to `$cotend-semantic-alignment` and a read-only evaluation to `$cotend-diagnose-only`; both bypass Init. A composite `$cotend-init <semantic request>` completes Init only, leaves the appended request unclassified and unexecuted, then reports the independent next action without executing it. The preparatory module must not become a second writable alignment owner.
-- Authority order when frameworks coexist:
-  1. active Trellis owns task/PRD/spec lifecycle and project-local coding rules;
-  2. CoTend owns collaboration, authority, risk, review, verification, handoff, acceptance, and release governance;
-  3. Karpathy/project coding guidance owns implementation discipline;
-  4. grill-me/Trellis brainstorm owns one-question-at-a-time clarification;
-  5. Code Context Harness owns code discovery but never product truth.
-- `.trellis/` presence alone is not binding. Only `trellis.mode: active` controls workflow; dormant Trellis is historical context and cannot override current truth. Project Init owns the five-state Trellis decision.
+- Resolve project meaning, detailed requirements, route, current reality, and coding constraints through the canonical role-based contract in `references/authority-and-triggers.md`. CoTend Core never grants project-truth authority from framework identity or active state.
+- When another development framework is present, classify its artifacts as `reference_only`, `historical`, or `conflict`. It may still supply a later capability's implementation/check procedure while that compatibility route exists, but it cannot own CoTend task, PRD, spec, Plan Tree, or semantic authority.
+- `.trellis/` presence or `trellis.mode: active` may describe a legacy compatibility route, not truth authority. Dormant state is historical; active state cannot override the CoTend authority chain. Project Init still owns the five-state compatibility decision until TD01 is replaced.
 - In active Trellis, `full` maps to the fixed implement/check chain and `adaptive` maps to the inline route with the same specs, checks, tests, evidence, and Constitution. Do not stack a duplicate framework chain on platform-native orchestration.
-- On instruction conflict preserve user intent and safety first, then active Trellis truth, then CoTend governance, then local coding style; record a material resolution.
+- On instruction conflict preserve user intent and safety first, apply the CoTend Project Truth Authority contract, then enforce project-local coding style inside that boundary; record a material resolution.
 
 ## Mandatory Module Routing
 
@@ -134,7 +130,7 @@ Do not use `lite` for medium/dev_high/critical, unattended batches, formal gates
 ## Execution Loop
 
 1. **Start/resume**: read active STATUS/review/task truth, resolve Full/Adaptive and adoption profiles, resolve any active material Route Rebase before trusting `current_next_leaf`, trace the active leaf through confirmed L0-L2, verify contract bindings only when the active high-value boundary triggers it, then load only triggered modules.
-2. **Scope**: use Code Context when triggered; bind non-trivial work to the active Plan Tree/Trellis route or reconcile it first.
+2. **Scope**: use Code Context when triggered; bind non-trivial work to the active CoTend Plan Tree or explicitly mapped route owner, classify any external-framework links, or reconcile the route first.
 3. **Execute**: keep changes inside authorization and use the active workflow shape without duplicate orchestration; when native agents are triggered, use dependency-first packets and one integration owner.
 4. **Verify/checkpoint**: run proportionate tests and conditional completion evidence; before advancing an important node, require semantic implementation closure; update durable state only when material.
 5. **Review/control gates**: perform actual-model self-review and any triggered external review, Sentinel, semantic reconciliation, Done, AI UAT, Human Rejoin, or Release Hardening.

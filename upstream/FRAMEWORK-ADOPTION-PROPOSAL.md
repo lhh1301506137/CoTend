@@ -97,7 +97,7 @@ analysis_language: zh-CN
 
 CodeGraph、Playwright、Git、Python 和 PowerShell 保持 external runtime；Codex、Claude 和 Chrome 保持 platform capability。CoTend 可以按产品合同检测或调用它们，但不把其源码、二进制、账号状态或平台内部实现并入产品。
 
-Trellis 与这些单用途工具不同：它本身是端到端开发治理框架。v1.65 adopted source 仍保留其运行时协调分支，但用户已把该状态确认为产品化缺口。当前先冻结八类能力与 241 处/22 文件基线，再由 CoTend 原生 owner 逐项替换；最终 Core 不调用、不激活也不向 Trellis 让出任务/规格权限。该后续处置不否定 `2026.07.23.2` 来源 lock，也不授权在缺少等价证据时提前删除现有能力。
+Trellis 与这些单用途工具不同：它本身是端到端开发治理框架。v1.65 adopted source 仍保留其运行时协调分支，但用户已把该状态确认为产品化缺口。L61 已冻结八类能力与 241 处/22 文件历史基线；L62 已用 CoTend 原生合同替换 TD08 项目真相权限，当前库存独立记录为 174 处/21 文件。其余 TD01-TD07 仍必须逐项通过等价 gate；最终 Core 不调用、不激活也不向 Trellis 让出任务/规格权限。该产品 overlay 不否定 `2026.07.23.2` 来源 lock，也不授权在缺少等价证据时提前删除现有能力。
 
 ### Claude 载体
 

@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 import verify_trellis_decoupling_plan as trellis_decoupling
+import verify_native_project_truth_authority as native_authority
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -374,6 +375,11 @@ EXPECTED_DELIVERY_PRODUCT_FILES = {
     "docs/evidence/ISOLATED-USER-SKILL-DELIVERY.md",
     "docs/evidence/PRODUCTION-USER-LAYOUT-RESOLVER.md",
     "docs/evidence/ISOLATED-PRODUCTION-USER-RECEIPT.md",
+}
+EXPECTED_NATIVE_AUTHORITY_FILES = {
+    "docs/PROJECT-TRUTH-AUTHORITY.md",
+    "scripts/verify_native_project_truth_authority.py",
+    "tests/test_native_project_truth_authority.py",
 }
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
@@ -2488,6 +2494,20 @@ def production_plugin_package_errors(
         "path_hash_manifest_sha256"
     ) != "ce3253e553f1a95ec81858b2b1e2429a771816e7477516da779b1a99e0c2c0de":
         errors.append("production Plugin source manifest lock mismatch")
+    if not isinstance(source_lock, dict) or source_lock.get("source_commit") != (
+        "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1"
+    ):
+        errors.append("production Plugin historical source commit mismatch")
+    if not isinstance(source_lock, dict) or (
+        source_lock.get("artifact_id"),
+        source_lock.get("revision"),
+        source_lock.get("target_manifest_sha256"),
+    ) != (
+        "cotend-codex-r000002",
+        2,
+        "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b",
+    ):
+        errors.append("production Plugin predecessor target binding mismatch")
     if not isinstance(output_lock, dict) or output_lock.get(
         "path_hash_manifest_sha256"
     ) != "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2":
@@ -2535,6 +2555,9 @@ def production_plugin_package_errors(
         "PACKAGE_BRAND_ASSETS",
         "validate_brand_assets",
         "source_bytes_identical",
+        "validate_historical_source_commit",
+        "_historical_source_skill_entries",
+        "repository_source_ahead",
         "existing output is not an owned valid CoTend package",
         "run_official_validator",
     ):
@@ -2600,7 +2623,8 @@ def production_plugin_package_errors(
         if metadata_values(evidence_text, key) != expected:
             errors.append(f"production Plugin package evidence mismatch: {key}")
     for marker in (
-        "`skills/` 仍是唯一语义源",
+        "rc.2 的 Skill 语义源固定为 Git commit",
+        "当前根 `skills/` 已推进到 target r3",
         "48 个文件",
         "逐字节一致",
         "17 类负向边界",
@@ -3932,8 +3956,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     expected_target = {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000002",
-        "revision": 2,
+        "artifact_id": "cotend-codex-r000003",
+        "revision": 3,
     }
     if not isinstance(target, dict) or any(
         target.get(key) != expected for key, expected in expected_target.items()
@@ -3956,12 +3980,29 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     ).hexdigest()
     if not isinstance(target, dict) or target.get("manifest_sha256") != carrier_manifest:
         errors.append("delivery target lock manifest mismatch")
+    expected_predecessors = [
+        {
+            "platform": "Codex",
+            "lineage": "cotend-codex",
+            "artifact_id": "cotend-codex-r000002",
+            "revision": 2,
+            "source_release_id": "2026.07.23.2",
+            "framework_protocol": "cotend-collaboration-v1.65",
+            "manifest_sha256": (
+                "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b"
+            ),
+        }
+    ]
+    if target_lock.get("predecessor_targets") != expected_predecessors:
+        errors.append("delivery target lock predecessor inventory mismatch")
     expected_legacy_mappings = [
         {
             "receipt_schema_version": 1,
             "artifact_id": framework_lock.get("release_id"),
             "protocol": framework_lock.get("framework_protocol"),
-            "manifest_sha256": carrier_manifest,
+            "manifest_sha256": (
+                "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b"
+            ),
             "target_artifact_id": "cotend-codex-r000002",
             "target_revision": 2,
         },
@@ -3978,22 +4019,22 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     ]
     if target_lock.get("legacy_receipt_mappings") != expected_legacy_mappings:
         errors.append("delivery target lock legacy mapping mismatch")
-    identity_evidence_path = "docs/evidence/TARGET-ARTIFACT-IDENTITY-SCHEMA-V2.md"
+    identity_evidence_path = "docs/evidence/NATIVE-PROJECT-TRUTH-TARGET-R3.md"
     if identity_evidence_path not in candidates:
         errors.append("target artifact identity evidence is missing or ignored")
     else:
         evidence = read(identity_evidence_path)
         for marker in (
-            "current_target_artifact_id: cotend-codex-r000002",
-            "current_target_revision: 2",
-            "predecessor_target_artifact_id: cotend-codex-r000001",
-            "predecessor_target_revision: 1",
-            "source_framework_lock_changed: true",
-            "receipt_schema: 2_with_schema_1_read_and_migration",
-            "checkpoint_schema: 2_with_schema_1_snapshot_read",
-            "identity_migration_available",
-            "downgrade_candidate",
-            "preserve_existing",
+            "current_target_artifact_id: cotend-codex-r000003",
+            "current_target_revision: 3",
+            "predecessor_target_artifact_id: cotend-codex-r000002",
+            "predecessor_target_revision: 2",
+            "source_framework_lock_changed: false",
+            "package_candidate: cotend@0.1.0-rc.2_immutable",
+            "package_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
+            "TD08-project-truth-authority",
+            "r2_to_r3_update_available",
+            "historical_git_source_required: true",
         ):
             if marker not in evidence:
                 errors.append(f"target artifact identity evidence is missing: {marker}")
@@ -4076,6 +4117,12 @@ def main() -> int:
     framework_lock_path = "upstream/framework.lock.json"
     trellis_decoupling_contract_path = "upstream/TRELLIS-DECOUPLING-PLAN.json"
     trellis_decoupling_document_path = "docs/TRELLIS-DECOUPLING-PARITY-PLAN.md"
+    missing_native_authority = EXPECTED_NATIVE_AUTHORITY_FILES - candidates
+    if missing_native_authority:
+        errors.append(
+            "native project-truth authority artifacts are missing or ignored: "
+            f"{sorted(missing_native_authority)}"
+        )
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
     if upstream_registry_path not in candidates:
@@ -4241,6 +4288,11 @@ def main() -> int:
             )
         except trellis_decoupling.TrellisDecouplingPlanError as exc:
             errors.append(f"Trellis decoupling baseline: {exc}")
+    if not missing_native_authority:
+        try:
+            native_authority.verify_repository(ROOT)
+        except native_authority.NativeAuthorityError as exc:
+            errors.append(f"native project-truth authority: {exc}")
 
     github_marketplace_carrier_evidence_path = (
         "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md"

@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+
+import verify_native_project_truth_authority as native_authority
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,9 +48,23 @@ EXPECTED_DOCUMENT_MARKERS = [
     "## 八类能力等价矩阵",
     "## 为什么先替换权限，再替换命令",
     "### G01 基线冻结",
+    "### L62 / TD08 已完成",
     "### G05 运行时零依赖",
-    "不编辑现有 Skill 运行行为",
+    "只移除 TD08",
 ]
+EXPECTED_BASELINE_INVENTORY_SHA256 = (
+    "a1c9893a7462d7abd925b1ae468a3dd97366fae850e2881a23546e5471e93aeb"
+)
+AUTHORIZED_TD08_INVENTORY_REDUCTIONS = {
+    "skills/cotend-collaboration/SKILL.md",
+    "skills/cotend-collaboration/references/code-context-harness.md",
+    "skills/cotend-collaboration/references/framework-change-evaluation.md",
+    "skills/cotend-collaboration/references/idea-to-consensus.md",
+    "skills/cotend-collaboration/references/native-agent-orchestration.md",
+    "skills/cotend-collaboration/references/plan-tree.md",
+    "skills/cotend-project-init/SKILL.md",
+    "skills/cotend-semantic-alignment/SKILL.md",
+}
 
 
 class TrellisDecouplingPlanError(ValueError):
@@ -118,11 +135,11 @@ def validate_contract(
 ) -> dict[str, Any]:
     if contract.get("schema") != "cotend.trellis-decoupling-plan":
         raise TrellisDecouplingPlanError("Trellis decoupling schema drifted")
-    if contract.get("schema_version") != 1:
+    if contract.get("schema_version") != 2:
         raise TrellisDecouplingPlanError("Trellis decoupling schema version drifted")
-    if contract.get("status") != "baseline_frozen_no_runtime_change":
+    if contract.get("status") != "native_replacement_in_progress":
         raise TrellisDecouplingPlanError(
-            "replacement may not start by editing the frozen baseline contract"
+            "native replacement state drifted"
         )
     if (
         contract.get("decision")
@@ -133,6 +150,8 @@ def validate_contract(
         raise TrellisDecouplingPlanError("current candidate identity drifted")
     if contract.get("target_candidate") != "cotend@0.1.0-rc.3_after_parity":
         raise TrellisDecouplingPlanError("target candidate identity drifted")
+    if contract.get("development_target_artifact") != "cotend-codex-r000003":
+        raise TrellisDecouplingPlanError("development target artifact drifted")
 
     source = contract.get("source_boundary")
     if not isinstance(source, dict):
@@ -159,16 +178,57 @@ def validate_contract(
         for path, count in expected_inventory.items()
     ):
         raise TrellisDecouplingPlanError("baseline file inventory is invalid")
-    if actual_inventory != expected_inventory:
+    baseline_digest = hashlib.sha256(
+        json.dumps(
+            expected_inventory,
+            ensure_ascii=True,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+    ).hexdigest()
+    if baseline_digest != EXPECTED_BASELINE_INVENTORY_SHA256:
         raise TrellisDecouplingPlanError(
-            "frozen runtime Trellis inventory changed before native parity"
+            "immutable 241/22 runtime Trellis baseline changed"
         )
-    if baseline.get("mention_count") != sum(actual_inventory.values()):
+    if baseline.get("mention_count") != sum(expected_inventory.values()):
         raise TrellisDecouplingPlanError("baseline mention total drifted")
-    if baseline.get("file_count") != len(actual_inventory):
+    if baseline.get("file_count") != len(expected_inventory):
         raise TrellisDecouplingPlanError("baseline file count drifted")
     if baseline.get("scope") != "skills/":
         raise TrellisDecouplingPlanError("runtime inventory scope drifted")
+    if baseline.get("mention_count") != 241 or baseline.get("file_count") != 22:
+        raise TrellisDecouplingPlanError("immutable baseline cardinality drifted")
+
+    current = contract.get("current_runtime")
+    if not isinstance(current, dict):
+        raise TrellisDecouplingPlanError("current runtime inventory is missing")
+    current_inventory = current.get("file_mentions")
+    if current_inventory != actual_inventory:
+        raise TrellisDecouplingPlanError(
+            "current runtime Trellis inventory differs from repository Skills"
+        )
+    if current.get("mention_count") != sum(actual_inventory.values()):
+        raise TrellisDecouplingPlanError("current runtime mention total drifted")
+    if current.get("file_count") != len(actual_inventory):
+        raise TrellisDecouplingPlanError("current runtime file count drifted")
+    if current.get("scope") != "skills/":
+        raise TrellisDecouplingPlanError("current runtime scope drifted")
+    changed_inventory_paths = {
+        path
+        for path in set(expected_inventory) | set(actual_inventory)
+        if expected_inventory.get(path, 0) != actual_inventory.get(path, 0)
+    }
+    if changed_inventory_paths != AUTHORIZED_TD08_INVENTORY_REDUCTIONS:
+        raise TrellisDecouplingPlanError(
+            "runtime inventory changed outside the exact TD08 authority surfaces"
+        )
+    if any(
+        actual_inventory.get(path, 0) >= expected_inventory.get(path, 0)
+        for path in changed_inventory_paths
+    ):
+        raise TrellisDecouplingPlanError(
+            "TD08 migration must reduce, not add, Trellis runtime references"
+        )
 
     runtime_path_prefixes = (
         "skills/",
@@ -234,9 +294,14 @@ def validate_contract(
         _require_non_empty_strings(
             item.get("cotend_owners"), f"{capability_id}.cotend_owners"
         )
-        if item.get("status") != "baseline_frozen":
+        expected_status = (
+            "native_parity_verified"
+            if capability_id == "TD08-project-truth-authority"
+            else "baseline_frozen"
+        )
+        if item.get("status") != expected_status:
             raise TrellisDecouplingPlanError(
-                f"{capability_id} advanced before replacement implementation"
+                f"{capability_id} replacement status drifted"
             )
         if item.get("removal_gate") != "native_parity_verified":
             raise TrellisDecouplingPlanError(
@@ -246,6 +311,16 @@ def validate_contract(
             raise TrellisDecouplingPlanError(
                 f"{capability_id} must retain an explicit gap"
             )
+        if capability_id == "TD08-project-truth-authority":
+            if item.get("native_coverage") != "verified_native_contract":
+                raise TrellisDecouplingPlanError("TD08 native coverage drifted")
+            if item.get("evidence") != [
+                "docs/PROJECT-TRUTH-AUTHORITY.md",
+                "skills/cotend-collaboration/references/authority-and-triggers.md",
+                "scripts/verify_native_project_truth_authority.py",
+                "tests/test_native_project_truth_authority.py",
+            ]:
+                raise TrellisDecouplingPlanError("TD08 evidence inventory drifted")
 
     if contract.get("replacement_order") != EXPECTED_REPLACEMENT_ORDER:
         raise TrellisDecouplingPlanError("dependency-driven replacement order drifted")
@@ -263,20 +338,28 @@ def validate_contract(
         if not isinstance(gate, dict):
             raise TrellisDecouplingPlanError("parity gate must be an object")
         _require_non_empty_strings(gate.get("evidence"), f"{gate['id']}.evidence")
-        expected_status = "complete" if index == 0 else "not_started"
+        expected_status = (
+            "complete"
+            if index == 0
+            else "in_progress_1_of_8"
+            if index == 1
+            else "not_started"
+        )
         if gate.get("status") != expected_status:
             raise TrellisDecouplingPlanError(
                 f"{gate['id']} status advanced without executed evidence"
             )
 
     if contract.get("this_slice") != {
-        "skill_behavior_changed": False,
-        "trellis_route_removed": False,
+        "skill_behavior_changed": True,
+        "trellis_route_removed": True,
+        "removed_capability_ids": ["TD08-project-truth-authority"],
+        "target_artifact_changed": True,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
     }:
         raise TrellisDecouplingPlanError(
-            "baseline-only slice boundary drifted"
+            "L62 slice boundary drifted"
         )
 
     for marker in EXPECTED_DOCUMENT_MARKERS:
@@ -284,6 +367,9 @@ def validate_contract(
             raise TrellisDecouplingPlanError(
                 f"decoupling document is missing marker: {marker}"
             )
+    native_result = native_authority.verify_repository(ROOT)
+    if native_result.get("status") != "native_parity_verified":
+        raise TrellisDecouplingPlanError("TD08 native authority verifier did not pass")
 
     return {
         "status": contract["status"],
@@ -292,7 +378,8 @@ def validate_contract(
         "runtime_mentions": sum(actual_inventory.values()),
         "runtime_files": len(actual_inventory),
         "trellis_runtime_paths": 0,
-        "skill_behavior_changed": False,
+        "skill_behavior_changed": True,
+        "native_capabilities_verified": 1,
     }
 
 
@@ -320,7 +407,8 @@ def main() -> int:
         "TRELLIS_DECOUPLING_PLAN_OK "
         f"capabilities={result['capabilities']} gates={result['gates']} "
         f"runtime_mentions={result['runtime_mentions']} "
-        f"runtime_files={result['runtime_files']} behavior_changed=false"
+        f"runtime_files={result['runtime_files']} behavior_changed=true "
+        f"native_verified={result['native_capabilities_verified']}"
     )
     return 0
 

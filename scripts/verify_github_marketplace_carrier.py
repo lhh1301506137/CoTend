@@ -543,7 +543,7 @@ def source_snapshot() -> dict[str, Any]:
             capture_output=True,
             text=True,
         ).stdout.strip(),
-        "source_manifest": contract["source_manifest"],
+        "source_manifest": contract["repository_source_manifest"],
         "production_manifest_sha256": package.sha256_file(package.MANIFEST_SOURCE),
         "package_lock_sha256": package.sha256_file(package.PACKAGE_LOCK_PATH),
         "artifact_lock_sha256": package.sha256_file(package.TARGET_ARTIFACT_LOCK),

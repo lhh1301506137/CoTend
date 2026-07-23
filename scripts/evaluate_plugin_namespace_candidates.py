@@ -760,17 +760,36 @@ def discover_candidate(
         for skill in base.EXPECTED_SKILLS
     }
     expected_plugin_names = {f"{PLUGIN_ID}:{name}" for name in target_names}
-    plugin_items = {
-        item.get("name"): item
-        for item in items
-        if item.get("name") in expected_plugin_names
-    }
     expected_standalone_names = set(base.EXPECTED_SKILLS)
+    project_root = project.resolve()
+    plugin_groups: dict[str, list[dict[str, Any]]] = {}
+    standalone_groups: dict[str, list[dict[str, Any]]] = {}
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        name = str(item.get("name", ""))
+        path = Path(str(item.get("path", ""))).resolve()
+        if path.is_relative_to(project_root):
+            standalone_name = (
+                name.split(":", 1)[1]
+                if name.startswith(f"{PLUGIN_ID}:")
+                else name
+            )
+            if standalone_name in expected_standalone_names:
+                standalone_groups.setdefault(standalone_name, []).append(item)
+        elif name in expected_plugin_names:
+            plugin_groups.setdefault(name, []).append(item)
+    if any(len(group) != 1 for group in plugin_groups.values()):
+        raise NamespaceEvaluationError(
+            f"{candidate.candidate_id}: duplicate Plugin discovery entries"
+        )
+    if any(len(group) != 1 for group in standalone_groups.values()):
+        raise NamespaceEvaluationError(
+            f"{candidate.candidate_id}: duplicate standalone discovery entries"
+        )
+    plugin_items = {name: group[0] for name, group in plugin_groups.items()}
     standalone_items = {
-        item.get("name"): item
-        for item in items
-        if item.get("name") in expected_standalone_names
-        and Path(str(item.get("path", ""))).resolve().is_relative_to(project.resolve())
+        name: group[0] for name, group in standalone_groups.items()
     }
     if set(plugin_items) != (expected_plugin_names if expect_plugin else set()):
         raise NamespaceEvaluationError(

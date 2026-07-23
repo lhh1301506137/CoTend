@@ -30,15 +30,16 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
             self.tracked_paths,
         )
 
-    def test_current_baseline_is_exact_and_behavior_unchanged(self) -> None:
+    def test_current_migration_preserves_baseline_and_advances_only_td08(self) -> None:
         result = self.validate()
         self.assertEqual(result["capabilities"], 8)
         self.assertEqual(result["gates"], 6)
-        self.assertEqual(result["runtime_mentions"], 241)
-        self.assertEqual(result["runtime_files"], 22)
-        self.assertFalse(result["skill_behavior_changed"])
+        self.assertEqual(result["runtime_mentions"], 174)
+        self.assertEqual(result["runtime_files"], 21)
+        self.assertTrue(result["skill_behavior_changed"])
+        self.assertEqual(result["native_capabilities_verified"], 1)
 
-    def test_early_runtime_text_deletion_is_rejected(self) -> None:
+    def test_immutable_baseline_change_is_rejected(self) -> None:
         changed = copy.deepcopy(self.contract)
         changed["baseline"]["file_mentions"][
             "skills/cotend-project-init/SKILL.md"
@@ -52,9 +53,23 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 
-    def test_capability_cannot_advance_without_implementation(self) -> None:
+    def test_another_capability_cannot_advance_without_implementation(self) -> None:
         changed = copy.deepcopy(self.contract)
         changed["capabilities"][0]["status"] = "native_parity_verified"
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(changed)
+
+    def test_current_inventory_drift_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.contract)
+        changed["current_runtime"]["file_mentions"][
+            "skills/cotend-project-init/SKILL.md"
+        ] += 1
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(changed)
+
+    def test_td08_evidence_cannot_be_removed(self) -> None:
+        changed = copy.deepcopy(self.contract)
+        changed["capabilities"][-1]["evidence"].pop()
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 

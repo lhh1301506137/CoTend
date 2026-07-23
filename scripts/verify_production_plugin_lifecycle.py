@@ -331,6 +331,14 @@ def run_success_scenario(
             source_before,
             identity=PRODUCTION_IDENTITY,
             projects_root=projects_root,
+            plugin_source_root=(
+                fixture
+                / "source-marketplace"
+                / "plugins"
+                / package.PLUGIN_NAME
+                / "skills"
+            ),
+            standalone_source_root=package.SOURCE_SKILLS_ROOT,
         )
     finally:
         try:
@@ -361,6 +369,14 @@ def run_failure_recovery_scenario(
                 identity=PRODUCTION_IDENTITY,
                 fail_after_step="plugin_add",
                 projects_root=projects_root,
+                plugin_source_root=(
+                    fixture
+                    / "source-marketplace"
+                    / "plugins"
+                    / package.PLUGIN_NAME
+                    / "skills"
+                ),
+                standalone_source_root=package.SOURCE_SKILLS_ROOT,
             )
         except lifecycle.PluginFixtureError as exc:
             injected_error = str(exc)

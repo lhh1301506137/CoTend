@@ -39,7 +39,7 @@ Do not load it for fully specified small edits, obvious bug fixes, or implementa
    - risk/release posture;
    - acceptance expectations.
 4. Ask only high-leverage questions the repo/docs cannot answer. Use grill-me style: one question at a time, with recommended option `1`.
-5. Preserve decision-worthy answers as source evidence for the direct Alignment flow; if the active Trellis brainstorm already records them, link that record rather than creating a parallel truth source. Do not mark protected semantics active from this preparatory module.
+5. Preserve decision-worthy answers as source evidence for the direct Alignment flow; if an external-framework brainstorm already records them, classify and link aligned content as `reference_only` rather than creating a parallel truth source. Do not mark protected semantics active from this preparatory module.
 6. Route the draft and evidence directly to `$cotend-semantic-alignment new_baseline`. That Skill teaches back current-MVP L0-L2 in the project's recorded user-facing language, or English by default, and obtains explicit confirmation for each protected node or exact grouped packet. For L2, it confirms the semantic charter before classifying or confirming rules; an intake rule list remains candidate evidence and never substitutes for the charter. Confirmation of L0 does not confirm AI-derived L1/L2.
 7. Only the direct Alignment flow absorbs confirmed protected consensus into existing durable documents: PRD/brief, Plan Tree or active plan, `STATUS.md`, and relevant decision/knowledge records. Classify L3+ as delegated inference, not user-confirmed truth.
 8. Mark the original idea artifact `absorbed` only after the direct Alignment flow persists the confirmed baseline; otherwise leave it `temporary` or explicitly archive it. Do not delete it silently.
@@ -89,8 +89,8 @@ Use `draft_pending_user_confirmation` when MVP, final shape, scope boundary, ris
 - Keep user-facing explanations in the project's recorded language, or English by default.
 - Avoid low-level implementation questions unless the decision really affects product direction, risk, cost, or maintainability.
 - Prefer concrete options with tradeoffs over open-ended questions.
-- If a Trellis project is active, prepare this evidence inside Trellis brainstorm/PRD rather than creating a parallel truth source, then let direct Semantic Alignment own protected confirmation/persistence.
-- If Trellis is dormant or absent, use existing CoTend, legacy dual-ai, grill, or PRD-lite records as their actual authority permits.
+- If an external-framework brainstorm/PRD exists, classify and link it under the CoTend Project Truth Authority contract rather than creating a parallel truth source; direct Semantic Alignment alone owns protected confirmation/persistence.
+- If no external-framework artifact applies, use existing CoTend, legacy, grill, or PRD-lite records under their actual authority labels.
 
 ## Done Gate To Implementation
 

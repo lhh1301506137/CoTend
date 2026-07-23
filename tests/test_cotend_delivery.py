@@ -13,8 +13,10 @@ from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "src"))
 
+import build_codex_plugin as plugin_package  # noqa: E402
 from cotend_delivery import Artifact, DeliveryError, DeliveryManager  # noqa: E402
 from cotend_delivery.core import LegacyReceiptMapping  # noqa: E402
 
@@ -73,8 +75,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         return Artifact.from_directory(
             source,
             source_release_id=self.artifact.source_release_id,
-            artifact_id="cotend-codex-r000003",
-            revision=3,
+            artifact_id="cotend-codex-r000004",
+            revision=4,
             protocol=self.artifact.protocol,
         )
 
@@ -86,7 +88,21 @@ class DeliveryLifecycleTests(unittest.TestCase):
         return json.loads(self.manager.receipt_path.read_text(encoding="utf-8"))
 
     def write_legacy_receipt(self, *, artifact_id: str | None = None) -> dict[str, object]:
-        mapping = self.artifact.legacy_receipt_mappings[0]
+        mapping = LegacyReceiptMapping(
+            receipt_schema_version=1,
+            artifact_id=self.artifact.source_release_id,
+            protocol=self.artifact.protocol,
+            manifest_sha256=self.artifact.manifest_sha256,
+            target_artifact_id=self.artifact.artifact_id,
+            target_revision=self.artifact.revision,
+        )
+        self.artifact = replace(
+            self.artifact,
+            legacy_receipt_mappings=(
+                mapping,
+                *self.artifact.legacy_receipt_mappings,
+            ),
+        )
         receipt = self.load_receipt()
         legacy = {
             key: value
@@ -140,8 +156,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         self.assertEqual(len(self.artifact.skills), 8)
         self.assertEqual(len(self.artifact.files), 37)
         self.assertEqual(self.artifact.source_release_id, "2026.07.23.2")
-        self.assertEqual(self.artifact.artifact_id, "cotend-codex-r000002")
-        self.assertEqual(self.artifact.revision, 2)
+        self.assertEqual(self.artifact.artifact_id, "cotend-codex-r000003")
+        self.assertEqual(self.artifact.revision, 3)
         before = tree_manifest(self.project)
 
         preview = self.manager.execute("install", self.artifact)
@@ -300,8 +316,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         self.assertEqual(updated["state_after"]["managed_files"], 37)
         current_receipt = self.load_receipt()
-        self.assertEqual(current_receipt["artifact_id"], "cotend-codex-r000002")
-        self.assertEqual(current_receipt["target_revision"], 2)
+        self.assertEqual(current_receipt["artifact_id"], "cotend-codex-r000003")
+        self.assertEqual(current_receipt["target_revision"], 3)
         self.assertEqual(current_receipt["protocol"], "cotend-collaboration-v1.65")
         self.assertTrue(
             (
@@ -354,13 +370,40 @@ class DeliveryLifecycleTests(unittest.TestCase):
         )
         self.assert_protected_unchanged()
 
+    def test_locked_r2_payload_updates_to_current_r3(self) -> None:
+        source = self.temp_root / "artifact-r2"
+        for relative, payload in plugin_package._historical_source_skill_entries(
+            "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1"
+        ):
+            path = source / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(payload)
+        predecessor = Artifact.from_directory(
+            source,
+            source_release_id="2026.07.23.2",
+            artifact_id="cotend-codex-r000002",
+            revision=2,
+            protocol="cotend-collaboration-v1.65",
+        )
+        self.manager.execute("install", predecessor, apply=True)
+
+        before = self.manager.inspect(self.artifact)
+        self.assertEqual(before["candidate_relation"], "update_available")
+        updated = self.manager.execute("update", self.artifact, apply=True)
+        self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
+        receipt = self.load_receipt()
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000003")
+        self.assertEqual(receipt["target_revision"], 3)
+        self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
+        self.assert_protected_unchanged()
+
     def test_protocol_change_is_incompatible_even_at_higher_revision(self) -> None:
         self.install()
         candidate = Artifact.from_directory(
             self.artifact.root,
             source_release_id=self.artifact.source_release_id,
-            artifact_id="cotend-codex-r000003",
-            revision=3,
+            artifact_id="cotend-codex-r000004",
+            revision=4,
             protocol="cotend-collaboration-v99",
         )
 

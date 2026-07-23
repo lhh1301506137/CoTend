@@ -11,7 +11,7 @@ The harness helps the AI answer:
 - What could this change accidentally affect?
 - What should a reviewer inspect independently?
 
-It does **not** define product truth. Product truth comes from the user's latest intent, `STATUS.md`, PRD/Trellis task/spec, active truth records, review logs, and accepted decisions.
+It does **not** define product truth. Resolve meaning, requirements, route, decisions, status projection, and current reality through the canonical CoTend Project Truth Authority contract in `authority-and-triggers.md`; external task/spec artifacts are classified evidence only.
 
 ## Provider Preference
 
@@ -22,7 +22,7 @@ Use the best available provider. For active Trellis-managed, `standard`, `full`,
 | `codegraph` | CodeGraph-like CLI/MCP/symbol/call graph is installed/configured and the project has an index, or the index can be safely initialized in the canonical project root. | Preferred concrete provider for agent development because it can answer structure, dependency, and symbol questions. |
 | `repo_map` | Aider-style repo map or other compressed code map exists. | Good for token-budgeted global understanding. |
 | `language_server` | LSP/ctags/indexer can find symbols/references. | Good fallback for typed projects. |
-| `rg_fallback` | CodeGraph/repo-map/index is missing, unavailable, declined, or inappropriate for a small task. | Use `rg`, file tree, imports, package scripts, active Trellis specs when binding, and direct reads. Record why CodeGraph was not used for large/active-Trellis projects. |
+| `rg_fallback` | CodeGraph/repo-map/index is missing, unavailable, declined, or inappropriate for a small task. | Use `rg`, file tree, imports, package scripts, CoTend-linked specs plus classified external references, and direct reads. Record why CodeGraph was not used for large/active-Trellis projects. |
 | `none` | Task is small or code structure does not matter. | Do not add ceremony. |
 
 Do not install global tools or add project-local dev dependencies automatically. Global tool installation, MCP setup, or package dependency changes require user approval.
@@ -65,7 +65,7 @@ Run this pass for new/unfamiliar projects, large repos, cross-module work, archi
 1. Read active truth first:
    - user goal/latest request;
    - `STATUS.md`;
-   - PRD/Trellis task/spec;
+   - current CoTend-linked PRD/brief/spec and classified external task/spec references;
    - `REVIEW-LOG.md` / handoff context when reviewing.
 2. State the target level: `full_goal`, `mvp`, or `stage_goal`.
 3. Query the available provider for:
