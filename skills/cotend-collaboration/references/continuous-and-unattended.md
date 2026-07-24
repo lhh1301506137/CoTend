@@ -101,7 +101,7 @@ Use this only when the project status explicitly records `local_closeout_authori
 Allowed local closeout actions:
 
 - create a local git commit for the verified in-scope checkpoint;
-- run Trellis finish/archive/journal for the completed task when Trellis is active and the task is verified;
+- run the still-supported `trellis-finish` compatibility archive/journal procedure only when the native CoTend record authorizes it and the task is verified;
 - update durable project logs such as `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, Trellis task notes, or milestone reports.
 
 Still requires the user:

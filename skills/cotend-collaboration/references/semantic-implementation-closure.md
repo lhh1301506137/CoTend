@@ -159,7 +159,7 @@ Set `status: closed` and `next_step_allowed: yes` only when all are true:
 - no undeclared active legacy fallback or identity break remains;
 - `semantic_delta.status` is not `l0_l2_confirmation_required`;
 - every listed remainder is genuinely non-blocking to responsibility, handoff contract, and cumulative main-chain behavior;
-- STATUS, Plan Tree/Trellis, review, and handoff wording does not overstate the evidence.
+- STATUS, Plan Tree, classified external evidence, review, and handoff wording does not overstate the evidence.
 
 Otherwise set `next_step_allowed: no`, keep the node active, and use the canonical claim's safe partial/blocked/unknown wording. Do not relabel a missing responsibility as polish merely to advance.
 

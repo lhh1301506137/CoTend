@@ -14,7 +14,7 @@ Load this module before marking a framework change stable when the work changes 
 
 - `cotend-collaboration`, `cotend-init`, `cotend-project-init`, `cotend-model-upgrade`, or their references;
 - default risk tier, authorization, `继续`, local closeout, commit/archive, or stop-boundary behavior;
-- Plan Tree, Trellis active/dormant, CodeGraph/Code Context Harness, review, handoff, Done Gate, Quality Sentinel, AI UAT, or Release Hardening routing;
+- Plan Tree, native workflow state/profile/execution mode, external-framework classification, CodeGraph/Code Context Harness, review, handoff, Done Gate, Quality Sentinel, AI UAT, or Release Hardening routing;
 - Claude/Gemini/external reviewer sync rules or share packages;
 - project framework initialization/update behavior;
 - recurring framework failure after the user or reviewer corrects the same behavior.
@@ -114,7 +114,7 @@ When the implementation differs from agreed wording, external-review recommendat
 
 - Fresh project init: framework creates the right minimal files and does not force heavy flow.
 - Legacy framework update: old docs/skills are reconciled without losing active truth.
-- Dormant Trellis: `.trellis/` presence alone does not force active Trellis.
+- Foreign framework presence or activation metadata alone does not alter native `current | dormant | conflict` state.
 - Active external framework: its aligned task/spec artifacts remain linkable `reference_only` evidence, while CoTend retains project-meaning and route authority.
 - Plan Tree baseline: new or inferred root/MVP/active leaf asks the user before product implementation.
 - Ordinary `继续`: normal development does not load cold-path framework evaluation.

@@ -14,7 +14,7 @@ Compatibility baseline: `cotend-collaboration-v1.65`.
 
 Use this skill to coordinate a cost-efficient current model and a stronger premium model on the same project, including one-shot advice, user-approved takeover, milestone re-entry advisor rounds, non-authorizing runtime-profile recommendations, and cold-path framework thinning review after the user confirms a new primary development model.
 
-It is not the CoTend governance framework itself. It may reuse existing project records such as `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, `PROJECT-DECISION-LOG.md`, `COLLAB-*`, `PLAN-CHANGELOG.md`, PRDs/specs, Trellis state, CodeGraph summaries, UAT notes, and source files, but it can also run in projects that do not use those files.
+It is not the CoTend governance framework itself. It may reuse existing project records such as `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, `PROJECT-DECISION-LOG.md`, `COLLAB-*`, `PLAN-CHANGELOG.md`, PRDs/specs, native workflow/profile state, classified external-framework evidence, CodeGraph summaries, UAT notes, and source files, but it can also run in projects that do not use those files.
 
 ## Default Roles
 
@@ -207,7 +207,7 @@ The first formal review may evaluate only reversible scaffold changes. Initial c
 - Plan Tree progressive load-policy granularity -> `widen_threshold` or `cold_path_only` candidate for strong long-context models.
 - Output ritual fields, such as repeated `loaded_protocol_modules` declarations -> on-demand declaration or merge candidate.
 
-The fixed Trellis `trellis-implement -> trellis-check` chain is evaluated through the runtime-profile assessment, not by deleting review/checking. When platform-native orchestration creates overlap, Adaptive may replace only the unconditional child-agent dispatch with direct implementation plus inline check/tests. The full chain remains available as the public/default fallback.
+The Full Implementer -> Checker pair is evaluated through the runtime-profile assessment, not by deleting review/checking. An authorized available `trellis-implement -> trellis-check` compatibility pair may temporarily provide those roles; otherwise CoTend uses bounded internal role packets. When platform-native orchestration creates overlap, Adaptive may replace only the unconditional child-agent dispatch with direct implementation plus inline check/tests. Full remains the public/default fallback.
 
 First-round actions allowed:
 

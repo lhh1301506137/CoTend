@@ -2,6 +2,73 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-07-24 L65 原生工作流状态与运行档位
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: workflow_behavior
+change_summary: 只把 TD01 工作流状态、Full/Adaptive 持久化和执行模式映射迁移到 CoTend 第一方责任链
+intent: 在不新建隐藏状态树、不改外部配置且不提前删除后续兼容过程的前提下，移除外部框架的状态与档位 owner
+expected_benefit:
+  - STATUS 或明确映射载体成为唯一 current/dormant/conflict 原生记录
+  - 项目 Full/Adaptive 跨会话和框架更新保持稳定
+  - Full 与 Adaptive 分别使用 delegated_pair 与 inline，切回 Full 不残留 inline
+  - 外部框架只保留 reference_only/historical/conflict 分类证据
+possible_harm:
+  - TD02、TD04、TD05、TD07 仍保留兼容过程，不能宣称完整解耦
+  - 迁移条件过宽可能错误吸收机器级偏好或外部路线状态
+  - 新建独立状态目录会增加第二真相面，因此明确禁止
+affected_workflows:
+  - project_init_update_repair_resume
+  - runtime_profile_selection_and_persistence
+  - external_framework_conflict_detection
+  - native_execution_mode_mapping
+  - target_artifact_delivery
+deviations:
+  - source release 与 framework.lock 继续保持 v1.65；L65 是 CoTend 产品 overlay
+  - 当前根载体推进为 cotend-codex-r000006；r5、r4、r3、r2 和 cotend@0.1.0-rc.2 均保持不可变
+  - 只替换 TD01；TD02、TD04、TD05、TD07 继续进入后续独立叶
+mechanism_budget:
+  added_context_surface: one_rewritten_existing_runtime_contract_one_public_contract_one_deterministic_verifier
+  ordinary_load_impact: no_new_skill_no_hidden_state_tree
+  ceremony_added: none_for_valid_current_record
+  duplication_check: reuses_STATUS_Project_Init_Collaboration_and_existing_profile_axis
+  cheaper_alternative_considered: 机械改名外部状态字段；因仍会保留外部 owner 与配置写入而拒绝
+  retirement_or_thinning_trigger: G05 后删除剩余兼容命令，保留通用外部冲突分类
+  expected_failure_prevented: profile_overwrite_external_config_ownership_dormant_auto_resume_ambiguous_migration_and_parallel_state_tree
+validation_scenarios:
+  - scenario: native_workflow_state_runtime_profile_matrix
+    expected: 十六类默认、继承、覆盖、切换、休眠、迁移和冲突场景均由 CoTend 决定
+    validation_result_type: executed
+    result: sixteen_scenarios_external_owner_and_config_write_false_legacy_source_unchanged
+  - scenario: exact_td01_inventory_change
+    expected: 旧状态路径、mode 与 dispatch 字段为零，后续四项兼容命令仍存在
+    validation_result_type: executed
+    result: current_43_mentions_16_files_and_required_commands_preserved
+  - scenario: r5_to_r6_delivery
+    expected: 可信 r5 可确定升级到当前 r6，r2 历史包仍可复现
+    validation_result_type: executed
+    result: predecessor_and_historical_package_tests_passed
+real_project_validation:
+  - scenario: native_init_update_resume_and_conflict
+    expected: 真实项目跨会话保持档位并在冲突时停止
+    validation_result_type: deferred
+    result: G06_not_started
+decision: watch
+rollback_triggers:
+  - 有效当前记录在无变化初始化时仍被重写
+  - 会话覆盖、模型变化或外部激活标记改写项目档位
+  - 外部配置被写入 CoTend state/profile/dispatch
+  - dormant 自动恢复，或冲突状态继续受影响工作
+  - r5/r4/r3/r2 身份或 rc.2 摘要发生变化
+review_after: L66_TD02_and_each_later_native_replacement_leaf
+watch_closure:
+  - keep_watch
+  - evidence: docs/NATIVE-WORKFLOW-STATE-AND-RUNTIME-PROFILES.md
+```
+
+本次不执行真实用户安装、push、tag、Release、Portal、submission、publish 或身份验证。`G02` 当前完成 `4/8`，只证明 TD08、TD03、TD06 与 TD01。
+
 ## 2026-07-24 L64 原生规格变化与 Route Rebase
 
 ```yaml
@@ -68,7 +135,7 @@ watch_closure:
   - evidence: docs/NATIVE-SPEC-CHANGE-AND-ROUTE-REBASE.md
 ```
 
-本次不执行真实用户安装、push、tag、Release、Portal、submission、publish 或身份验证。`G02` 当前完成 `3/8`，只证明 TD08、TD03 与 TD06。
+L64 检查点没有执行真实用户安装、push、tag、Release、Portal、submission、publish 或身份验证；当时 `G02` 完成 `3/8`。
 
 ## 2026-07-24 L63 原生需求澄清
 

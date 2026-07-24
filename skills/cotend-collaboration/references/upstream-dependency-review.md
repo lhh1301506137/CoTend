@@ -156,7 +156,7 @@ When the review causes a local framework change, map these classes into Framewor
 
 - Does it bypass `dual-ai` risk tiers or critical stop boundaries?
 - Does it bypass the actual primary model's formal self-review or an explicitly assigned external-review gate?
-- Does it make Trellis active merely because `.trellis/` exists?
+- Does it alter native CoTend state merely because a foreign framework is present?
 - Does it treat upstream docs as active project truth?
 - Does it duplicate or conflict with Plan Tree, `PROJECT-UNDERSTANDING/`, or `PROJECT-KNOWLEDGE-CHANGELOG.md`?
 - Does it increase ordinary `/CoTend Init` or `继续` context cost?
@@ -189,7 +189,7 @@ For passive/non-adopted upstream observations with no local behavior change, upd
 Run only the checks relevant to the dependency:
 
 - Skill/prompt update: frontmatter and trigger consistency; no stale version strings; no conflict with module routing.
-- Trellis update: `.trellis/.version`, `.template-hashes.json`, local modifications, active/dormant state, active task/spec compatibility.
+- External framework update: identity/version evidence, local modifications, classified current/historical/conflict artifacts, and remaining procedure compatibility. Never copy its state/profile into the native CoTend record.
 - CodeGraph/MCP update: MCP connection, `codegraph init .`, ignored `.codegraph/`, sample query/scope result, no product-truth substitution.
 - Plugin/runtime update: confirm whether it is platform-managed and whether local framework files need any change.
 - Code/assets/runtime adoption: complete the embedded dependency review; mutation case with an unknown bundled dependency must fail the safe-adoption gate, while design-inspiration-only may use evidence-backed `not_applicable_with_evidence`.

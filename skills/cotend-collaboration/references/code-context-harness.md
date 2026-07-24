@@ -15,19 +15,19 @@ It does **not** define product truth. Resolve meaning, requirements, route, deci
 
 ## Provider Preference
 
-Use the best available provider. For active Trellis-managed, `standard`, `full`, long-running, large, or cross-module projects, CodeGraph is the expected provider unless the user explicitly opts out or setup is unavailable. Dormant Trellis is historical context only and does not by itself make CodeGraph required.
+Use the best available provider. For current `standard` or `full`, long-running, large, or cross-module projects, CodeGraph is the expected provider unless the user explicitly opts out or setup is unavailable. Historical external-framework evidence does not by itself make CodeGraph required.
 
 | Provider | Use When | Notes |
 |---|---|---|
 | `codegraph` | CodeGraph-like CLI/MCP/symbol/call graph is installed/configured and the project has an index, or the index can be safely initialized in the canonical project root. | Preferred concrete provider for agent development because it can answer structure, dependency, and symbol questions. |
 | `repo_map` | Aider-style repo map or other compressed code map exists. | Good for token-budgeted global understanding. |
 | `language_server` | LSP/ctags/indexer can find symbols/references. | Good fallback for typed projects. |
-| `rg_fallback` | CodeGraph/repo-map/index is missing, unavailable, declined, or inappropriate for a small task. | Use `rg`, file tree, imports, package scripts, CoTend-linked specs plus classified external references, and direct reads. Record why CodeGraph was not used for large/active-Trellis projects. |
+| `rg_fallback` | CodeGraph/repo-map/index is missing, unavailable, declined, or inappropriate for a small task. | Use `rg`, file tree, imports, package scripts, CoTend-linked specs plus classified external references, and direct reads. Record why CodeGraph was not used for large/current standard-full projects. |
 | `none` | Task is small or code structure does not matter. | Do not add ceremony. |
 
 Do not install global tools or add project-local dev dependencies automatically. Global tool installation, MCP setup, or package dependency changes require user approval.
 
-Project-local generated indexes are different: for active Trellis-managed, `standard`, `full`, large, unfamiliar, cross-module, architecture-heavy, or review-heavy projects, a CodeGraph index may be created automatically when `codegraph` is already installed and the canonical project root is clear. Generated indexes must be ignored/untracked unless the user explicitly wants them committed.
+Project-local generated indexes are different: for current `standard` or `full`, large, unfamiliar, cross-module, architecture-heavy, or review-heavy projects, a CodeGraph index may be created automatically when `codegraph` is already installed and the canonical project root is clear. Generated indexes must be ignored/untracked unless the user explicitly wants them committed.
 
 ## CodeGraph MCP Configuration
 
@@ -40,9 +40,9 @@ Rules:
 - Keep CodeGraph telemetry disabled for this local-first framework unless the user explicitly opts in. After install/upgrade, check `codegraph telemetry status`; if it is enabled, run `codegraph telemetry off` and record that privacy boundary in the init/update summary.
 - If the current Codex workspace root is a parent folder, use `codegraph` CLI `-p <canonical project path>` for checks/queries and record the canonical project root in the initialization report.
 
-## Default For Active Trellis / Large Projects
+## Default For Current Standard, Full, Or Large Projects
 
-If a user initializes a project with active Trellis / CoTend collaboration, assume they expect the project to be substantial enough to benefit from full Code Context Harness capability. If Trellis is `dormant`, decide CodeGraph requirement from project size/profile instead.
+If a user initializes a current standard/full CoTend project, assume it is substantial enough to benefit from full Code Context Harness capability. If the native workflow is dormant, inspect/report only; otherwise decide CodeGraph need from project size and adoption profile.
 
 For these projects:
 

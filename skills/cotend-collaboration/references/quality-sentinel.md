@@ -34,7 +34,7 @@ When the same AI/process failure happens twice in one task/project, or once with
 
 Choose the smallest owner-aligned prevention:
 
-- project-specific rule -> active PRD/STATUS, `.trellis/spec/`, or `AGENTS.md`;
+- project-specific rule -> active CoTend PRD/spec/STATUS, Plan Tree node, or `AGENTS.md`;
 - missing check -> existing test/smoke/lint/type-check/script/checklist;
 - collaboration/process miss -> existing STATUS/review/quality/handoff surface;
 - cross-project recurring failure -> propose a framework change through Framework Change Evaluation;

@@ -1,7 +1,7 @@
 ---
 name: cotend-project-init
 description: >-
-  Initialize, update, repair, migrate, or resume a coding project workflow for CoTend, including migration from legacy dual-ai project truth. Auto-classifies project state; reports the protected multidimensional L0-L2 semantic baseline and derived status without forcing a legacy rebuild; emits a non-nested semantic-onboarding handoff for fresh idea/intake projects with an unresolved baseline; separates carrier/provider/actual-model/role identity from runtime-profile selection; preserves user-selected Full/Adaptive across framework updates; applies CoTend Full only when no prior choice exists; maps the effective model-independent selection to Trellis dispatch; validates delegation-maturity state; and preserves review, evidence, risk, acceptance, release, and explicit-handback boundaries.
+  Initialize, update, repair, migrate, or resume a coding project workflow for CoTend, including migration from legacy project truth. Auto-classifies native workflow and foreign-framework state; reports the protected multidimensional L0-L2 semantic baseline and derived status without forcing a legacy rebuild; emits a non-nested semantic-onboarding handoff for fresh idea/intake projects with an unresolved baseline; separates carrier/provider/actual-model/role identity from runtime-profile selection; preserves user-selected Full/Adaptive across framework updates; applies CoTend Full only when no prior choice exists; maps the effective selection to delegated_pair or inline execution; validates delegation-maturity state; and preserves review, evidence, risk, acceptance, release, and explicit-handback boundaries.
 ---
 
 # CoTend Project Init
@@ -12,8 +12,8 @@ Initialize a project for the user's current AI development workflow without requ
 
 This skill is an orchestrator. Prefer loading or following these skills when available:
 
-- `trellis-start` when Trellis is present and the Trellis Activation Decision says `mode: active`, or when the user explicitly asks to inspect/activate Trellis.
-- `trellis-before-dev` when `.trellis/workflow.md` Phase 2.1 selects inline pre-development/spec loading; otherwise follow active Trellis workflow routing.
+- `trellis-start` only when an already-authorized compatibility startup procedure is recorded by the native CoTend workflow or the user explicitly asks to inspect that procedure. This temporary TD02 route owns no state or truth.
+- `trellis-before-dev` only when the same native record selects the remaining compatibility pre-development procedure. Do not infer authorization from external files.
 - `karpathy-guidelines` for coding behavior.
 - `cotend-collaboration` for canonical carrier/provider/actual-model/role identity, runtime-profile routing, review cadence, risk tiers, acceptance/test harness routing, AI UAT, user/grill decision logging, and self-review.
 - `grill-me` only for a framework-setup question that Init itself owns; never use it during Init to clarify appended product meaning or create protected semantic consensus.
@@ -65,7 +65,7 @@ Classify the project as exactly one:
 | Mode | Meaning | Action |
 |---|---|---|
 | `fresh_init` | No durable workflow files or only generic repo files. | Create the minimal selected profile files and initialize records. |
-| `legacy_update` | Old dual-ai/Trellis/collaboration files exist but protocol/version/modules are stale or incomplete. | Preserve old records, migrate active truth, add missing fields/modules, mark superseded docs. |
+| `legacy_update` | Old framework/collaboration files exist but protocol/version/modules are stale or incomplete. | Preserve old records, migrate active truth, add missing fields/modules, mark superseded docs. |
 | `partial_repair` | Some files exist but are inconsistent, missing review boundaries, missing CodeGraph state, or mixed old/new instructions. | Reconcile without deleting user content; record conflicts and fix what is safe. |
 | `current_resume` | Project already matches the current protocol enough to proceed. | Refresh context, verify CodeGraph/status, identify next step, and say whether `继续` is safe. |
 | `blocked_human_decision` | Conflicting product truth, critical operation, release/public boundary, destructive cleanup, or scope decision is required. | Stop with Human Rejoin format; do not guess. |
@@ -85,15 +85,25 @@ An absent/partial/stale/conflicting baseline blocks only product paths that depe
 
 An active material Route Rebase is likewise scoped. `evaluating` may be `continue_ready` only for materiality/semantic-impact/authority classification and cannot activate the candidate. `pending_user_confirmation` makes the exact semantic decision the one affected-route handback and bare `继续` cannot answer it. `applying` / `revalidating` may be `continue_ready` only when no human gate is pending and the next action starts at the recorded reliable boundary. `blocked` prevents only dependent leaves; an unrelated route may continue when its own protected ancestors are already explicitly user-confirmed and dependency isolation is evidenced. Init must not ask for a new confirmation merely because another route is rebasing. Never revive the previous path merely because Init changed sessions/models.
 
-## Runtime Profile Selection And Config Mapping
+## Native Workflow State And Runtime Profile
 
 Load and execute `cotend-collaboration/references/runtime-profiles.md`; it is the only selector contract. Do not infer runtime behavior from the project adoption profile and do not create separate full/A Skill copies.
 
-Apply session/project/product-default runtime-profile precedence. Inspect, in order:
+First classify the native workflow through the canonical contract:
+
+1. `absent` when no native record exists yet;
+2. `current` when exactly one valid record owns the current route;
+3. `dormant` only when the native record or an explicit user decision says CoTend is intentionally inactive;
+4. `conflict` for duplicate, invalid, ambiguous, or route-affecting conflicting state.
+
+Persist the record in `STATUS.md` or the project's explicitly mapped equivalent. Do not create a hidden state directory, parallel task tree, or profile database. External framework artifacts are individually classified `reference_only | historical | conflict`; their presence or activation flags never become CoTend state.
+
+Then apply session/project/legacy/product-default runtime-profile precedence. Inspect, in order:
 
 1. an explicit current-session A/Full choice in the current user request or active session record;
-2. `.trellis/config.yaml` or the platform-equivalent project record containing `runtime_profile: full | adaptive`;
-3. the CoTend product default `full` only when neither prior source exists.
+2. one valid native project record containing `runtime_profile: full | adaptive`;
+3. one unambiguous project-local legacy selection discovered during Auto Mode;
+4. the CoTend product default `full` only when no prior source exists.
 
 Never read, import, translate, or infer a CoTend selection from a private Dual owner-default file or an old machine-wide Dual preference. A legacy project-local `dual_ai.runtime_profile` may be migrated only when its value and scope are unambiguous; record the resulting CoTend project selection as migrated rather than treating legacy machine state as authority.
 
@@ -103,11 +113,11 @@ Preserve a valid existing project `runtime_profile` across framework updates. De
 
 Write a project profile only after explicit project-persistence intent or when materializing a first-use product default. A session-only choice changes the current execution route without rewriting the project. Bare `继续`, silence, an AI recommendation, or a model-role decision is not a profile change.
 
-Migrate a v1.54-v1.64 project record by retaining its valid `runtime_profile` and replacing obsolete selector metadata with `runtime_profile_source`, `runtime_profile_confirmed_by_user`, and `runtime_profile_selected_at` when an authorized structural update occurs. Do not treat missing `adaptive_opt_in`, eligibility, model-match, or fallback fields as a reason to change A into Full. Invalid values require a user choice before profile-sensitive implementation.
+Migrate a v1.54-v1.64 project record only when exactly one project-local value and its project scope are unambiguous. Retain its valid `runtime_profile`, write it to the native status carrier with `runtime_profile_source: migrated_existing_selection`, and leave the source file byte-identical. Do not import foreign tasks, specs, route state, activation state, or unrelated metadata. Invalid, duplicate, ambiguous, or route-conflicting candidates require a user choice before profile-sensitive implementation.
 
-When Trellis is active, map the effective result idempotently in `.trellis/config.yaml`: `adaptive -> codex.dispatch_mode: inline`; `full -> codex.dispatch_mode: sub-agent` or the equivalent absent/default state only when no inline override exists. When the effective user-owned selection changes from Adaptive to Full, explicitly restore `sub-agent`; never leave `inline` active. Preserve unrelated configuration and do not emit duplicate YAML keys/blocks. If Trellis is dormant or absent, enforce the selected route without creating Trellis solely for this setting.
+Map the effective result only in the native record: `adaptive -> execution_mode: inline`; `full -> execution_mode: delegated_pair`. When the persistent selection changes from Adaptive to Full, explicitly restore `delegated_pair`; never leave `inline`. Never write CoTend profile or execution metadata into an external framework configuration.
 
-Always report the effective `runtime_profile_selection`, its persistence/source, whether it was inherited across a framework update, the derived display name, Trellis mapping, and the separate `project_adoption_profile`. Report runtime identity beside it only when relevant; never imply identity selected the profile. A second init/update with unchanged inputs must produce no config diff.
+Always report `cotend_workflow_state`, the effective `runtime_profile_selection`, persistence/source, version inheritance, display name, `execution_mode`, external-framework classifications, and the separate `project_adoption_profile`. Report runtime identity beside them only when relevant; never imply identity selected the profile. A second init/update with unchanged inputs must produce no diff.
 
 ## Legacy Update / Repair Rules
 
@@ -127,51 +137,55 @@ Initialize projects with the role-based authority contract in `cotend-collaborat
 
 1. **CoTend Project Truth Authority** owns product meaning, detailed requirement authority, route navigation, user decisions, status projection, current-reality evidence, and the boundary around project-local constraints. It never delegates those roles from framework identity or active state.
 2. **cotend-collaboration** owns collaboration governance: role assignment, risk authorization, continuous/unattended checkpoints, user interruption/new idea reconciliation, review/self-review gates, handoff scope, Acceptance/Test Harness, Quality Sentinel, AI UAT, Done Gate, intent drift review, Release Hardening, and human rejoin explanations.
-3. **External development-framework artifacts**, including active Trellis files, are classified `reference_only`, `historical`, or `conflict`. A later compatibility capability may still invoke its implementation/check/finish procedure, but its task, PRD, spec, state, or coding guideline never becomes CoTend Core authority.
+3. **External development-framework artifacts** are classified `reference_only`, `historical`, or `conflict`. A later compatibility capability may still invoke its implementation/check/finish procedure, but its task, PRD, spec, state, profile, or coding guideline never becomes CoTend Core authority.
 4. **Karpathy and project coding guidelines** own coding behavior only inside higher user, safety, confirmed-product, and authorized-route boundaries.
 5. **grill-me** owns clarification style for fuzzy requirements. Existing external brainstorm records may be linked as classified evidence; user-facing decisions must be recorded in `PROJECT-DECISION-LOG.md` when they match canonical decision-worthy topics.
 6. **Code Context Harness** owns codebase structure discovery. It helps the Primary choose what to read/review but never owns product truth or route selection.
 
-When Trellis compatibility is active, record its remaining procedure mapping without granting it project-truth authority:
+When an authorized compatibility route is recorded, keep only its remaining procedure mapping without granting it state or project-truth authority:
 
 - `trellis-implement` = implementation worker under the active Primary AI.
 - `trellis-check` = Trellis spec/quality checker; it may fix issues but does not replace the actual primary model's formal self-review unless the project explicitly records it as the formal reviewer.
 - `CodexSelf` / `ClaudeSelf` = accepted legacy carrier aliases normalized to the actual model's formal same-model self-review.
 - Claude/Gemini/Kimi or another named model = optional external/advisory reviewer only after carrier and actual model identity are separated.
 
-Apply the effective runtime profile after this mapping. `full` keeps the fixed `trellis-implement -> trellis-check` dispatch chain. `adaptive` uses the existing inline Trellis path: the Primary implements, loads/performs the Trellis check procedure inline, and runs relevant tests. Optional agents require positive expected net benefit and non-overlapping scope; platform-native orchestration must not be followed by a duplicate unconditional Trellis chain.
+Apply the effective runtime profile after this mapping. `full` uses native `delegated_pair`: an explicitly authorized and available `trellis-implement -> trellis-check` compatibility pair may temporarily supply the two roles; otherwise use bounded internal role packets without claiming TD04/TD05 parity. `adaptive` uses native `inline`: the Primary implements and performs the Checker contract inline, using an authorized compatibility check when available or the current CoTend harness/review contracts otherwise. Optional agents require positive expected net benefit and non-overlapping scope; platform-native orchestration must not be followed by a duplicate unconditional compatibility chain.
 
-## Trellis Activation Decision
+## Native Workflow State Decision
 
-Auto Mode must decide whether Trellis should be active. The decision is based on project status, development progress, active truth quality, and the agreed final/MVP product shape, not on `.trellis/` presence alone.
+Auto Mode must decide whether the CoTend-native workflow record is absent, current, dormant, or conflicting. The decision is based on the native carrier, user authority, current route, and classified evidence, never on foreign-framework presence alone.
 
 Record exactly one:
 
-| Mode | Meaning | Action |
+| Detection / state | Meaning | Action |
 |---|---|---|
-| `active` | Trellis exists or is explicitly requested, its applicable artifacts are classified, and its remaining compatibility procedures add net value. | Link aligned context as `reference_only`; use only the still-supported compatibility procedures. CoTend retains truth and route authority. |
-| `dormant` | `.trellis/` exists but is stale, over-initialized, too heavy for this project/stage, or not current truth. | Keep `.trellis/` as historical context; do not delete it; do not run Trellis phases by default. |
-| `recommended` | Trellis is absent but the project likely needs strict task/spec substrate. | Explain recommendation; continue non-Trellis unless the user approves activation. |
-| `not_needed` | Trellis is absent and the project is light or already sufficiently governed. | Use non-Trellis lite/standard/full according to project needs. |
-| `needs_user_decision` | Trellis state conflicts with current truth and affects the next step, or activation would require migration/cleanup beyond safe setup. | Stop with Human Rejoin format. |
+| `absent` | No native record exists. | Create one current record and materialize the selected profile when safe. |
+| `current` | Exactly one valid native record owns the route. | Preserve it and continue through ordinary gates. |
+| `dormant` | The native record intentionally keeps CoTend inactive. | Preserve history; inspect/report only until explicit resume. |
+| `conflict` | Native state/profile is invalid, duplicate, ambiguous, or conflicts with route-affecting evidence. | Fail closed with Human Rejoin; do not guess or write a profile. |
 
-Prefer `active` when evidence shows: multiple substantial feature streams, long-running roadmap, complex cross-module architecture, frequent spec conflicts, release preparation, team/multi-agent coordination, or explicit user request.
-
-Prefer `dormant` when evidence shows: light project, old framework over-initialized it, current work is UAT/bugfix/polish/small slices, existing `STATUS.md` / `REVIEW-LOG.md` / `QUALITY-SIGNALS.md` / `COLLAB-*` already provide enough governance, or Trellis docs are stale/superseded.
-
-When setting `dormant`, update or create the active status record with:
+The persisted shape is:
 
 ```yaml
-trellis:
-  present: yes
-  mode: dormant
-  binding: no
-  reason:
-  active_truth_source: status_review_logs
-  reactivation_condition:
+cotend_workflow:
+  schema_version: 1
+  state: current | dormant | conflict
+  state_reason:
+  runtime_profile: full | adaptive
+  execution_mode: delegated_pair | inline
+  external_frameworks:
+    - identity:
+      classification: reference_only | historical | conflict
+      affects_current_route: true | false
+      evidence_pointer:
+      compatibility_procedures:
+        - capability: startup | pre_development | implementation | verification | closeout
+          procedure_id:
+          status: authorized | disabled
+          authority: cotend_native_record | user_explicit
 ```
 
-Do not delete `.trellis/` automatically. Classify dormant Trellis docs as `historical`; active artifacts still require `reference_only | historical | conflict` classification and never override CoTend truth. Platform breadcrumbs or hooks are environmental context, not routing authority. If dormant Trellis contains useful lessons, link or summarize them into the current CoTend carriers without making Trellis a hidden binding source.
+Do not delete external artifacts automatically. Keep their source bytes unchanged, classify them separately, and migrate only an unambiguous project-local profile value. If useful history exists, link or summarize it into current CoTend carriers without making it a hidden binding source.
 
 ## Harness Ratchet
 
@@ -186,21 +200,21 @@ During old-project repair, check for repeated workflow misses: skipped Trellis p
 
 ## Code Context Harness
 
-Initialize a goal-grounded code context layer for active Trellis/standard/full, large, unfamiliar, or cross-module projects.
+Initialize a goal-grounded code context layer for current standard/full, large, unfamiliar, or cross-module projects.
 
 Provider preference:
 
-1. CodeGraph-like CLI/MCP/symbol graph with project index when available. This is expected for Trellis/large projects.
+1. CodeGraph-like CLI/MCP/symbol graph with project index when available. This is expected for standard/full or large projects.
 2. Aider-style repo map / language server / ctags-like symbol index when available.
 3. `rg`, project tree, classified linked specs, package scripts, and direct file reads as a recorded fallback.
 
 Do not install global tools automatically or add project-local dev dependencies without approval. Global tool installation, MCP setup, package dependency changes, and public/share/release boundary changes require user approval.
 
-Project-local CodeGraph indexes are allowed safe framework setup for active Trellis/standard/full/large projects when `codegraph` is already installed and the canonical project root is clear. Generated indexes must be ignored/untracked unless the user explicitly wants them committed.
+Project-local CodeGraph indexes are allowed safe framework setup for current standard/full or large projects when `codegraph` is already installed and the canonical project root is clear. Generated indexes must be ignored/untracked unless the user explicitly wants them committed.
 
 Use it after active truth is read, not before. The graph/map helps determine `must_read`, `should_check`, and impact scope; it must not silently expand the user's goal.
 
-If CodeGraph is missing/unindexed in an active Trellis/standard/full project, do not silently downgrade. If `codegraph` is already installed and the canonical project root is clear, run `codegraph init .` from that root, ensure `.codegraph/` is ignored/untracked, then record `provider_status: available` and `freshness: fresh`.
+If CodeGraph is missing or unindexed in a current standard/full project, do not silently downgrade. If `codegraph` is already installed and the canonical project root is clear, run `codegraph init .` from that root, ensure `.codegraph/` is ignored/untracked, then record `provider_status: available` and `freshness: fresh`.
 
 Use `rg_fallback` only when CodeGraph is missing, unavailable, unsafe to initialize, declined by the user, or unnecessary for a tiny/local task. Record the fallback reason. If the user is away, continue only inside the current authorized scope and surface unresolved setup in the next checkpoint.
 
@@ -351,22 +365,21 @@ Record the route decision in `STATUS.md`, `REVIEW-LOG.md`, or the active batch r
 Do not start large product development until this workflow is complete.
 
 1. Run Auto Mode classification.
-   - Inspect durable files, Trellis state, old collaboration records, current protocol markers, CodeGraph status, `USER-DEVELOPMENT-PROFILE.md` when present, project runtime-profile/model-role records, any legacy Codex-home machine preference as non-authorizing migration evidence, active truth, available L0-L2 confirmation evidence, any active canonical Route Rebase reference/state/reliable boundary in existing carriers, and shallow intake candidates without interpreting their product meaning.
+   - Inspect durable files, the native workflow record, classified external-framework evidence, old collaboration records, current protocol markers, CodeGraph status, `USER-DEVELOPMENT-PROFILE.md` when present, project runtime-profile/model-role records, any legacy machine preference as non-authorizing evidence, active truth, available L0-L2 confirmation evidence, any active canonical Route Rebase reference/state/reliable boundary in existing carriers, and shallow intake candidates without interpreting their product meaning.
    - Set `auto_mode: fresh_init | legacy_update | partial_repair | current_resume | blocked_human_decision`.
    - If the mode is `blocked_human_decision`, stop with Human Rejoin format.
    - Otherwise complete safe setup/update/repair before continuing.
 
-2. Decide Trellis mode.
-   - Inspect `.trellis/` presence, Trellis task/spec freshness, existing `STATUS.md` / `REVIEW-LOG.md` / `QUALITY-SIGNALS.md` / `COLLAB-*`, active truth, current development stage, review debt, planned feature horizon, and the agreed final/MVP product shape.
-   - Set `trellis.mode: active | dormant | recommended | not_needed | needs_user_decision`.
-   - If `mode: active`, run/read only the still-supported Trellis compatibility startup context, classify task/spec/guideline artifacts, and bind the resulting work to the CoTend route owner.
-   - If `mode: dormant`, preserve `.trellis/` as historical context, record why it is not binding, suppress stale Trellis breadcrumbs as environmental noise, and use non-Trellis routing unless explicitly reactivated.
-   - If `mode: recommended`, explain why Trellis would help but continue non-Trellis unless the user approves activation.
-   - If `mode: not_needed`, say Trellis is not needed for the current project/stage.
-   - If `mode: needs_user_decision`, stop with Human Rejoin format.
+2. Resolve native workflow state.
+   - Inspect the single native record in `STATUS.md` or its explicit mapping, then inventory relevant foreign-framework artifacts without treating their presence as activation.
+   - Set detection to `absent | present` and state to `current | dormant | conflict`.
+   - For `absent`, create one current native record when migration/default selection is unambiguous.
+   - For `current`, preserve the record and classify every relevant external artifact separately.
+   - For `dormant`, inspect/report only; require an explicit resume before product work.
+   - For `conflict`, or for a route-affecting external conflict, stop with Human Rejoin. Do not write a profile.
 
 3. Select the runtime profile, then load collaboration rules.
-   - Load `cotend-collaboration/references/runtime-profiles.md`, preserve a session/project selection across framework and model changes, use the applicable product default only when no choice exists, ignore model/Model Upgrade facts as selector inputs, and map the effective profile to Trellis dispatch idempotently.
+   - Load `cotend-collaboration/references/runtime-profiles.md`, preserve a session/project selection across framework and model changes, use the applicable product default only when no choice exists, ignore model/Model Upgrade facts as selector inputs, and map the effective profile to `delegated_pair | inline` idempotently in the native record.
    - Use `cotend-collaboration` v1.65 semantics.
    - Treat `cotend-collaboration` as modular: load core first, then required `references/*.md` modules by trigger.
    - Load `cotend-collaboration/references/authority-and-triggers.md` whenever exact authority labels, stop boundaries, Chrome/release/decision triggers, or checkpoint measurement rules are needed.
@@ -438,7 +451,7 @@ Do not start large product development until this workflow is complete.
    - For complex work, draft vertical slices before execution.
 
 10. Configure Plan Tree.
-    - Load `cotend-collaboration/references/plan-tree.md` when the project is standard/full with multiple stages, active Trellis, unattended/continuous development, high-value next-step selection, plan-external work, or drift/confusion risk.
+    - Load `cotend-collaboration/references/plan-tree.md` when the project is standard/full with multiple stages, unattended/continuous development, high-value next-step selection, plan-external work, or drift/confusion risk.
     - If required and missing, create only the minimum structural `PROJECT-PLAN-TREE.md` index and related directories/records needed by the selected profile, populated from already user-confirmed facts. Do not propose or persist new L0/L1/L2 meaning during Init. Direct `$cotend-semantic-alignment new_baseline` owns the minimum semantic structure and truth updates when protected meaning is absent.
     - During init/rebuild, read active truth fully enough to record canonical `semantic_baseline` `coverage / authority / currency / consistency` and derive `status: not_required | absent | partial | confirmed | stale | conflict`; during ordinary resume, read only the compact derived status/non-default gaps, current work summary/acceptance, protected parent-chain summaries, per-node contract references, and unresolved/recent decision/knowledge entries that affect the route.
     - Check that every current-MVP L0-L2 node required by the next product route has its own explicit user-confirmation evidence. For every new or materially changed confirmation, require one unique decision-log `cotend.semantic-contract.v1` payload whose digest verifies through the Semantic Alignment helper. During ordinary resume, consume an unchanged recorded `verified` reference without recomputing every node; rerun mechanical verification during init/rebuild, an active important-close/material-rebase/decision-relevant-completion boundary, or when a payload/reference/currency anomaly appears. Using the zero-dependency helper to inspect an existing payload is not execution/delegation of the Semantic Alignment control flow and must not draft or write meaning. Parent confirmation, successful code, old AI-written docs, bare `继续`, `dev_high`, Adaptive, or delegation maturity are not descendant confirmation or contract binding.
@@ -509,18 +522,18 @@ Do not start large product development until this workflow is complete.
     - Do not update global skills from project-local evidence unless the user asks or the failure is clearly cross-project.
 
 19. Configure Code Context Harness.
-    - If the project is active Trellis-managed, `standard`, `full`, large, unfamiliar, cross-module, architecture-heavy, or likely to need external review, load `references/code-context-harness.md`.
+    - If the project is current and `standard` or `full`, large, unfamiliar, cross-module, architecture-heavy, or likely to need external review, load `references/code-context-harness.md`.
     - Detect available provider: `codegraph`, `repo_map`, `language_server`, `rg_fallback`, or `none`.
-    - For active Trellis/standard/full projects, treat CodeGraph as expected and record why it is unavailable if falling back.
+    - For current standard/full projects, treat CodeGraph as expected and record why it is unavailable if falling back.
     - If CodeGraph CLI is available but MCP is missing after a config switch, use or recommend the provider's documented MCP setup flow without changing unrelated configuration.
-    - For each active Trellis/standard/full/large project, initialize or refresh an isolated project-local index with `codegraph init .` from the canonical project root when `codegraph` is installed and the root is clear. Do not reuse another project's `.codegraph/`.
+    - For each current standard/full or large project, initialize or refresh an isolated project-local index with `codegraph init .` from the canonical project root when `codegraph` is installed and the root is clear. Do not reuse another project's `.codegraph/`.
     - Ensure `.codegraph/` is ignored/untracked; add `.codegraph/` to the canonical root `.gitignore` when safe. If `.codegraph/` is already tracked, the root is ambiguous, or `.gitignore` cannot be safely updated, stop with Human Rejoin instead of silently falling back.
     - Record that code context is a scope hint, not product truth.
-    - For projects with active Trellis compatibility, run it after the CoTend goal/route owner is resolved and applicable external task/PRD/spec artifacts are classified, so discovery stays tied to `full_goal`, `mvp`, or `stage_goal`. Dormant Trellis files are optional history only.
+    - When an authorized external compatibility procedure remains, run code-context discovery only after the CoTend goal/route owner is resolved and applicable external task/PRD/spec artifacts are classified. Historical foreign files are optional evidence only.
 
 ## Required Initialization Report
 
-After initialization, report in the project's recorded user-facing language, or English by default. Do not reduce initialization quality to save tokens. Deep-read active truth, runtime-profile evidence, Trellis state, Plan Tree, node docs, expanded understanding, decision log, knowledge changelog, Code Context Harness, and framework files as needed for the selected mode. The optimization is presentation-layer only: default to a compact decision report, and include the detailed audit only when it is useful or requested.
+After initialization, report in the project's recorded user-facing language, or English by default. Do not reduce initialization quality to save tokens. Deep-read active truth, native workflow/profile evidence, external-framework classifications, Plan Tree, node docs, expanded understanding, decision log, knowledge changelog, Code Context Harness, and framework files as needed for the selected mode. The optimization is presentation-layer only: default to a compact decision report, and include the detailed audit only when useful or requested.
 
 Use this order:
 
@@ -541,8 +554,8 @@ Never omit these from the user-facing report when present:
 - decision log status when user/grill/advisor decisions affect active direction, next leaf, model role, risk, release, or acceptance;
 - unresolved user interruption/new idea reconciliation when it affects active direction, route, risk, acceptance, or continuation authority;
 - post-init consistency self-check failures or warnings, especially stale understanding README text, missing decision-log or changelog coverage, broken links, metadata format drift, linked external-task conflict, or unreliable commit anchors;
-- Trellis active/dormant/recommended/not_needed/needs_user_decision state and conflicts;
-- effective runtime profile, persistence/source/version inheritance, Trellis dispatch mapping, the separate project adoption profile, and an effective delegation-maturity level on every report (`ask_each_time` / `no_record_default` when absent);
+- native workflow detection/state/carrier and external-framework classifications or conflicts;
+- effective runtime profile, persistence/source/version inheritance, native execution mode, the separate project adoption profile, and an effective delegation-maturity level on every report (`ask_each_time` / `no_record_default` when absent);
 - current risk authorization, `dev_high` basis, local closeout state, and critical/release stop boundaries;
 - review debt, Quality Sentinel alerts, Done Gate or Release Hardening triggers;
 - intent drift review when Done Gate, milestone, long unattended, acceptance, or release boundary is active;
@@ -556,7 +569,7 @@ Never omit these from the user-facing report when present:
 
 Every report must include a one-line Never-Omit coverage statement, such as:
 
-`Never-Omit Coverage: blockers=<not_present|not_relevant|present_unchanged|present>; semantic_baseline=<...>; semantic_contract_binding=<not_triggered|verified_active_scope|legacy_migration_at_trigger|affected_stale_or_unknown>; semantic_onboarding_handoff=<...>; appended_request=<...>; pending_confirmations=<...>; existing_or_observed_high_level_understanding=<...>; active_path_or_route=<...>; route_rebase=<...>; semantic_implementation_closure=<...>; decision_log=<...>; delegation_maturity=<...>; user_interruption=<...>; post_init_consistency=<...>; semantic_reconciliation=<...>; runtime_and_adoption_profiles=<...>; trellis_mode=<...>; risk_and_critical_boundaries=<...>; review_debt_or_sentinel=<...>; done_or_release_gate=<...>; intent_drift=<...>; acceptance_harness=<...>; code_context=<...>; durable_files=<...>; explicit_skill_handback=<...>; readiness_and_next_step=<...>.`
+`Never-Omit Coverage: blockers=<not_present|not_relevant|present_unchanged|present>; semantic_baseline=<...>; semantic_contract_binding=<not_triggered|verified_active_scope|legacy_migration_at_trigger|affected_stale_or_unknown>; semantic_onboarding_handoff=<...>; appended_request=<...>; pending_confirmations=<...>; existing_or_observed_high_level_understanding=<...>; active_path_or_route=<...>; route_rebase=<...>; semantic_implementation_closure=<...>; decision_log=<...>; delegation_maturity=<...>; user_interruption=<...>; post_init_consistency=<...>; semantic_reconciliation=<...>; native_workflow_and_profiles=<...>; external_frameworks=<...>; risk_and_critical_boundaries=<...>; review_debt_or_sentinel=<...>; done_or_release_gate=<...>; intent_drift=<...>; acceptance_harness=<...>; code_context=<...>; durable_files=<...>; explicit_skill_handback=<...>; readiness_and_next_step=<...>.`
 
 Default compact summary:
 
@@ -583,6 +596,13 @@ Default compact summary:
 - post_init_consistency:
 - semantic_reconciliation:
 - role_assignment: <use the canonical runtime_identity-based schema from cotend-collaboration/references/review-and-self-review.md when identity is relevant, changed, third-party-routed, or unverified>
+- cotend_workflow_state:
+  detection: absent | present
+  state: current | dormant | conflict
+  state_source: native_project_record | materialized_default | migrated_legacy_project_selection | unresolved
+  record_carrier: STATUS.md | <explicitly mapped equivalent>
+  write_performed: true | false
+  external_framework_owner: false
 - runtime_profile:
   effective: full | adaptive
   display_name: v1.65-full | v1.65-A
@@ -592,11 +612,16 @@ Default compact summary:
   inherited_across_framework_update: true | false | not_applicable
   previous_display_name: <versioned display | none>
   legacy_machine_preference: absent | ignored_non_authorizing
-  trellis_dispatch_mode: sub-agent | inline | not_applicable
+  execution_mode: delegated_pair | inline
   recommendation: none | advisory_recommended
   recommendation_pointer: none | <evidence or guide>
-  unresolved_reason: none | invalid_runtime_value
+  unresolved_reason: none | invalid_runtime_value | duplicate_native_record | ambiguous_legacy_selection | external_route_conflict
 - project_adoption_profile: lite | standard | full
+- external_frameworks:
+  - identity:
+    classification: reference_only | historical | conflict
+    affects_current_route: true | false
+    evidence_pointer:
 - delegation_maturity:
   effective_level: ask_each_time | act_then_report
   evidence_state: no_record_default | collecting | not_eligible | eligible_to_offer | user_declined | active | restored | invalid
@@ -607,7 +632,6 @@ Default compact summary:
   pending_offer: yes | no
   cooldown_new_samples_remaining: 0..10
   restore_reason:
-- trellis_mode: active | dormant | recommended | not_needed | needs_user_decision
 - risk_authorization:
 - pending_user_confirmations:
 - user_interruption:
@@ -662,14 +686,17 @@ Project initialization report:
 - role_assignment:
 - runtime_profile_selection: <use the canonical schema from cotend-collaboration/references/runtime-profiles.md>
 - project_adoption_profile: lite | standard | full
-- trellis:
-  - present: yes | no
-  - mode: active | dormant | recommended | not_needed | needs_user_decision
-  - binding: yes | no
-  - reason:
-  - active_truth_source:
-  - reactivation_condition:
-  - context_loaded:
+- cotend_workflow_state: <use the canonical schema from cotend-collaboration/references/runtime-profiles.md>
+- external_frameworks:
+  - identity:
+    classification: reference_only | historical | conflict
+    affects_current_route: true | false
+    evidence_pointer:
+    compatibility_procedures:
+      - capability: startup | pre_development | implementation | verification | closeout
+        procedure_id:
+        status: authorized | disabled
+        authority: cotend_native_record | user_explicit
 - project_stage:
   stage:
   evidence:
@@ -736,7 +763,7 @@ Project initialization report:
   checked:
     - semantic_baseline_coverage
     - semantic_contract_binding
-    - plan_tree_current_leaf_vs_trellis_current_task
+    - plan_tree_current_leaf_vs_external_compatibility_task
     - understanding_readme_freshness
     - decision_log_coverage
     - knowledge_changelog_coverage

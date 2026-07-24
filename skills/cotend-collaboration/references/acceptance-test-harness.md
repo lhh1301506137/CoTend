@@ -49,7 +49,7 @@ If Chrome is required but unavailable, report `chrome_required_but_unavailable` 
 
 ## Acceptance Matrix
 
-For each meaningful slice, record a compact matrix in `STATUS.md`, active Trellis task, `REVIEW-LOG.md`, or handoff:
+For each meaningful slice, record a compact matrix in `STATUS.md`, the active CoTend Plan Tree node/spec carrier, `REVIEW-LOG.md`, or handoff:
 
 ```yaml
 acceptance_test_harness:

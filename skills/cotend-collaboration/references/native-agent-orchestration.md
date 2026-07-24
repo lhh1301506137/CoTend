@@ -1,13 +1,13 @@
 # Native Agent Orchestration
 
-Use this module when the Primary may use native subagents, parallel agent work, a multi-packet long task, a fresh final review context, or when an agent has no trustworthy first response. It governs delegation shape. It does not require optional delegation; the one explicit exception is the Full profile's fixed Trellis implement/check quality chain owned by `runtime-profiles.md`.
+Use this module when the Primary may use native subagents, parallel agent work, a multi-packet long task, a fresh final review context, or when an agent has no trustworthy first response. It governs delegation shape. It does not require optional delegation; the one explicit exception is the Full profile's fixed Implementer/Checker quality pair owned by `runtime-profiles.md`.
 
 ## Root Responsibility
 
 The root Primary keeps the continuous product context and remains responsible for:
 
 - user-confirmed L0-L2 meaning, authority, risk, and pending decisions;
-- the active Trellis/Plan Tree route and dependency graph;
+- the active CoTend Plan Tree route and dependency graph;
 - packet boundaries, write ownership, integration, and conflict resolution;
 - verification selection, final review, completion claims, and user-facing reporting.
 
@@ -17,7 +17,7 @@ A subagent may explore, implement, test, or review one bounded packet. It cannot
 
 For every extra/optional agent and every proposal to split the selected workflow into more packets, delegate only when expected benefit is positive after counting additional model/tool tokens, repeated discovery, coordination, write conflicts, integration effort, machine resources, and verification cost.
 
-The Full profile's fixed `trellis-implement -> trellis-check` pair is a profile-authorized quality baseline, not an optional dispatch decision. Do not use this gate to cancel that pair. Apply the rest of this module to both roles, and require positive net benefit before either role creates additional agents or the root decomposes the work beyond the fixed pair.
+The Full profile's fixed Implementer -> Checker pair is a profile-authorized quality baseline, not an optional dispatch decision. An explicitly authorized available `trellis-implement -> trellis-check` procedure pair may temporarily provide those roles; otherwise use internal role packets. Do not use this gate to cancel the pair. Apply the rest of this module to both roles, and require positive net benefit before either role creates additional agents or the root decomposes the work beyond the fixed pair.
 
 Positive signals include:
 
@@ -161,4 +161,4 @@ Do not encode a community article's provider, WebSocket setting, fixed first-eve
 - fresh-context review described as user acceptance or different-model evidence without identity proof;
 - a second permanent work ledger that competes with the CoTend route owner, STATUS, decision, or review records;
 - blind retry of an ambiguous side-effecting task.
-- using the optional-agent net-benefit gate to cancel the Full profile's fixed implement/check quality chain, or using the fixed pair to justify further low-benefit subdivision.
+- using the optional-agent net-benefit gate to cancel the Full profile's fixed Implementer/Checker quality pair, or using the fixed pair to justify further low-benefit subdivision.

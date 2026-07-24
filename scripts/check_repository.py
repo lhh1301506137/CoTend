@@ -395,6 +395,12 @@ EXPECTED_NATIVE_ROUTE_REBASE_FILES = {
     "scripts/verify_native_spec_change_route_rebase.py",
     "tests/test_native_spec_change_route_rebase.py",
 }
+EXPECTED_NATIVE_WORKFLOW_STATE_FILES = {
+    "docs/NATIVE-WORKFLOW-STATE-AND-RUNTIME-PROFILES.md",
+    "docs/evidence/NATIVE-WORKFLOW-STATE-RUNTIME-PROFILES-TARGET-R6.md",
+    "scripts/verify_native_workflow_state_runtime_profiles.py",
+    "tests/test_native_workflow_state_runtime_profiles.py",
+}
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
     "install",
@@ -2638,7 +2644,7 @@ def production_plugin_package_errors(
             errors.append(f"production Plugin package evidence mismatch: {key}")
     for marker in (
         "rc.2 的 Skill 语义源固定为 Git commit",
-        "当前根 `skills/` 已推进到 target r5",
+        "当前根 `skills/` 已推进到 target r6",
         "48 个文件",
         "逐字节一致",
         "17 类负向边界",
@@ -3970,8 +3976,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     expected_target = {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000005",
-        "revision": 5,
+        "artifact_id": "cotend-codex-r000006",
+        "revision": 6,
     }
     if not isinstance(target, dict) or any(
         target.get(key) != expected for key, expected in expected_target.items()
@@ -3995,6 +4001,17 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if not isinstance(target, dict) or target.get("manifest_sha256") != carrier_manifest:
         errors.append("delivery target lock manifest mismatch")
     expected_predecessors = [
+        {
+            "platform": "Codex",
+            "lineage": "cotend-codex",
+            "artifact_id": "cotend-codex-r000005",
+            "revision": 5,
+            "source_release_id": "2026.07.23.2",
+            "framework_protocol": "cotend-collaboration-v1.65",
+            "manifest_sha256": (
+                "319f9f889b400d7a642de6ac81319ceac4aea493209b7b5527dd947f9ccade23"
+            ),
+        },
         {
             "platform": "Codex",
             "lineage": "cotend-codex",
@@ -4056,23 +4073,23 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if target_lock.get("legacy_receipt_mappings") != expected_legacy_mappings:
         errors.append("delivery target lock legacy mapping mismatch")
     identity_evidence_path = (
-        "docs/evidence/NATIVE-SPEC-CHANGE-ROUTE-REBASE-TARGET-R5.md"
+        "docs/evidence/NATIVE-WORKFLOW-STATE-RUNTIME-PROFILES-TARGET-R6.md"
     )
     if identity_evidence_path not in candidates:
         errors.append("target artifact identity evidence is missing or ignored")
     else:
         evidence = read(identity_evidence_path)
         for marker in (
-            "current_target_artifact_id: cotend-codex-r000005",
-            "current_target_revision: 5",
-            "predecessor_target_artifact_id: cotend-codex-r000004",
-            "predecessor_target_revision: 4",
+            "current_target_artifact_id: cotend-codex-r000006",
+            "current_target_revision: 6",
+            "current_target_manifest_sha256: 58410dbbf9ab0945af62cea0583938c5f5bc733634a72035c5b06e6c71073271",
+            "predecessor_target_artifact_id: cotend-codex-r000005",
+            "predecessor_target_revision: 5",
             "source_framework_lock_changed: false",
             "package_candidate: cotend@0.1.0-rc.2_immutable",
             "package_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
-            "TD06-spec-change-and-route-rebase",
-            "r4_to_r5_update_available",
-            "historical_git_source_required: true",
+            "TD01-workflow-state-and-mode",
+            "predecessor_source_commit: d2c78fe12262bd18beb5f46ded8d1850e9f44207",
         ):
             if marker not in evidence:
                 errors.append(f"target artifact identity evidence is missing: {marker}")
@@ -4176,6 +4193,14 @@ def main() -> int:
         errors.append(
             "native spec-change/Route-Rebase artifacts are missing or ignored: "
             f"{sorted(missing_native_route_rebase)}"
+        )
+    missing_native_workflow_state = (
+        EXPECTED_NATIVE_WORKFLOW_STATE_FILES - candidates
+    )
+    if missing_native_workflow_state:
+        errors.append(
+            "native workflow-state/runtime-profile artifacts are missing or ignored: "
+            f"{sorted(missing_native_workflow_state)}"
         )
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")

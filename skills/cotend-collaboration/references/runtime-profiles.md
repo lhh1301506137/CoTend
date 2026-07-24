@@ -1,110 +1,160 @@
-# Runtime Profiles
+# Native Workflow State And Runtime Profiles
 
-This is the single canonical contract for selecting and executing the CoTend runtime profile. Other Skills may route here and report the result, but they must not define a second selector or a second `full`/`adaptive` Skill tree.
+This is the single canonical contract for CoTend workflow state, runtime-profile selection, and execution-mode mapping. Project Init detects and persists the state through this contract. Other Skills may route here and report the result, but they must not define a second state owner, selector, or Full/Adaptive Skill tree.
 
 ## Two Orthogonal Profile Axes
 
-`runtime_profile` controls how the active Primary AI is orchestrated. The existing project adoption profile controls how much durable project governance is present. They are independent:
+`runtime_profile` controls how the active Primary AI is orchestrated. The project adoption profile controls how much durable project governance is present. They are independent:
 
 | Axis | Machine values | Meaning |
 |---|---|---|
-| Runtime profile | `full`, `adaptive` | Agent orchestration and Trellis dispatch behavior. |
+| Runtime profile | `full`, `adaptive` | `delegated_pair` or `inline` execution while retaining the same Constitution. |
 | Project adoption profile | `lite`, `standard`, `full` | Durable project files, review shape, and collaboration records. |
 
 Always report both fields by their full names. Never shorten either one to an ambiguous `profile`, and never infer one from the other.
 
+## Native State Owner
+
+Use the existing `STATUS.md` or the project's explicitly mapped equivalent as the only durable CoTend workflow-state carrier. Do not create a hidden state directory, a parallel task tree, or another profile database.
+
+Detection may return `absent` before a record exists. A persisted native record uses exactly one state:
+
+| State | Meaning | Continuation |
+|---|---|---|
+| `current` | The record is valid, internally consistent, and owns the current CoTend route. | Continue within the normal authority, risk, review, and acceptance gates. |
+| `dormant` | CoTend governance is intentionally inactive for the project or route, while its record remains recoverable history. | Inspect and report only; require explicit resume before product work. |
+| `conflict` | Native records are duplicated, invalid, ambiguous, or conflict with route-affecting evidence. | Fail closed and ask the user before affected work. |
+
+`dormant` is never inferred merely from old or foreign files. `conflict` blocks only the affected route when dependency isolation is evidenced. A direct user request to resume a valid dormant record changes it to `current`; silence or bare `continue` does not.
+
+The canonical record is intentionally compact:
+
+```yaml
+cotend_workflow:
+  schema_version: 1
+  state: current | dormant | conflict
+  state_reason:
+  protocol: cotend-collaboration-v1.65
+  runtime_profile: full | adaptive
+  runtime_profile_source: user_explicit_project | product_default_materialized | migrated_existing_selection
+  runtime_profile_confirmed_by_user: true | false
+  runtime_profile_selected_at: <YYYY-MM-DD | null>
+  execution_mode: delegated_pair | inline
+  external_frameworks:
+    - identity:
+      classification: reference_only | historical | conflict
+      affects_current_route: true | false
+      evidence_pointer:
+      compatibility_procedures:
+        - capability: startup | pre_development | implementation | verification | closeout
+          procedure_id:
+          status: authorized | disabled
+          authority: cotend_native_record | user_explicit
+```
+
+Preserve unrelated fields in the carrier. Apply structural updates idempotently: one native record, one value per field, and a second initialization with unchanged inputs produces no diff.
+
+## External Framework Classification
+
+Classify every relevant external development-framework artifact independently:
+
+- `reference_only`: current enough to consult as evidence, but it owns no CoTend truth, state, profile, route, or execution decision;
+- `historical`: useful recoverable history that is not binding;
+- `conflict`: inconsistent or ambiguous evidence requiring resolution when it affects the current route.
+
+Presence, an activation flag, a task marker, or an external configuration value never makes that framework the CoTend workflow owner. Never write CoTend state, profile, dispatch, or migration metadata into external framework files. Keep external source files byte-identical during native-state migration.
+
+Any remaining compatibility invocation must be explicitly listed in the native record's `compatibility_procedures`. An absent or disabled procedure is not invoked. The record stores only the minimum capability/procedure mapping needed until that capability becomes native; it does not import the external framework's lifecycle state.
+
+An external conflict with `affects_current_route: true` produces native `state: conflict` and a Human Rejoin. A non-affecting external conflict is reported and isolated without stopping a separately confirmed route.
+
 ## Names And Defaults
 
-| Machine value | User-visible name | Meaning |
+| Machine value | User-visible name | Execution mode |
 |---|---|---|
-| `full` | `v1.65-full` | Complete protection and fixed Trellis implementation/check dispatch. |
-| `adaptive` | `v1.65-A` | Adaptive orchestration explicitly selected by the user or inherited from a project selection. `A` means Adaptive. |
+| `full` | `v1.65-full` | `delegated_pair` |
+| `adaptive` | `v1.65-A` | `inline` |
 
-The CoTend product default is `full` when no prior selection exists. It is product-scoped, not model- or carrier-scoped.
+The CoTend product default is `full` when no prior selection exists. It is product-scoped, not model-, carrier-, or external-framework-scoped.
 
-The product default is only an initial value. Once a project records `full` or `adaptive`, framework updates preserve that stable machine value. Upgrading `v1.64-A` to v1.65 therefore produces `v1.65-A`; it must not silently become `v1.65-full`. The same rule preserves Full, and it also preserves a CoTend user's explicit A selection even though CoTend's first-use default is Full.
+The default is only an initial value. Once a project records `full` or `adaptive`, framework updates preserve that stable machine value. Upgrading `v1.64-A` to v1.65 produces `v1.65-A`; it must not silently become `v1.65-full`. The same rule preserves Full.
 
-Carrier, provider, actual model, reasoning configuration, role, Model Upgrade evidence, self-assessment, historical performance, and delegation maturity are not selector inputs. They may support truthful identity, tool compatibility, review independence, model-upgrade analysis, and a non-authorizing recommendation, but they never activate, reject, invalidate, restore, or migrate a runtime profile.
+Carrier, provider, actual model, reasoning configuration, role, Model Upgrade evidence, self-assessment, historical performance, and delegation maturity are not selector inputs. They may support truthful identity, tool compatibility, review independence, or a non-authorizing recommendation, but they never activate, reject, invalidate, restore, or migrate a runtime profile.
 
 ## Selection Sources And Precedence
 
 Resolve in this order:
 
 1. a user-explicit current-session selection;
-2. a valid project-persistent `runtime_profile: full | adaptive`;
-3. the CoTend product default `full`.
+2. one valid native project record;
+3. one unambiguous project-local legacy selection discovered during Auto Mode;
+4. the CoTend product default `full`.
 
 A session selection does not rewrite the project record unless the user also asks to save it for the project. A project selection persists across sessions and framework versions until the user explicitly changes it. Product defaults never overwrite an existing selection.
 
-The canonical project record is intentionally small:
+`product_default_materialized` records which initial default was applied; it is not stronger authority than a later user choice. A session-only override is reported but not persisted.
 
-```yaml
-cotend:
-  runtime_profile: full | adaptive
-  runtime_profile_source: user_explicit_project | product_default_materialized | migrated_existing_selection
-  runtime_profile_confirmed_by_user: true | false
-  runtime_profile_selected_at: <YYYY-MM-DD | null>
-```
+Private owner-default files and old machine-wide preferences are outside CoTend authority. CoTend must not read, import, translate, or infer a selection from them.
 
-`product_default_materialized` records which initial default was applied; it is not a stronger authority than a later user choice. A session-only override is reported in the runtime selection packet but is not persisted here.
+## Legacy Migration
 
-Private Dual owner-default files and old machine-wide Dual preferences are outside CoTend authority. CoTend must not read, import, translate, or infer a selection from them. Project Init may materialize only the CoTend Full product default, a direct user selection, or an unambiguous existing project selection.
+Migrate only when all of these are true:
 
-### Legacy Migration
+1. no valid native record exists;
+2. exactly one project-local legacy candidate contains `full` or `adaptive`;
+3. its project scope and current applicability are unambiguous;
+4. no other candidate or route-affecting foreign state conflicts with it.
 
-- A valid existing project `runtime_profile: full | adaptive` is a persistent choice even if its v1.54-v1.64 record also contains `adaptive_opt_in`, model, eligibility, safety, or fallback fields. Preserve the profile and remove obsolete selector fields only during an authorized structural update.
-- An unambiguous legacy project-local `dual_ai.runtime_profile` may migrate to `cotend.runtime_profile`; record `runtime_profile_source: migrated_existing_selection`. Machine-wide or private owner defaults remain non-authorizing and must not be read for CoTend selection.
-- An invalid runtime value such as `turbo` is not silently coerced. Report it and ask the user to choose A or Full; until resolved, do not start profile-sensitive implementation.
+Write the value into the native status carrier with `runtime_profile_source: migrated_existing_selection`. Do not modify, delete, or normalize the source file. Do not import foreign task, PRD, spec, route, activation state, or unrelated metadata. Preserve all unrelated project truth.
 
-### Recommendations Are Advisory
+Multiple candidates, invalid values, unclear scope, or conflicting route-affecting evidence produce `state: conflict`, no profile write, and a user decision. Never silently coerce an invalid value such as `turbo`.
 
-Model Upgrade or a product guide may recommend A or Full after analyzing the actual model, carrier, tool surface, task shape, cost, or observed quality. Record this as `advisory_recommended`. A recommendation is never selection authority, and changing models does not require a new profile decision. If runtime evidence suggests the current profile is performing poorly, stop at the applicable safety/review boundary, explain the evidence, and ask whether the user wants to switch; do not silently rewrite the persistent choice.
+Older valid CoTend project records may retain their stable `runtime_profile` while obsolete selector metadata is removed only during an authorized structural update. Missing old eligibility, model-match, or fallback fields is not a reason to change Adaptive into Full.
 
-## Trellis Mapping
+## Profile And State Transitions
 
-When Trellis is active, map the effective runtime profile to the existing Codex dispatch switch:
+- Fresh project: materialize `current + full + delegated_pair`.
+- Existing current Full: preserve the record and emit no write.
+- Existing current Adaptive: preserve the record and emit no write.
+- Session-only override: change effective execution for this session and leave the project record untouched.
+- Persisted Full to Adaptive: require explicit project-persistence intent, then write `adaptive + inline`.
+- Persisted Adaptive to Full: require explicit project-persistence intent, then write `full + delegated_pair`; never leave `inline`.
+- Current to dormant: only an explicit user decision or already-authoritative native project record may establish dormancy.
+- Dormant to current: require explicit resume and preserve the stored profile.
+- Any invalid or duplicate native record: set or report `conflict`; do not start profile-sensitive work.
 
-| Effective runtime profile | `.trellis/config.yaml` |
-|---|---|
-| `full` | `codex.dispatch_mode: sub-agent` (or the equivalent absent/default state when no managed override existed). |
-| `adaptive` | `codex.dispatch_mode: inline`. |
-
-Project Init owns this mapping. Apply it structurally and idempotently: preserve unrelated YAML keys/comments when possible, keep at most one `cotend` block and one `codex` block, and make a second application byte-identical to the first. `codex.dispatch_mode` is an execution mapping, not a substitute for the separately reported `runtime_profile`.
-
-When the user changes a persistent selection from A to Full, explicitly restore `sub-agent`; never leave `inline` active. An absent/default dispatch is acceptable only when no inline override exists and the resolved profile is already Full.
-
-If Trellis is absent or dormant, enforce the same orchestration behavior in the selected workflow route without creating Trellis solely to carry this switch.
+Project Init owns these transitions. It must never store them in an external framework configuration.
 
 ## Full Execution Contract
 
-`full` preserves the v1.53 execution shape and all current governance:
+`full` uses `execution_mode: delegated_pair` and preserves all current governance:
 
-- In active Trellis implementation work, the main session follows the fixed `trellis-implement -> trellis-check` chain.
-- The implementation worker and checker follow Trellis task/spec context and do not replace the actual primary model's formal self-review unless the project explicitly records that role.
-- This fixed pair is a profile-authorized quality baseline and the sole exception to the optional-agent positive-net-benefit gate. It must not create additional agents or split into more packets unless the extra dispatch has positive expected net benefit.
-- Both fixed roles still use the native-agent contract for explicit context, dependency, non-overlapping ownership, root integration, local plus integrated verification, fresh review when triggered, and side-effect-safe retry. The exception changes whether the baseline pair runs, not how safely it runs.
-- All required verification, review, evidence, acceptance, release, risk, and stop boundaries remain active.
+- For implementation work, run one fixed Implementer -> Checker pair.
+- When the native record explicitly authorizes both remaining `trellis-implement -> trellis-check` compatibility procedures and they are available, they may supply those roles until TD04 and TD05 are replaced.
+- Otherwise create bounded internal Implementer and Checker role packets through `native-agent-orchestration.md`. This fallback preserves Full behavior but does not claim the dedicated TD04/TD05 contracts or parity gates are complete.
+- Both roles follow the CoTend-owned route and classified evidence. They do not gain task/spec authority from a compatibility procedure and do not replace the actual Primary model's formal self-review unless that role is explicitly recorded.
+- This fixed pair is a profile-authorized quality baseline and the sole exception to the optional-agent positive-net-benefit gate. Additional agents or packets still require positive expected net benefit.
+- Both roles use the native-agent contract for explicit context, dependencies, non-overlapping ownership, root integration, local plus integrated verification, fresh review when triggered, and side-effect-safe retry.
+- All required verification, evidence, acceptance, release, risk, and stop boundaries remain active.
 
-Use `full` whenever it is the effective user/project/product selection. Do not infer it from model identity or a missing capability assessment.
+The remaining compatibility names above belong only to TD04/TD05 and must not be used as state, profile, truth, or route owners.
 
 ## Adaptive Execution Contract
 
-`adaptive` changes only reversible orchestration scaffolding:
+`adaptive` uses `execution_mode: inline` and changes only reversible orchestration scaffolding:
 
-- In active Trellis work, the main Primary implements inline through the existing `in_progress-inline` route.
-- Before editing, it still loads the applicable task PRD/specs and pre-development guidance.
-- After implementation, it loads and performs the Trellis check procedure inline, runs the relevant tests/checks, fixes in-scope findings, and reports evidence. `inline` never means `unchecked`.
-- It may dispatch optional agents only when expected net benefit is positive: genuinely parallel independent work, useful context isolation, specialist capability, independent/different-model challenge, or repeated failure/blockage.
-- When it dispatches, it must use the dependency, per-packet context, ownership, integration, verification, and cleanup contract in `native-agent-orchestration.md`; Adaptive changes dispatch shape, not that contract.
-- It normally does not dispatch agents for linear documentation, one bounded module, a child task that duplicates the parent task, or work that would make parent and child reread the same full context and repeat the same implementation.
-- If the platform already orchestrated suitable agents for the task, do not stack an unconditional framework chain on top. Reuse their evidence and add only a missing independent challenge or specialist boundary when it has material value.
-- Optional-agent use must record the reason, non-overlapping scope, expected benefit, and how results will be integrated. A non-dispatch decision needs no ceremony unless it affects review confidence or a high-impact boundary.
+- The Primary implements the authorized CoTend leaf inline.
+- Before editing, it loads the applicable CoTend-owned requirements, acceptance, route, and pre-development guidance.
+- After implementation, it performs the Checker contract inline, runs relevant tests/checks, fixes in-scope findings, and reports evidence. When the native record authorizes an available `trellis-check` compatibility procedure, use it inline; otherwise use the current CoTend Acceptance/Test Harness and review contracts. Neither path claims TD05 native parity early. `inline` never means `unchecked`.
+- Optional agents require positive expected net benefit: independent parallel work, context isolation, specialist capability, independent challenge, or repeated failure.
+- Dispatched agents follow `native-agent-orchestration.md`; Adaptive changes dispatch shape, not authority or safety.
+- Do not stack another unconditional framework chain on platform-native orchestration.
 
-Adaptive may save the fixed implementation/check child-agent round trips. It does not save specification reading, implementation, inline checking, tests, evidence, formal review when triggered, user confirmation, or release hardening.
+Adaptive may save fixed child-agent round trips. It does not skip specification reading, implementation, checks, tests, evidence, formal review, user confirmation, or release hardening.
 
 ## Constitution Parity
 
-Both profiles inherit the complete current `Constitution Never Thin` list from `references/authority-and-triggers.md` with no overrides:
+Both profiles inherit the complete `Constitution Never Thin` list from `references/authority-and-triggers.md` with no overrides:
 
 ```yaml
 constitution_inheritance:
@@ -113,19 +163,22 @@ constitution_inheritance:
   adaptive: inherit_all_exactly_no_overrides
 ```
 
-The selector may change only orchestration scaffolding. It must never change authority/status labels, `user_confirmed` priority, the protected current-MVP L0-L2 baseline or non-inherited confirmation rule, Critical / Never-Unattended stops, pending-question or `继续` semantics, Done Gate, AI UAT status, final user acceptance, Release Hardening, evidence/deviation vocabulary, decision-log obligations, FCE, reverse review, or explicit control-Skill handback.
+The selector may change only orchestration scaffolding. It must never change authority/status labels, `user_confirmed` priority, protected current-MVP L0-L2 confirmation, Critical stops, pending-question or `continue` semantics, Done Gate, AI UAT status, final user acceptance, Release Hardening, evidence/deviation vocabulary, decision-log obligations, or explicit control-Skill handback.
 
-Both profiles also execute the same triggered semantic-contract verification and semantic implementation closure gate. Adaptive may reduce duplicate agent dispatch, but it cannot skip per-node binding, staged legacy migration at a relevant boundary, completion freshness, pre-implementation acceptance derivation, active-reality inspection, the canonical completion claim, local/adjacent/cumulative evidence, or the material-node navigation decision.
-
-Both profiles also use the same dynamic active-path and triggered Route Rebase semantics: `mainline` is the current `active_path`; L3/L4 remains AI-owned inside confirmed ancestors and existing risk/acceptance/release gates; L0-L2 changes require direct Semantic Alignment and exact user confirmation; impact dispositions, reliable resume boundaries, refreshed completion evidence, and unrelated-route isolation are identical. Adaptive cannot turn a pending confirmation into authority or cross a blocked/revalidating route merely because orchestration is inline.
-
-Both profiles also use the same native-agent orchestration contract whenever native agents are actually used. Full keeps its profile-authorized fixed Trellis implement/check chain; Adaptive may choose inline or optional agents. Positive net benefit governs every optional/extra agent and further decomposition in both profiles, but does not cancel the Full baseline pair. Neither profile may use blanket context inheritance, conflicting write ownership, skipped packet verification, or blind side-effect retries.
+Both profiles execute the same semantic-contract verification, implementation closure, dynamic active-path, Route Rebase, acceptance, and review contracts. Neither may use blanket context inheritance, conflicting write ownership, skipped packet verification, or blind side-effect retries.
 
 ## Required Selection Record
 
 Project Init and Model Upgrade outputs use this compact record:
 
 ```yaml
+cotend_workflow_state:
+  detection: absent | present
+  state: current | dormant | conflict
+  state_source: native_project_record | materialized_default | migrated_legacy_project_selection | unresolved
+  record_carrier: STATUS.md | <explicitly mapped equivalent>
+  write_performed: true | false
+  external_framework_owner: false
 runtime_profile_selection:
   requested: full | adaptive | missing | invalid
   source: session_explicit | project_persistent | cotend_product_default | migrated_legacy_project_selection | invalid
@@ -136,27 +189,36 @@ runtime_profile_selection:
   legacy_machine_preference: absent | ignored_non_authorizing
   effective: full | adaptive
   display_name: v1.65-full | v1.65-A
-  trellis_dispatch_mode: sub-agent | inline | not_applicable
+  execution_mode: delegated_pair | inline
   recommendation: none | advisory_recommended
   recommendation_pointer: none | <non-authorizing evidence or guide>
-  unresolved_reason: none | invalid_runtime_value
+  unresolved_reason: none | invalid_runtime_value | duplicate_native_record | ambiguous_legacy_selection | external_route_conflict
 project_adoption_profile: lite | standard | full
+external_frameworks:
+  - identity:
+    classification: reference_only | historical | conflict
+    affects_current_route: true | false
+    evidence_pointer:
+    compatibility_procedures:
+      - capability: startup | pre_development | implementation | verification | closeout
+        procedure_id:
+        status: authorized | disabled
+        authority: cotend_native_record | user_explicit
 ```
 
-Report the effective selection, persistence scope, source, version inheritance, and dispatch separately. Runtime identity may be reported beside this packet when relevant, but it is not nested into or consumed by the selector.
+Report selection, persistence, source, version inheritance, and execution mode separately. Runtime identity may appear beside this packet but is not consumed by the selector. Switching any model, provider, carrier, configuration, or reviewer does not alter the effective profile.
 
-Reviewer and Primary identities are outside this selector. Switching any model, provider, carrier, configuration, or role does not alter Trellis dispatch or the effective profile.
+## Recommendations, Watch, And Rollback
+
+Model Upgrade or a product guide may recommend Adaptive or Full after analyzing the actual model, carrier, tools, task shape, cost, or observed quality. Record this as `advisory_recommended`. A recommendation is never selection authority.
+
+Adaptive remains an FCE `watch` choice. Observe duplicate-agent reduction, missed scope, inline-check quality, test coverage, review findings, rework, and user correction. When evidence supports switching to Full, stop at the applicable checkpoint and ask; do not rewrite the project choice.
+
+A safety stop, failed check, model change, role rollback, or external framework upgrade must not erase the native record or delete project truth, decisions, evidence, or governance files. Rollback restores the last verified native record and leaves external framework files untouched.
 
 ## Public And Release Boundary
 
-- Public documentation and the share package explain both profiles but declare `full` as the default.
-- The package must not contain or read a Dual owner-default file, maintainer legacy machine preference, current project active-profile selection, private model-role record, or private absolute paths.
-- CoTend exposes both profiles without a model gate. Its first-use product default is Full; a CoTend user's explicit project selection persists across CoTend/framework updates.
-- CoTend must never read, import, translate, or infer selection from a private Dual owner default. Its own first-use default remains Full.
-- Codex and Claude carrier versions may differ only when release metadata and migration guidance disclose the difference explicitly.
-
-## Watch And Rollback
-
-Adaptive remains an FCE `watch` choice. Observe real tasks for duplicate-agent reduction, missed scope, inline-check quality, test coverage, review findings, rework, and user correction.
-
-When evidence supports switching to Full, stop at the applicable checkpoint and make a plain-language recommendation. Only the user changes the persistent profile. A temporary safety stop, failed check, model change, or rollback of model roles must not erase the stored choice or delete project truth, decision records, evidence, or governance files.
+- Public documentation and the share package explain both profiles and declare Full as the default.
+- The package must not contain or read private owner defaults, machine preferences, current private project selections, private model-role records, or private absolute paths.
+- CoTend exposes both profiles without a model gate.
+- Carrier adapters may differ only when release metadata and migration guidance disclose the difference explicitly.

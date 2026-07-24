@@ -54,12 +54,12 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         inventory = namespace.identifier_inventory(
             namespace.base.SOURCE_SKILLS_ROOT, namespace.USER_OWNED_SKILLS
         )
-        self.assertEqual(inventory["occurrences"], 179)
-        self.assertEqual(inventory["files"], 21)
+        self.assertEqual(inventory["occurrences"], 181)
+        self.assertEqual(inventory["files"], 22)
         self.assertEqual(
             inventory["by_identifier"],
             {
-                "cotend-collaboration": 68,
+                "cotend-collaboration": 70,
                 "cotend-diagnose-only": 25,
                 "cotend-init": 12,
                 "cotend-model-upgrade": 11,
@@ -75,8 +75,8 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
                 "fallback_path": 2,
                 "frontmatter_name": 6,
                 "plain_reference": 31,
-                "protocol_or_version": 13,
-                "reference_path": 52,
+                "protocol_or_version": 14,
+                "reference_path": 53,
             },
         )
 
@@ -157,7 +157,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         )
         self.assertEqual(
             preserve["residual_source_identifier_inventory"]["occurrences"],
-            179,
+            181,
         )
         self.assertEqual(preserve["residual_migration_review_required"], 0)
         self.assertEqual(preserve["plugin_sensitive_reference_count"], 77)
@@ -174,9 +174,9 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         self.assertFalse(short["source_comparison"]["byte_identical"])
         self.assertEqual(
             short["residual_source_identifier_inventory"]["occurrences"],
-            167,
+            169,
         )
-        self.assertEqual(short["residual_migration_review_required"], 154)
+        self.assertEqual(short["residual_migration_review_required"], 155)
         self.assertEqual(short["plugin_sensitive_reference_count"], 71)
         self.assertEqual(len(short["target_entrypoints"]), 6)
         self.assertEqual(

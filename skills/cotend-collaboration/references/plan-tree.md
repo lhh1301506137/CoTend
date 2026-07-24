@@ -1,6 +1,6 @@
 # Plan Tree
 
-Use this module when the project needs a durable goal-to-next-step map: standard/full projects with multiple stages, active Trellis, unattended/continuous development, high-value next-step selection, plan-external changes, or signs of drift/confusion.
+Use this module when the project needs a durable goal-to-next-step map: current standard/full projects with multiple stages, unattended/continuous development, high-value next-step selection, plan-external changes, or signs of drift/confusion.
 
 ## Purpose
 
@@ -81,7 +81,8 @@ metadata:
     - W1
   active_truth_sources:
     -
-  trellis_mode: active | dormant | not_present
+  cotend_workflow_state: current | dormant | conflict
+  external_frameworks: none | classified
   last_reconciled_commit:
   active_node:
   current_next_leaf:

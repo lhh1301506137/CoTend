@@ -74,7 +74,7 @@ Gate：确定性 fixtures 和至少一个真实本地项目都完成端到端验
 - 每个原生替代项通过 success、blocked、failure、stop、恢复和无关文件保护后，才删除对应 Trellis 路径。
 - 最终第一方运行时 Skills 中不保留 Trellis 命令、状态路径或任务/规格权限；竞品研究和来源归属继续保留真实名称。
 
-Gate：[`TRELLIS-DECOUPLING-PARITY-PLAN.md`](TRELLIS-DECOUPLING-PARITY-PLAN.md) 的 G01-G05 全部通过后才构建 rc.3；G06 真实项目和用户验收通过前保持 `watch`。当前 G01 完成，G02 完成 3/8：TD08 项目真相权限、TD03 需求澄清和 TD06 规格变化/Route Rebase 已原生化；其余五项仍保留兼容路由。内部 target r5 不是 rc.3 包。
+Gate：[`TRELLIS-DECOUPLING-PARITY-PLAN.md`](TRELLIS-DECOUPLING-PARITY-PLAN.md) 的 G01-G05 全部通过后才构建 rc.3；G06 真实项目和用户验收通过前保持 `watch`。当前 G01 完成，G02 完成 4/8：TD08 项目真相权限、TD03 需求澄清、TD06 规格变化/Route Rebase 和 TD01 工作流状态/运行档位已原生化；其余四项仍保留兼容路由。内部 target r6 不是 rc.3 包。
 
 ### P5 - 完成保留能力与差异改进
 

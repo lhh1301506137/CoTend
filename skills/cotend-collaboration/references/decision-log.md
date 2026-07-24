@@ -21,7 +21,7 @@ Do not log every tiny implementation choice. Leaf-level technical choices may be
 
 ## Required File
 
-For standard/full, active Trellis, multi-stage, advisor/takeover, or user-controlled product projects, use:
+For current standard/full, multi-stage, advisor/takeover, or user-controlled product projects, use:
 
 ```text
 PROJECT-DECISION-LOG.md
