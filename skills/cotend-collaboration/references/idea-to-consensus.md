@@ -14,6 +14,21 @@ The target workflow is human-led delegated continuous development:
 - Codex proposes concrete product/technical options and records consensus;
 - implementation starts only after MVP/final-shape assumptions are clear enough for delegated execution.
 
+## CoTend Native Requirements Clarification
+
+CoTend owns the clarification route. `grill-me` supplies interaction discipline, not route or truth authority. The direct `$cotend-semantic-alignment` entry owns product-semantic questioning and protected confirmation; this module only prepares evidence, identifies the highest-value unresolved branch, and returns one question.
+
+Apply this contract:
+
+1. Ask exactly one high-value question at a time. Do not batch independent product, scope, taste, architecture, acceptance, or risk choices merely to reduce turns.
+2. Explain why the answer matters and present option `1` as the recommended answer when a responsible default exists. Reply `1` accepts only that displayed recommendation.
+3. Keep fuzzy intake `temporary`. A draft, detailed answer, internally consistent artifact, or external-framework status never makes it confirmed product truth.
+4. A bare `continue` or equivalent resume request never selects a pending answer. Re-present the unresolved question or continue evidence gathering without inventing a choice.
+5. Persist a decision-worthy answer in the existing `PROJECT-DECISION-LOG.md` before it changes the active route, protected meaning, scope, acceptance, risk, release posture, model role, or continuation authority. Factual clarification that changes none of those does not require a decision entry.
+6. Use `external_brainstorm` for newly classified external brainstorm evidence. Classify the artifact as `reference_only`, `historical`, or `conflict`; never dispatch to it, grant it route ownership, or create a parallel PRD, Plan Tree, semantic baseline, or decision ledger.
+7. Init never executes this contract. It reports the independent `$cotend-semantic-alignment new_baseline` handback, and the user starts that separate control flow.
+8. After each answer, recompute the highest-value unresolved branch. Stop asking when the direct Alignment flow has enough evidence to present the exact protected confirmation packet.
+
 ## Trigger
 
 Load this module when any of these appear:
@@ -38,7 +53,7 @@ Do not load it for fully specified small edits, obvious bug fixes, or implementa
    - explicit non-goals;
    - risk/release posture;
    - acceptance expectations.
-4. Ask only high-leverage questions the repo/docs cannot answer. Use grill-me style: one question at a time, with recommended option `1`.
+4. Ask only high-leverage questions the repo/docs cannot answer. Apply the CoTend Native Requirements Clarification contract above.
 5. Preserve decision-worthy answers as source evidence for the direct Alignment flow; if an external-framework brainstorm already records them, classify and link aligned content as `reference_only` rather than creating a parallel truth source. Do not mark protected semantics active from this preparatory module.
 6. Route the draft and evidence directly to `$cotend-semantic-alignment new_baseline`. That Skill teaches back current-MVP L0-L2 in the project's recorded user-facing language, or English by default, and obtains explicit confirmation for each protected node or exact grouped packet. For L2, it confirms the semantic charter before classifying or confirming rules; an intake rule list remains candidate evidence and never substitutes for the charter. Confirmation of L0 does not confirm AI-derived L1/L2.
 7. Only the direct Alignment flow absorbs confirmed protected consensus into existing durable documents: PRD/brief, Plan Tree or active plan, `STATUS.md`, and relevant decision/knowledge records. Classify L3+ as delegated inference, not user-confirmed truth.

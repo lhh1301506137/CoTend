@@ -160,7 +160,7 @@ Use `decision_worthy_topics` as the canonical label set for deciding whether a u
 | `model_role_or_review` | primary/reviewer/advisor role, premium-model takeover, review gate, or external review scope |
 | `continuation_authority` | unattended window, bare `继续` meaning, local closeout authorization, or future resume behavior |
 | `delegation_maturity` | whether one narrow low-risk decision category stays per-decision or moves to user-confirmed execute-then-report delegation, including refusal, scope, cooldown, or restoration |
-| `advisor_or_grill_answer` | answer to a grill-me, Trellis brainstorm, advisor, takeover, milestone, or Done Gate question when the answer also affects one of the substantive decision topics above |
+| `advisor_or_grill_answer` | answer to a CoTend clarification/grill-me, classified external brainstorm, advisor, takeover, milestone, or Done Gate question when the answer also affects one of the substantive decision topics above |
 | `user_interruption_or_new_idea` | a midstream user doubt, correction, or new idea changes priority, scope, route, acceptance, risk, model role, or future continuation |
 | `supersession_or_rejection` | a prior decision is superseded, narrowed, rejected, or re-opened |
 
@@ -168,7 +168,7 @@ Use `decision_worthy_topics` as the canonical label set for deciding whether a u
 
 Record a decision when any of these matches a `decision_worthy_topics` label:
 
-- grill-me, Trellis brainstorm, or direct user Q&A changes root goal, MVP, stage, feature meaning, UX taste, route, priority, acceptance, risk, release, or model role;
+- CoTend clarification/grill-me, classified external brainstorm evidence, or direct user Q&A changes root goal, MVP, stage, feature meaning, UX taste, route, priority, acceptance, risk, release, or model role;
 - the user replies `1` to accept a recommended answer;
 - the user corrects the primary AI or advisor's understanding;
 - the user interrupts ongoing work with a doubt, correction, or new idea that changes scope, route, acceptance, risk, model role, continuation authority, or active truth;

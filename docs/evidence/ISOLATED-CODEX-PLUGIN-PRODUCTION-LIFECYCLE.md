@@ -30,13 +30,13 @@ metadata:
 
 ## 结论
 
-当前精确 `cotend@0.1.0-rc.2` 48 文件生产候选已经在真实 Codex CLI 0.144.1 中完成完全隔离的安装生命周期。验证不是重新制作一份近似 fixture：两个场景都直接调用 `scripts/build_codex_plugin.py`，随后再次校验 package lock v2 与完整 path/hash manifest。包摘要保持 `a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2`，8 个 Skill、37 个 Skill 文件继续与 package lock 指定的 Git source commit 下 `skills/` 逐字节一致，4 个品牌资产保持锁定。当前根 Skill 推进到 r3 后，生命周期仍构建冻结的 rc.2，而不会静默采用开发态字节。
+当前精确 `cotend@0.1.0-rc.2` 48 文件生产候选已经在真实 Codex CLI 0.144.1 中完成完全隔离的安装生命周期。验证不是重新制作一份近似 fixture：两个场景都直接调用 `scripts/build_codex_plugin.py`，随后再次校验 package lock v2 与完整 path/hash manifest。包摘要保持 `a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2`，8 个 Skill、37 个 Skill 文件继续与 package lock 指定的 Git source commit 下 `skills/` 逐字节一致，4 个品牌资产保持锁定。当前根 Skill 推进到 r4 后，生命周期仍构建冻结的 rc.2，而不会静默采用开发态字节。
 
 正常场景完成 17 步：local Marketplace add/list、Plugin available/add/list、空项目发现、standalone Skills 共存发现、remove/缺席发现、reinstall/重新发现、最终 remove、最终缺席发现、Marketplace remove 与最终缺席确认。安装时 app-server 发现 8 个 `cotend:<skill>` Plugin Skill；共存项目同时保留 8 个 repo-scope standalone Skill。移除 Plugin 后，standalone 项仍存在，没有被接管或删除。
 
 第二个场景在 `plugin_add` 已成功后注入确定性异常，然后完成 5 步恢复：Plugin remove、Plugin list absent、Plugin Skill discovery absent、Marketplace remove、Marketplace list absent。恢复完成后，正常场景和失败场景的 15 个隔离运行时写入根均被清除。
 
-L62 复验进一步分开两种字节权威：Plugin discovery 必须匹配 rc.2 包内的历史 r2 Skill，repo-scope standalone discovery 必须匹配当前 r3 项目源。Codex app-server 在同名共存时可能给 repo 项也返回 `cotend:` namespace，因此 verifier 先按真实路径归属和 `user | repo` scope 分类，再规范化 standalone 名称；同名结果不会互相覆盖，也不会用当前 r3 根误判历史 rc.2 包。修正后 17+5 生命周期从全新隔离根通过。
+L62/L63 复验进一步分开两种字节权威：Plugin discovery 必须匹配 rc.2 包内的历史 r2 Skill，repo-scope standalone discovery 必须匹配当前 r4 项目源。Codex app-server 在同名共存时可能给 repo 项也返回 `cotend:` namespace，因此 verifier 先按真实路径归属和 `user | repo` scope 分类，再规范化 standalone 名称；同名结果不会互相覆盖，也不会用当前 r4 根误判历史 rc.2 包。修正后 17+5 生命周期从全新隔离根通过。
 
 L54 在仓库根加入 Plugin/Marketplace 后，原先位于仓库私有夹具内的两个项目 cwd 会继承父仓库上下文。生产 lifecycle 因此把空项目和 standalone 共存项目迁到系统临时目录下、带 `cotend-L46-projects-` 固定前缀的独立根；package、一次性 Marketplace、命令证据和 15 个写入根仍留在 L46 ignored fixture。共享 Phase A 通过显式 cwd boundary 拒绝路径逃逸，场景结束后外部项目根也必须清除。这只修复测试上下文隔离，不改变生产候选包或生命周期合同。
 

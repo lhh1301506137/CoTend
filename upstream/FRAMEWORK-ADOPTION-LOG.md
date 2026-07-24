@@ -266,3 +266,26 @@ push_release_or_publish: not_performed
 L62 是 CoTend 产品 overlay，不是新的 dual-ai 来源 release：项目含义、详细需求、活动路线、用户决定、STATUS 投影、现实证据和本地编码约束不再向外部开发框架身份让权。对齐、过时、L0-L2 冲突、L3-L4 冲突和未知依赖均由 CoTend 原生场景验证；其余 TD01-TD07 继续保留既有兼容路由。
 
 根 `skills/` 因行为变化推进为同 lineage target r3。此前 r2 与本地未发布 rc.2 不被重写；rc.2 构建器从最初验证提交读取 8 Skills/37 文件，保持原 48 文件 package 与 ZIP 摘要。该过渡构建需要完整 Git 历史，且不构成 rc.3、push、release、submission 或 publish 授权。
+
+## cotend-native-overlay-L63-TD03
+
+```yaml
+status: native_parity_verified_for_requirements_clarification
+source_framework_release_unchanged: 2026.07.23.2
+source_framework_lock_changed: false
+product_overlay: TD03-requirements-clarification
+historical_runtime_baseline: 241_mentions_22_files
+L62_runtime_checkpoint: 174_mentions_21_files
+current_runtime_inventory: 163_mentions_21_files
+current_target_artifact_id: cotend-codex-r000004
+current_target_revision: 4
+predecessor_target_artifact_id: cotend-codex-r000003
+plugin_candidate: cotend@0.1.0-rc.2_immutable
+plugin_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1
+grill_me_sha256: 8cfed91b3d4f8407d868648bb83bd48ddfd25ac1f1a5e909f4c80d54e2b0fe98
+push_release_or_publish: not_performed
+```
+
+L63 继续作为 CoTend 产品 overlay：需求澄清由 Idea to Consensus、Semantic Alignment 和 Decision Log 第一方链拥有，`grill-me` 只保留原名、MIT 归属与一次一问交互纪律。Project Init 不再按外部框架状态分派 brainstorm；外部记录只作为分类证据。
+
+根 `skills/` 推进为同 lineage target r4，L62 的 r3 成为精确 predecessor。r2 与本地未发布 rc.2 继续由历史 source commit 重建，48 文件 package 与 ZIP 摘要不变。本叶不构成 rc.3、push、release、submission 或 publish 授权。

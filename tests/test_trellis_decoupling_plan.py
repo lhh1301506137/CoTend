@@ -22,22 +22,26 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
         cls.inventory = decoupling.runtime_inventory()
         cls.tracked_paths = decoupling.tracked_paths()
 
-    def validate(self, contract: dict | None = None) -> dict:
+    def validate(
+        self,
+        contract: dict | None = None,
+        inventory: dict[str, int] | None = None,
+    ) -> dict:
         return decoupling.validate_contract(
             self.contract if contract is None else contract,
             self.document_text,
-            self.inventory,
+            self.inventory if inventory is None else inventory,
             self.tracked_paths,
         )
 
-    def test_current_migration_preserves_baseline_and_advances_only_td08(self) -> None:
+    def test_current_migration_preserves_baseline_and_advances_td08_td03(self) -> None:
         result = self.validate()
         self.assertEqual(result["capabilities"], 8)
         self.assertEqual(result["gates"], 6)
-        self.assertEqual(result["runtime_mentions"], 174)
+        self.assertEqual(result["runtime_mentions"], 163)
         self.assertEqual(result["runtime_files"], 21)
         self.assertTrue(result["skill_behavior_changed"])
-        self.assertEqual(result["native_capabilities_verified"], 1)
+        self.assertEqual(result["native_capabilities_verified"], 2)
 
     def test_immutable_baseline_change_is_rejected(self) -> None:
         changed = copy.deepcopy(self.contract)
@@ -67,9 +71,25 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 
+    def test_code_and_contract_cannot_drift_together_inside_allowed_path(self) -> None:
+        path = "skills/cotend-project-init/SKILL.md"
+        changed_contract = copy.deepcopy(self.contract)
+        changed_inventory = copy.deepcopy(self.inventory)
+        changed_contract["current_runtime"]["file_mentions"][path] -= 1
+        changed_contract["current_runtime"]["mention_count"] -= 1
+        changed_inventory[path] -= 1
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(changed_contract, changed_inventory)
+
     def test_td08_evidence_cannot_be_removed(self) -> None:
         changed = copy.deepcopy(self.contract)
         changed["capabilities"][-1]["evidence"].pop()
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(changed)
+
+    def test_td03_evidence_cannot_be_removed(self) -> None:
+        changed = copy.deepcopy(self.contract)
+        changed["capabilities"][2]["evidence"].pop()
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 

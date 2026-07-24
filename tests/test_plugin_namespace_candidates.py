@@ -54,7 +54,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         inventory = namespace.identifier_inventory(
             namespace.base.SOURCE_SKILLS_ROOT, namespace.USER_OWNED_SKILLS
         )
-        self.assertEqual(inventory["occurrences"], 176)
+        self.assertEqual(inventory["occurrences"], 179)
         self.assertEqual(inventory["files"], 21)
         self.assertEqual(
             inventory["by_identifier"],
@@ -64,14 +64,14 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
                 "cotend-init": 12,
                 "cotend-model-upgrade": 11,
                 "cotend-project-init": 15,
-                "cotend-semantic-alignment": 45,
+                "cotend-semantic-alignment": 48,
             },
         )
         self.assertEqual(
             inventory["by_category"],
             {
                 "agent_self_prompt": 6,
-                "explicit_invocation": 66,
+                "explicit_invocation": 69,
                 "fallback_path": 2,
                 "frontmatter_name": 6,
                 "plain_reference": 31,
@@ -157,10 +157,10 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         )
         self.assertEqual(
             preserve["residual_source_identifier_inventory"]["occurrences"],
-            176,
+            179,
         )
         self.assertEqual(preserve["residual_migration_review_required"], 0)
-        self.assertEqual(preserve["plugin_sensitive_reference_count"], 74)
+        self.assertEqual(preserve["plugin_sensitive_reference_count"], 77)
 
         short = results["N2-short"]
         self.assertEqual(short["skills"], 8)
@@ -174,10 +174,10 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         self.assertFalse(short["source_comparison"]["byte_identical"])
         self.assertEqual(
             short["residual_source_identifier_inventory"]["occurrences"],
-            164,
+            167,
         )
-        self.assertEqual(short["residual_migration_review_required"], 151)
-        self.assertEqual(short["plugin_sensitive_reference_count"], 68)
+        self.assertEqual(short["residual_migration_review_required"], 154)
+        self.assertEqual(short["plugin_sensitive_reference_count"], 71)
         self.assertEqual(len(short["target_entrypoints"]), 6)
         self.assertEqual(
             {item["canonical_name"] for item in short["target_entrypoints"]},

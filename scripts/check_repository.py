@@ -9,6 +9,7 @@ from pathlib import Path
 
 import verify_trellis_decoupling_plan as trellis_decoupling
 import verify_native_project_truth_authority as native_authority
+import verify_native_requirements_clarification as native_clarification
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -380,6 +381,12 @@ EXPECTED_NATIVE_AUTHORITY_FILES = {
     "docs/PROJECT-TRUTH-AUTHORITY.md",
     "scripts/verify_native_project_truth_authority.py",
     "tests/test_native_project_truth_authority.py",
+}
+EXPECTED_NATIVE_CLARIFICATION_FILES = {
+    "docs/NATIVE-REQUIREMENTS-CLARIFICATION.md",
+    "docs/evidence/NATIVE-REQUIREMENTS-CLARIFICATION-TARGET-R4.md",
+    "scripts/verify_native_requirements_clarification.py",
+    "tests/test_native_requirements_clarification.py",
 }
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
@@ -2624,7 +2631,7 @@ def production_plugin_package_errors(
             errors.append(f"production Plugin package evidence mismatch: {key}")
     for marker in (
         "rc.2 的 Skill 语义源固定为 Git commit",
-        "当前根 `skills/` 已推进到 target r3",
+        "当前根 `skills/` 已推进到 target r4",
         "48 个文件",
         "逐字节一致",
         "17 类负向边界",
@@ -3956,8 +3963,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     expected_target = {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000003",
-        "revision": 3,
+        "artifact_id": "cotend-codex-r000004",
+        "revision": 4,
     }
     if not isinstance(target, dict) or any(
         target.get(key) != expected for key, expected in expected_target.items()
@@ -3981,6 +3988,17 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if not isinstance(target, dict) or target.get("manifest_sha256") != carrier_manifest:
         errors.append("delivery target lock manifest mismatch")
     expected_predecessors = [
+        {
+            "platform": "Codex",
+            "lineage": "cotend-codex",
+            "artifact_id": "cotend-codex-r000003",
+            "revision": 3,
+            "source_release_id": "2026.07.23.2",
+            "framework_protocol": "cotend-collaboration-v1.65",
+            "manifest_sha256": (
+                "ae7c033c3038af5de34623d683c60f78370921dd80788785d52257f7c82f4fac"
+            ),
+        },
         {
             "platform": "Codex",
             "lineage": "cotend-codex",
@@ -4019,21 +4037,23 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     ]
     if target_lock.get("legacy_receipt_mappings") != expected_legacy_mappings:
         errors.append("delivery target lock legacy mapping mismatch")
-    identity_evidence_path = "docs/evidence/NATIVE-PROJECT-TRUTH-TARGET-R3.md"
+    identity_evidence_path = (
+        "docs/evidence/NATIVE-REQUIREMENTS-CLARIFICATION-TARGET-R4.md"
+    )
     if identity_evidence_path not in candidates:
         errors.append("target artifact identity evidence is missing or ignored")
     else:
         evidence = read(identity_evidence_path)
         for marker in (
-            "current_target_artifact_id: cotend-codex-r000003",
-            "current_target_revision: 3",
-            "predecessor_target_artifact_id: cotend-codex-r000002",
-            "predecessor_target_revision: 2",
+            "current_target_artifact_id: cotend-codex-r000004",
+            "current_target_revision: 4",
+            "predecessor_target_artifact_id: cotend-codex-r000003",
+            "predecessor_target_revision: 3",
             "source_framework_lock_changed: false",
             "package_candidate: cotend@0.1.0-rc.2_immutable",
             "package_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
-            "TD08-project-truth-authority",
-            "r2_to_r3_update_available",
+            "TD03-requirements-clarification",
+            "r3_to_r4_update_available",
             "historical_git_source_required: true",
         ):
             if marker not in evidence:
@@ -4122,6 +4142,14 @@ def main() -> int:
         errors.append(
             "native project-truth authority artifacts are missing or ignored: "
             f"{sorted(missing_native_authority)}"
+        )
+    missing_native_clarification = (
+        EXPECTED_NATIVE_CLARIFICATION_FILES - candidates
+    )
+    if missing_native_clarification:
+        errors.append(
+            "native requirements-clarification artifacts are missing or ignored: "
+            f"{sorted(missing_native_clarification)}"
         )
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
@@ -4293,6 +4321,11 @@ def main() -> int:
             native_authority.verify_repository(ROOT)
         except native_authority.NativeAuthorityError as exc:
             errors.append(f"native project-truth authority: {exc}")
+    if not missing_native_clarification:
+        try:
+            native_clarification.verify_repository(ROOT)
+        except native_clarification.NativeClarificationError as exc:
+            errors.append(f"native requirements clarification: {exc}")
 
     github_marketplace_carrier_evidence_path = (
         "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md"

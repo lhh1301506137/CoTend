@@ -342,7 +342,7 @@ At each checkpoint, decide next action:
 | AI UAT fails | diagnose, fix, retest |
 | user interrupts with doubt/new idea | classify via User Interruption Reconciliation, then answer/apply/park/replan/ask |
 | critical risk appears | stop and ask user |
-| direction unclear | Active Trellis: update/return to `trellis-brainstorm`; non-Trellis/dormant Trellis: grill-me or ask user |
+| direction unclear | Report the independent direct `$cotend-semantic-alignment new_baseline` handback; Init does not ask product questions or dispatch to an external brainstorm |
 
 Record the route decision in `STATUS.md`, `REVIEW-LOG.md`, or the active batch record when it changes execution. Record user-facing questions and answers in `PROJECT-DECISION-LOG.md` when they match the canonical decision-worthy topics in `cotend-collaboration/references/authority-and-triggers.md`.
 
@@ -499,7 +499,7 @@ Do not start large product development until this workflow is complete.
 
 17. Use grill-me style for fuzzy requirements.
     - During Init, use this style only for an Init-owned framework setup decision, one question at a time with recommended option `1`.
-    - Do not use grill-me, Trellis brainstorm, or idea-to-consensus inside Init to clarify, confirm, or persist product semantics. Report that independent post-init route into direct `$cotend-semantic-alignment new_baseline` instead.
+    - Do not use grill-me, an external-framework brainstorm, or idea-to-consensus inside Init to clarify, confirm, or persist product semantics. Report that independent post-init route into direct `$cotend-semantic-alignment new_baseline` instead.
     - If a framework-setup answer can be discovered from the codebase, inspect the codebase instead of asking.
     - Record only the framework-setup decision that Init owns. Product-semantic decisions and protected truth are recorded by the independent direct Alignment flow.
 

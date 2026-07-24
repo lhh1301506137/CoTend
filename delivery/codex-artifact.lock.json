@@ -11,9 +11,9 @@
   "target": {
     "platform": "Codex",
     "lineage": "cotend-codex",
-    "artifact_id": "cotend-codex-r000003",
-    "revision": 3,
-    "manifest_sha256": "ae7c033c3038af5de34623d683c60f78370921dd80788785d52257f7c82f4fac"
+    "artifact_id": "cotend-codex-r000004",
+    "revision": 4,
+    "manifest_sha256": "9b82dc8689e19c9d95c7b867c18adc3b50d32d7c82aa772b6d397aa3a70a4abd"
   },
   "product": {
     "version": null
@@ -21,6 +21,15 @@
   "skill_count": 8,
   "skill_file_count": 37,
   "predecessor_targets": [
+    {
+      "platform": "Codex",
+      "lineage": "cotend-codex",
+      "artifact_id": "cotend-codex-r000003",
+      "revision": 3,
+      "source_release_id": "2026.07.23.2",
+      "framework_protocol": "cotend-collaboration-v1.65",
+      "manifest_sha256": "ae7c033c3038af5de34623d683c60f78370921dd80788785d52257f7c82f4fac"
+    },
     {
       "platform": "Codex",
       "lineage": "cotend-codex",

@@ -1,6 +1,6 @@
 # Project Decision Log
 
-Use this module when grill-me, Trellis brainstorm, direct user correction, midstream user interruption/new idea, advisor review, takeover review, milestone re-entry, delegation-maturity review, or release/risk discussion produces a decision the user can use to control project direction.
+Use this module when CoTend clarification/grill-me, classified external brainstorm evidence, direct user correction, midstream user interruption/new idea, advisor review, takeover review, milestone re-entry, delegation-maturity review, or release/risk discussion produces a decision the user can use to control project direction.
 
 ## Purpose
 
@@ -38,7 +38,7 @@ Use compact Markdown entries. Preserve the user's words where useful.
 
 metadata:
   date: YYYY-MM-DD
-  source: grill_me | trellis_brainstorm | user_direct | user_interruption | advisor_question | takeover | milestone_reentry | delegation_maturity_offer | delegation_maturity_restore | release_gate | risk_gate | other
+  source: grill_me | external_brainstorm | user_direct | user_interruption | advisor_question | takeover | milestone_reentry | delegation_maturity_offer | delegation_maturity_restore | release_gate | risk_gate | other
   scope: root_goal | mvp | stage | feature | leaf | route | ux | architecture | risk | release | model_role | acceptance | delegation
   status: user_confirmed | primary_ai_auto_within_scope | advisor_recommended | pending_user_confirmation | superseded | rejected
   supersedes:
@@ -198,6 +198,8 @@ Keep the current `grill-me` style:
 - user replying only `1` means explicit acceptance.
 
 After the user answers, record the decision before using it to steer implementation when it matches a canonical `decision_worthy_topics` label.
+
+Existing records may retain older source labels as opaque historical evidence. Do not rewrite them mechanically or reactivate the framework that produced them. Newly classified external brainstorm evidence uses `external_brainstorm`; its container never becomes route or truth authority.
 
 ## Interaction With Knowledge Changelog
 

@@ -2,6 +2,76 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-07-24 L63 原生需求澄清
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: workflow_behavior
+change_summary: 只把 TD03 模糊需求的一次一问、待答停止、决定持久化和外部 brainstorm 分类迁移到 CoTend 第一方责任链
+intent: 在保持 grill-me MIT 字节和 Semantic Alignment 保护边界的前提下，移除外部开发框架的主动 brainstorm 路由
+expected_benefit:
+  - 所有产品语义澄清由 CoTend Semantic Alignment 统一拥有
+  - Init 继续只 handback，不在初始化内执行产品提问
+  - 裸 continue 不选择答案，决定相关回答先记录再驱动路线
+  - 外部 brainstorm 只作为 reference_only、historical 或 conflict 证据
+possible_harm:
+  - 只完成 TD03 时，其余六类 Trellis 兼容接口仍存在，不能宣称完整解耦
+  - 机械编辑 grill-me 会破坏第三方来源锁，因此必须保持字节不变
+  - 当前根 Skill 推进到 r4，历史 r3、r2 和 rc.2 必须继续精确可恢复
+affected_workflows:
+  - fuzzy_idea_to_consensus
+  - semantic_alignment_new_baseline
+  - project_init_handback
+  - decision_log_source_and_persistence
+  - target_artifact_delivery
+deviations:
+  - source release 与 framework.lock 继续保持 v1.65；L63 是 CoTend 产品 overlay
+  - 当前根载体推进为 cotend-codex-r000004；r3、r2 和 cotend@0.1.0-rc.2 均保持不可变
+  - 只替换 TD03；TD01、TD02、TD04-TD07 继续进入后续独立叶
+mechanism_budget:
+  added_context_surface: one_cold_path_contract_one_public_evidence_doc_one_small_verifier
+  ordinary_load_impact: one_short_core_routing_sentence
+  ceremony_added: none_for_clear_requirements
+  duplication_check: reuses_existing_alignment_plan_decision_surfaces
+  cheaper_alternative_considered: 只删除 Project Init 分支；因无法锁住裸继续、决定顺序和外部冲突行为而拒绝
+  retirement_or_thinning_trigger: G05 后把迁移计数收敛为零运行依赖规则
+  expected_failure_prevented: external_brainstorm_dispatch_batched_material_questions_unlogged_route_change_and_init_semantic_execution
+validation_scenarios:
+  - scenario: native_clarification_matrix
+    expected: 清晰、模糊、Init、裸继续、推荐答案、事实回答、对齐外部证据和冲突外部证据均由 CoTend 决定
+    validation_result_type: executed
+    result: eight_scenarios_max_one_question_external_route_owner_false_parallel_truth_false
+  - scenario: unchanged_grill_me
+    expected: bundled MIT companion 保持 adopted 字节
+    validation_result_type: executed
+    result: sha256_8cfed91b3d4f8407d868648bb83bd48ddfd25ac1f1a5e909f4c80d54e2b0fe98
+  - scenario: exact_td03_inventory_change
+    expected: 只允许四个 TD03 表面在 L62 检查点之后减少
+    validation_result_type: executed
+    result: current_163_mentions_21_files_and_4_td03_paths_verified
+  - scenario: r3_to_r4_delivery
+    expected: 可信 r3 回执可确定升级到当前 r4，r2 历史包仍可复现
+    validation_result_type: executed
+    result: predecessor_and_historical_package_tests_passed
+real_project_validation:
+  - scenario: novice_fuzzy_project
+    expected: 真实小白用户在无外部开发框架时完成澄清、确认、实现和跨会话恢复
+    validation_result_type: deferred
+    result: G06_not_started
+decision: watch
+rollback_triggers:
+  - Init 开始执行产品澄清或把 handback 当成确认
+  - 一次提出多个独立重大问题，裸 continue 选择答案，或决定在记录前改变路线
+  - 外部 brainstorm 再次成为 route owner 或产生平行真相
+  - grill-me adopted 字节、r3/r2 身份或 rc.2 摘要发生变化
+review_after: L64_TD06_and_each_later_native_replacement_leaf
+watch_closure:
+  - keep_watch
+  - evidence: docs/NATIVE-REQUIREMENTS-CLARIFICATION.md
+```
+
+本次不执行真实用户安装、push、tag、Release、Portal、submission、publish 或身份验证。`G02` 当前完成 `2/8`，只证明 TD08 与 TD03。
+
 ## 2026-07-24 L62 原生项目真相权限
 
 ```yaml
@@ -69,11 +139,11 @@ watch_closure:
   - evidence: docs/evidence/NATIVE-PROJECT-TRUTH-TARGET-R3.md
 ```
 
-本次不执行真实用户安装、push、tag、Release、Portal、submission、publish 或身份验证。`G02` 当前只完成 `1/8`，因此不能把 L62 表述为 CoTend 已完全移除 Trellis。
+L62 本次不执行真实用户安装、push、tag、Release、Portal、submission、publish 或身份验证。该检查点只完成 `1/8`，不能表述为 CoTend 已完全移除 Trellis。
 
 权限迁移后的判断顺序是固定的：先读取用户确认的产品含义和需求，再读取项目决策与活动路线，最后用代码、测试和运行结果校验状态。外部开发框架留下的任务、规格或状态文件只能补充证据，不能覆盖这条链。如果两者冲突，浅层冲突停止受影响范围并等待用户裁决，执行层冲突则由 CoTend 从最近可靠边界重新规划；两种情况都不得同时维护两套“当前真相”。
 
-版本处理同样遵守不可改写原则。当前根 Skill 的行为变化属于 r3，但此前已验证的 r2 与 rc.2 仍代表原字节。过渡构建通过固定历史提交重现旧 Skill，而不是在仓库中复制第二份源码；因此完整 Git 历史是明确、可测试且可在后续候选中退休的临时成本。
+版本处理同样遵守不可改写原则。L62 检查点的 Skill 行为变化属于 r3，但此前已验证的 r2 与 rc.2 仍代表原字节。过渡构建通过固定历史提交重现旧 Skill，而不是在仓库中复制第二份源码；因此完整 Git 历史是明确、可测试且可在后续候选中退休的临时成本。
 
 ## 2026-07-24 冻结 CoTend 原生工作流等价基线
 
