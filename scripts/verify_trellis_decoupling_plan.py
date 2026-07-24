@@ -12,6 +12,7 @@ import verify_native_project_truth_authority as native_authority
 import verify_native_requirements_clarification as native_clarification
 import verify_native_spec_change_route_rebase as native_route_rebase
 import verify_native_workflow_state_runtime_profiles as native_workflow_state
+import verify_native_init_resume_before_development as native_project_entry
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,14 +56,15 @@ EXPECTED_DOCUMENT_MARKERS = [
     "### L63 / TD03 已完成",
     "### L64 / TD06 已完成",
     "### L65 / TD01 已完成",
+    "### L66 / TD02 已完成",
     "### G05 运行时零依赖",
-    "只移除 TD01",
+    "只移除 TD02",
 ]
 EXPECTED_BASELINE_INVENTORY_SHA256 = (
     "a1c9893a7462d7abd925b1ae468a3dd97366fae850e2881a23546e5471e93aeb"
 )
 EXPECTED_CURRENT_INVENTORY_SHA256 = (
-    "459e3edb03e980b34c86fe595f2fd6cdb213f49434683fe2577893eb44479b6e"
+    "74aff2a1d99c4656d32db45b6964c6699317bbe5387e445e1804de6bbc33e6d8"
 )
 AUTHORIZED_TD08_INVENTORY_REDUCTIONS = {
     "skills/cotend-collaboration/SKILL.md",
@@ -101,6 +103,9 @@ AUTHORIZED_TD01_INVENTORY_REDUCTIONS = {
     "skills/cotend-collaboration/references/upstream-dependency-review.md",
     "skills/cotend-init/SKILL.md",
     "skills/cotend-model-upgrade/SKILL.md",
+    "skills/cotend-project-init/SKILL.md",
+}
+AUTHORIZED_TD02_INVENTORY_REDUCTIONS = {
     "skills/cotend-project-init/SKILL.md",
 }
 
@@ -188,7 +193,7 @@ def validate_contract(
         raise TrellisDecouplingPlanError("current candidate identity drifted")
     if contract.get("target_candidate") != "cotend@0.1.0-rc.3_after_parity":
         raise TrellisDecouplingPlanError("target candidate identity drifted")
-    if contract.get("development_target_artifact") != "cotend-codex-r000006":
+    if contract.get("development_target_artifact") != "cotend-codex-r000007":
         raise TrellisDecouplingPlanError("development target artifact drifted")
 
     source = contract.get("source_boundary")
@@ -261,7 +266,7 @@ def validate_contract(
     ).hexdigest()
     if current_digest != EXPECTED_CURRENT_INVENTORY_SHA256:
         raise TrellisDecouplingPlanError(
-            "exact L65 43/16 runtime Trellis inventory changed"
+            "exact L66 38/16 runtime Trellis inventory changed"
         )
     changed_inventory_paths = {
         path
@@ -273,10 +278,11 @@ def validate_contract(
         | AUTHORIZED_TD03_INVENTORY_REDUCTIONS
         | AUTHORIZED_TD06_INVENTORY_REDUCTIONS
         | AUTHORIZED_TD01_INVENTORY_REDUCTIONS
+        | AUTHORIZED_TD02_INVENTORY_REDUCTIONS
     )
     if changed_inventory_paths != authorized_reductions:
         raise TrellisDecouplingPlanError(
-            "runtime inventory changed outside the exact TD08, TD03, TD06, and TD01 surfaces"
+            "runtime inventory changed outside the exact TD08, TD03, TD06, TD01, and TD02 surfaces"
         )
     if any(
         actual_inventory.get(path, 0) >= expected_inventory.get(path, 0)
@@ -355,6 +361,7 @@ def validate_contract(
             if capability_id
             in {
                 "TD01-workflow-state-and-mode",
+                "TD02-init-resume-and-before-development",
                 "TD03-requirements-clarification",
                 "TD06-spec-change-and-route-rebase",
                 "TD08-project-truth-authority",
@@ -383,6 +390,17 @@ def validate_contract(
                 "tests/test_native_workflow_state_runtime_profiles.py",
             ]:
                 raise TrellisDecouplingPlanError("TD01 evidence inventory drifted")
+        if capability_id == "TD02-init-resume-and-before-development":
+            if item.get("native_coverage") != "verified_native_contract":
+                raise TrellisDecouplingPlanError("TD02 native coverage drifted")
+            if item.get("evidence") != [
+                "docs/NATIVE-INIT-RESUME-BEFORE-DEVELOPMENT.md",
+                "skills/cotend-project-init/SKILL.md",
+                "skills/cotend-collaboration/references/code-context-harness.md",
+                "scripts/verify_native_init_resume_before_development.py",
+                "tests/test_native_init_resume_before_development.py",
+            ]:
+                raise TrellisDecouplingPlanError("TD02 evidence inventory drifted")
         if capability_id == "TD08-project-truth-authority":
             if item.get("native_coverage") != "verified_native_contract":
                 raise TrellisDecouplingPlanError("TD08 native coverage drifted")
@@ -433,7 +451,7 @@ def validate_contract(
         expected_status = (
             "complete"
             if index == 0
-            else "in_progress_4_of_8"
+            else "in_progress_5_of_8"
             if index == 1
             else "not_started"
         )
@@ -445,13 +463,13 @@ def validate_contract(
     if contract.get("this_slice") != {
         "skill_behavior_changed": True,
         "trellis_route_removed": True,
-        "removed_capability_ids": ["TD01-workflow-state-and-mode"],
+        "removed_capability_ids": ["TD02-init-resume-and-before-development"],
         "target_artifact_changed": True,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
     }:
         raise TrellisDecouplingPlanError(
-            "L65 slice boundary drifted"
+            "L66 slice boundary drifted"
         )
 
     for marker in EXPECTED_DOCUMENT_MARKERS:
@@ -477,6 +495,11 @@ def validate_contract(
         raise TrellisDecouplingPlanError(
             "TD01 native workflow-state verifier did not pass"
         )
+    project_entry_result = native_project_entry.verify_repository(ROOT)
+    if project_entry_result.get("status") != "native_parity_verified":
+        raise TrellisDecouplingPlanError(
+            "TD02 native init/resume/pre-development verifier did not pass"
+        )
 
     return {
         "status": contract["status"],
@@ -486,7 +509,7 @@ def validate_contract(
         "runtime_files": len(actual_inventory),
         "trellis_runtime_paths": 0,
         "skill_behavior_changed": True,
-        "native_capabilities_verified": 4,
+        "native_capabilities_verified": 5,
     }
 
 

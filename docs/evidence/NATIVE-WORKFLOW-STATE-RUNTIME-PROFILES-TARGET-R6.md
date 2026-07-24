@@ -30,4 +30,4 @@ push_release_submission_or_publish: false
 
 ## 版本边界
 
-r6 是当前根 `skills/` 的内部开发 target。r5 是精确 predecessor；r4、r3、r2 继续保留在 artifact lock 中。rc.2 仍从固定历史 r2 Git 提交构建，不吸收 r3-r6 的当前字节。
+r6 是 TD01 完成时的根 `skills/` 内部开发检查点。r5 是其精确 predecessor；r4、r3、r2 继续保留在 artifact lock 中。后续 target 不改写该历史证据；rc.2 仍从固定历史 r2 Git 提交构建。

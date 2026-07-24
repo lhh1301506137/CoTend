@@ -54,12 +54,12 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         inventory = namespace.identifier_inventory(
             namespace.base.SOURCE_SKILLS_ROOT, namespace.USER_OWNED_SKILLS
         )
-        self.assertEqual(inventory["occurrences"], 181)
+        self.assertEqual(inventory["occurrences"], 184)
         self.assertEqual(inventory["files"], 22)
         self.assertEqual(
             inventory["by_identifier"],
             {
-                "cotend-collaboration": 70,
+                "cotend-collaboration": 73,
                 "cotend-diagnose-only": 25,
                 "cotend-init": 12,
                 "cotend-model-upgrade": 11,
@@ -76,7 +76,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
                 "frontmatter_name": 6,
                 "plain_reference": 31,
                 "protocol_or_version": 14,
-                "reference_path": 53,
+                "reference_path": 56,
             },
         )
 
@@ -157,7 +157,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         )
         self.assertEqual(
             preserve["residual_source_identifier_inventory"]["occurrences"],
-            181,
+            184,
         )
         self.assertEqual(preserve["residual_migration_review_required"], 0)
         self.assertEqual(preserve["plugin_sensitive_reference_count"], 77)
@@ -174,9 +174,9 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         self.assertFalse(short["source_comparison"]["byte_identical"])
         self.assertEqual(
             short["residual_source_identifier_inventory"]["occurrences"],
-            169,
+            172,
         )
-        self.assertEqual(short["residual_migration_review_required"], 155)
+        self.assertEqual(short["residual_migration_review_required"], 158)
         self.assertEqual(short["plugin_sensitive_reference_count"], 71)
         self.assertEqual(len(short["target_entrypoints"]), 6)
         self.assertEqual(

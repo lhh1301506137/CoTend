@@ -46,6 +46,8 @@ Then execute its Auto Mode exactly. Do not duplicate or reinterpret its detailed
 
 On resume, propagate Project Init's canonical `route_rebase` reference/state unchanged when one is active. `evaluating` resumes classification only and cannot activate the candidate. `pending_user_confirmation` is the specialized handback for the affected route; bare `继续` must not restore the previous path or choose the candidate. `applying` / `revalidating` may be reported as resumable only when no human gate is pending, and only from the recorded reliable boundary. Omit the packet entirely for ordinary route work.
 
+After this Skill has returned control, resumed broad product work must pass Project Init's native pre-development readiness route through `cotend-collaboration/references/code-context-harness.md`. Provider or index preparation performed during Init does not satisfy the handback and does not authorize same-response implementation.
+
 ## Output Boundary
 
 Report in the project's recorded user-facing language, or English by default, using the `cotend-project-init` output contract:

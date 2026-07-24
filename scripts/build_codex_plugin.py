@@ -539,8 +539,8 @@ def validate_contract() -> dict[str, Any]:
     if (
         target.get("platform") != "Codex"
         or target.get("lineage") != "cotend-codex"
-        or target.get("artifact_id") != "cotend-codex-r000006"
-        or target.get("revision") != 6
+        or target.get("artifact_id") != "cotend-codex-r000007"
+        or target.get("revision") != 7
         or not isinstance(target.get("manifest_sha256"), str)
         or len(target["manifest_sha256"]) != 64
     ):

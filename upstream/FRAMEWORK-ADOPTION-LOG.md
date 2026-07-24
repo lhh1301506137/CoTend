@@ -336,3 +336,28 @@ push_release_or_publish: not_performed
 L65 继续作为 CoTend 产品 overlay：`STATUS.md` 或项目明确映射载体成为唯一原生 workflow-state owner；Full/Adaptive 分别映射为 `delegated_pair/inline`。外部框架只保留逐项分类证据，不承载 CoTend 状态、档位或 dispatch，也不接收 CoTend 配置写入。16 类状态转换和迁移场景均通过，旧来源与无关项目真相保持不变。
 
 根 `skills/` 推进为同 lineage target r6，L64 的 r5 成为精确 predecessor，r4、r3 与 r2 继续保留。未发布 rc.2 仍由历史 r2 source commit 重建，48 文件 package 与 ZIP 摘要不变。TD02、TD04、TD05、TD07 兼容过程保持，且本叶不构成 rc.3、push、release、submission 或 publish 授权。
+
+## cotend-native-overlay-L66-TD02
+
+```yaml
+status: native_parity_verified_for_init_resume_before_development
+source_framework_release_unchanged: 2026.07.23.2
+source_framework_lock_changed: false
+product_overlay: TD02-init-resume-and-before-development
+historical_runtime_baseline: 241_mentions_22_files
+L62_runtime_checkpoint: 174_mentions_21_files
+L63_runtime_checkpoint: 163_mentions_21_files
+L64_runtime_checkpoint: 158_mentions_21_files
+L65_runtime_checkpoint: 43_mentions_16_files
+current_runtime_inventory: 38_mentions_16_files
+current_target_artifact_id: cotend-codex-r000007
+current_target_revision: 7
+predecessor_target_artifact_id: cotend-codex-r000006
+plugin_candidate: cotend@0.1.0-rc.2_immutable
+plugin_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1
+push_release_or_publish: not_performed
+```
+
+L66 继续作为 CoTend 产品 overlay：Init 与 Project Init 原生拥有初始化、更新、修复、迁移、续接、冲突停止和一次 handback；Code Context Harness 原生拥有真相优先的开发前门。13 类入口与 9 类开发前场景通过，外部开发框架不取得 owner，重复检查保持幂等。
+
+根 `skills/` 推进为同 lineage target r7，L65 的 r6 成为精确 predecessor，r5、r4、r3 与 r2 继续保留。未发布 rc.2 仍由历史 r2 source commit 重建，48 文件 package 与 ZIP 摘要不变。TD04、TD05、TD07 兼容过程保持，且本叶不构成 rc.3、push、release、submission 或 publish 授权。

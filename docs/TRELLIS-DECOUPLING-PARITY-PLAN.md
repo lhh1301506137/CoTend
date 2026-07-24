@@ -6,7 +6,7 @@ authority: product_owner_confirmed_2026-07-24
 scope: packaged_CoTend_runtime_and_first_party_Skills
 current_candidate: cotend@0.1.0-rc.2_local_unpublished
 target_candidate: cotend@0.1.0-rc.3_after_parity
-development_target_artifact: cotend-codex-r000006
+development_target_artifact: cotend-codex-r000007
 machine_contract: ../upstream/TRELLIS-DECOUPLING-PLAN.json
 analysis_language: zh-CN
 ```
@@ -22,8 +22,8 @@ Trellis 可以继续出现在竞品研究、固定来源和历史采用说明中
 ## 当前事实
 
 - L61 冻结基线是根 `skills/` 中 241 处不区分大小写的 `Trellis`，分布在 22 个第一方 Skill 文件；它作为不可变历史量尺保留。
-- L62 完成 TD08 权限替换后的检查点库存是 174 处、21 个文件；L63 完成 TD03 主动澄清路由替换后为 163 处、21 个文件；L64 完成 TD06 规格变化权限替换后为 158 处、21 个文件；L65 完成 TD01 原生状态与档位替换后，当前库存是 43 处、16 个文件。每次减少均限定在已审计表面。
-- 当前根 Skill 字节属于内部 target r6；r5、r4、r3 和 r2 依次保留为精确 predecessor。rc.2 不再从当前工作树取 Skill，而从其已验证历史 r2 提交复现，因此不会把 L62-L65 字节静默塞进同一候选身份。
+- L62 完成 TD08 权限替换后的检查点库存是 174 处、21 个文件；L63 完成 TD03 主动澄清路由替换后为 163 处、21 个文件；L64 完成 TD06 规格变化权限替换后为 158 处、21 个文件；L65 完成 TD01 原生状态与档位替换后为 43 处、16 个文件；L66 完成 TD02 初始化/续接/开发前门后，当前库存是 38 处、16 个文件。每次减少均限定在已审计表面。
+- 当前根 Skill 字节属于内部 target r7；r6、r5、r4、r3 和 r2 依次保留为精确 predecessor。rc.2 不再从当前工作树取 Skill，而从其已验证历史 r2 提交复现，因此不会把 L62-L66 字节静默塞进同一候选身份。
 - 仓库没有跟踪 `.trellis/`，也没有位于 Skill、源码、交付、打包或插件运行时路径下的 Trellis 命名文件、Trellis 源码、模板、hooks、二进制或依赖包。本计划、研究、来源说明和验证器可以保留 Trellis 名称，以准确描述替换对象和来源边界。
 - `requirements-ci.txt` 只固定 PyYAML；Plugin/package manifest 没有 Trellis 组件或许可证载体。
 - 因此当前问题是**运行时框架集成与权限依赖**，不是已经复制 Trellis 源码。
@@ -48,7 +48,7 @@ Trellis 可以继续出现在竞品研究、固定来源和历史采用说明中
 | 2 | `trellis-brainstorm` | 一次一问；模糊输入不冒充确认真相；用户决定可恢复 | grill-me、Idea to Consensus、Semantic Alignment、决策日志 | **TD03 已完成**：八类场景、Init handback、裸继续停止、决定先记录和外部证据隔离通过 | 后续累计主旅程和真实小白验收仍由 G03/G06 验证，不恢复外部 brainstorm 路由 |
 | 3 | `trellis-update-spec` | L0-L2 含义与 L3-L4 执行分离；受影响路线从可靠边界重基 | Semantic Alignment、Route Rebase、Plan Tree、Knowledge Changelog | **TD06 已完成**：十类场景覆盖权限、接受/拒绝、隔离、证据失效、中断恢复与外部冲突 | 后续累计主旅程和真实项目仍由 G03/G06 验证，不恢复外部 spec 写入或 update 路由 |
 | 4 | `.trellis/`、`trellis.mode`、`.trellis/config.yaml` | 判断当前/历史/冲突状态；持久化 Full/Adaptive；迁移不破坏真相 | Project Init、Collaboration、Plan Tree、STATUS | **TD01 已完成**：原生 `current / dormant / conflict`、Full/Adaptive 和 `delegated_pair / inline` 的 16 类场景通过 | 后续累计主旅程、负向恢复集成和真实项目仍由 G03/G04/G06 验证，不恢复外部状态/config owner |
-| 5 | `trellis-start`、`trellis-before-dev` | 初始化、更新、修复、迁移、续接幂等；开发前加载真相和代码上下文 | CoTend Init、Project Init、Code Context Harness | 主流程已存在 | 删除 Trellis dispatch 后重跑 fresh/update/repair/migrate/resume 和冲突停止矩阵 |
+| 5 | `trellis-start`、`trellis-before-dev` | 初始化、更新、修复、迁移、续接幂等；开发前加载真相和代码上下文 | CoTend Init、Project Init、Code Context Harness | **TD02 已完成**：13 类入口与 9 类开发前场景通过；一次 handback、专属决定停止和真相优先顺序成立 | 后续累计主旅程、负向恢复集成和真实项目仍由 G03/G04/G06 验证，不恢复外部启动/开发前路由 |
 | 6 | `trellis-implement` | 只实现已授权叶子；写入责任和依赖清楚；产生相称测试与证据 | CoTend 原生 Implementer、Native Agent Orchestration、Plan Tree | 规则存在，Full 仍绑定 Trellis 名称 | 原生 Implementer 通过独立/内联、失败、范围越界和依赖顺序测试 |
 | 7 | `trellis-check` | 检查差异、规格、测试和失败路径；可修范围内问题；不替代用户验收 | CoTend 原生 Checker、Acceptance Harness、自审、AI UAT | 组件已存在，尚未验证为完整原生检查链 | 原生 Checker 与 Implementer 解耦，发现/修复/拒绝/用户验收边界通过 |
 | 8 | `trellis-finish`、archive、journal | 验证后收尾；保存状态、审查、决定、交接和真相；本地提交不等于发布 | Goal Completion、STATUS、REVIEW、HANDOFF、本地 closeout | 基本具备 | 完成成功/失败收尾、跨会话恢复、回滚和无关文件保护 |
@@ -97,9 +97,15 @@ CoTend 现在只在 `STATUS.md` 或项目明确映射的同等状态载体中保
 
 16 类场景覆盖首次默认、升级幂等、会话覆盖、持久切换、Adaptive 回 Full、休眠恢复、无效/重复状态、外部参考/历史/冲突、旧档位无损迁移和含糊迁移停止。所有场景均保证 external owner/config write 为 false、旧来源不变、无关真相保留、无并行状态树。当前只移除 TD01 外部状态/config 路由，不删除 TD02、TD04、TD05、TD07。
 
+### L66 / TD02 已完成
+
+CoTend Init 保持薄入口，Project Init 成为 fresh/update/repair/resume/blocked 分类、安全写入和一次 handback 的唯一 owner。明确 Init 不在同一响应启动产品实现；裸 `continue` 只恢复同一已确认路线，不能回答语义、Route Rebase、验收、发布或其他专属决定。
+
+Code Context Harness 现在拥有原生开发前门：先读取 CoTend 当前真相、活动叶、需求、验收和风险，再查询 CodeGraph/fallback 并用实际文件验证影响集。13 类入口场景和 9 类开发前场景覆盖成功、阻塞、停止、provider 降级、根目录含糊和重复无写入。当前只移除 TD02 的启动与开发前路由，不删除 TD04、TD05、TD07。
+
 ### G02 单项原生等价
 
-每个接口至少覆盖 success、blocked、failure、stop，固定 CoTend owner、状态迁移、测试和回滚，再删除对应旧路径。当前进度为 4/8：TD08、TD03、TD06 与 TD01 已通过。
+每个接口至少覆盖 success、blocked、failure、stop，固定 CoTend owner、状态迁移、测试和回滚，再删除对应旧路径。当前进度为 5/8：TD08、TD03、TD06、TD01 与 TD02 已通过。
 
 ### G03 累计主旅程
 
@@ -128,14 +134,14 @@ CoTend 现在只在 `STATUS.md` 或项目明确映射的同等状态载体中保
 
 - rc.2 保持为本地未发布的 v1.65 累计采用基线和回滚锚点。
 - 能力替换期间不推送、不创建 tag/Release、不提交 Portal。
-- 当前内部 target r6 只表示同 lineage Skill 字节推进，不是 rc.3 包。
+- 当前内部 target r7 只表示同 lineage Skill 字节推进，不是 rc.3 包。
 - 只有 G01-G05 通过后才构建 rc.3。
 - G06 通过前，框架变更评估保持 `watch`，不得宣称“完全独立且无能力退化”。
 - 官方 Plugin 身份验证路线暂时停放；产品核心变化闭合后再恢复。
 
-## L65 本切片不做
+## L66 本切片不做
 
-- 不删除 TD02、TD04、TD05、TD07 的 Trellis 兼容流程。
+- 不删除 TD04、TD05、TD07 的 Trellis 兼容流程。
 - 不新增用户可见的 Implement/Check 命令。
 - 不创建 `.cotend/` 新状态布局。
 - 不修改 dual-ai upstream，也不要求其删除私人 Trellis 集成。

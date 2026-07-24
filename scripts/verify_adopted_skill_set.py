@@ -558,14 +558,25 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         "target": {
             "platform": "Codex",
             "lineage": "cotend-codex",
-            "artifact_id": "cotend-codex-r000006",
-            "revision": 6,
+            "artifact_id": "cotend-codex-r000007",
+            "revision": 7,
             "manifest_sha256": carrier_manifest,
         },
         "product": {"version": None},
         "skill_count": 8,
         "skill_file_count": 37,
         "predecessor_targets": [
+            {
+                "platform": "Codex",
+                "lineage": "cotend-codex",
+                "artifact_id": "cotend-codex-r000006",
+                "revision": 6,
+                "source_release_id": "2026.07.23.2",
+                "framework_protocol": "cotend-collaboration-v1.65",
+                "manifest_sha256": (
+                    "58410dbbf9ab0945af62cea0583938c5f5bc733634a72035c5b06e6c71073271"
+                ),
+            },
             {
                 "platform": "Codex",
                 "lineage": "cotend-codex",

@@ -6,7 +6,7 @@
   "decision": "preserve_governance_capabilities_replace_trellis_identity_authority_and_runtime_dependency",
   "current_candidate": "cotend@0.1.0-rc.2_local_unpublished",
   "target_candidate": "cotend@0.1.0-rc.3_after_parity",
-  "development_target_artifact": "cotend-codex-r000006",
+  "development_target_artifact": "cotend-codex-r000007",
   "source_boundary": {
     "trellis_relationship": "restricted_design_inspiration_and_legacy_runtime_integration",
     "trellis_source_adoption": "none",
@@ -58,7 +58,7 @@
   "current_runtime": {
     "scope": "skills/",
     "case_insensitive_term": "trellis",
-    "mention_count": 43,
+    "mention_count": 38,
     "file_count": 16,
     "file_mentions": {
       "skills/cotend-collaboration/SKILL.md": 2,
@@ -75,7 +75,7 @@
       "skills/cotend-collaboration/references/upstream-dependency-review.md": 1,
       "skills/cotend-model-upgrade/SKILL.md": 2,
       "skills/cotend-model-upgrade/references/packet-templates.md": 3,
-      "skills/cotend-project-init/SKILL.md": 13,
+      "skills/cotend-project-init/SKILL.md": 8,
       "skills/cotend-semantic-alignment/SKILL.md": 1
     }
   },
@@ -145,10 +145,17 @@
         "cotend-project-init",
         "Code Context Harness"
       ],
-      "native_coverage": "substantial_unified_flow_exists",
-      "known_gap": "trellis_specific_dispatch_and_predevelopment_branches_not_yet_removed_or_parity_tested",
-      "status": "baseline_frozen",
-      "removal_gate": "native_parity_verified"
+      "native_coverage": "verified_native_contract",
+      "known_gap": "none_within_TD02_entry_and_predevelopment_scope; cumulative journey, negative recovery integration, and real-project acceptance remain",
+      "status": "native_parity_verified",
+      "removal_gate": "native_parity_verified",
+      "evidence": [
+        "docs/NATIVE-INIT-RESUME-BEFORE-DEVELOPMENT.md",
+        "skills/cotend-project-init/SKILL.md",
+        "skills/cotend-collaboration/references/code-context-harness.md",
+        "scripts/verify_native_init_resume_before_development.py",
+        "tests/test_native_init_resume_before_development.py"
+      ]
     },
     {
       "id": "TD03-requirements-clarification",
@@ -321,7 +328,7 @@
         "native_owner_and_state_transition",
         "focused_regression_tests"
       ],
-      "status": "in_progress_4_of_8"
+      "status": "in_progress_5_of_8"
     },
     {
       "id": "G03-cumulative-main-journey",
@@ -369,7 +376,7 @@
     "skill_behavior_changed": true,
     "trellis_route_removed": true,
     "removed_capability_ids": [
-      "TD01-workflow-state-and-mode"
+      "TD02-init-resume-and-before-development"
     ],
     "target_artifact_changed": true,
     "package_identity_changed": false,

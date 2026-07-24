@@ -12,10 +12,9 @@ Initialize a project for the user's current AI development workflow without requ
 
 This skill is an orchestrator. Prefer loading or following these skills when available:
 
-- `trellis-start` only when an already-authorized compatibility startup procedure is recorded by the native CoTend workflow or the user explicitly asks to inspect that procedure. This temporary TD02 route owns no state or truth.
-- `trellis-before-dev` only when the same native record selects the remaining compatibility pre-development procedure. Do not infer authorization from external files.
 - `karpathy-guidelines` for coding behavior.
 - `cotend-collaboration` for canonical carrier/provider/actual-model/role identity, runtime-profile routing, review cadence, risk tiers, acceptance/test harness routing, AI UAT, user/grill decision logging, and self-review.
+- `cotend-collaboration/references/code-context-harness.md` for the native pre-development readiness gate after Init has returned control.
 - `grill-me` only for a framework-setup question that Init itself owns; never use it during Init to clarify appended product meaning or create protected semantic consensus.
 - Do not load `cotend-collaboration/references/idea-to-consensus.md` during Init to preflight a fuzzy idea or semantic request. Report `idea-to-consensus -> direct $cotend-semantic-alignment new_baseline` as an independent post-init route instead.
 
@@ -84,6 +83,22 @@ For a direct invocation or a `cotend-init` delegation, readiness describes proje
 An absent/partial/stale/conflicting baseline blocks only product paths that depend on the unresolved L0-L2 meaning. Report unaffected confirmed paths separately; do not freeze unrelated maintenance or future branches merely because one feature is pending.
 
 An active material Route Rebase is likewise scoped. `evaluating` may be `continue_ready` only for materiality/semantic-impact/authority classification and cannot activate the candidate. `pending_user_confirmation` makes the exact semantic decision the one affected-route handback and bare `继续` cannot answer it. `applying` / `revalidating` may be `continue_ready` only when no human gate is pending and the next action starts at the recorded reliable boundary. `blocked` prevents only dependent leaves; an unrelated route may continue when its own protected ancestors are already explicitly user-confirmed and dependency isolation is evidenced. Init must not ask for a new confirmation merely because another route is rebasing. Never revive the previous path merely because Init changed sessions/models.
+
+## Native Initialization And Resume Boundary
+
+Project Init owns the complete native entry lifecycle. It must finish these phases in order:
+
+1. classify exactly one Auto Mode;
+2. resolve the native workflow state and runtime profile;
+3. preserve or safely repair durable CoTend truth and control-plane files;
+4. run post-init consistency checks;
+5. report readiness and return control exactly once.
+
+Safe setup, update, repair, and migration writes are idempotent. Preserve user-authored truth and unrelated files; a second run with unchanged inputs must produce no diff. A dormant record requires explicit resume. A conflicting record, route-affecting external conflict, invalid profile, ambiguous migration, or missing specialized human decision fails closed before affected development.
+
+An explicit Init invocation never starts product implementation in the same response. When no specialized decision is pending, its handback may offer only the same already-confirmed route; bare `continue` satisfies that generic handback on the next turn. A specialized semantic, Route Rebase, acceptance, release, risk, or other human-only decision remains the sole handback and is never answered by bare `continue`.
+
+The native pre-development readiness gate in `cotend-collaboration/references/code-context-harness.md` runs only after this handback is satisfied or when work entered directly under an already-authorized route without an explicit Init control flow. Init may prepare a provider or index, but preparation does not satisfy the handback and does not authorize broad edits.
 
 ## Native Workflow State And Runtime Profile
 
@@ -179,7 +194,7 @@ cotend_workflow:
       affects_current_route: true | false
       evidence_pointer:
       compatibility_procedures:
-        - capability: startup | pre_development | implementation | verification | closeout
+        - capability: implementation | verification | closeout
           procedure_id:
           status: authorized | disabled
           authority: cotend_native_record | user_explicit
@@ -196,7 +211,7 @@ Initialize a lightweight harness feedback loop:
 - Propose global skill changes only when the failure is cross-project, high-impact, or clearly caused by the global workflow itself.
 - Do not add rules for every isolated mistake. Mark uncertain candidates as `watching`.
 
-During old-project repair, check for repeated workflow misses: skipped Trellis phases, stale PRD/spec truth, lost review boundaries, risk misclassification, missing verification, repeated user corrections, or recurring bugs.
+During old-project repair, check for repeated workflow misses: skipped workflow phases, stale PRD/spec truth, lost review boundaries, risk misclassification, missing verification, repeated user corrections, or recurring bugs.
 
 ## Code Context Harness
 
@@ -402,7 +417,7 @@ Do not start large product development until this workflow is complete.
 
 6. Determine project stage.
    - Classify as `personal_dev`, `prototype`, `internal_test`, or `public_release`.
-   - Infer from README, deployment config, env examples, auth/payment code, data sources, package scripts, Trellis/STATUS/PRD records, and the user's latest statements.
+   - Infer from README, deployment config, env examples, auth/payment code, data sources, package scripts, classified external-framework/STATUS/PRD records, and the user's latest statements.
    - If ambiguous and it changes risk boundaries, ask one concise question with option `1` as the recommended default.
 
 7. Set continuous-development authority.
@@ -471,7 +486,7 @@ Do not start large product development until this workflow is complete.
     - Premium-model advisor or takeover recommendations that affect understanding/route must be logged as `advisor_recommended` or `primary_ai_proposed_delta`, not merged into user consensus until the user confirms. If the advisor asks the user a product/architecture/model-role question and the user answers, record that answer in `PROJECT-DECISION-LOG.md`.
     - If existing capability trees, glossaries, domain models, taxonomies, expanded understanding, or equivalent semantic assets are encountered in the active route, preserve their real authority and link/reuse them through the existing Plan Tree/understanding surfaces. File existence is not confirmation; Init must not create a parallel semantic asset or resolve a protected conflict itself.
     - Accepted aliases from `cotend-collaboration/references/authority-and-triggers.md` remain valid during migration. Report them as migration suggestions, not initialization failures, unless the project has already adopted a stricter schema.
-    - In projects with Trellis artifacts, classify and record useful task/PRD/spec links in Plan Tree/node docs; do not duplicate full content or treat the links as route authority.
+    - In projects with external development-framework artifacts, classify and record useful task/PRD/spec links in Plan Tree/node docs; do not duplicate full content or treat the links as route authority.
     - Before declaring the project `continue_ready`, run the Plan Tree Post-Init Consistency Self-Check, including multidimensional `semantic_baseline_coverage`, triggered semantic-contract binding verification, active truth/navigation pointer closure, and material Route Rebase continuity when referenced. Fix safe control-plane drift when clearly in scope; never repair product meaning or re-sign a contract without user confirmation.
     - Run the Triggered Semantic Reconciliation depth needed to report Init safety: check protected lineage first, then inspect the active path/recent decisions and changes for init/update/resume/repair. Run deeper comparison only when an anomaly or possible self-consistent wrong baseline is needed to classify `stale` / `conflict`; report the result without drafting replacement meaning. Include the standing baseline and four-state reconciliation result when reconciliation runs.
 
@@ -523,6 +538,8 @@ Do not start large product development until this workflow is complete.
 
 19. Configure Code Context Harness.
     - If the project is current and `standard` or `full`, large, unfamiliar, cross-module, architecture-heavy, or likely to need external review, load `references/code-context-harness.md`.
+    - During Init, provider/index setup is framework preparation only. Do not mark the native pre-development gate satisfied and do not start product work in the same response.
+    - After the Init handback is satisfied, require the native pre-development order before broad edits: current CoTend truth -> active leaf and route -> requirements/acceptance/risk -> code-context provider and impact set -> direct file verification.
     - Detect available provider: `codegraph`, `repo_map`, `language_server`, `rg_fallback`, or `none`.
     - For current standard/full projects, treat CodeGraph as expected and record why it is unavailable if falling back.
     - If CodeGraph CLI is available but MCP is missing after a config switch, use or recommend the provider's documented MCP setup flow without changing unrelated configuration.
@@ -693,7 +710,7 @@ Project initialization report:
     affects_current_route: true | false
     evidence_pointer:
     compatibility_procedures:
-      - capability: startup | pre_development | implementation | verification | closeout
+      - capability: implementation | verification | closeout
         procedure_id:
         status: authorized | disabled
         authority: cotend_native_record | user_explicit

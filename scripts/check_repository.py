@@ -11,6 +11,8 @@ import verify_trellis_decoupling_plan as trellis_decoupling
 import verify_native_project_truth_authority as native_authority
 import verify_native_requirements_clarification as native_clarification
 import verify_native_spec_change_route_rebase as native_route_rebase
+import verify_native_workflow_state_runtime_profiles as native_workflow_state
+import verify_native_init_resume_before_development as native_project_entry
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -400,6 +402,12 @@ EXPECTED_NATIVE_WORKFLOW_STATE_FILES = {
     "docs/evidence/NATIVE-WORKFLOW-STATE-RUNTIME-PROFILES-TARGET-R6.md",
     "scripts/verify_native_workflow_state_runtime_profiles.py",
     "tests/test_native_workflow_state_runtime_profiles.py",
+}
+EXPECTED_NATIVE_PROJECT_ENTRY_FILES = {
+    "docs/NATIVE-INIT-RESUME-BEFORE-DEVELOPMENT.md",
+    "docs/evidence/NATIVE-INIT-RESUME-BEFORE-DEVELOPMENT-TARGET-R7.md",
+    "scripts/verify_native_init_resume_before_development.py",
+    "tests/test_native_init_resume_before_development.py",
 }
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
@@ -2644,7 +2652,7 @@ def production_plugin_package_errors(
             errors.append(f"production Plugin package evidence mismatch: {key}")
     for marker in (
         "rc.2 的 Skill 语义源固定为 Git commit",
-        "当前根 `skills/` 已推进到 target r6",
+        "当前根 `skills/` 已推进到 target r7",
         "48 个文件",
         "逐字节一致",
         "17 类负向边界",
@@ -3976,8 +3984,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     expected_target = {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000006",
-        "revision": 6,
+        "artifact_id": "cotend-codex-r000007",
+        "revision": 7,
     }
     if not isinstance(target, dict) or any(
         target.get(key) != expected for key, expected in expected_target.items()
@@ -4001,6 +4009,17 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if not isinstance(target, dict) or target.get("manifest_sha256") != carrier_manifest:
         errors.append("delivery target lock manifest mismatch")
     expected_predecessors = [
+        {
+            "platform": "Codex",
+            "lineage": "cotend-codex",
+            "artifact_id": "cotend-codex-r000006",
+            "revision": 6,
+            "source_release_id": "2026.07.23.2",
+            "framework_protocol": "cotend-collaboration-v1.65",
+            "manifest_sha256": (
+                "58410dbbf9ab0945af62cea0583938c5f5bc733634a72035c5b06e6c71073271"
+            ),
+        },
         {
             "platform": "Codex",
             "lineage": "cotend-codex",
@@ -4073,23 +4092,23 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if target_lock.get("legacy_receipt_mappings") != expected_legacy_mappings:
         errors.append("delivery target lock legacy mapping mismatch")
     identity_evidence_path = (
-        "docs/evidence/NATIVE-WORKFLOW-STATE-RUNTIME-PROFILES-TARGET-R6.md"
+        "docs/evidence/NATIVE-INIT-RESUME-BEFORE-DEVELOPMENT-TARGET-R7.md"
     )
     if identity_evidence_path not in candidates:
         errors.append("target artifact identity evidence is missing or ignored")
     else:
         evidence = read(identity_evidence_path)
         for marker in (
-            "current_target_artifact_id: cotend-codex-r000006",
-            "current_target_revision: 6",
-            "current_target_manifest_sha256: 58410dbbf9ab0945af62cea0583938c5f5bc733634a72035c5b06e6c71073271",
-            "predecessor_target_artifact_id: cotend-codex-r000005",
-            "predecessor_target_revision: 5",
+            "current_target_artifact_id: cotend-codex-r000007",
+            "current_target_revision: 7",
+            "current_target_manifest_sha256: 246b16c990a85a2e183e0033c0b3a15a087e793ce0ace1f18e3d736f5a8fd045",
+            "predecessor_target_artifact_id: cotend-codex-r000006",
+            "predecessor_target_revision: 6",
             "source_framework_lock_changed: false",
             "package_candidate: cotend@0.1.0-rc.2_immutable",
             "package_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
-            "TD01-workflow-state-and-mode",
-            "predecessor_source_commit: d2c78fe12262bd18beb5f46ded8d1850e9f44207",
+            "TD02-init-resume-and-before-development",
+            "predecessor_source_commit: d69b719f2d94ceda0f8e3396eee71bdd378050ce",
         ):
             if marker not in evidence:
                 errors.append(f"target artifact identity evidence is missing: {marker}")
@@ -4201,6 +4220,14 @@ def main() -> int:
         errors.append(
             "native workflow-state/runtime-profile artifacts are missing or ignored: "
             f"{sorted(missing_native_workflow_state)}"
+        )
+    missing_native_project_entry = (
+        EXPECTED_NATIVE_PROJECT_ENTRY_FILES - candidates
+    )
+    if missing_native_project_entry:
+        errors.append(
+            "native init/resume/pre-development artifacts are missing or ignored: "
+            f"{sorted(missing_native_project_entry)}"
         )
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
@@ -4382,6 +4409,16 @@ def main() -> int:
             native_route_rebase.verify_repository(ROOT)
         except native_route_rebase.NativeRouteRebaseError as exc:
             errors.append(f"native spec change and Route Rebase: {exc}")
+    if not missing_native_workflow_state:
+        try:
+            native_workflow_state.verify_repository(ROOT)
+        except native_workflow_state.NativeWorkflowStateError as exc:
+            errors.append(f"native workflow state and runtime profiles: {exc}")
+    if not missing_native_project_entry:
+        try:
+            native_project_entry.verify_repository(ROOT)
+        except native_project_entry.NativeProjectEntryError as exc:
+            errors.append(f"native init/resume/pre-development: {exc}")
 
     github_marketplace_carrier_evidence_path = (
         "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md"

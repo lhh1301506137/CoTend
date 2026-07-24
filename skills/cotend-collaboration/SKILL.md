@@ -48,6 +48,7 @@ This body is the always-needed governance and routing core. Detailed contracts l
 ## Entry And Framework Coordination
 
 - Initialize, update, repair, migrate, or resume a downstream project through `cotend-project-init` Auto Mode. It decides fresh/legacy/repair/current/blocked state and returns control once.
+- After an explicit Init handback is satisfied, and before broad implementation or review, run the native pre-development readiness gate in `references/code-context-harness.md`: current CoTend truth and active route first, then code-context scope, then direct file verification. Provider setup during Init is preparation only.
 - Route a direct writable semantic request to `$cotend-semantic-alignment` and a read-only evaluation to `$cotend-diagnose-only`; both bypass Init. A composite `$cotend-init <semantic request>` completes Init only, leaves the appended request unclassified and unexecuted, then reports the independent next action without executing it. The preparatory module must not become a second writable alignment owner.
 - Resolve project meaning, detailed requirements, route, current reality, and coding constraints through the canonical role-based contract in `references/authority-and-triggers.md`. CoTend Core never grants project-truth authority from framework identity or active state.
 - Project Init stores one native workflow record in `STATUS.md` or its explicit equivalent. Detection may be `absent`; persisted state is `current | dormant | conflict`. Do not create a hidden state directory or a second task/profile database.
@@ -80,7 +81,7 @@ missing_required_modules:
 | Important current-MVP L2/main-chain implementation, post-alignment repair, material-node completion, or advancing to the next important node | `references/semantic-implementation-closure.md` plus `references/acceptance-test-harness.md` |
 | Repeated bugs/process failures, weak verification, deferred findings, quality decay, rubber-stamp review | `references/quality-sentinel.md` |
 | Feature appears built but needs product-style interaction/acceptance | `references/ai-uat.md` |
-| Current standard/full init or resume; large/unfamiliar/cross-module/architecture/review scope | `references/code-context-harness.md` |
+| Current standard/full init or resume; native pre-development readiness; large/unfamiliar/cross-module/architecture/review scope | `references/code-context-harness.md` |
 | Standard/full multi-stage work, Plan Tree route, drift, reconciliation, protected L0-L2, understanding depth | `references/plan-tree.md` |
 | Writable baseline/rebaseline/feature meaning change or semantic-contract migration | Direct `$cotend-semantic-alignment` plus `references/plan-tree.md`, `references/authority-and-triggers.md`, `references/templates.md`, and its zero-dependency contract helper |
 | Read-only semantic correctness/drift check or edits withheld | Direct `$cotend-diagnose-only` plus minimum relevant intent/product evidence |
@@ -129,8 +130,8 @@ Do not use `lite` for medium/dev_high/critical, unattended batches, formal gates
 
 ## Execution Loop
 
-1. **Start/resume**: read active STATUS/review/task truth, resolve Full/Adaptive and adoption profiles, resolve any active material Route Rebase before trusting `current_next_leaf`, trace the active leaf through confirmed L0-L2, verify contract bindings only when the active high-value boundary triggers it, then load only triggered modules.
-2. **Scope**: use Code Context when triggered; bind non-trivial work to the active CoTend Plan Tree or explicitly mapped route owner, classify any external-framework links, or reconcile the route first.
+1. **Start/resume**: read active STATUS/review/task truth, resolve Full/Adaptive and adoption profiles, resolve any active material Route Rebase before trusting `current_next_leaf`, trace the active leaf through confirmed L0-L2, verify contract bindings only when the active high-value boundary triggers it, then load only triggered modules. An explicit Init completes and hands back before product work.
+2. **Scope**: after any required Init handback, pass native pre-development readiness before broad edits. Load current truth before Code Context, bind non-trivial work to the active CoTend Plan Tree or explicitly mapped route owner, classify any external-framework links, and verify provider hints against real files.
 3. **Execute**: keep changes inside authorization and use the active workflow shape without duplicate orchestration; when native agents are triggered, use dependency-first packets and one integration owner.
 4. **Verify/checkpoint**: run proportionate tests and conditional completion evidence; before advancing an important node, require semantic implementation closure; update durable state only when material.
 5. **Review/control gates**: perform actual-model self-review and any triggered external review, Sentinel, semantic reconciliation, Done, AI UAT, Human Rejoin, or Release Hardening.

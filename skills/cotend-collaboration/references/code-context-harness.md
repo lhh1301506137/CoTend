@@ -58,6 +58,48 @@ For these projects:
 
 Never treat CodeGraph setup as permission to widen scope, install global tools silently, add dependencies, commit generated indexes, or skip direct file/diff/test verification.
 
+## Native Pre-Development Readiness Gate
+
+Run this gate after an explicit Init control flow has returned control and its handback has been satisfied, or immediately before broad work that entered directly under an already-authorized route. Initialization may prepare the provider or index, but it cannot satisfy the explicit Init handback or start product development in the same response.
+
+Broad implementation or review is ready only when all of these checks pass in order:
+
+1. confirm native workflow state is `current` and no specialized human decision or stop boundary is pending;
+2. read current CoTend truth first: latest user request, active status carrier, active Plan Tree path/leaf, current requirements, acceptance contract, risk authorization, and any active Route Rebase;
+3. confirm the requested work is inside the authorized leaf and all required current-MVP ancestors are confirmed;
+4. select and inspect the code-context provider, establish `must_read`, `should_check`, `out_of_scope`, and affected callers/tests;
+5. verify the provider's hints against actual files before editing.
+
+Stop the affected route when the workflow is dormant/conflicting, the Init handback is unsatisfied, a specialized decision is pending, the active leaf or required acceptance/risk boundary is missing, or the canonical project root is ambiguous. A generic `continue` never clears a specialized decision.
+
+If CodeGraph is fresh, use it. If it is installed but safely unindexed or stale, initialize/refresh only the canonical project-local index and keep it ignored. If it is unavailable, declined, or unnecessary, use a recorded `rg_fallback` when the existing provider rules allow it. Never use fallback to bypass an ambiguous root, tracked index, missing authority, or stop boundary.
+
+External development-framework task/spec files remain classified evidence only. They cannot satisfy the current-truth pass, select the active leaf, authorize writes, or become the provider's scope owner.
+
+A repeated gate with unchanged truth, route, provider freshness, and repository bytes must not modify project truth or files. A first safe index initialization may write generated ignored state; the next unchanged gate must be a no-op and produce the same scope signature.
+
+When material, record:
+
+```yaml
+pre_development_readiness:
+  status: ready | blocked | not_required
+  init_handback_satisfied: true | false | not_applicable
+  workflow_state: current | dormant | conflict
+  specialized_decision_pending: true | false
+  current_truth_loaded_before_code_context: true | false
+  active_leaf:
+  requirements_and_acceptance:
+  risk_authorization:
+  provider: codegraph | repo_map | language_server | rg_fallback | none
+  provider_action: inspect | initialize_index | refresh_index | record_fallback | none
+  scope_signature:
+  generated_index_write: true | false
+  project_truth_modified: false
+  external_framework_owner: false
+  broad_edits_allowed: true | false
+  blocking_reason: none | <exact reason>
+```
+
 ## Goal-Grounded Context Pass
 
 Run this pass for new/unfamiliar projects, large repos, cross-module work, architecture/refactor tasks, review scope discovery, unattended batch summaries, or when Codex is unsure which files matter.

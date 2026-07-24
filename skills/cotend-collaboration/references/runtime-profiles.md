@@ -46,7 +46,7 @@ cotend_workflow:
       affects_current_route: true | false
       evidence_pointer:
       compatibility_procedures:
-        - capability: startup | pre_development | implementation | verification | closeout
+        - capability: implementation | verification | closeout
           procedure_id:
           status: authorized | disabled
           authority: cotend_native_record | user_explicit
@@ -200,7 +200,7 @@ external_frameworks:
     affects_current_route: true | false
     evidence_pointer:
     compatibility_procedures:
-      - capability: startup | pre_development | implementation | verification | closeout
+      - capability: implementation | verification | closeout
         procedure_id:
         status: authorized | disabled
         authority: cotend_native_record | user_explicit
