@@ -305,6 +305,14 @@ For an important current-MVP L2 or main-chain step, autonomous L3/L4 work remain
 
 This section owns material active-route behavior. The canonical triggered-only `route_rebase` packet shape lives only in `templates.md`; do not copy its fields or create a standing route-rebase file.
 
+### CoTend Native Specification Ownership
+
+- Semantic Alignment is the only writable owner of current-MVP L0-L2 product meaning. It proposes protected changes, obtains the exact user decision, writes the confirmed result, and propagates its directed impact.
+- Plan Tree is the only route owner. It evaluates and applies material L3/L4 execution changes inside confirmed ancestors, consumes confirmed L0-L2 results, and controls the reliable resume boundary and next leaf.
+- The current CoTend-owned PRD, spec, brief, node, decision log, knowledge changelog, and STATUS projection may carry requirements or the one canonical triggered packet according to their existing roles. They do not form a second specification tree.
+- External project or framework specifications are classified evidence only. Aligned material may be linked, stale material remains historical, and conflict blocks the affected route until CoTend resolves it. External state never becomes the packet or route owner.
+- Rejected, deferred, and superseded candidates remain recoverable history. Only the resulting path is current, and old completion evidence must be revalidated whenever its meaning, runtime path, dependency, or evidence premise changed.
+
 ### Relative Route State And Materiality
 
 Nodes and candidate routes are not born as permanent mainline/branch classes. `active_path` is the current user-confirmed or AI-authorized route through the one Plan Tree. A candidate may be merged, promoted, replaced, reordered, deferred, rejected, or superseded as evidence changes; the resulting selected route becomes the new `active_path`.

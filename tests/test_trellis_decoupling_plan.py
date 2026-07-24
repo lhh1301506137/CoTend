@@ -34,14 +34,16 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
             self.tracked_paths,
         )
 
-    def test_current_migration_preserves_baseline_and_advances_td08_td03(self) -> None:
+    def test_current_migration_preserves_baseline_and_advances_td08_td03_td06(
+        self,
+    ) -> None:
         result = self.validate()
         self.assertEqual(result["capabilities"], 8)
         self.assertEqual(result["gates"], 6)
-        self.assertEqual(result["runtime_mentions"], 163)
+        self.assertEqual(result["runtime_mentions"], 158)
         self.assertEqual(result["runtime_files"], 21)
         self.assertTrue(result["skill_behavior_changed"])
-        self.assertEqual(result["native_capabilities_verified"], 2)
+        self.assertEqual(result["native_capabilities_verified"], 3)
 
     def test_immutable_baseline_change_is_rejected(self) -> None:
         changed = copy.deepcopy(self.contract)
@@ -90,6 +92,12 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
     def test_td03_evidence_cannot_be_removed(self) -> None:
         changed = copy.deepcopy(self.contract)
         changed["capabilities"][2]["evidence"].pop()
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(changed)
+
+    def test_td06_evidence_cannot_be_removed(self) -> None:
+        changed = copy.deepcopy(self.contract)
+        changed["capabilities"][5]["evidence"].pop()
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 

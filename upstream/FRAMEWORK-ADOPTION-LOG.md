@@ -289,3 +289,26 @@ push_release_or_publish: not_performed
 L63 继续作为 CoTend 产品 overlay：需求澄清由 Idea to Consensus、Semantic Alignment 和 Decision Log 第一方链拥有，`grill-me` 只保留原名、MIT 归属与一次一问交互纪律。Project Init 不再按外部框架状态分派 brainstorm；外部记录只作为分类证据。
 
 根 `skills/` 推进为同 lineage target r4，L62 的 r3 成为精确 predecessor。r2 与本地未发布 rc.2 继续由历史 source commit 重建，48 文件 package 与 ZIP 摘要不变。本叶不构成 rc.3、push、release、submission 或 publish 授权。
+
+## cotend-native-overlay-L64-TD06
+
+```yaml
+status: native_parity_verified_for_spec_change_and_route_rebase
+source_framework_release_unchanged: 2026.07.23.2
+source_framework_lock_changed: false
+product_overlay: TD06-spec-change-and-route-rebase
+historical_runtime_baseline: 241_mentions_22_files
+L62_runtime_checkpoint: 174_mentions_21_files
+L63_runtime_checkpoint: 163_mentions_21_files
+current_runtime_inventory: 158_mentions_21_files
+current_target_artifact_id: cotend-codex-r000005
+current_target_revision: 5
+predecessor_target_artifact_id: cotend-codex-r000004
+plugin_candidate: cotend@0.1.0-rc.2_immutable
+plugin_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1
+push_release_or_publish: not_performed
+```
+
+L64 继续作为 CoTend 产品 overlay：规格变化不新增独立 Skill，而由现有 Semantic Alignment、Plan Tree、canonical `route_rebase` packet、Decision Log 和 Knowledge Changelog 承接。外部 task、PRD 与 spec 只作为分类证据；L0-L2 需要用户明确裁决，L3-L4 在已确认上级内自治，拒绝、证据失效和中断恢复均保留可追踪结果。
+
+根 `skills/` 推进为同 lineage target r5，L63 的 r4 成为精确 predecessor，r3 与 r2 继续保留。未发布 rc.2 仍由历史 r2 source commit 重建，48 文件 package 与 ZIP 摘要不变。本叶不构成 rc.3、push、release、submission 或 publish 授权。

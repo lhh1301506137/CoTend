@@ -25,7 +25,7 @@ Default behavior is automatic. When the user invokes `/cotend-init`, `$cotend-pr
 
 Auto Mode is initialization-only. It may classify and report the standing `semantic_baseline`, affected paths, gaps, and unaffected confirmed paths, but it must not classify, execute, load, call, delegate, or wrap `$cotend-semantic-alignment` or `$cotend-diagnose-only`. It must not draft a semantic confirmation packet, create or advance a pending semantic decision, or silently start a rebaseline.
 
-Auto Mode may also discover and report an already-active canonical `route_rebase` from its existing Plan Tree/Trellis/PRD/STATUS/decision/knowledge carrier. It must not redefine the packet, choose a pending L0-L2 candidate, or rebuild an old path from memory. Omit it entirely when no material rebase is active.
+Auto Mode may also discover and report an already-active canonical `route_rebase` from its existing CoTend-owned Plan Tree/project-spec/STATUS/decision/knowledge carrier. It must not redefine the packet, choose a pending L0-L2 candidate, or rebuild an old path from memory. Omit it entirely when no material rebase is active.
 
 It must not preflight either independent flow or inspect extra semantic surfaces for an appended request. Standing baseline safety inspection remains allowed only at Init depth.
 
@@ -127,7 +127,7 @@ Initialize projects with the role-based authority contract in `cotend-collaborat
 
 1. **CoTend Project Truth Authority** owns product meaning, detailed requirement authority, route navigation, user decisions, status projection, current-reality evidence, and the boundary around project-local constraints. It never delegates those roles from framework identity or active state.
 2. **cotend-collaboration** owns collaboration governance: role assignment, risk authorization, continuous/unattended checkpoints, user interruption/new idea reconciliation, review/self-review gates, handoff scope, Acceptance/Test Harness, Quality Sentinel, AI UAT, Done Gate, intent drift review, Release Hardening, and human rejoin explanations.
-3. **External development-framework artifacts**, including active Trellis files, are classified `reference_only`, `historical`, or `conflict`. A later compatibility capability may still invoke its implementation/check/update/finish procedure, but its task, PRD, spec, state, or coding guideline never becomes CoTend Core authority.
+3. **External development-framework artifacts**, including active Trellis files, are classified `reference_only`, `historical`, or `conflict`. A later compatibility capability may still invoke its implementation/check/finish procedure, but its task, PRD, spec, state, or coding guideline never becomes CoTend Core authority.
 4. **Karpathy and project coding guidelines** own coding behavior only inside higher user, safety, confirmed-product, and authorized-route boundaries.
 5. **grill-me** owns clarification style for fuzzy requirements. Existing external brainstorm records may be linked as classified evidence; user-facing decisions must be recorded in `PROJECT-DECISION-LOG.md` when they match canonical decision-worthy topics.
 6. **Code Context Harness** owns codebase structure discovery. It helps the Primary choose what to read/review but never owns product truth or route selection.

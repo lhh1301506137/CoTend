@@ -6,7 +6,7 @@ authority: product_owner_confirmed_2026-07-24
 scope: packaged_CoTend_runtime_and_first_party_Skills
 current_candidate: cotend@0.1.0-rc.2_local_unpublished
 target_candidate: cotend@0.1.0-rc.3_after_parity
-development_target_artifact: cotend-codex-r000004
+development_target_artifact: cotend-codex-r000005
 machine_contract: ../upstream/TRELLIS-DECOUPLING-PLAN.json
 analysis_language: zh-CN
 ```
@@ -22,8 +22,8 @@ Trellis 可以继续出现在竞品研究、固定来源和历史采用说明中
 ## 当前事实
 
 - L61 冻结基线是根 `skills/` 中 241 处不区分大小写的 `Trellis`，分布在 22 个第一方 Skill 文件；它作为不可变历史量尺保留。
-- L62 完成 TD08 权限替换后的检查点库存是 174 处、21 个文件；L63 完成 TD03 主动澄清路由替换后，当前库存是 163 处、21 个文件。两次减少均限定在各自已审计表面。
-- 当前根 Skill 字节属于内部 target r4；r3 保留为 L62 的精确 predecessor。rc.2 不再从当前工作树取 Skill，而从其已验证历史 r2 提交复现，因此不会把 L62/L63 字节静默塞进同一候选身份。
+- L62 完成 TD08 权限替换后的检查点库存是 174 处、21 个文件；L63 完成 TD03 主动澄清路由替换后为 163 处、21 个文件；L64 完成 TD06 规格变化权限替换后，当前库存是 158 处、21 个文件。三次减少均限定在各自已审计表面。
+- 当前根 Skill 字节属于内部 target r5；r4、r3 和 r2 依次保留为精确 predecessor。rc.2 不再从当前工作树取 Skill，而从其已验证历史 r2 提交复现，因此不会把 L62-L64 字节静默塞进同一候选身份。
 - 仓库没有跟踪 `.trellis/`，也没有位于 Skill、源码、交付、打包或插件运行时路径下的 Trellis 命名文件、Trellis 源码、模板、hooks、二进制或依赖包。本计划、研究、来源说明和验证器可以保留 Trellis 名称，以准确描述替换对象和来源边界。
 - `requirements-ci.txt` 只固定 PyYAML；Plugin/package manifest 没有 Trellis 组件或许可证载体。
 - 因此当前问题是**运行时框架集成与权限依赖**，不是已经复制 Trellis 源码。
@@ -46,7 +46,7 @@ Trellis 可以继续出现在竞品研究、固定来源和历史采用说明中
 |---:|---|---|---|---|---|
 | 1 | Trellis task / PRD / spec / coding guidelines 的最高权限 | 单一可恢复项目真相；目标、阶段、叶子、需求、验收和编码约束可追踪 | Plan Tree、PROJECT-UNDERSTANDING、决策日志、STATUS、项目 PRD/spec、AGENTS.md | **TD08 已完成**：唯一角色型权限合同和六类场景通过；外部框架只可 reference/history/conflict | 后续累计主旅程和真实项目仍由 G03/G06 验证，不回退为外部框架权限 |
 | 2 | `trellis-brainstorm` | 一次一问；模糊输入不冒充确认真相；用户决定可恢复 | grill-me、Idea to Consensus、Semantic Alignment、决策日志 | **TD03 已完成**：八类场景、Init handback、裸继续停止、决定先记录和外部证据隔离通过 | 后续累计主旅程和真实小白验收仍由 G03/G06 验证，不恢复外部 brainstorm 路由 |
-| 3 | `trellis-update-spec` | L0-L2 含义与 L3-L4 执行分离；受影响路线从可靠边界重基 | Semantic Alignment、Route Rebase、Plan Tree、Knowledge Changelog | 基本具备 | 证明规格变化传播、旧决定保留、未受影响路线可继续 |
+| 3 | `trellis-update-spec` | L0-L2 含义与 L3-L4 执行分离；受影响路线从可靠边界重基 | Semantic Alignment、Route Rebase、Plan Tree、Knowledge Changelog | **TD06 已完成**：十类场景覆盖权限、接受/拒绝、隔离、证据失效、中断恢复与外部冲突 | 后续累计主旅程和真实项目仍由 G03/G06 验证，不恢复外部 spec 写入或 update 路由 |
 | 4 | `.trellis/`、`trellis.mode`、`.trellis/config.yaml` | 判断当前/历史/冲突状态；持久化 Full/Adaptive；迁移不破坏真相 | Project Init、Collaboration、Plan Tree、STATUS | 部分具备 | 完成 CoTend 自有状态与档位转换测试；外部框架只触发冲突报告 |
 | 5 | `trellis-start`、`trellis-before-dev` | 初始化、更新、修复、迁移、续接幂等；开发前加载真相和代码上下文 | CoTend Init、Project Init、Code Context Harness | 主流程已存在 | 删除 Trellis dispatch 后重跑 fresh/update/repair/migrate/resume 和冲突停止矩阵 |
 | 6 | `trellis-implement` | 只实现已授权叶子；写入责任和依赖清楚；产生相称测试与证据 | CoTend 原生 Implementer、Native Agent Orchestration、Plan Tree | 规则存在，Full 仍绑定 Trellis 名称 | 原生 Implementer 通过独立/内联、失败、范围越界和依赖顺序测试 |
@@ -85,9 +85,15 @@ Trellis 可以继续出现在竞品研究、固定来源和历史采用说明中
 
 八类场景覆盖清晰需求、普通模糊需求、Init 模糊输入、待答裸继续、推荐答案 `1`、事实回答、对齐外部证据和冲突外部证据；每个场景最多一个问题，external route owner 与 parallel truth 均为 false。当前只移除 TD03 主动澄清路由，不删除 TD01、TD02、TD04-TD07。
 
+### L64 / TD06 已完成
+
+规格变化现在完全沿 CoTend 第一方责任链处理：Semantic Alignment 是 L0-L2 唯一可写 owner，Plan Tree 是路线与 L3-L4 重基 owner，`templates.md` 只拥有触发式 packet schema，决策日志与知识变更日志分别保留用户决定和路线变化历史。外部 task、PRD 或 spec 只作为分类证据，不能成为 packet 或活动路线 owner。
+
+十类场景覆盖普通叶子不触发、L3-L4 自治、L0-L2 待决、裸继续、接受、拒绝、无关路线隔离、证据失效、中断恢复和外部 spec 冲突。所有结果都保留旧决定，不创建第二套规格树，external route owner 为 false。当前只移除 TD06 外部 spec 写入与 update 路由，不删除 TD01、TD02、TD04、TD05、TD07。
+
 ### G02 单项原生等价
 
-每个接口至少覆盖 success、blocked、failure、stop，固定 CoTend owner、状态迁移、测试和回滚，再删除对应旧路径。当前进度为 2/8：TD08 与 TD03 已通过。
+每个接口至少覆盖 success、blocked、failure、stop，固定 CoTend owner、状态迁移、测试和回滚，再删除对应旧路径。当前进度为 3/8：TD08、TD03 与 TD06 已通过。
 
 ### G03 累计主旅程
 
@@ -116,14 +122,14 @@ Trellis 可以继续出现在竞品研究、固定来源和历史采用说明中
 
 - rc.2 保持为本地未发布的 v1.65 累计采用基线和回滚锚点。
 - 能力替换期间不推送、不创建 tag/Release、不提交 Portal。
-- 当前内部 target r4 只表示同 lineage Skill 字节推进，不是 rc.3 包。
+- 当前内部 target r5 只表示同 lineage Skill 字节推进，不是 rc.3 包。
 - 只有 G01-G05 通过后才构建 rc.3。
 - G06 通过前，框架变更评估保持 `watch`，不得宣称“完全独立且无能力退化”。
 - 官方 Plugin 身份验证路线暂时停放；产品核心变化闭合后再恢复。
 
-## L63 本切片不做
+## L64 本切片不做
 
-- 不删除 TD01、TD02、TD04-TD07 的 Trellis 调用、状态和兼容流程。
+- 不删除 TD01、TD02、TD04、TD05、TD07 的 Trellis 调用、状态和兼容流程。
 - 不新增用户可见的 Implement/Check 命令。
 - 不创建 `.cotend/` 新状态布局。
 - 不修改 dual-ai upstream，也不要求其删除私人 Trellis 集成。

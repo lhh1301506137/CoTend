@@ -7,7 +7,7 @@ scope: project_meaning_requirements_route_decisions_status_reality_and_local_con
 runtime_contract: ../skills/cotend-collaboration/references/authority-and-triggers.md
 executable_verifier: ../scripts/verify_native_project_truth_authority.py
 introduced_target_artifact: cotend-codex-r000003
-current_target_artifact: cotend-codex-r000004
+current_target_artifact: cotend-codex-r000005
 rollback_candidate: cotend@0.1.0-rc.2_local_unpublished
 analysis_language: zh-CN
 ```
@@ -53,22 +53,22 @@ CoTend 不为了完成分类而激活、更新或执行外部框架，也不把�
 
 ## L62 边界
 
-L62 只关闭 TD08“项目真相权限”缺口。以下能力仍保留旧兼容路由，必须在各自后续叶完成原生等价后才能删除：
+L62 只关闭 TD08“项目真相权限”缺口。以下是当时仍保留的兼容能力；括号标出后来已完成的独立原生化叶：
 
 - 工作流状态与 Full/Adaptive 映射；
 - Init/resume/before-development；
 - requirements clarification（TD03 已由 L63 原生化）；
-- spec update 与完整 Route Rebase 迁移；
+- spec update 与完整 Route Rebase 迁移（TD06 已由 L64 原生化）；
 - Implementer；
 - Checker；
 - finish/archive/recovery。
 
-L62 首次形成内部 target `cotend-codex-r000003`；L63 继续推进当前根 Skill 到 `cotend-codex-r000004`。两者都表示同一 Codex lineage 的开发字节，不是公开产品版本。`cotend@0.1.0-rc.2` 仍是未发布回滚候选，固定到其已验证 Git 来源提交，包体和 ZIP 摘要不能随 r3/r4 开发态改变。只有全部 G01-G05 完成后才构建 rc.3。
+L62 首次形成内部 target `cotend-codex-r000003`；L63 推进到 `cotend-codex-r000004`；L64 再推进到当前 `cotend-codex-r000005`。这些都表示同一 Codex lineage 的开发字节，不是公开产品版本。`cotend@0.1.0-rc.2` 仍是未发布回滚候选，固定到其已验证 Git 来源提交，包体和 ZIP 摘要不能随 r3-r5 开发态改变。只有全部 G01-G05 完成后才构建 rc.3。
 
 ## 已执行验证
 
 - 规范文字检查：唯一 owner、三类外部状态、分层冲突、受影响路径停止和不重复真相均存在；
 - 行为场景：无外部框架、对齐、过时、L0-L2 冲突、L3-L4 冲突、未知依赖六类均由可执行模型验证；
 - 负向检查：恢复“active Trellis 拥有/绑定项目真相”等让权语句会失败；
-- 迁移检查：241/22 作为不可变历史基线保留，当前库存独立记录；TD08 与 TD03 已分别推进为 `native_parity_verified`；
+- 迁移检查：241/22 作为不可变历史基线保留，当前库存独立记录；TD08、TD03 与 TD06 已分别推进为 `native_parity_verified`；
 - 发布边界：没有真实用户安装、push、tag、Release、Portal、submission、publish 或身份验证。

@@ -103,18 +103,18 @@ def prepare_project(path: Path) -> Path:
 
 
 def make_updated_artifact(fixture: Path, baseline: Artifact) -> Artifact:
-    source = fixture / "artifacts" / "candidate-r5"
+    source = fixture / "artifacts" / "candidate-r6"
     shutil.copytree(ROOT / "skills", source)
     changed = source / "cotend-init" / "SKILL.md"
     changed.write_text(
-        changed.read_text(encoding="utf-8") + "\n<!-- L24 integration candidate -->\n",
+        changed.read_text(encoding="utf-8") + "\n<!-- delivery integration candidate -->\n",
         encoding="utf-8",
     )
     return Artifact.from_directory(
         source,
         source_release_id=baseline.source_release_id,
-        artifact_id="cotend-codex-r000005",
-        revision=5,
+        artifact_id="cotend-codex-r000006",
+        revision=6,
         protocol=baseline.protocol,
     )
 
@@ -791,8 +791,8 @@ def run_concurrency_worker(
     candidate = Artifact.from_directory(
         source,
         source_release_id=baseline.source_release_id,
-        artifact_id="cotend-codex-r000005",
-        revision=5,
+        artifact_id="cotend-codex-r000006",
+        revision=6,
         protocol=baseline.protocol,
     )
     manager = DeliveryManager(project)

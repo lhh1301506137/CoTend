@@ -10,6 +10,7 @@ from typing import Any
 
 import verify_native_project_truth_authority as native_authority
 import verify_native_requirements_clarification as native_clarification
+import verify_native_spec_change_route_rebase as native_route_rebase
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,14 +52,15 @@ EXPECTED_DOCUMENT_MARKERS = [
     "### G01 基线冻结",
     "### L62 / TD08 已完成",
     "### L63 / TD03 已完成",
+    "### L64 / TD06 已完成",
     "### G05 运行时零依赖",
-    "只移除 TD03",
+    "只移除 TD06",
 ]
 EXPECTED_BASELINE_INVENTORY_SHA256 = (
     "a1c9893a7462d7abd925b1ae468a3dd97366fae850e2881a23546e5471e93aeb"
 )
 EXPECTED_CURRENT_INVENTORY_SHA256 = (
-    "14716dee8e384cc30f03825562da5975303ee220a7b1f47eded9c98304bb4294"
+    "c01a4f7fc853c1619eb597333920fb75ddf2b50244bd21bd1ceda6087c3db94b"
 )
 AUTHORIZED_TD08_INVENTORY_REDUCTIONS = {
     "skills/cotend-collaboration/SKILL.md",
@@ -74,6 +76,12 @@ AUTHORIZED_TD03_INVENTORY_REDUCTIONS = {
     "skills/cotend-collaboration/references/authority-and-triggers.md",
     "skills/cotend-collaboration/references/decision-log.md",
     "skills/cotend-collaboration/references/plan-tree.md",
+    "skills/cotend-project-init/SKILL.md",
+}
+AUTHORIZED_TD06_INVENTORY_REDUCTIONS = {
+    "skills/cotend-collaboration/references/decision-log.md",
+    "skills/cotend-collaboration/references/semantic-implementation-closure.md",
+    "skills/cotend-collaboration/references/templates.md",
     "skills/cotend-project-init/SKILL.md",
 }
 
@@ -161,7 +169,7 @@ def validate_contract(
         raise TrellisDecouplingPlanError("current candidate identity drifted")
     if contract.get("target_candidate") != "cotend@0.1.0-rc.3_after_parity":
         raise TrellisDecouplingPlanError("target candidate identity drifted")
-    if contract.get("development_target_artifact") != "cotend-codex-r000004":
+    if contract.get("development_target_artifact") != "cotend-codex-r000005":
         raise TrellisDecouplingPlanError("development target artifact drifted")
 
     source = contract.get("source_boundary")
@@ -234,7 +242,7 @@ def validate_contract(
     ).hexdigest()
     if current_digest != EXPECTED_CURRENT_INVENTORY_SHA256:
         raise TrellisDecouplingPlanError(
-            "exact L63 163/21 runtime Trellis inventory changed"
+            "exact L64 158/21 runtime Trellis inventory changed"
         )
     changed_inventory_paths = {
         path
@@ -244,10 +252,11 @@ def validate_contract(
     authorized_reductions = (
         AUTHORIZED_TD08_INVENTORY_REDUCTIONS
         | AUTHORIZED_TD03_INVENTORY_REDUCTIONS
+        | AUTHORIZED_TD06_INVENTORY_REDUCTIONS
     )
     if changed_inventory_paths != authorized_reductions:
         raise TrellisDecouplingPlanError(
-            "runtime inventory changed outside the exact TD08 and TD03 surfaces"
+            "runtime inventory changed outside the exact TD08, TD03, and TD06 surfaces"
         )
     if any(
         actual_inventory.get(path, 0) >= expected_inventory.get(path, 0)
@@ -326,6 +335,7 @@ def validate_contract(
             if capability_id
             in {
                 "TD03-requirements-clarification",
+                "TD06-spec-change-and-route-rebase",
                 "TD08-project-truth-authority",
             }
             else "baseline_frozen"
@@ -362,6 +372,16 @@ def validate_contract(
                 "tests/test_native_requirements_clarification.py",
             ]:
                 raise TrellisDecouplingPlanError("TD03 evidence inventory drifted")
+        if capability_id == "TD06-spec-change-and-route-rebase":
+            if item.get("native_coverage") != "verified_native_contract":
+                raise TrellisDecouplingPlanError("TD06 native coverage drifted")
+            if item.get("evidence") != [
+                "docs/NATIVE-SPEC-CHANGE-AND-ROUTE-REBASE.md",
+                "skills/cotend-collaboration/references/plan-tree.md",
+                "scripts/verify_native_spec_change_route_rebase.py",
+                "tests/test_native_spec_change_route_rebase.py",
+            ]:
+                raise TrellisDecouplingPlanError("TD06 evidence inventory drifted")
 
     if contract.get("replacement_order") != EXPECTED_REPLACEMENT_ORDER:
         raise TrellisDecouplingPlanError("dependency-driven replacement order drifted")
@@ -382,7 +402,7 @@ def validate_contract(
         expected_status = (
             "complete"
             if index == 0
-            else "in_progress_2_of_8"
+            else "in_progress_3_of_8"
             if index == 1
             else "not_started"
         )
@@ -394,13 +414,13 @@ def validate_contract(
     if contract.get("this_slice") != {
         "skill_behavior_changed": True,
         "trellis_route_removed": True,
-        "removed_capability_ids": ["TD03-requirements-clarification"],
+        "removed_capability_ids": ["TD06-spec-change-and-route-rebase"],
         "target_artifact_changed": True,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
     }:
         raise TrellisDecouplingPlanError(
-            "L63 slice boundary drifted"
+            "L64 slice boundary drifted"
         )
 
     for marker in EXPECTED_DOCUMENT_MARKERS:
@@ -416,6 +436,11 @@ def validate_contract(
         raise TrellisDecouplingPlanError(
             "TD03 native clarification verifier did not pass"
         )
+    route_rebase_result = native_route_rebase.verify_repository(ROOT)
+    if route_rebase_result.get("status") != "native_parity_verified":
+        raise TrellisDecouplingPlanError(
+            "TD06 native spec-change verifier did not pass"
+        )
 
     return {
         "status": contract["status"],
@@ -425,7 +450,7 @@ def validate_contract(
         "runtime_files": len(actual_inventory),
         "trellis_runtime_paths": 0,
         "skill_behavior_changed": True,
-        "native_capabilities_verified": 2,
+        "native_capabilities_verified": 3,
     }
 
 

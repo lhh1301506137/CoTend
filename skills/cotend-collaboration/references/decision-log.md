@@ -11,7 +11,7 @@ It complements but does not replace:
 - `PROJECT-PLAN-TREE.md` and `PROJECT-PLAN-NODES/` for route and plan structure;
 - `PROJECT-UNDERSTANDING/` for expanded user-readable product understanding;
 - `PROJECT-KNOWLEDGE-CHANGELOG.md` for material changes to understanding, route, links, or consensus status;
-- Trellis `prd.md` for active task requirements.
+- a CoTend-owned project PRD, spec, or brief for current detailed requirements.
 
 ## When To Record
 
@@ -47,7 +47,7 @@ metadata:
     - PROJECT-PLAN-NODES/<node>.md
     - PROJECT-UNDERSTANDING/<doc>.md
     - PROJECT-KNOWLEDGE-CHANGELOG.md
-    - .trellis/tasks/<task>/prd.md
+    - docs/<active-spec>.md
   resulting_changes:
     - doc:
       change:

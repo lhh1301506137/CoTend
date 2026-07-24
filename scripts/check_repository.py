@@ -10,6 +10,7 @@ from pathlib import Path
 import verify_trellis_decoupling_plan as trellis_decoupling
 import verify_native_project_truth_authority as native_authority
 import verify_native_requirements_clarification as native_clarification
+import verify_native_spec_change_route_rebase as native_route_rebase
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -387,6 +388,12 @@ EXPECTED_NATIVE_CLARIFICATION_FILES = {
     "docs/evidence/NATIVE-REQUIREMENTS-CLARIFICATION-TARGET-R4.md",
     "scripts/verify_native_requirements_clarification.py",
     "tests/test_native_requirements_clarification.py",
+}
+EXPECTED_NATIVE_ROUTE_REBASE_FILES = {
+    "docs/NATIVE-SPEC-CHANGE-AND-ROUTE-REBASE.md",
+    "docs/evidence/NATIVE-SPEC-CHANGE-ROUTE-REBASE-TARGET-R5.md",
+    "scripts/verify_native_spec_change_route_rebase.py",
+    "tests/test_native_spec_change_route_rebase.py",
 }
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
@@ -2631,7 +2638,7 @@ def production_plugin_package_errors(
             errors.append(f"production Plugin package evidence mismatch: {key}")
     for marker in (
         "rc.2 的 Skill 语义源固定为 Git commit",
-        "当前根 `skills/` 已推进到 target r4",
+        "当前根 `skills/` 已推进到 target r5",
         "48 个文件",
         "逐字节一致",
         "17 类负向边界",
@@ -3963,8 +3970,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     expected_target = {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000004",
-        "revision": 4,
+        "artifact_id": "cotend-codex-r000005",
+        "revision": 5,
     }
     if not isinstance(target, dict) or any(
         target.get(key) != expected for key, expected in expected_target.items()
@@ -3988,6 +3995,17 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if not isinstance(target, dict) or target.get("manifest_sha256") != carrier_manifest:
         errors.append("delivery target lock manifest mismatch")
     expected_predecessors = [
+        {
+            "platform": "Codex",
+            "lineage": "cotend-codex",
+            "artifact_id": "cotend-codex-r000004",
+            "revision": 4,
+            "source_release_id": "2026.07.23.2",
+            "framework_protocol": "cotend-collaboration-v1.65",
+            "manifest_sha256": (
+                "9b82dc8689e19c9d95c7b867c18adc3b50d32d7c82aa772b6d397aa3a70a4abd"
+            ),
+        },
         {
             "platform": "Codex",
             "lineage": "cotend-codex",
@@ -4038,22 +4056,22 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if target_lock.get("legacy_receipt_mappings") != expected_legacy_mappings:
         errors.append("delivery target lock legacy mapping mismatch")
     identity_evidence_path = (
-        "docs/evidence/NATIVE-REQUIREMENTS-CLARIFICATION-TARGET-R4.md"
+        "docs/evidence/NATIVE-SPEC-CHANGE-ROUTE-REBASE-TARGET-R5.md"
     )
     if identity_evidence_path not in candidates:
         errors.append("target artifact identity evidence is missing or ignored")
     else:
         evidence = read(identity_evidence_path)
         for marker in (
-            "current_target_artifact_id: cotend-codex-r000004",
-            "current_target_revision: 4",
-            "predecessor_target_artifact_id: cotend-codex-r000003",
-            "predecessor_target_revision: 3",
+            "current_target_artifact_id: cotend-codex-r000005",
+            "current_target_revision: 5",
+            "predecessor_target_artifact_id: cotend-codex-r000004",
+            "predecessor_target_revision: 4",
             "source_framework_lock_changed: false",
             "package_candidate: cotend@0.1.0-rc.2_immutable",
             "package_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
-            "TD03-requirements-clarification",
-            "r3_to_r4_update_available",
+            "TD06-spec-change-and-route-rebase",
+            "r4_to_r5_update_available",
             "historical_git_source_required: true",
         ):
             if marker not in evidence:
@@ -4150,6 +4168,14 @@ def main() -> int:
         errors.append(
             "native requirements-clarification artifacts are missing or ignored: "
             f"{sorted(missing_native_clarification)}"
+        )
+    missing_native_route_rebase = (
+        EXPECTED_NATIVE_ROUTE_REBASE_FILES - candidates
+    )
+    if missing_native_route_rebase:
+        errors.append(
+            "native spec-change/Route-Rebase artifacts are missing or ignored: "
+            f"{sorted(missing_native_route_rebase)}"
         )
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
@@ -4326,6 +4352,11 @@ def main() -> int:
             native_clarification.verify_repository(ROOT)
         except native_clarification.NativeClarificationError as exc:
             errors.append(f"native requirements clarification: {exc}")
+    if not missing_native_route_rebase:
+        try:
+            native_route_rebase.verify_repository(ROOT)
+        except native_route_rebase.NativeRouteRebaseError as exc:
+            errors.append(f"native spec change and Route Rebase: {exc}")
 
     github_marketplace_carrier_evidence_path = (
         "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md"

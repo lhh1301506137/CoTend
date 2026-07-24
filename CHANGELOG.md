@@ -10,18 +10,21 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - Repository verification that rejects premature runtime text deletion, missing capability coverage, mechanical renaming, or status advancement without implementation.
 - CoTend-native project-truth authority with executable external-framework alignment, history, conflict, stop, and route-rebase scenarios.
 - CoTend-native requirements clarification with one-question-at-a-time, Init handback, pending-answer, decision-persistence, and external-evidence scenarios.
+- CoTend-native specification change and Route Rebase with ten executable authority, decision, impact, evidence, interruption, and recovery scenarios.
 
 ### Changed
 
 - Removed Trellis identity and active-state precedence from project meaning, requirements, route, decision, status, evidence, and coding-constraint authority.
 - Advanced the repository carrier to internal target `cotend-codex-r000003` while preserving the adopted Dual AI v1.65 source lock.
 - Advanced the repository carrier from target `cotend-codex-r000003` to `cotend-codex-r000004` while preserving r3 as an exact predecessor.
+- Advanced the repository carrier from target `cotend-codex-r000004` to `cotend-codex-r000005` while preserving r4, r3, and r2 as exact predecessors.
 - Removed the active external-framework brainstorm dispatch; `grill-me` remains byte-identical and Semantic Alignment owns clarification.
+- Removed external specification write-carrier and update-route authority; external task, PRD, and spec artifacts remain classified evidence only.
 - Bound the unpublished rc.2 package to its verified historical source commit so the existing 48-file package and ZIP remain reproducible while root Skills evolve.
 
 ### Boundaries
 
-- Only TD08 project-truth authority and TD03 requirements clarification have native parity; the other six Trellis compatibility interfaces remain until their own evidence gates pass.
+- TD08 project-truth authority, TD03 requirements clarification, and TD06 specification change/Route Rebase have native parity; the other five Trellis compatibility interfaces remain until their own evidence gates pass.
 - Plugin package identity, release tag, remote repository, real-user installation, and submission state did not change.
 - The next Plugin candidate will not advance beyond rc.2 until cumulative CoTend-native parity is implemented and verified.
 

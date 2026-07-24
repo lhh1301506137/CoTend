@@ -298,7 +298,7 @@ route_rebase:
       evidence_or_owner:
   unresolved_blockers:
     - none | <blocker>
-  durable_carrier: existing_plan_tree_node | active_trellis_or_prd | status | decision_log | knowledge_changelog
+  durable_carrier: existing_plan_tree_node | cotend_owned_project_spec | status | decision_log | knowledge_changelog
   history_ref:
 ```
 

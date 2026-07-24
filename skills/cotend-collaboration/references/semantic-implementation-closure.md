@@ -178,7 +178,7 @@ Implementation discovery may improve the route without changing product meaning:
 
 ## Durable State And Integration
 
-- Record the compact state in an existing active Plan Tree node, Trellis task/PRD evidence section, `STATUS.md`, `REVIEW-LOG.md`, or handoff. Do not create `SEMANTIC-IMPLEMENTATION-CLOSURE.md` or another standing project file.
+- Record the compact state in an existing CoTend-owned Plan Tree node, project PRD/spec evidence section, `STATUS.md`, `REVIEW-LOG.md`, or handoff. Do not create `SEMANTIC-IMPLEMENTATION-CLOSURE.md` or another standing project file.
 - Plan Tree may select the next important leaf only after this gate permits it. Tiny child leaves may continue inside the same open parent closure.
 - During Route Rebase recovery, Plan Tree resumes at the canonical reliable boundary and may mark the packet `closed` only after this gate and the refreshed Acceptance claim support the resulting path. It must not jump to a later `current_next_leaf` because old evidence once passed.
 - Goal Completion treats any required material closure that is not `closed` as a blocker to the corresponding MVP/full-goal claim.

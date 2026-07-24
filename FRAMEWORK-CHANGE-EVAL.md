@@ -2,6 +2,74 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-07-24 L64 原生规格变化与 Route Rebase
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: workflow_behavior
+change_summary: 只把 TD06 规格变化权限、Route Rebase 状态、可靠恢复和外部 spec 证据边界迁移到 CoTend 第一方责任链
+intent: 在不新增规格 Skill 或第二棵状态树的前提下，移除外部开发框架的活动 spec 写入和 update 路由权限
+expected_benefit:
+  - L0-L2 变化继续只由用户裁决和 Semantic Alignment 写入
+  - L3-L4 变化由 Plan Tree 在已确认上级内自治并从可靠边界恢复
+  - 接受、拒绝、证据失效、中断和无关路线隔离均有确定结果
+  - 外部 task、PRD 和 spec 只作为分类证据，永不拥有 packet 或活动路线
+possible_harm:
+  - 只完成 TD06 时，其余五类 Trellis 兼容接口仍存在，不能宣称完整解耦
+  - 若把普通叶子变化都升级为 Route Rebase，会增加无必要的状态和 token 成本
+  - 当前根 Skill 推进到 r5，历史 r4、r3、r2 和 rc.2 必须继续精确可恢复
+affected_workflows:
+  - protected_semantic_change
+  - material_l3_l4_route_change
+  - route_rebase_persistence_and_resume
+  - completion_evidence_refresh
+  - project_init_active_rebase_report
+  - target_artifact_delivery
+deviations:
+  - source release 与 framework.lock 继续保持 v1.65；L64 是 CoTend 产品 overlay
+  - 当前根载体推进为 cotend-codex-r000005；r4、r3、r2 和 cotend@0.1.0-rc.2 均保持不可变
+  - 只替换 TD06；TD01、TD02、TD04、TD05、TD07 继续进入后续独立叶
+mechanism_budget:
+  added_context_surface: one_short_existing_plan_tree_subsection_one_public_contract_one_deterministic_verifier
+  ordinary_load_impact: no_new_skill_and_no_packet_for_ordinary_leaf_choice
+  ceremony_added: none_for_nonmaterial_local_changes
+  duplication_check: reuses_semantic_alignment_plan_tree_templates_decision_log_and_knowledge_changelog
+  cheaper_alternative_considered: 只删除外部 update 名称；因无法锁住权限、拒绝、中断和证据刷新而拒绝
+  retirement_or_thinning_trigger: G05 后把迁移计数收敛为零运行依赖规则
+  expected_failure_prevented: external_spec_authority_silent_semantic_acceptance_old_done_inheritance_resume_past_invalid_boundary_and_parallel_spec_tree
+validation_scenarios:
+  - scenario: native_spec_change_route_rebase_matrix
+    expected: 十类普通、L3-L4、L0-L2、接受/拒绝、隔离、证据、中断和外部冲突均由 CoTend 决定
+    validation_result_type: executed
+    result: ten_scenarios_external_route_owner_false_parallel_spec_tree_false_old_decisions_preserved
+  - scenario: exact_td06_inventory_change
+    expected: 只允许四个 TD06 表面在 L63 检查点之后减少
+    validation_result_type: executed
+    result: current_158_mentions_21_files_and_4_td06_paths_verified
+  - scenario: r4_to_r5_delivery
+    expected: 可信 r4 回执可确定升级到当前 r5，r2 历史包仍可复现
+    validation_result_type: executed
+    result: predecessor_and_historical_package_tests_passed
+real_project_validation:
+  - scenario: novice_midstream_spec_change
+    expected: 真实项目在语义变化、中断和跨会话恢复后保持正确路线与用户控制
+    validation_result_type: deferred
+    result: G06_not_started
+decision: watch
+rollback_triggers:
+  - 普通叶子变化开始制造常驻 packet 或新增规格树
+  - 裸 continue 接受 L0-L2 候选，或 L3-L4 变化反而无条件请求用户批准
+  - 拒绝历史被删除、旧完成证据跨变化自动继承，或恢复跳过可靠边界
+  - 外部 spec 再次成为写入、packet 或 route owner
+  - r4/r3/r2 身份或 rc.2 摘要发生变化
+review_after: L65_TD01_and_each_later_native_replacement_leaf
+watch_closure:
+  - keep_watch
+  - evidence: docs/NATIVE-SPEC-CHANGE-AND-ROUTE-REBASE.md
+```
+
+本次不执行真实用户安装、push、tag、Release、Portal、submission、publish 或身份验证。`G02` 当前完成 `3/8`，只证明 TD08、TD03 与 TD06。
+
 ## 2026-07-24 L63 原生需求澄清
 
 ```yaml
