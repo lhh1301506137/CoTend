@@ -66,9 +66,9 @@ TD01 不是把外部框架的目录换成 `.cotend/`，而是收回三个第一�
 
 CoTend 不向外部配置写入状态、档位、dispatch 或迁移元数据。外部 task、PRD、spec、激活标记和配置值都不能成为 CoTend 状态 owner。
 
-尚未原生化的兼容过程必须由原生记录中的 `compatibility_procedures` 明确允许；缺失或禁用就不调用。这里只保存最小的能力/过程映射，不复制外部框架生命周期状态。
+外部开发框架的生命周期过程不作为 CoTend Core 执行。旧任务、规格或收尾记录只能按 reference、history 或 conflict 分类，当前执行统一由 CoTend 原生合同负责。
 
-Full 固定的是 Implementer→Checker 双角色结果，而不是外部命令依赖。TD04 后来已经由原生 Implementation Pass 承接 Implementer，TD05 又由原生 Verification Pass 承接 Checker；Full 使用独立 Checker 角色，Adaptive 使用同合同内联检查。当前只保留 TD07 closeout 兼容过程。
+Full 固定的是 Implementer→Checker 双角色结果，而不是外部命令依赖。TD04 后来已经由原生 Implementation Pass 承接 Implementer，TD05 又由原生 Verification Pass 承接 Checker；Full 使用独立 Checker 角色，Adaptive 使用同合同内联检查。TD07 已由原生 Native Closeout Pass 承接。
 
 ## 旧项目迁移
 
@@ -120,12 +120,12 @@ TD01 只替换状态、档位和执行模式所有权；其检查点当时不提
 - TD02 的初始化、续接和开发前门后来已在 r7 原生化；
 - TD04 的实现过程后来已在 r8 由 CoTend Native Implementation Pass 原生化；
 - TD05 的检查过程后来已在 r9 由 CoTend Native Verification Pass 原生化；
-- TD07 的 `trellis-finish` 收尾过程仍保留。
+- TD07 的收尾、归档与恢复过程后来已在 r10 由 Native Closeout Pass 原生化。
 
-这些名称只代表尚待替换的过程，不能拥有 CoTend 状态、真相、档位或路线。它们将在各自原生等价测试完成后移除。
+这些阶段都不能让外部框架拥有 CoTend 状态、真相、档位或路线。G03-G06 仍需验证累计流程、负向恢复、运行包零痕迹和真实项目体验。
 
 ## 当前结论与剩余门
 
-运行 Skills 中旧状态路径、旧 mode 字段和旧 dispatch 字段已经清零。TD01 检查点把库存从 L64 的 158 处、21 文件降为 43 处、16 文件；后续 TD02 降到 38 处、16 文件，TD04 降到 28 处、15 文件，TD05 再降到当前 20 处、10 文件。当前剩余内容属于 TD07 兼容过程及历史/来源边界。
+运行 Skills 中旧状态路径、旧 mode 字段和旧 dispatch 字段已经清零。TD01 检查点把库存从 L64 的 158 处、21 文件降为 43 处、16 文件；后续 TD02 降到 38 处、16 文件，TD04 降到 28 处、15 文件，TD05 降到 20 处、10 文件，TD07 再降到当前 7 处、6 文件。当前剩余内容只属于待 G05 处理的通用边界及历史/来源说明。
 
 TD01 单项原生等价已经成立，但不能据此宣称整个解耦完成。G03、G04、G06 仍需分别验证累计主旅程、负向恢复/所有权以及真实可写项目与用户验收。

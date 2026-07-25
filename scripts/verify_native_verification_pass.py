@@ -81,10 +81,13 @@ ResumeState = Literal[
 ]
 
 REMOVED_TD05_COMMAND = "trellis-check"
-REQUIRED_REMAINING_COMMANDS = ("trellis-finish",)
-EXPECTED_TRELLIS_MENTIONS = 20
-EXPECTED_TRELLIS_FILES = 10
-EXPECTED_SKILL_FILES = 39
+REQUIRED_REMAINING_COMMANDS: tuple[str, ...] = ()
+EXPECTED_TRELLIS_MENTIONS = 7
+EXPECTED_TRELLIS_FILES = 6
+EXPECTED_SKILL_FILES = 40
+EXPECTED_R9_MANIFEST = (
+    "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"
+)
 EXPECTED_R8_MANIFEST = (
     "84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3"
 )
@@ -108,7 +111,7 @@ REQUIRED_VERIFICATION_MARKERS = (
 REQUIRED_COLLABORATION_MARKERS = (
     "read `references/verification-pass.md`",
     "Full dispatches an independent Checker role and Adaptive enters the same Checker contract inline",
-    "Implementation Pass followed by the native Verification Pass",
+    "native Implementation Pass, native Verification Pass, formal review, and Native Closeout Pass",
 )
 REQUIRED_ACCEPTANCE_MARKERS = (
     "Checker result contract in `verification-pass.md`",
@@ -121,8 +124,8 @@ REQUIRED_REVIEW_MARKERS = (
 REQUIRED_RUNTIME_MARKERS = (
     "independently scoped Checker executes `verification-pass.md`",
     "distinct inline checking phase and executes `verification-pass.md`",
-    "remove only the obsolete verification compatibility entry",
-    "capability: closeout",
+    "remove obsolete compatibility entries only after reconciling any in-flight side effect",
+    "Both profiles finish verified checkpoints through `closeout-pass.md`",
 )
 REQUIRED_ORCHESTRATION_MARKERS = (
     "Checker always uses the native `verification-pass.md` contract",
@@ -131,7 +134,7 @@ REQUIRED_ORCHESTRATION_MARKERS = (
 REQUIRED_PROJECT_INIT_MARKERS = (
     "check through `cotend-collaboration/references/verification-pass.md`",
     "independently scoped native Checker",
-    "capability: closeout",
+    "Local closeout always uses `cotend-collaboration/references/closeout-pass.md`",
 )
 REQUIRED_MODEL_MARKERS = (
     "Checker always uses its native Verification Pass",
@@ -143,7 +146,7 @@ REQUIRED_DOCUMENT_MARKERS = (
     "cotend-codex-r000009",
     "Full 独立 Checker",
     "Adaptive 内联 Checker",
-    "20 处、10 个文件",
+    "7 处、6 个文件",
     "正式自审",
     "TD07",
 )
@@ -722,31 +725,31 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000009"
-        or target.get("revision") != 9
+        target.get("artifact_id") != "cotend-codex-r000010"
+        or target.get("revision") != 10
         or target.get("manifest_sha256") != digest
         or lock.get("skill_count") != 8
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
         or len(files) != EXPECTED_SKILL_FILES
     ):
-        raise NativeVerificationPassError("r9 target identity or manifest drifted")
+        raise NativeVerificationPassError("r10 target identity or manifest drifted")
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000008",
-        "revision": 8,
+        "artifact_id": "cotend-codex-r000009",
+        "revision": 9,
         "source_release_id": "2026.07.23.2",
         "framework_protocol": "cotend-collaboration-v1.65",
-        "manifest_sha256": EXPECTED_R8_MANIFEST,
+        "manifest_sha256": EXPECTED_R9_MANIFEST,
     }:
-        raise NativeVerificationPassError("r8 predecessor identity drifted")
+        raise NativeVerificationPassError("r9 predecessor identity drifted")
 
     _require_markers(
         texts["evidence"],
         (
             "current_target_artifact_id: cotend-codex-r000009",
             "current_target_revision: 9",
-            f"current_target_manifest_sha256: {digest}",
+            f"current_target_manifest_sha256: {EXPECTED_R9_MANIFEST}",
             "predecessor_target_artifact_id: cotend-codex-r000008",
             f"predecessor_target_manifest_sha256: {EXPECTED_R8_MANIFEST}",
             "runtime_trellis_inventory: 20_mentions_10_files",
@@ -769,7 +772,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         not isinstance(td05, dict)
         or td05.get("status") != "native_parity_verified"
         or not isinstance(g02, dict)
-        or g02.get("status") != "in_progress_7_of_8"
+        or g02.get("status") != "complete"
         or current_runtime.get("mention_count") != EXPECTED_TRELLIS_MENTIONS
         or current_runtime.get("file_count") != EXPECTED_TRELLIS_FILES
         or current_runtime.get("file_mentions") != inventory

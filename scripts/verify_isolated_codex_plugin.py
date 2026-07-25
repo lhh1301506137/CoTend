@@ -38,7 +38,7 @@ EXPECTED_SKILLS = (
     "grill-me",
     "karpathy-guidelines",
 )
-EXPECTED_FILE_COUNT = 39
+EXPECTED_FILE_COUNT = 40
 PACKAGE_SUPPORT_FILES = {
     "LICENSE": ROOT / "LICENSE",
     "NOTICE": ROOT / "NOTICE",

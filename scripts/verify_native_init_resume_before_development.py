@@ -55,12 +55,10 @@ LOAD_ORDER = (
     "actual_file_verification",
 )
 REMOVED_TD02_COMMANDS = ("trellis-start", "trellis-before-dev")
-REQUIRED_REMAINING_COMMANDS = (
-    "trellis-finish",
-)
-EXPECTED_TRELLIS_MENTIONS = 20
-EXPECTED_TRELLIS_FILES = 10
-EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS = 3
+REQUIRED_REMAINING_COMMANDS: tuple[str, ...] = ()
+EXPECTED_TRELLIS_MENTIONS = 7
+EXPECTED_TRELLIS_FILES = 6
+EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS = 0
 
 REQUIRED_PROJECT_INIT_MARKERS = (
     "## Native Initialization And Resume Boundary",
@@ -93,8 +91,8 @@ REQUIRED_DOCUMENT_MARKERS = (
     "cotend-codex-r000007",
     "入口侧共 13 类场景",
     "开发前侧共 9 类场景",
-    "20 处、10 个文件",
-    "当前只保留 TD07 收尾兼容过程",
+    "7 处、6 个文件",
+    "TD07 已由 Native Closeout Pass 承接",
 )
 REQUIRED_EVIDENCE_MARKERS = (
     "current_target_artifact_id: cotend-codex-r000007",
@@ -593,29 +591,25 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
             raise NativeProjectEntryError(
                 f"TD02 compatibility command remains: {command}"
             )
-    _require_markers(
-        combined_skills,
-        REQUIRED_REMAINING_COMMANDS,
-        "remaining TD07 route",
-    )
+    _require_markers(combined_skills, REQUIRED_REMAINING_COMMANDS, "remaining routes")
     if "capability: startup | pre_development" in runtime_profiles:
         raise NativeProjectEntryError(
             "native record still exposes TD02 compatibility capabilities"
         )
-    if "capability: closeout" not in runtime_profiles:
+    if "capability: closeout" in runtime_profiles:
         raise NativeProjectEntryError(
-            "remaining compatibility capability schema drifted"
+            "obsolete closeout compatibility capability remains"
         )
 
     inventory = trellis_inventory(root)
     if (
         sum(inventory.values()) != EXPECTED_TRELLIS_MENTIONS
         or len(inventory) != EXPECTED_TRELLIS_FILES
-        or inventory.get("skills/cotend-project-init/SKILL.md")
+        or inventory.get("skills/cotend-project-init/SKILL.md", 0)
         != EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS
     ):
         raise NativeProjectEntryError(
-            "current runtime inventory is not the exact 20/10 checkpoint"
+            "current runtime inventory is not the exact 7/6 checkpoint"
         )
 
     entry_results: dict[str, dict[str, object]] = {}

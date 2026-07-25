@@ -54,12 +54,12 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         inventory = namespace.identifier_inventory(
             namespace.base.SOURCE_SKILLS_ROOT, namespace.USER_OWNED_SKILLS
         )
-        self.assertEqual(inventory["occurrences"], 186)
+        self.assertEqual(inventory["occurrences"], 188)
         self.assertEqual(inventory["files"], 22)
         self.assertEqual(
             inventory["by_identifier"],
             {
-                "cotend-collaboration": 75,
+                "cotend-collaboration": 77,
                 "cotend-diagnose-only": 25,
                 "cotend-init": 12,
                 "cotend-model-upgrade": 11,
@@ -76,7 +76,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
                 "frontmatter_name": 6,
                 "plain_reference": 31,
                 "protocol_or_version": 14,
-                "reference_path": 58,
+                "reference_path": 60,
             },
         )
 
@@ -147,8 +147,8 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
 
         preserve = results["N1-preserve"]
         self.assertEqual(preserve["skills"], 8)
-        self.assertEqual(preserve["skill_files"], 39)
-        self.assertEqual(preserve["package_files"], 45)
+        self.assertEqual(preserve["skill_files"], 40)
+        self.assertEqual(preserve["package_files"], 46)
         self.assertEqual(transforms["N1-preserve"], [])
         self.assertTrue(preserve["source_comparison"]["byte_identical"])
         self.assertEqual(preserve["source_comparison"]["moved_path_count"], 0)
@@ -157,26 +157,26 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         )
         self.assertEqual(
             preserve["residual_source_identifier_inventory"]["occurrences"],
-            186,
+            188,
         )
         self.assertEqual(preserve["residual_migration_review_required"], 0)
         self.assertEqual(preserve["plugin_sensitive_reference_count"], 77)
 
         short = results["N2-short"]
         self.assertEqual(short["skills"], 8)
-        self.assertEqual(short["skill_files"], 39)
-        self.assertEqual(short["package_files"], 45)
+        self.assertEqual(short["skill_files"], 40)
+        self.assertEqual(short["package_files"], 46)
         self.assertEqual(len(transforms["N2-short"]), 12)
-        self.assertEqual(short["source_comparison"]["moved_path_count"], 37)
+        self.assertEqual(short["source_comparison"]["moved_path_count"], 38)
         self.assertEqual(
             short["source_comparison"]["byte_changed_file_count"], 12
         )
         self.assertFalse(short["source_comparison"]["byte_identical"])
         self.assertEqual(
             short["residual_source_identifier_inventory"]["occurrences"],
-            174,
+            176,
         )
-        self.assertEqual(short["residual_migration_review_required"], 160)
+        self.assertEqual(short["residual_migration_review_required"], 162)
         self.assertEqual(short["plugin_sensitive_reference_count"], 71)
         self.assertEqual(len(short["target_entrypoints"]), 6)
         self.assertEqual(

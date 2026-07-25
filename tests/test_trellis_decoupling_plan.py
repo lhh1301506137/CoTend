@@ -34,16 +34,16 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
             self.tracked_paths,
         )
 
-    def test_current_migration_preserves_baseline_and_advances_seven_capabilities(
+    def test_current_migration_preserves_baseline_and_advances_all_capabilities(
         self,
     ) -> None:
         result = self.validate()
         self.assertEqual(result["capabilities"], 8)
         self.assertEqual(result["gates"], 6)
-        self.assertEqual(result["runtime_mentions"], 20)
-        self.assertEqual(result["runtime_files"], 10)
+        self.assertEqual(result["runtime_mentions"], 7)
+        self.assertEqual(result["runtime_files"], 6)
         self.assertTrue(result["skill_behavior_changed"])
-        self.assertEqual(result["native_capabilities_verified"], 7)
+        self.assertEqual(result["native_capabilities_verified"], 8)
 
     def test_immutable_baseline_change_is_rejected(self) -> None:
         changed = copy.deepcopy(self.contract)
@@ -59,22 +59,22 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 
-    def test_another_capability_cannot_advance_without_implementation(self) -> None:
+    def test_verified_capability_cannot_regress_to_baseline(self) -> None:
         changed = copy.deepcopy(self.contract)
-        changed["capabilities"][6]["status"] = "native_parity_verified"
+        changed["capabilities"][6]["status"] = "baseline_frozen"
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 
     def test_current_inventory_drift_is_rejected(self) -> None:
         changed = copy.deepcopy(self.contract)
         changed["current_runtime"]["file_mentions"][
-            "skills/cotend-project-init/SKILL.md"
+            "skills/cotend-collaboration/references/plan-tree.md"
         ] += 1
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 
     def test_code_and_contract_cannot_drift_together_inside_allowed_path(self) -> None:
-        path = "skills/cotend-project-init/SKILL.md"
+        path = "skills/cotend-collaboration/references/plan-tree.md"
         changed_contract = copy.deepcopy(self.contract)
         changed_inventory = copy.deepcopy(self.inventory)
         changed_contract["current_runtime"]["file_mentions"][path] -= 1
@@ -122,6 +122,12 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
     def test_td06_evidence_cannot_be_removed(self) -> None:
         changed = copy.deepcopy(self.contract)
         changed["capabilities"][5]["evidence"].pop()
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(changed)
+
+    def test_td07_evidence_cannot_be_removed(self) -> None:
+        changed = copy.deepcopy(self.contract)
+        changed["capabilities"][6]["evidence"].pop()
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 

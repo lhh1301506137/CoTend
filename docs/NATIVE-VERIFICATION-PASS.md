@@ -68,8 +68,8 @@ CoTend 现在由内部 Native Verification Pass 承接 Checker：读取 TD04 的
 
 ## 本叶边界
 
-第一方运行 Skills 中 `trellis-check` 已归零，verification 兼容映射已移除。当前 Trellis 库存从 TD04 的 28 处、15 个文件下降到 20 处、10 个文件；剩余内容只属于 TD07 closeout 兼容过程以及历史、来源或治理边界。
+第一方运行 Skills 中 `trellis-check` 已归零，verification 兼容映射已移除。TD05 检查点把 Trellis 库存从 TD04 的 28 处、15 个文件下降到 20 处、10 个文件；后续 TD07 又通过 Native Closeout Pass 降到当前 7 处、6 个文件。
 
-当前开发根目标是 `cotend-codex-r000009`，r8 是精确 predecessor。未发布 `cotend@0.1.0-rc.2` 继续从历史 r2 source commit 构建，其 37 个 Skill 来源文件、48 文件包体和 ZIP 摘要不因 r9 开发字节改变。
+当前开发根目标是 `cotend-codex-r000010`，r9 是精确 predecessor。未发布 `cotend@0.1.0-rc.2` 继续从历史 r2 source commit 构建，其 37 个 Skill 来源文件、48 文件包体和 ZIP 摘要不因 r10 开发字节改变。
 
-本叶不代表 TD07、G03 累计主旅程、G04 负向恢复集成、G05 运行时零依赖或 G06 真实项目/用户验收已经完成，也不授权真实安装、全局更新、push、tag、Release、Portal、submission 或 publish。
+TD07 已完成单项原生等价，但本叶不代表 G03 累计主旅程、G04 负向恢复集成、G05 运行时零依赖或 G06 真实项目/用户验收已经完成，也不授权真实安装、全局更新、push、tag、Release、Portal、submission 或 publish。

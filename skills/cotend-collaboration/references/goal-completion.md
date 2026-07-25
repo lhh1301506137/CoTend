@@ -34,6 +34,8 @@ Assess:
 - whether remaining tasks are necessary or optional polish.
 - intent drift between the original idea/user-confirmed active truth and the current product behavior.
 
+Goal Completion and Native Closeout are independent. A verified local checkpoint may complete `closeout-pass.md` while the goal remains in progress; a likely-complete goal may still require closeout before acceptance. Neither result inherits the other's authority.
+
 ## Status
 
 ```yaml

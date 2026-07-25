@@ -116,8 +116,8 @@ class IsolatedProductionUserReceiptTests(unittest.TestCase):
         return Artifact.from_directory(
             source,
             source_release_id=self.artifact.source_release_id,
-            artifact_id="cotend-codex-r000010",
-            revision=10,
+            artifact_id="cotend-codex-r000011",
+            revision=11,
             protocol=self.artifact.protocol,
         )
 
@@ -314,7 +314,7 @@ class IsolatedProductionUserReceiptTests(unittest.TestCase):
         rebound = self.production_manager(codex_home=other_codex_home)
         rebound.execute("migrate_identity", apply=True)
         changed.execute("update", apply=True)
-        self.assertEqual(self.receipt()["target_revision"], 10)
+        self.assertEqual(self.receipt()["target_revision"], 11)
 
     def test_production_bridge_is_hard_disabled_and_never_creates_state(self) -> None:
         bridge = ProductionUserDeliveryBridge(

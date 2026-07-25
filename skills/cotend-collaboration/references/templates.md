@@ -45,7 +45,7 @@ plan_tree_alignment:
   why_this_is_highest_value_now:
   reconciliation_done: yes | no | not_required
   alignment:
-  trellis_links:
+  external_framework_links:
   dependencies:
   acceptance:
 ```
@@ -386,7 +386,8 @@ external_review_decision:
 local_closeout_authorization:
   status: active | disabled
   local_commit_allowed: yes | no
-  trellis_finish_archive_allowed: yes | no | not_applicable
+  native_closeout_allowed: yes | no | not_applicable
+  closeout_evidence_pointer:
   excluded_actions:
     # Canonical summary only; exact boundaries live in `authority-and-triggers.md`.
     -

@@ -66,6 +66,7 @@ SKILLS = {
 
 NATIVE_TARGET_ADDITIONS = {
     "cotend-collaboration": {
+        "references/closeout-pass.md",
         "references/implementation-pass.md",
         "references/verification-pass.md",
     },
@@ -303,8 +304,8 @@ def verify_references(errors: list[str]) -> None:
             errors.append(
                 f"collaboration reference is not discoverable from SKILL.md: {name}"
             )
-    if len(reference_names) != 23:
-        errors.append("cotend-collaboration reference count must be 23")
+    if len(reference_names) != 24:
+        errors.append("cotend-collaboration reference count must be 24")
     packet = (
         ROOT
         / "skills"
@@ -569,14 +570,25 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         "target": {
             "platform": "Codex",
             "lineage": "cotend-codex",
-            "artifact_id": "cotend-codex-r000009",
-            "revision": 9,
+            "artifact_id": "cotend-codex-r000010",
+            "revision": 10,
             "manifest_sha256": carrier_manifest,
         },
         "product": {"version": None},
         "skill_count": 8,
-        "skill_file_count": 39,
+        "skill_file_count": 40,
         "predecessor_targets": [
+            {
+                "platform": "Codex",
+                "lineage": "cotend-codex",
+                "artifact_id": "cotend-codex-r000009",
+                "revision": 9,
+                "source_release_id": "2026.07.23.2",
+                "framework_protocol": "cotend-collaboration-v1.65",
+                "manifest_sha256": (
+                    "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"
+                ),
+            },
             {
                 "platform": "Codex",
                 "lineage": "cotend-codex",
@@ -758,10 +770,10 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
                 or len(adapted) != len(set(adapted))
                 or set(imported) & set(adapted)
                 or recorded != actual
-                or len(actual) != 39
+                or len(actual) != 40
             ):
                 errors.append(
-                    "framework candidate inventory does not equal the 39 current Skill files"
+                    "framework candidate inventory does not equal the 40 current Skill files"
                 )
         if candidate_adoption.get("final_framework_lock_exists") is not True:
             errors.append("framework candidate does not record the final lock")
@@ -927,7 +939,7 @@ def main() -> int:
     print(
         "ADOPTED_SKILL_SET_VERIFICATION_OK "
         f"mode={'pre_lock' if args.pre_lock else 'final'} "
-        "skills=8 files=39 capabilities=19"
+        "skills=8 files=40 capabilities=19"
     )
     return 0
 

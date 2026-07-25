@@ -152,12 +152,12 @@ Initialize projects with the role-based authority contract in `cotend-collaborat
 
 1. **CoTend Project Truth Authority** owns product meaning, detailed requirement authority, route navigation, user decisions, status projection, current-reality evidence, and the boundary around project-local constraints. It never delegates those roles from framework identity or active state.
 2. **cotend-collaboration** owns collaboration governance: role assignment, risk authorization, continuous/unattended checkpoints, user interruption/new idea reconciliation, review/self-review gates, handoff scope, Acceptance/Test Harness, Quality Sentinel, AI UAT, Done Gate, intent drift review, Release Hardening, and human rejoin explanations.
-3. **External development-framework artifacts** are classified `reference_only`, `historical`, or `conflict`. A remaining compatibility capability may still invoke its finish procedure, but its implementation, checking, task, PRD, spec, state, profile, or coding guideline never becomes CoTend Core authority.
+3. **External development-framework artifacts** are classified `reference_only`, `historical`, or `conflict`. They never own or execute CoTend implementation, checking, closeout, task, PRD, spec, state, profile, or coding-guideline behavior.
 4. **Karpathy and project coding guidelines** own coding behavior only inside higher user, safety, confirmed-product, and authorized-route boundaries.
 5. **grill-me** owns clarification style for fuzzy requirements. Existing external brainstorm records may be linked as classified evidence; user-facing decisions must be recorded in `PROJECT-DECISION-LOG.md` when they match canonical decision-worthy topics.
 6. **Code Context Harness** owns codebase structure discovery. It helps the Primary choose what to read/review but never owns product truth or route selection.
 
-When an authorized compatibility route is recorded, keep only its remaining closeout procedure mapping without granting it state or project-truth authority:
+Local closeout always uses `cotend-collaboration/references/closeout-pass.md`; do not preserve an external lifecycle procedure as an active compatibility route:
 
 - `CodexSelf` / `ClaudeSelf` = accepted legacy carrier aliases normalized to the actual model's formal same-model self-review.
 - Claude/Gemini/Kimi or another named model = optional external/advisory reviewer only after carrier and actual model identity are separated.
@@ -191,11 +191,6 @@ cotend_workflow:
       classification: reference_only | historical | conflict
       affects_current_route: true | false
       evidence_pointer:
-      compatibility_procedures:
-        - capability: closeout
-          procedure_id:
-          status: authorized | disabled
-          authority: cotend_native_record | user_explicit
 ```
 
 Do not delete external artifacts automatically. Keep their source bytes unchanged, classify them separately, and migrate only an unambiguous project-local profile value. If useful history exists, link or summarize it into current CoTend carriers without making it a hidden binding source.
@@ -423,7 +418,7 @@ Do not start large product development until this workflow is complete.
    - Use `max_continuous_risk: medium` only as a temporary fallback while project stage, local-only status, data scope, payment/cost exposure, or public/release posture is not yet known.
    - Once inspection confirms the local personal conditions, upgrade the recorded authorization to `dev_high` without asking again.
    - If the user says "只允许低风险" or equivalent, record `max_continuous_risk: low` for the named scope.
-   - If the user explicitly enables uninterrupted local closeout, or the project is a confirmed personal/local project where local commits reduce checkpoint risk, record `local_closeout_authorization`. This may allow verified in-scope local commits and Trellis finish/archive/journal, but never push/deploy/release/publish, force-push/history rewrite, secrets/private data exposure, destructive operations, scope expansion, final user acceptance, or any `critical` item.
+   - If the user explicitly enables uninterrupted local closeout, or the project is a confirmed personal/local project where local commits reduce checkpoint risk, record `local_closeout_authorization`. This may allow verified in-scope native record synchronization and local commits through `cotend-collaboration/references/closeout-pass.md`, but never push/deploy/release/publish, force-push/history rewrite, secrets/private data exposure, destructive operations, scope expansion, final user acceptance, or any `critical` item.
    - Do not preserve momentum by choosing only low-value low-risk work; if the most valuable next step needs medium/dev-high authority, continue when authorized and record rationale. If it needs critical authority or scope expansion, stop and ask.
    - Critical work must stop for the user according to the canonical Critical / Never-Unattended Stop List in `cotend-collaboration/references/authority-and-triggers.md`.
    - Make these stop boundaries visible in the report whenever relevant:
@@ -444,7 +439,7 @@ Do not start large product development until this workflow is complete.
    - Use the External Advisor Trigger Map in `cotend-collaboration/references/review-and-self-review.md` to decide when actual-primary self-review is enough and when a separately identified external model should be recommended.
    - Cut or recommend review checkpoints at runnable feature slices, materially large diffs (typically about 8+ material files or about 1000 meaningful changed lines), about 5 task units, unclear verification failure, Quality Sentinel signal, or before any non-preauthorized commit/release/archive.
    - Estimate checkpoint size with the Checkpoint Measurement Method in `cotend-collaboration/references/authority-and-triggers.md`; do not invent exact rolling metrics or unsupported history windows.
-   - If `local_closeout_authorization.status: active`, local commit plus Trellis finish/archive/journal may be part of the checkpoint closeout after verification and self-review.
+   - If `local_closeout_authorization.status: active`, native closeout records plus an optional local commit may be part of checkpoint closeout after verification and formal self-review.
    - If asked for Claude/Codex review later, prepare the batch from the last completed review boundary, not only the latest change.
 
 8a. Inspect delegation maturity.
@@ -544,7 +539,7 @@ Do not start large product development until this workflow is complete.
     - For each current standard/full or large project, initialize or refresh an isolated project-local index with `codegraph init .` from the canonical project root when `codegraph` is installed and the root is clear. Do not reuse another project's `.codegraph/`.
     - Ensure `.codegraph/` is ignored/untracked; add `.codegraph/` to the canonical root `.gitignore` when safe. If `.codegraph/` is already tracked, the root is ambiguous, or `.gitignore` cannot be safely updated, stop with Human Rejoin instead of silently falling back.
     - Record that code context is a scope hint, not product truth.
-    - When an authorized external compatibility procedure remains, run code-context discovery only after the CoTend goal/route owner is resolved and applicable external task/PRD/spec artifacts are classified. Historical foreign files are optional evidence only.
+    - When external development-framework artifacts remain, run code-context discovery only after the CoTend goal/route owner is resolved and applicable external task/PRD/spec/closeout artifacts are classified. Historical foreign files are optional evidence only and are never executed as CoTend Core.
 
 ## Required Initialization Report
 
@@ -707,11 +702,6 @@ Project initialization report:
     classification: reference_only | historical | conflict
     affects_current_route: true | false
     evidence_pointer:
-    compatibility_procedures:
-      - capability: closeout
-        procedure_id:
-        status: authorized | disabled
-        authority: cotend_native_record | user_explicit
 - project_stage:
   stage:
   evidence:
@@ -729,7 +719,7 @@ Project initialization report:
   scope:
 - local_closeout_authorization:
   status: active | disabled
-  mode: manual_closeout | auto_local_commit_and_trellis_finish
+  mode: manual_closeout | auto_local_commit_and_native_closeout
   authorization_basis:
   scope:
   allowed_actions:

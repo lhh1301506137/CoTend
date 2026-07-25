@@ -664,7 +664,7 @@ When no external framework is present, use the same authority chain. Keep detail
 
 ## Checkpoint Updates
 
-At checkpoint, local closeout, Trellis finish/archive, handoff, or review:
+At checkpoint, Native Closeout Pass, handoff, or review:
 
 - report whether any L0-L2 semantics changed, remain pending, or were newly discovered;
 - summarize completed user-visible outcomes under the confirmed baseline instead of using code/file/task volume as product progress;

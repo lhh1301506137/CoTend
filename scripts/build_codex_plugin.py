@@ -340,9 +340,9 @@ def source_skill_manifest() -> dict[str, str]:
     if actual_directories != EXPECTED_SKILLS:
         raise PluginPackageError("repository Skill directory inventory drifted")
     manifest = path_hash_manifest(SOURCE_SKILLS_ROOT)
-    if len(manifest) != 39:
+    if len(manifest) != 40:
         raise PluginPackageError(
-            f"expected 39 repository Skill files, found {len(manifest)}"
+            f"expected 40 repository Skill files, found {len(manifest)}"
         )
     for skill in EXPECTED_SKILLS:
         if f"{skill}/SKILL.md" not in manifest:
@@ -540,8 +540,8 @@ def validate_contract() -> dict[str, Any]:
     if (
         target.get("platform") != "Codex"
         or target.get("lineage") != "cotend-codex"
-        or target.get("artifact_id") != "cotend-codex-r000009"
-        or target.get("revision") != 9
+        or target.get("artifact_id") != "cotend-codex-r000010"
+        or target.get("revision") != 10
         or not isinstance(target.get("manifest_sha256"), str)
         or len(target["manifest_sha256"]) != 64
     ):

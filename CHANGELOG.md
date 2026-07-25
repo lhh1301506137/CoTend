@@ -14,6 +14,7 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - CoTend-native workflow state and runtime profiles with sixteen executable default, inheritance, session override, persistence, dormancy, migration, conflict, and external-framework scenarios.
 - CoTend-native Implementation Pass with bounded leaf authority, write ownership, dependency, failure, interruption, and Full/Adaptive parity scenarios.
 - CoTend-native Verification Pass with direct diff/spec/test inspection, authorized fix and rerun evidence, failure/stop recovery, and Full/Adaptive Checker parity.
+- CoTend-native Closeout Pass with durable-record synchronization, optional local commits, pre/post-commit failure isolation, interrupted recovery, and Full/Adaptive parity.
 
 ### Changed
 
@@ -27,11 +28,13 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - Replaced external workflow-state/config ownership with one CoTend-native `current | dormant | conflict` record and native `delegated_pair | inline` execution mapping.
 - Bound the unpublished rc.2 package to its verified historical source commit so the existing 48-file package and ZIP remain reproducible while root Skills evolve.
 - Advanced the repository carrier through targets `cotend-codex-r000007`, `r000008`, and `r000009`, preserving every prior target as an exact predecessor.
-- Removed the active external implementation and checking routes; only the closeout compatibility route remains pending its own parity gate.
+- Advanced the repository carrier to `cotend-codex-r000010`, preserving r9 through r2 as exact predecessors while keeping the rc.2 package immutable.
+- Removed the active external implementation, checking, and closeout routes; all eight G02 capability replacements now have native parity evidence.
 
 ### Boundaries
 
-- TD08 project-truth authority, TD03 requirements clarification, TD06 specification change/Route Rebase, TD01 workflow state/runtime profiles, TD02 init/pre-development, TD04 implementation, and TD05 verification have native parity; only TD07 closeout remains until its evidence gate passes.
+- TD08 project-truth authority, TD03 requirements clarification, TD06 specification change/Route Rebase, TD01 workflow state/runtime profiles, TD02 init/pre-development, TD04 implementation, TD05 verification, and TD07 closeout have per-capability native parity.
+- G03 cumulative journeys, G04 integrated negative recovery, G05 zero runtime mentions, and G06 real-project/user acceptance remain separate incomplete gates.
 - Plugin package identity, release tag, remote repository, real-user installation, and submission state did not change.
 - The next Plugin candidate will not advance beyond rc.2 until cumulative CoTend-native parity is implemented and verified.
 

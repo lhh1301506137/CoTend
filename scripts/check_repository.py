@@ -15,6 +15,7 @@ import verify_native_workflow_state_runtime_profiles as native_workflow_state
 import verify_native_init_resume_before_development as native_project_entry
 import verify_native_implementation_pass as native_implementation
 import verify_native_verification_pass as native_verification
+import verify_native_closeout_pass as native_closeout
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -424,6 +425,13 @@ EXPECTED_NATIVE_VERIFICATION_FILES = {
     "scripts/verify_native_verification_pass.py",
     "skills/cotend-collaboration/references/verification-pass.md",
     "tests/test_native_verification_pass.py",
+}
+EXPECTED_NATIVE_CLOSEOUT_FILES = {
+    "docs/NATIVE-CLOSEOUT-ARCHIVE-AND-RECOVERY.md",
+    "docs/evidence/NATIVE-CLOSEOUT-PASS-TARGET-R10.md",
+    "scripts/verify_native_closeout_pass.py",
+    "skills/cotend-collaboration/references/closeout-pass.md",
+    "tests/test_native_closeout_pass.py",
 }
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
@@ -1626,8 +1634,8 @@ def upstream_adoption_errors(
     }
     if actual_skill_ids != expected_skill_ids:
         errors.append("adopted Codex Skill directory set must contain exactly eight Skills")
-    if len(skill_files) != 39:
-        errors.append(f"adopted Codex Skill source set must contain 39 files: {len(skill_files)}")
+    if len(skill_files) != 40:
+        errors.append(f"adopted Codex Skill source set must contain 40 files: {len(skill_files)}")
     adopted_files = value(candidate, "adoption", "imported_files")
     adapted_files = value(candidate, "adoption", "adapted_files")
     if not isinstance(adopted_files, list) or not isinstance(adapted_files, list):
@@ -1642,7 +1650,7 @@ def upstream_adoption_errors(
         if adopted_set != expected_direct_adoption:
             errors.append("directly adopted Skill file inventory drift")
         if adopted_set & adapted_set or adopted_set | adapted_set != skill_files:
-            errors.append("candidate adopted/adapted inventory does not equal the 39 current Skill files")
+            errors.append("candidate adopted/adapted inventory does not equal the 40 current Skill files")
     if value(candidate, "adoption", "required_before_lock") != []:
         errors.append("framework candidate retains unresolved pre-lock requirements")
 
@@ -2185,7 +2193,7 @@ def isolated_codex_plugin_fixture_errors(
     verifier_text = read("scripts/verify_isolated_codex_plugin.py")
     for marker in (
         'PLUGIN_VERSION = "0.0.0-dev.1+codex.fixture"',
-        "EXPECTED_FILE_COUNT = 39",
+        "EXPECTED_FILE_COUNT = 40",
         '"--phase-a"',
         '"--negative-mutations"',
         '"remote_plugin"',
@@ -2216,8 +2224,8 @@ def isolated_codex_plugin_fixture_errors(
         "phase_a_steps": {"17"},
         "negative_cases": {"12"},
         "adopted_skills": {"8"},
-        "adopted_skill_files": {"39"},
-        "package_files": {"45"},
+        "adopted_skill_files": {"40"},
+        "package_files": {"46"},
         "protected_user_metadata": {"unchanged_stat_only"},
         "tracked_production_plugin": {"cotend@0.1.0-rc.2_local_unpublished"},
     }.items():
@@ -2227,7 +2235,7 @@ def isolated_codex_plugin_fixture_errors(
     for marker in (
         "15 个写入根全部解析到 ignored fixture",
         "官方 Plugin validator：`passed`",
-        "Plugin package：45 个文件",
+        "Plugin package：46 个文件",
         "实际执行并通过以下 17 步",
         "cotend:cotend-init",
         "cotend:cotend-semantic-alignment",
@@ -2668,7 +2676,7 @@ def production_plugin_package_errors(
             errors.append(f"production Plugin package evidence mismatch: {key}")
     for marker in (
         "rc.2 的 Skill 语义源固定为 Git commit",
-        "当前根 `skills/` 已推进到 target r9",
+        "当前根 `skills/` 已推进到 target r10",
         "48 个文件",
         "逐字节一致",
         "17 类负向边界",
@@ -2874,7 +2882,7 @@ def github_marketplace_root_carrier_errors(
             "tracked Marketplace inventory mismatch: " f"{tracked_marketplaces}"
         )
     source_files = sorted(path for path in candidates if path.startswith("skills/"))
-    if len(source_files) != 39:
+    if len(source_files) != 40:
         errors.append(f"root Marketplace Skill source count drifted: {len(source_files)}")
     if any(path.startswith("codex-skills/") for path in candidates):
         errors.append("legacy codex-skills source must not coexist with root skills")
@@ -2913,6 +2921,7 @@ def github_marketplace_root_carrier_errors(
     for key, expected in {
         "status": {"passed_isolated_github_marketplace_root_carrier"},
         "evidence_type": {"executed"},
+        "evidence_date": {"2026-07-26"},
         "codex_version": {"codex-cli_0.144.1"},
         "repository_carrier": {"present_and_valid"},
         "root_plugin_manifest": {".codex-plugin/plugin.json"},
@@ -2923,22 +2932,22 @@ def github_marketplace_root_carrier_errors(
         "semantic_source": {"skills/"},
         "semantic_sources": {"1"},
         "source_skill_manifest_sha256": {
-            "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"
+            "0715c20f517f906996d4882e47c664449a23cf6f7747b6a2d42835f35591b8a9"
         },
         "package_manifest_sha256": {
             "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2"
         },
         "allowed_manifest_path_rewrites": {"3"},
         "adopted_skills": {"8"},
-        "adopted_skill_files": {"39"},
+        "adopted_skill_files": {"40"},
         "normal_lifecycle_steps": {"15"},
         "failure_recovery_steps": {"5"},
         "write_roots_redirected": {"15"},
         "protected_user_boundaries": {"8"},
         "focused_tests": {"12"},
-        "full_unit_tests": {"296"},
+        "full_unit_tests": {"311"},
         "repository_check": {
-            "passed_243_public_candidates_19_capabilities_19_specs"
+            "passed_248_public_candidates_19_capabilities_19_specs"
         },
         "official_validator": {"passed"},
         "local_marketplace_repeat_add": {"idempotent_success"},
@@ -3694,7 +3703,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         if actual_operations != EXPECTED_DELIVERY_OPERATIONS:
             errors.append(f"delivery operation inventory drift: {sorted(actual_operations)}")
         for marker in (
-            "EXPECTED_FILE_COUNT = 39",
+            "EXPECTED_FILE_COUNT = 40",
+            "R9_FILE_COUNT = 39",
             "SOURCE_FRAMEWORK_FILE_COUNT = 37",
             "class DeliveryLayout:",
             "class LegacyReceiptMapping:",
@@ -3764,6 +3774,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             "confirmation_gate_zero_write",
             "stale_plan_toctou_zero_write",
             "terminated_recovery_retains_dual_evidence",
+            'artifact_id="cotend-codex-r000011"',
+            "revision=11",
         ):
             if marker not in harness_text:
                 errors.append(f"delivery lifecycle harness marker is missing: {marker}")
@@ -3995,14 +4007,14 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         }
         or product != {"version": None}
         or target_lock.get("skill_count") != 8
-        or target_lock.get("skill_file_count") != 39
+        or target_lock.get("skill_file_count") != 40
     ):
         errors.append("delivery target lock source or envelope mismatch")
     expected_target = {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000009",
-        "revision": 9,
+        "artifact_id": "cotend-codex-r000010",
+        "revision": 10,
     }
     if not isinstance(target, dict) or any(
         target.get(key) != expected for key, expected in expected_target.items()
@@ -4026,6 +4038,17 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if not isinstance(target, dict) or target.get("manifest_sha256") != carrier_manifest:
         errors.append("delivery target lock manifest mismatch")
     expected_predecessors = [
+        {
+            "platform": "Codex",
+            "lineage": "cotend-codex",
+            "artifact_id": "cotend-codex-r000009",
+            "revision": 9,
+            "source_release_id": "2026.07.23.2",
+            "framework_protocol": "cotend-collaboration-v1.65",
+            "manifest_sha256": (
+                "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"
+            ),
+        },
         {
             "platform": "Codex",
             "lineage": "cotend-codex",
@@ -4130,23 +4153,30 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     ]
     if target_lock.get("legacy_receipt_mappings") != expected_legacy_mappings:
         errors.append("delivery target lock legacy mapping mismatch")
-    identity_evidence_path = "docs/evidence/NATIVE-VERIFICATION-PASS-TARGET-R9.md"
+    identity_evidence_path = "docs/evidence/NATIVE-CLOSEOUT-PASS-TARGET-R10.md"
     if identity_evidence_path not in candidates:
         errors.append("target artifact identity evidence is missing or ignored")
     else:
         evidence = read(identity_evidence_path)
         for marker in (
-            "current_target_artifact_id: cotend-codex-r000009",
-            "current_target_revision: 9",
-            "current_target_manifest_sha256: 32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072",
-            "predecessor_target_artifact_id: cotend-codex-r000008",
-            "predecessor_target_revision: 8",
-            "predecessor_target_manifest_sha256: 84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3",
+            "current_target_artifact_id: cotend-codex-r000010",
+            "current_target_revision: 10",
+            "current_target_manifest_sha256: 0715c20f517f906996d4882e47c664449a23cf6f7747b6a2d42835f35591b8a9",
+            "predecessor_target_artifact_id: cotend-codex-r000009",
+            "predecessor_target_revision: 9",
+            "predecessor_target_manifest_sha256: 32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072",
             "source_framework_lock_changed: false",
             "package_candidate: cotend@0.1.0-rc.2_immutable",
             "package_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
-            "TD05-verification-pass",
-            "runtime_trellis_inventory: 20_mentions_10_files",
+            "TD07-closeout-archive-and-recovery",
+            "runtime_trellis_inventory: 7_mentions_6_files",
+            "full_unit_tests: 311_passed",
+            "official_skill_quick_validate: passed_8_of_8",
+            "repository_check: passed_248_public_candidates_19_capabilities_19_specs",
+            "delivery_lifecycle: passed_11_steps_5_identity_8_negative_6_concurrency_8_recovery",
+            "writable_lifecycle: passed_4_scenarios_9_negative",
+            "production_plugin_lifecycle: passed_17_steps_5_recovery",
+            "github_marketplace_carrier: passed_15_steps_5_recovery",
         ):
             if marker not in evidence:
                 errors.append(f"target artifact identity evidence is missing: {marker}")
@@ -4282,6 +4312,12 @@ def main() -> int:
         errors.append(
             "native verification-pass artifacts are missing or ignored: "
             f"{sorted(missing_native_verification)}"
+        )
+    missing_native_closeout = EXPECTED_NATIVE_CLOSEOUT_FILES - candidates
+    if missing_native_closeout:
+        errors.append(
+            "native closeout-pass artifacts are missing or ignored: "
+            f"{sorted(missing_native_closeout)}"
         )
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
@@ -4483,6 +4519,11 @@ def main() -> int:
             native_verification.verify_repository(ROOT)
         except native_verification.NativeVerificationPassError as exc:
             errors.append(f"native verification pass: {exc}")
+    if not missing_native_closeout:
+        try:
+            native_closeout.verify_repository(ROOT)
+        except native_closeout.NativeCloseoutPassError as exc:
+            errors.append(f"native closeout pass: {exc}")
 
     github_marketplace_carrier_evidence_path = (
         "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md"

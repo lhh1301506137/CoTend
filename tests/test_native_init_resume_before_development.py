@@ -16,11 +16,11 @@ class NativeInitResumeBeforeDevelopmentTests(unittest.TestCase):
     def test_repository_contract_and_exact_runtime_inventory(self) -> None:
         result = native_entry.verify_repository()
         self.assertEqual(result["status"], "native_parity_verified")
-        self.assertEqual(result["runtime_mentions"], 20)
-        self.assertEqual(result["runtime_files"], 10)
+        self.assertEqual(result["runtime_mentions"], 7)
+        self.assertEqual(result["runtime_files"], 6)
         self.assertEqual(result["td02_commands"], 0)
-        self.assertEqual(result["remaining_commands"], 1)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000009")
+        self.assertEqual(result["remaining_commands"], 0)
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000010")
 
     def test_all_entry_modes_and_stops_are_covered(self) -> None:
         result = native_entry.verify_repository()
@@ -102,7 +102,7 @@ class NativeInitResumeBeforeDevelopmentTests(unittest.TestCase):
         self.assertFalse(repeated.generated_index_write)
         self.assertEqual(first.scope_signature, repeated.scope_signature)
 
-    def test_td02_td04_and_td05_commands_are_removed_but_td07_remains(self) -> None:
+    def test_td02_commands_and_all_remaining_compatibility_commands_are_removed(self) -> None:
         text = "\n".join(
             path.read_text(encoding="utf-8")
             for path in sorted((ROOT / "skills").rglob("*"))

@@ -36,7 +36,7 @@ REQUIRED_RUNTIME_MARKERS = (
     "`conflict`",
     "## External Framework Classification",
     "Never write CoTend state, profile, dispatch, or migration metadata into external framework files.",
-    "Any remaining closeout compatibility invocation must be explicitly listed",
+    "External lifecycle procedures are never invoked as CoTend Core.",
     "1. a user-explicit current-session selection;",
     "2. one valid native project record;",
     "3. one unambiguous project-local legacy selection",
@@ -53,24 +53,22 @@ REQUIRED_INIT_MARKERS = (
     "execution_mode: delegated_pair | inline",
     "state: current | dormant | conflict",
     "Never write CoTend profile or execution metadata into an external framework configuration.",
-    "compatibility_procedures:",
+    "external_frameworks:",
 )
 REQUIRED_COLLABORATION_MARKERS = (
     "Detection may be `absent`; persisted state is `current | dormant | conflict`.",
     "`full` maps to native `delegated_pair`; `adaptive` maps to native `inline`.",
-    "Never write CoTend profile or execution metadata into its configuration.",
+    "Never write CoTend profile or execution metadata into its configuration",
 )
 REQUIRED_DOCUMENT_MARKERS = (
     "# CoTend 原生工作流状态与运行档位",
     "cotend-codex-r000006",
     "current / dormant / conflict",
     "delegated_pair / inline",
-    "当前只保留 TD07 closeout 兼容过程",
+    "TD07 已由原生 Native Closeout Pass 承接",
     "G03、G04、G06",
 )
-REQUIRED_COMPATIBILITY_COMMANDS = (
-    "trellis-finish",
-)
+REQUIRED_COMPATIBILITY_COMMANDS: tuple[str, ...] = ()
 FORBIDDEN_STATE_PATTERNS = {
     "foreign_state_path": re.compile(r"\.trellis(?:[/\\]|`)", re.IGNORECASE),
     "foreign_mode_key": re.compile(r"\btrellis\.mode\b", re.IGNORECASE),

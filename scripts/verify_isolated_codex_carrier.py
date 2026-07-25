@@ -303,8 +303,8 @@ def verify_static(
     }
     if source_manifest != managed_manifest:
         raise CarrierError("installed Skill files differ from repository source")
-    if len(managed_manifest) != 39:
-        raise CarrierError(f"expected 39 managed Skill files, found {len(managed_manifest)}")
+    if len(managed_manifest) != 40:
+        raise CarrierError(f"expected 40 managed Skill files, found {len(managed_manifest)}")
 
     for skill in sorted(EXPECTED_SKILLS):
         skill_file = target_root / skill / "SKILL.md"

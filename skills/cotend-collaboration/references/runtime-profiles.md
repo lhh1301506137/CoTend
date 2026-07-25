@@ -45,11 +45,6 @@ cotend_workflow:
       classification: reference_only | historical | conflict
       affects_current_route: true | false
       evidence_pointer:
-      compatibility_procedures:
-        - capability: closeout
-          procedure_id:
-          status: authorized | disabled
-          authority: cotend_native_record | user_explicit
 ```
 
 Preserve unrelated fields in the carrier. Apply structural updates idempotently: one native record, one value per field, and a second initialization with unchanged inputs produces no diff.
@@ -64,7 +59,7 @@ Classify every relevant external development-framework artifact independently:
 
 Presence, an activation flag, a task marker, or an external configuration value never makes that framework the CoTend workflow owner. Never write CoTend state, profile, dispatch, or migration metadata into external framework files. Keep external source files byte-identical during native-state migration.
 
-Any remaining closeout compatibility invocation must be explicitly listed in the native record's `compatibility_procedures`. An absent or disabled procedure is not invoked. The record stores only the minimum closeout procedure mapping needed until that capability becomes native; it does not import the external framework's lifecycle state.
+External lifecycle procedures are never invoked as CoTend Core. Existing external closeout records are classified evidence only; current closeout uses `closeout-pass.md` and the native project records.
 
 An external conflict with `affects_current_route: true` produces native `state: conflict` and a Human Rejoin. A non-affecting external conflict is reported and isolated without stopping a separately confirmed route.
 
@@ -111,7 +106,7 @@ Multiple candidates, invalid values, unclear scope, or conflicting route-affecti
 
 Older valid CoTend project records may retain their stable `runtime_profile` while obsolete selector metadata is removed only during an authorized structural update. Missing old eligibility, model-match, or fallback fields is not a reason to change Adaptive into Full.
 
-During an authorized update from a pre-native-Checker record, remove only the obsolete verification compatibility entry after reconciling any in-flight side effect. Preserve the external artifact, profile, route, and unrelated record fields. An ambiguous in-flight check blocks the affected route; it is not silently retried through either path. The closeout entry remains until its own parity gate closes.
+During an authorized update from a record that predates the native Implementation, Verification, or Closeout Pass, remove obsolete compatibility entries only after reconciling any in-flight side effect. Preserve the external artifact, profile, route, and unrelated record fields. An ambiguous in-flight action blocks the affected route; it is not silently retried through either path.
 
 ## Profile And State Transitions
 
@@ -138,7 +133,7 @@ Project Init owns these transitions. It must never store them in an external fra
 - Both roles use the native-agent contract for explicit context, dependencies, non-overlapping ownership, root integration, local plus integrated verification, fresh review when triggered, and side-effect-safe retry.
 - All required verification, evidence, acceptance, release, risk, and stop boundaries remain active.
 
-The remaining compatibility mapping belongs only to closeout; it must not be used as state, profile, truth, implementation, checking, or route authority.
+Both profiles finish verified checkpoints through `closeout-pass.md`; neither delegates closeout to an external framework.
 
 ## Adaptive Execution Contract
 
@@ -200,11 +195,6 @@ external_frameworks:
     classification: reference_only | historical | conflict
     affects_current_route: true | false
     evidence_pointer:
-    compatibility_procedures:
-      - capability: closeout
-        procedure_id:
-        status: authorized | disabled
-        authority: cotend_native_record | user_explicit
 ```
 
 Report selection, persistence, source, version inheritance, and execution mode separately. Runtime identity may appear beside this packet but is not consumed by the selector. Switching any model, provider, carrier, configuration, or reviewer does not alter the effective profile.

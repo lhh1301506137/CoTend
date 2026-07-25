@@ -47,10 +47,10 @@ Local commits are risk-lowering checkpoints when they only capture verified, in-
 Default rule:
 
 - Without recorded `local_closeout_authorization`, stop before commit/archive and ask the user.
-- With recorded `local_closeout_authorization.status: active`, a local commit plus Trellis finish/archive/journal may proceed inside the current authorized scope when all conditions in `continuous-and-unattended.md` are satisfied.
+- With recorded `local_closeout_authorization.status: active`, native durable-record synchronization plus an optional local commit may proceed inside the current authorized scope when all conditions in `continuous-and-unattended.md` and `closeout-pass.md` are satisfied.
 - Commit messages must identify the task/slice and avoid secrets or private data.
 - Before staging, inspect `git status` and exclude unrelated/user changes.
-- After local closeout, report commit hash, Trellis archive/journal result, verification, and whether any stop boundary was encountered.
+- After local closeout, report the closeout result, commit hash or not-applicable reason, synchronized records, post-commit verification, and whether any stop boundary was encountered.
 
 Never covered by local closeout authorization: any item in the canonical Critical / Never-Unattended Stop List in `authority-and-triggers.md`.
 
@@ -99,12 +99,12 @@ continuous_risk_authorization:
     -
 local_closeout_authorization:
   status: active | disabled
-  mode: manual_closeout | auto_local_commit_and_trellis_finish
+  mode: manual_closeout | auto_local_commit_and_native_closeout
   authorization_basis: user_explicit | project_default_personal_local | disabled_by_policy
   scope: current_window | current_project | named_milestone
   allowed_actions:
     - local_git_commit
-    - trellis_finish_archive_journal
+    - native_closeout_records_and_local_commit
     - durable_status_review_log_updates
   excluded_actions:
     # Canonical summary only; exact boundaries live in `authority-and-triggers.md`.

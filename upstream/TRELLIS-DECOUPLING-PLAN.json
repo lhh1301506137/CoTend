@@ -6,7 +6,7 @@
   "decision": "preserve_governance_capabilities_replace_trellis_identity_authority_and_runtime_dependency",
   "current_candidate": "cotend@0.1.0-rc.2_local_unpublished",
   "target_candidate": "cotend@0.1.0-rc.3_after_parity",
-  "development_target_artifact": "cotend-codex-r000009",
+  "development_target_artifact": "cotend-codex-r000010",
   "source_boundary": {
     "trellis_relationship": "restricted_design_inspiration_and_legacy_runtime_integration",
     "trellis_source_adoption": "none",
@@ -58,18 +58,14 @@
   "current_runtime": {
     "scope": "skills/",
     "case_insensitive_term": "trellis",
-    "mention_count": 20,
-    "file_count": 10,
+    "mention_count": 7,
+    "file_count": 6,
     "file_mentions": {
       "skills/cotend-collaboration/references/authority-and-triggers.md": 1,
-      "skills/cotend-collaboration/references/continuous-and-unattended.md": 3,
       "skills/cotend-collaboration/references/framework-change-evaluation.md": 1,
-      "skills/cotend-collaboration/references/plan-tree.md": 3,
+      "skills/cotend-collaboration/references/plan-tree.md": 2,
       "skills/cotend-collaboration/references/quality-sentinel.md": 1,
-      "skills/cotend-collaboration/references/risk-and-approval.md": 4,
-      "skills/cotend-collaboration/references/templates.md": 2,
       "skills/cotend-collaboration/references/upstream-dependency-review.md": 1,
-      "skills/cotend-project-init/SKILL.md": 3,
       "skills/cotend-semantic-alignment/SKILL.md": 1
     }
   },
@@ -194,7 +190,7 @@
         "Plan Tree"
       ],
       "native_coverage": "verified_native_contract",
-      "known_gap": "none_within_TD04_implementation_scope; TD05 Checker, TD07 closeout, cumulative journey, negative recovery integration, and real-project acceptance remain",
+      "known_gap": "none_within_TD04_implementation_scope; cumulative journey, negative recovery integration, and real-project acceptance remain",
       "status": "native_parity_verified",
       "removal_gate": "native_parity_verified",
       "evidence": [
@@ -221,7 +217,7 @@
         "AI UAT"
       ],
       "native_coverage": "verified_native_contract",
-      "known_gap": "none_within_TD05_verification_scope; TD07 closeout, cumulative journey, negative recovery integration, and real-project acceptance remain",
+      "known_gap": "none_within_TD05_verification_scope; cumulative journey, negative recovery integration, and real-project acceptance remain",
       "status": "native_parity_verified",
       "removal_gate": "native_parity_verified",
       "evidence": [
@@ -277,10 +273,16 @@
         "HANDOFF",
         "local closeout"
       ],
-      "native_coverage": "substantial",
-      "known_gap": "remove_trellis_archive_fields_and_revalidate_resume_after_native_closeout",
-      "status": "baseline_frozen",
-      "removal_gate": "native_parity_verified"
+      "native_coverage": "verified_native_contract",
+      "known_gap": "none_within_TD07_closeout_scope; cumulative journey, negative recovery integration, zero-runtime inventory, and real-project acceptance remain",
+      "status": "native_parity_verified",
+      "removal_gate": "native_parity_verified",
+      "evidence": [
+        "docs/NATIVE-CLOSEOUT-ARCHIVE-AND-RECOVERY.md",
+        "skills/cotend-collaboration/references/closeout-pass.md",
+        "scripts/verify_native_closeout_pass.py",
+        "tests/test_native_closeout_pass.py"
+      ]
     },
     {
       "id": "TD08-project-truth-authority",
@@ -334,7 +336,7 @@
         "native_owner_and_state_transition",
         "focused_regression_tests"
       ],
-      "status": "in_progress_7_of_8"
+      "status": "complete"
     },
     {
       "id": "G03-cumulative-main-journey",
@@ -382,7 +384,7 @@
     "skill_behavior_changed": true,
     "trellis_route_removed": true,
     "removed_capability_ids": [
-      "TD05-verification-pass"
+      "TD07-closeout-archive-and-recovery"
     ],
     "target_artifact_changed": true,
     "package_identity_changed": false,

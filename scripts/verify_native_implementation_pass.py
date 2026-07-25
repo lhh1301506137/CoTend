@@ -58,10 +58,13 @@ ResumeState = Literal[
 ]
 
 REMOVED_TD04_COMMAND = "trellis-implement"
-REQUIRED_REMAINING_COMMANDS = ("trellis-finish",)
-EXPECTED_TRELLIS_MENTIONS = 20
-EXPECTED_TRELLIS_FILES = 10
-EXPECTED_SKILL_FILES = 39
+REQUIRED_REMAINING_COMMANDS: tuple[str, ...] = ()
+EXPECTED_TRELLIS_MENTIONS = 7
+EXPECTED_TRELLIS_FILES = 6
+EXPECTED_SKILL_FILES = 40
+EXPECTED_R9_MANIFEST = (
+    "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"
+)
 EXPECTED_R8_MANIFEST = (
     "84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3"
 )
@@ -91,8 +94,8 @@ REQUIRED_COLLABORATION_MARKERS = (
 REQUIRED_RUNTIME_MARKERS = (
     "The Implementer executes `implementation-pass.md` through a bounded role packet",
     "The Primary executes the native `implementation-pass.md` contract",
-    "capability: closeout",
-    "The remaining compatibility mapping belongs only to closeout",
+    "Both profiles finish verified checkpoints through `closeout-pass.md`",
+    "neither delegates closeout to an external framework",
 )
 REQUIRED_ORCHESTRATION_MARKERS = (
     "The Implementer always uses the native `implementation-pass.md` contract",
@@ -101,7 +104,7 @@ REQUIRED_ORCHESTRATION_MARKERS = (
 REQUIRED_PROJECT_INIT_MARKERS = (
     "Both profiles implement through `cotend-collaboration/references/implementation-pass.md` and check through `cotend-collaboration/references/verification-pass.md`.",
     "dispatch a bounded native Implementer",
-    "capability: closeout",
+    "Local closeout always uses `cotend-collaboration/references/closeout-pass.md`",
 )
 REQUIRED_MODEL_MARKERS = (
     "The Implementer always uses CoTend's native Implementation Pass",
@@ -117,7 +120,7 @@ REQUIRED_DOCUMENT_MARKERS = (
     "cotend-codex-r000008",
     "Full 与 Adaptive",
     "15 类行为场景",
-    "20 处、10 个文件",
+    "7 处、6 个文件",
     "Verification Pass",
     "TD07",
 )
@@ -472,8 +475,8 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000009"
-        or target.get("revision") != 9
+        target.get("artifact_id") != "cotend-codex-r000010"
+        or target.get("revision") != 10
         or target.get("manifest_sha256") != digest
         or lock.get("skill_count") != 8
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
@@ -482,13 +485,13 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000008",
-        "revision": 8,
+        "artifact_id": "cotend-codex-r000009",
+        "revision": 9,
         "source_release_id": "2026.07.23.2",
         "framework_protocol": "cotend-collaboration-v1.65",
-        "manifest_sha256": EXPECTED_R8_MANIFEST,
+        "manifest_sha256": EXPECTED_R9_MANIFEST,
     }:
-        raise NativeImplementationPassError("r8 predecessor identity drifted")
+        raise NativeImplementationPassError("r9 predecessor identity drifted")
     if len(files) != EXPECTED_SKILL_FILES:
         raise NativeImplementationPassError("current Skill file inventory drifted")
     _require_markers(

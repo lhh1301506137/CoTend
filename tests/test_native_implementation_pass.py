@@ -17,12 +17,12 @@ class NativeImplementationPassTests(unittest.TestCase):
         result = implementation.verify_repository()
         self.assertEqual(result["status"], "native_parity_verified")
         self.assertEqual(result["scenario_count"], 15)
-        self.assertEqual(result["runtime_mentions"], 20)
-        self.assertEqual(result["runtime_files"], 10)
+        self.assertEqual(result["runtime_mentions"], 7)
+        self.assertEqual(result["runtime_files"], 6)
         self.assertEqual(result["td04_commands"], 0)
-        self.assertEqual(result["remaining_commands"], 1)
-        self.assertEqual(result["skill_files"], 39)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000009")
+        self.assertEqual(result["remaining_commands"], 0)
+        self.assertEqual(result["skill_files"], 40)
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000010")
 
     def test_full_and_adaptive_use_the_same_result_contract(self) -> None:
         full = implementation.evaluate_implementation(profile="full")
@@ -116,7 +116,7 @@ class NativeImplementationPassTests(unittest.TestCase):
         with self.assertRaises(implementation.NativeImplementationPassError):
             implementation.evaluate_implementation(resume_state="unknown")  # type: ignore[arg-type]
 
-    def test_td04_and_td05_commands_are_removed_but_td07_remains(self) -> None:
+    def test_td04_and_all_remaining_compatibility_commands_are_removed(self) -> None:
         text = "\n".join(
             path.read_text(encoding="utf-8")
             for path in sorted((ROOT / "skills").rglob("*"))

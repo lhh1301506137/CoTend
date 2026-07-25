@@ -2,6 +2,74 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-07-26 L69 原生收尾、归档与恢复
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: workflow_behavior
+change_summary: 只把 TD07 验证后记录同步、可选本地提交、提交后复验和中断恢复迁移到 CoTend 第一方责任链
+intent: 在不新增用户命令、不改写 Git 历史、不继承 Done/验收/发布权限且不推进 G03-G06 的前提下，移除最后一个外部框架收尾运行依赖
+expected_benefit:
+  - preflight、记录、commit、提交后复验和完成使用单一可恢复状态机
+  - 提交前失败只回滚本叶拥有且未漂移的记录，并发修改不被覆盖
+  - 提交后失败保留 commit、记录和失败证据，不自动 reset/amend/rebase
+  - HANDOFF 只在真实交接需要时更新，本地提交与 Done、验收、push 和发布保持独立
+  - Full 与 Adaptive 使用相同收尾结果合同
+possible_harm:
+  - 记录 owner 或 before/post hash 识别错误可能覆盖项目治理记录
+  - 自动本地提交若暂存边界错误可能混入无关、私密或用户修改
+  - 单项状态机通过不代表跨阶段集成、零运行提及或真实项目体验已经通过
+affected_workflows:
+  - verification_and_formal_review_to_local_closeout
+  - durable_project_record_synchronization
+  - optional_local_git_checkpoint
+  - interrupted_closeout_resume_and_idempotency
+  - target_artifact_delivery
+deviations:
+  - source release 与 framework.lock 继续保持 v1.65/37 文件；L69 是 CoTend 产品 overlay
+  - 当前根载体推进为 cotend-codex-r000010；r9-r2 与 cotend@0.1.0-rc.2 均保持不可变
+  - 只关闭 TD07 与 G02；G03-G06 不自动启动
+mechanism_budget:
+  added_context_surface: one_reference_cold_path_one_public_contract_one_deterministic_verifier
+  ordinary_load_impact: none_until_verified_local_checkpoint_closeout
+  ceremony_added: none_for_small_edits_without_closeout_contract
+  duplication_check: reuses_STATUS_REVIEW_decision_knowledge_Plan_Tree_QUALITY_SIGNALS_HANDOFF_and_existing_local_authorization
+  cheaper_alternative_considered: 只把 finish/archive 字段改名；因不能证明阶段恢复、提交前后失败差异和权限隔离而拒绝
+  retirement_or_thinning_trigger: 平台提供同等原子记录与 Git checkpoint 事务后可替换内部执行机制，结果和权限边界保留
+  expected_failure_prevented: partial_record_drift_duplicate_commit_blind_retry_history_rewrite_unrelated_staging_and_release_overclaim
+validation_scenarios:
+  - scenario: native_closeout_pass_matrix
+    expected: 成功、无需提交、阻塞、失败、回滚、中断、漂移和幂等均由 CoTend 决定
+    validation_result_type: executed
+    result: twenty_three_scenarios_full_adaptive_same_result_contract
+  - scenario: exact_td07_inventory_change
+    expected: 只移除 TD07 命令、archive/journal 字段和 compatibility mapping
+    validation_result_type: inspection
+    result: current_7_mentions_6_files_td07_runtime_route_zero
+  - scenario: r9_to_r10_delivery
+    expected: 可信 r9 可确定升级到当前 r10，r2 历史包仍可复现
+    validation_result_type: executed
+    result: predecessor_and_historical_package_tests_passed
+real_project_validation:
+  - scenario: native_closeout_in_real_writable_project
+    expected: 真实项目完成记录、提交、恢复、跨会话接手和用户验收边界保持
+    validation_result_type: deferred
+    result: G06_not_started
+decision: watch
+rollback_triggers:
+  - Full 与 Adaptive 的阶段、失败或权限合同分叉
+  - 收尾覆盖并发/无关文件、暂存敏感路径或产生未授权提交
+  - 提交后失败自动改写历史或丢失 commit/证据
+  - 本地提交被当成 Done、用户验收、push、Release 或 publish 授权
+  - r9-r2 身份或 rc.2 固定摘要发生变化
+review_after: G03_G04_G05_G06
+watch_closure:
+  - keep_watch
+  - evidence: docs/NATIVE-CLOSEOUT-ARCHIVE-AND-RECOVERY.md
+```
+
+本次不执行真实用户安装、push、tag、Release、Portal、submission 或 publish。`G02` 现已完成 `8/8`，但这只表示八项能力分别取得原生等价；累计主旅程、集成负向恢复、运行时零提及和真实项目/用户验收仍由 G03-G06 独立证明。
+
 ## 2026-07-25 L68 原生检查阶段
 
 ```yaml
