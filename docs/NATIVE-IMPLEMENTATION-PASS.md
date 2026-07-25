@@ -21,7 +21,7 @@ TD04 解决的是“谁以及如何执行已经获准的实现叶”，不是重
 2. Native Implementation Pass 只消费一个已授权叶或切片，定义 Implementer 的输入、写入、停止、测试和证据回传。
 3. Native Agent Orchestration 定义代理工作包、依赖顺序、并行写入限制和唯一集成责任人。
 4. Acceptance/Test Harness 选择最低但足够的验证层。
-5. TD05 Checker 在 Implementation Pass 之后独立运行；TD04 的普通自检不是正式检查、正式审查或用户验收。
+5. 原生 Verification Pass 在 Implementation Pass 之后运行；TD04 的普通自检不是 Checker 结果、正式审查或用户验收。
 
 另一套开发框架的任务、状态、规格或命令不能给 Implementer 授权。外部材料仍只能是 `reference_only | historical | conflict` 证据。
 
@@ -79,8 +79,8 @@ Implementer 可以在确认祖先内选择可逆 L3/L4 技术细节、编辑自�
 
 ## 本叶边界
 
-运行 Skills 中 `trellis-implement` 已归零，Trellis 库存由 L66 的 38 处、16 个文件下降到 28 处、15 个文件。`trellis-check` 与 `trellis-finish` 继续保留，分别等待 TD05 与 TD07 独立等价验证。
+TD04 检查点把运行 Skills 中 `trellis-implement` 归零，并将 Trellis 库存由 L66 的 38 处、16 个文件下降到 28 处、15 个文件。后续 TD05 已由原生 Verification Pass 将当前库存进一步降为 20 处、10 个文件；现在只剩 `trellis-finish` 等待 TD07 独立等价验证。
 
-当前开发根目标是 `cotend-codex-r000008`，r7 是精确 predecessor。未发布 `cotend@0.1.0-rc.2` 继续从历史 r2 source commit 构建，其包体和 ZIP 摘要不因 r8 开发字节改变。
+本合同自身由 `cotend-codex-r000008` 首次固定，r7 是其精确 predecessor；当前开发根已推进到 r9，并把 r8 作为精确 predecessor。未发布 `cotend@0.1.0-rc.2` 继续从历史 r2 source commit 构建，其包体和 ZIP 摘要不因 r8/r9 开发字节改变。
 
 本叶不代表 G03 累计主旅程、G04 负向恢复集成、G05 运行时零依赖或 G06 真实项目/用户验收已经完成，也不授权真实安装、全局更新、push、tag、Release、Portal、submission 或 publish。

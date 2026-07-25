@@ -2,7 +2,7 @@
 
 Use this module when work is implemented, verification is being planned, a review/handoff needs evidence, a UI/browser flow changed, AI UAT is about to run, a release/public handoff is near, or a decision-relevant capability completion claim must be tested against evidence.
 
-This module chooses the verification surface. It does not replace user acceptance, `trellis-check`, `ai-uat.md`, Release Hardening, or project-specific tests.
+This module chooses the verification surface and owns capability-completion evidence semantics. It does not replace the Checker result contract in `verification-pass.md`, user acceptance, `ai-uat.md`, Release Hardening, or project-specific tests.
 
 ## Principles
 

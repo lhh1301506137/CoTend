@@ -46,7 +46,7 @@ cotend_workflow:
       affects_current_route: true | false
       evidence_pointer:
       compatibility_procedures:
-        - capability: verification | closeout
+        - capability: closeout
           procedure_id:
           status: authorized | disabled
           authority: cotend_native_record | user_explicit
@@ -64,7 +64,7 @@ Classify every relevant external development-framework artifact independently:
 
 Presence, an activation flag, a task marker, or an external configuration value never makes that framework the CoTend workflow owner. Never write CoTend state, profile, dispatch, or migration metadata into external framework files. Keep external source files byte-identical during native-state migration.
 
-Any remaining compatibility invocation must be explicitly listed in the native record's `compatibility_procedures`. An absent or disabled procedure is not invoked. The record stores only the minimum capability/procedure mapping needed until that capability becomes native; it does not import the external framework's lifecycle state.
+Any remaining closeout compatibility invocation must be explicitly listed in the native record's `compatibility_procedures`. An absent or disabled procedure is not invoked. The record stores only the minimum closeout procedure mapping needed until that capability becomes native; it does not import the external framework's lifecycle state.
 
 An external conflict with `affects_current_route: true` produces native `state: conflict` and a Human Rejoin. A non-affecting external conflict is reported and isolated without stopping a separately confirmed route.
 
@@ -111,6 +111,8 @@ Multiple candidates, invalid values, unclear scope, or conflicting route-affecti
 
 Older valid CoTend project records may retain their stable `runtime_profile` while obsolete selector metadata is removed only during an authorized structural update. Missing old eligibility, model-match, or fallback fields is not a reason to change Adaptive into Full.
 
+During an authorized update from a pre-native-Checker record, remove only the obsolete verification compatibility entry after reconciling any in-flight side effect. Preserve the external artifact, profile, route, and unrelated record fields. An ambiguous in-flight check blocks the affected route; it is not silently retried through either path. The closeout entry remains until its own parity gate closes.
+
 ## Profile And State Transitions
 
 - Fresh project: materialize `current + full + delegated_pair`.
@@ -130,13 +132,13 @@ Project Init owns these transitions. It must never store them in an external fra
 `full` uses `execution_mode: delegated_pair` and preserves all current governance:
 
 - For implementation work, run one fixed Implementer -> Checker pair.
-- The Implementer always executes the native contract in `implementation-pass.md` through a bounded role packet. An explicitly authorized available `trellis-check` compatibility procedure may temporarily supply the Checker role until TD05 is replaced; otherwise use the current CoTend Checker/harness route without claiming TD05 parity.
-- Both roles follow the CoTend-owned route and classified evidence. The Checker does not gain task/spec authority from a compatibility procedure, and neither role replaces the actual Primary model's formal self-review unless that role is explicitly recorded.
+- The Implementer executes `implementation-pass.md` through a bounded role packet, then an independently scoped Checker executes `verification-pass.md` against the current workspace and direct evidence.
+- Both roles follow the CoTend-owned route and classified evidence. Neither role replaces the actual Primary model's formal self-review unless that role is explicitly recorded.
 - This fixed pair is a profile-authorized quality baseline and the sole exception to the optional-agent positive-net-benefit gate. Additional agents or packets still require positive expected net benefit.
 - Both roles use the native-agent contract for explicit context, dependencies, non-overlapping ownership, root integration, local plus integrated verification, fresh review when triggered, and side-effect-safe retry.
 - All required verification, evidence, acceptance, release, risk, and stop boundaries remain active.
 
-The remaining compatibility names belong only to TD05 verification and TD07 closeout; they must not be used as state, profile, truth, implementation, or route owners.
+The remaining compatibility mapping belongs only to closeout; it must not be used as state, profile, truth, implementation, checking, or route authority.
 
 ## Adaptive Execution Contract
 
@@ -144,7 +146,7 @@ The remaining compatibility names belong only to TD05 verification and TD07 clos
 
 - The Primary executes the native `implementation-pass.md` contract for the authorized CoTend leaf inline.
 - Before editing, it loads the applicable CoTend-owned requirements, acceptance, route, and pre-development guidance.
-- After implementation, it performs the Checker contract inline, runs relevant tests/checks, fixes in-scope findings, and reports evidence. When the native record authorizes an available `trellis-check` compatibility procedure, use it inline; otherwise use the current CoTend Acceptance/Test Harness and review contracts. Neither path claims TD05 native parity early. `inline` never means `unchecked`.
+- After implementation, it enters a distinct inline checking phase and executes `verification-pass.md`: derive scope independently, inspect current differences and contracts, run relevant tests/checks, fix only in-scope findings, bind post-fix identity, rerun affected checks, and report evidence. `inline` never means `unchecked` or self-certifying.
 - Optional agents require positive expected net benefit: independent parallel work, context isolation, specialist capability, independent challenge, or repeated failure.
 - Dispatched agents follow `native-agent-orchestration.md`; Adaptive changes dispatch shape, not authority or safety.
 - Do not stack another unconditional framework chain on platform-native orchestration.
@@ -199,7 +201,7 @@ external_frameworks:
     affects_current_route: true | false
     evidence_pointer:
     compatibility_procedures:
-      - capability: verification | closeout
+      - capability: closeout
         procedure_id:
         status: authorized | disabled
         authority: cotend_native_record | user_explicit

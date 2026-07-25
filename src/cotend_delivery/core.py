@@ -24,7 +24,8 @@ EXPECTED_SKILLS = (
 )
 FIRST_PARTY_SKILLS = EXPECTED_SKILLS[:6]
 SHAREABLE_COMPANION_SKILLS = EXPECTED_SKILLS[6:]
-EXPECTED_FILE_COUNT = 38
+EXPECTED_FILE_COUNT = 39
+R8_FILE_COUNT = 38
 SOURCE_FRAMEWORK_FILE_COUNT = 37
 RECEIPT_SCHEMA = "cotend.delivery-receipt"
 CHECKPOINT_SCHEMA = "cotend.delivery-checkpoint"
@@ -140,8 +141,10 @@ def _target_artifact_id(lineage: str, revision: int) -> str:
 
 
 def _expected_file_count(revision: int) -> int:
-    if revision >= 8:
+    if revision >= 9:
         return EXPECTED_FILE_COUNT
+    if revision == 8:
+        return R8_FILE_COUNT
     if revision >= 2:
         return SOURCE_FRAMEWORK_FILE_COUNT
     return 30

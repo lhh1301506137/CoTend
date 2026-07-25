@@ -56,12 +56,11 @@ LOAD_ORDER = (
 )
 REMOVED_TD02_COMMANDS = ("trellis-start", "trellis-before-dev")
 REQUIRED_REMAINING_COMMANDS = (
-    "trellis-check",
     "trellis-finish",
 )
-EXPECTED_TRELLIS_MENTIONS = 28
-EXPECTED_TRELLIS_FILES = 15
-EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS = 5
+EXPECTED_TRELLIS_MENTIONS = 20
+EXPECTED_TRELLIS_FILES = 10
+EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS = 3
 
 REQUIRED_PROJECT_INIT_MARKERS = (
     "## Native Initialization And Resume Boundary",
@@ -94,8 +93,8 @@ REQUIRED_DOCUMENT_MARKERS = (
     "cotend-codex-r000007",
     "入口侧共 13 类场景",
     "开发前侧共 9 类场景",
-    "28 处、15 个文件",
-    "TD05、TD07",
+    "20 处、10 个文件",
+    "当前只保留 TD07 收尾兼容过程",
 )
 REQUIRED_EVIDENCE_MARKERS = (
     "current_target_artifact_id: cotend-codex-r000007",
@@ -597,15 +596,13 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     _require_markers(
         combined_skills,
         REQUIRED_REMAINING_COMMANDS,
-        "remaining TD05/TD07 routes",
+        "remaining TD07 route",
     )
     if "capability: startup | pre_development" in runtime_profiles:
         raise NativeProjectEntryError(
             "native record still exposes TD02 compatibility capabilities"
         )
-    if "capability: verification | closeout" not in (
-        runtime_profiles
-    ):
+    if "capability: closeout" not in runtime_profiles:
         raise NativeProjectEntryError(
             "remaining compatibility capability schema drifted"
         )
@@ -618,7 +615,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         != EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS
     ):
         raise NativeProjectEntryError(
-            "current runtime inventory is not the exact 28/15 checkpoint"
+            "current runtime inventory is not the exact 20/10 checkpoint"
         )
 
     entry_results: dict[str, dict[str, object]] = {}

@@ -13,8 +13,8 @@ metadata:
   phase_a_steps: 17
   negative_cases: 12
   adopted_skills: 8
-  adopted_skill_files: 38
-  package_files: 44
+  adopted_skill_files: 39
+  package_files: 45
   protected_user_metadata: unchanged_stat_only
   tracked_production_plugin: cotend@0.1.0-rc.2_local_unpublished
 ```
@@ -38,8 +38,8 @@ metadata:
 ## 静态包结果
 
 - 官方 Plugin validator：`passed`。
-- Skills：8 个目录、38 个文件，与仓库源逐字节一致。
-- Plugin package：44 个文件，包括 manifest、Skills、Apache-2.0 文件、NOTICE、第三方 notices 和两个 MIT 文本。
+- Skills：8 个目录、39 个文件，与仓库源逐字节一致。
+- Plugin package：45 个文件，包括 manifest、Skills、Apache-2.0 文件、NOTICE、第三方 notices 和两个 MIT 文本。
 - manifest 只声明 `skills`，没有 hooks、apps、MCP、assets 或 scripts。
 - 候选版本明确带有 fixture prerelease/build 标识，不冒充公开版本。
 
@@ -111,7 +111,7 @@ python scripts/verify_isolated_codex_plugin.py --prepare --negative-mutations --
 
 ```text
 ISOLATED_CODEX_PLUGIN_PREFLIGHT_OK roots=15
-ISOLATED_CODEX_PLUGIN_STATIC_OK skills=8 skill_files=38 package_files=44
+ISOLATED_CODEX_PLUGIN_STATIC_OK skills=8 skill_files=39 package_files=45
 ISOLATED_CODEX_PLUGIN_NEGATIVE_MUTATIONS_OK cases=12
 ISOLATED_CODEX_PLUGIN_PHASE_A_OK steps=17 plugin_skills=8 coexistence=8
 ```

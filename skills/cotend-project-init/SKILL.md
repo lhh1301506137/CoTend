@@ -152,18 +152,17 @@ Initialize projects with the role-based authority contract in `cotend-collaborat
 
 1. **CoTend Project Truth Authority** owns product meaning, detailed requirement authority, route navigation, user decisions, status projection, current-reality evidence, and the boundary around project-local constraints. It never delegates those roles from framework identity or active state.
 2. **cotend-collaboration** owns collaboration governance: role assignment, risk authorization, continuous/unattended checkpoints, user interruption/new idea reconciliation, review/self-review gates, handoff scope, Acceptance/Test Harness, Quality Sentinel, AI UAT, Done Gate, intent drift review, Release Hardening, and human rejoin explanations.
-3. **External development-framework artifacts** are classified `reference_only`, `historical`, or `conflict`. A remaining compatibility capability may still invoke its check/finish procedure, but its implementation, task, PRD, spec, state, profile, or coding guideline never becomes CoTend Core authority.
+3. **External development-framework artifacts** are classified `reference_only`, `historical`, or `conflict`. A remaining compatibility capability may still invoke its finish procedure, but its implementation, checking, task, PRD, spec, state, profile, or coding guideline never becomes CoTend Core authority.
 4. **Karpathy and project coding guidelines** own coding behavior only inside higher user, safety, confirmed-product, and authorized-route boundaries.
 5. **grill-me** owns clarification style for fuzzy requirements. Existing external brainstorm records may be linked as classified evidence; user-facing decisions must be recorded in `PROJECT-DECISION-LOG.md` when they match canonical decision-worthy topics.
 6. **Code Context Harness** owns codebase structure discovery. It helps the Primary choose what to read/review but never owns product truth or route selection.
 
-When an authorized compatibility route is recorded, keep only its remaining procedure mapping without granting it state or project-truth authority:
+When an authorized compatibility route is recorded, keep only its remaining closeout procedure mapping without granting it state or project-truth authority:
 
-- `trellis-check` = Trellis spec/quality checker; it may fix issues but does not replace the actual primary model's formal self-review unless the project explicitly records it as the formal reviewer.
 - `CodexSelf` / `ClaudeSelf` = accepted legacy carrier aliases normalized to the actual model's formal same-model self-review.
 - Claude/Gemini/Kimi or another named model = optional external/advisory reviewer only after carrier and actual model identity are separated.
 
-Apply the effective runtime profile after this mapping. Both profiles implement through `cotend-collaboration/references/implementation-pass.md`. `full` uses native `delegated_pair`: dispatch a bounded native Implementer, then use the authorized compatibility Checker when available or the current CoTend Checker/harness route without claiming TD05 parity. `adaptive` uses native `inline`: the Primary executes the same Implementation Pass and then performs the Checker contract inline. Optional agents require positive expected net benefit and non-overlapping scope; platform-native orchestration must not be followed by a duplicate unconditional chain.
+Apply the effective runtime profile after this mapping. Both profiles implement through `cotend-collaboration/references/implementation-pass.md` and check through `cotend-collaboration/references/verification-pass.md`. `full` uses native `delegated_pair`: dispatch a bounded native Implementer and then an independently scoped native Checker. `adaptive` uses native `inline`: the Primary executes the same Implementation Pass and then enters a distinct inline Verification Pass. Optional agents require positive expected net benefit and non-overlapping scope; platform-native orchestration must not be followed by a duplicate unconditional chain.
 
 ## Native Workflow State Decision
 
@@ -193,7 +192,7 @@ cotend_workflow:
       affects_current_route: true | false
       evidence_pointer:
       compatibility_procedures:
-        - capability: verification | closeout
+        - capability: closeout
           procedure_id:
           status: authorized | disabled
           authority: cotend_native_record | user_explicit
@@ -709,7 +708,7 @@ Project initialization report:
     affects_current_route: true | false
     evidence_pointer:
     compatibility_procedures:
-      - capability: verification | closeout
+      - capability: closeout
         procedure_id:
         status: authorized | disabled
         authority: cotend_native_record | user_explicit

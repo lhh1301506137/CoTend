@@ -15,18 +15,18 @@ marketplace_source: url_relative_root
 candidate_version: 0.1.0-rc.2
 semantic_source: skills/
 semantic_sources: 1
-source_skill_manifest_sha256: 84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3
+source_skill_manifest_sha256: 32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072
 package_manifest_sha256: a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2
 allowed_manifest_path_rewrites: 3
 adopted_skills: 8
-adopted_skill_files: 38
+adopted_skill_files: 39
 normal_lifecycle_steps: 15
 failure_recovery_steps: 5
 write_roots_redirected: 15
 protected_user_boundaries: 8
 focused_tests: 12
-full_unit_tests: 281
-repository_check: passed_238_public_candidates_19_capabilities_19_specs
+full_unit_tests: 296
+repository_check: passed_243_public_candidates_19_capabilities_19_specs
 official_validator: passed
 local_marketplace_repeat_add: idempotent_success
 local_marketplace_upgrade: local_path_not_configured_as_git_marketplace
@@ -48,7 +48,7 @@ CoTend 仓库根现在包含一个可被 Codex 识别的 Plugin manifest 和一�
 
 ## 唯一语义源与摘要
 
-首次隔离夹具尝试把 Plugin `skills` 指向 `./codex-skills/`，官方 validator 明确拒绝该结构。CoTend 因此把仓库内唯一 Skill 源承载在根 `skills/`；当前 38 个 Skill 文件的相对 path/hash 摘要为 `84c4c0...4bc3`，没有复制第二份 Skill 树，也没有改写固定上游 release 内仍真实存在的来源路径。
+首次隔离夹具尝试把 Plugin `skills` 指向 `./codex-skills/`，官方 validator 明确拒绝该结构。CoTend 因此把仓库内唯一 Skill 源承载在根 `skills/`；当前 39 个 Skill 文件的相对 path/hash 摘要为 `32049a...9072`，没有复制第二份 Skill 树，也没有改写固定上游 release 内仍真实存在的来源路径。
 
 完整 48 文件包摘要为 `a61b75...76dc2`。根 manifest 由生产 manifest 机械派生，唯一允许的差异是 `composerIcon`、`logo` 和 `logoDark` 指向仓库内锁定资产的位置；其他字段漂移会被测试和仓库检查器拒绝。
 
@@ -86,8 +86,8 @@ python scripts/verify_github_marketplace_carrier.py
 ```text
 Ran 12 tests - OK
 GITHUB_MARKETPLACE_CARRIER_OK version=0.1.0-rc.2 steps=15 recovery=5 skills=8 roots=15 purged=true protected_unchanged=true remote_git=not_run
-Ran 281 tests - OK
-REPOSITORY_CHECK_OK public_candidates=238 capabilities=19 behavior_specs=19
+Ran 296 tests - OK
+REPOSITORY_CHECK_OK public_candidates=243 capabilities=19 behavior_specs=19
 ```
 
 详细 JSON、逐命令输出和一次性 Git fixture 只保存在 gitignored 私有证据目录；公开证据不携带本机绝对路径或用户配置内容。

@@ -29,7 +29,7 @@ metadata:
 
 CoTend 现在具有一份可执行的 skills-only Public Plugin **生产候选包契约**：仓库固定候选 manifest 与 package lock，构建器在 gitignored 隔离目录组装完整包体。rc.2 的 Skill 语义源固定为 Git commit `37e657f0a1e2ddb7b2094f8e4708c2b7563380c1` 下的 `skills/`，仓库没有跟踪第二份 Skill 树。
 
-当前根 `skills/` 已推进到 target r8，因此不能再作为 rc.2 的即时源。两次相互独立的构建都生成 48 个文件，path/hash manifest 完全相同；其中 8 个 Skill、37 个 Skill 文件与锁定提交逐字节一致，4 个品牌资产与 package lock v2 的白名单/哈希一致，六个 CoTend 自有入口继续保留 N3 的友好 display name。当前 Plugin Creator validator：`passed`。
+当前根 `skills/` 已推进到 target r9，因此不能再作为 rc.2 的即时源。两次相互独立的构建都生成 48 个文件，path/hash manifest 完全相同；其中 8 个 Skill、37 个 Skill 文件与锁定提交逐字节一致，4 个品牌资产与 package lock v2 的白名单/哈希一致，六个 CoTend 自有入口继续保留 N3 的友好 display name。当前 Plugin Creator validator：`passed`。
 
 `cotend@0.1.0-rc.2` 是本次上游更新后绑定的首次提交候选；它不构成 release 或 publish 授权，也不证明 Portal 接受 `-rc.2` 预发布版本。若 Portal 拒绝该版本，必须重开 Q02；当前没有生成 Marketplace，没有安装或卸载 Plugin，也没有执行 submission、release、publish 或 push。
 
@@ -65,7 +65,7 @@ CoTend 现在具有一份可执行的 skills-only Public Plugin **生产候选�
 6. link/junction 分类被拒绝；
 7. 六个 N3 display name 和三个不超过 128 字符的 starter prompt 保持；
 8. 对有效既有输出重新构建保持幂等；
-9. 当前 r7 Skill 与锁定 rc.2 Skill 明确不同，包内字节仍精确匹配历史 source commit；
+9. 当前 r9 Skill 与锁定 rc.2 Skill 明确不同，包内字节仍精确匹配历史 source commit；
 10. 缩写、非法、缺失或不可用 source commit 被拒绝。
 
 以上共形成 17 类负向边界：3 类输出路径、12 类包体变异、1 类不明既有输出、1 类 link/junction。当前 Plugin Creator validator 文件 SHA-256 为 `4e84c911479e4d158d723ed8ccc881d3499e580fbf5650e60d379a1a25ac3186`，本轮对隔离包返回通过。
@@ -76,7 +76,7 @@ CoTend 现在具有一份可执行的 skills-only Public Plugin **生产候选�
 
 构建只读取固定 allowlist 和本地 Git 历史，不使用网络。`.private-provenance/` 与 `dist/` 两个允许输出根都被 Git 忽略；输出存在时，只有它先通过当前完整包合同验证才允许被幂等替换，未知或已漂移目录会停止并保留现场。
 
-这个 rc.2→r7 过渡构建需要完整 Git 历史。CI 使用 `fetch-depth: 0`；没有 `.git` 历史的 source archive 不能重建 rc.2。该限制被显式保留，而不是复制第二份旧 Skill 树。未来 rc.3 只有在 G01-G05 完成后才绑定当前原生源。
+这个 rc.2→r9 过渡构建需要完整 Git 历史。CI 使用 `fetch-depth: 0`；没有 `.git` 历史的 source archive 不能重建 rc.2。该限制被显式保留，而不是复制第二份旧 Skill 树。未来 rc.3 只有在 G01-G05 完成后才绑定当前原生源。
 
 所有进入包体的 `skills/**`、manifest、SVG、LICENSE、NOTICE、第三方 notices/来源登记和 MIT license 均由 `.gitattributes` 固定 `eol=lf`，PNG 固定为 binary。源摘要会在构建前再次验证，因此 Windows `core.autocrlf` 或其他检出策略不能静默改变发布字节。
 

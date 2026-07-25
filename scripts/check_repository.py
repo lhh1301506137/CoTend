@@ -14,6 +14,7 @@ import verify_native_spec_change_route_rebase as native_route_rebase
 import verify_native_workflow_state_runtime_profiles as native_workflow_state
 import verify_native_init_resume_before_development as native_project_entry
 import verify_native_implementation_pass as native_implementation
+import verify_native_verification_pass as native_verification
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -416,6 +417,13 @@ EXPECTED_NATIVE_IMPLEMENTATION_FILES = {
     "scripts/verify_native_implementation_pass.py",
     "skills/cotend-collaboration/references/implementation-pass.md",
     "tests/test_native_implementation_pass.py",
+}
+EXPECTED_NATIVE_VERIFICATION_FILES = {
+    "docs/NATIVE-VERIFICATION-PASS.md",
+    "docs/evidence/NATIVE-VERIFICATION-PASS-TARGET-R9.md",
+    "scripts/verify_native_verification_pass.py",
+    "skills/cotend-collaboration/references/verification-pass.md",
+    "tests/test_native_verification_pass.py",
 }
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
@@ -1618,8 +1626,8 @@ def upstream_adoption_errors(
     }
     if actual_skill_ids != expected_skill_ids:
         errors.append("adopted Codex Skill directory set must contain exactly eight Skills")
-    if len(skill_files) != 38:
-        errors.append(f"adopted Codex Skill source set must contain 38 files: {len(skill_files)}")
+    if len(skill_files) != 39:
+        errors.append(f"adopted Codex Skill source set must contain 39 files: {len(skill_files)}")
     adopted_files = value(candidate, "adoption", "imported_files")
     adapted_files = value(candidate, "adoption", "adapted_files")
     if not isinstance(adopted_files, list) or not isinstance(adapted_files, list):
@@ -1634,7 +1642,7 @@ def upstream_adoption_errors(
         if adopted_set != expected_direct_adoption:
             errors.append("directly adopted Skill file inventory drift")
         if adopted_set & adapted_set or adopted_set | adapted_set != skill_files:
-            errors.append("candidate adopted/adapted inventory does not equal the 38 current Skill files")
+            errors.append("candidate adopted/adapted inventory does not equal the 39 current Skill files")
     if value(candidate, "adoption", "required_before_lock") != []:
         errors.append("framework candidate retains unresolved pre-lock requirements")
 
@@ -2177,7 +2185,7 @@ def isolated_codex_plugin_fixture_errors(
     verifier_text = read("scripts/verify_isolated_codex_plugin.py")
     for marker in (
         'PLUGIN_VERSION = "0.0.0-dev.1+codex.fixture"',
-        "EXPECTED_FILE_COUNT = 38",
+        "EXPECTED_FILE_COUNT = 39",
         '"--phase-a"',
         '"--negative-mutations"',
         '"remote_plugin"',
@@ -2208,8 +2216,8 @@ def isolated_codex_plugin_fixture_errors(
         "phase_a_steps": {"17"},
         "negative_cases": {"12"},
         "adopted_skills": {"8"},
-        "adopted_skill_files": {"38"},
-        "package_files": {"44"},
+        "adopted_skill_files": {"39"},
+        "package_files": {"45"},
         "protected_user_metadata": {"unchanged_stat_only"},
         "tracked_production_plugin": {"cotend@0.1.0-rc.2_local_unpublished"},
     }.items():
@@ -2219,7 +2227,7 @@ def isolated_codex_plugin_fixture_errors(
     for marker in (
         "15 个写入根全部解析到 ignored fixture",
         "官方 Plugin validator：`passed`",
-        "Plugin package：44 个文件",
+        "Plugin package：45 个文件",
         "实际执行并通过以下 17 步",
         "cotend:cotend-init",
         "cotend:cotend-semantic-alignment",
@@ -2660,7 +2668,7 @@ def production_plugin_package_errors(
             errors.append(f"production Plugin package evidence mismatch: {key}")
     for marker in (
         "rc.2 的 Skill 语义源固定为 Git commit",
-        "当前根 `skills/` 已推进到 target r8",
+        "当前根 `skills/` 已推进到 target r9",
         "48 个文件",
         "逐字节一致",
         "17 类负向边界",
@@ -2866,7 +2874,7 @@ def github_marketplace_root_carrier_errors(
             "tracked Marketplace inventory mismatch: " f"{tracked_marketplaces}"
         )
     source_files = sorted(path for path in candidates if path.startswith("skills/"))
-    if len(source_files) != 38:
+    if len(source_files) != 39:
         errors.append(f"root Marketplace Skill source count drifted: {len(source_files)}")
     if any(path.startswith("codex-skills/") for path in candidates):
         errors.append("legacy codex-skills source must not coexist with root skills")
@@ -2915,22 +2923,22 @@ def github_marketplace_root_carrier_errors(
         "semantic_source": {"skills/"},
         "semantic_sources": {"1"},
         "source_skill_manifest_sha256": {
-            "84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3"
+            "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"
         },
         "package_manifest_sha256": {
             "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2"
         },
         "allowed_manifest_path_rewrites": {"3"},
         "adopted_skills": {"8"},
-        "adopted_skill_files": {"38"},
+        "adopted_skill_files": {"39"},
         "normal_lifecycle_steps": {"15"},
         "failure_recovery_steps": {"5"},
         "write_roots_redirected": {"15"},
         "protected_user_boundaries": {"8"},
         "focused_tests": {"12"},
-        "full_unit_tests": {"281"},
+        "full_unit_tests": {"296"},
         "repository_check": {
-            "passed_238_public_candidates_19_capabilities_19_specs"
+            "passed_243_public_candidates_19_capabilities_19_specs"
         },
         "official_validator": {"passed"},
         "local_marketplace_repeat_add": {"idempotent_success"},
@@ -3686,7 +3694,7 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         if actual_operations != EXPECTED_DELIVERY_OPERATIONS:
             errors.append(f"delivery operation inventory drift: {sorted(actual_operations)}")
         for marker in (
-            "EXPECTED_FILE_COUNT = 38",
+            "EXPECTED_FILE_COUNT = 39",
             "SOURCE_FRAMEWORK_FILE_COUNT = 37",
             "class DeliveryLayout:",
             "class LegacyReceiptMapping:",
@@ -3987,14 +3995,14 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         }
         or product != {"version": None}
         or target_lock.get("skill_count") != 8
-        or target_lock.get("skill_file_count") != 38
+        or target_lock.get("skill_file_count") != 39
     ):
         errors.append("delivery target lock source or envelope mismatch")
     expected_target = {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000008",
-        "revision": 8,
+        "artifact_id": "cotend-codex-r000009",
+        "revision": 9,
     }
     if not isinstance(target, dict) or any(
         target.get(key) != expected for key, expected in expected_target.items()
@@ -4018,6 +4026,17 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if not isinstance(target, dict) or target.get("manifest_sha256") != carrier_manifest:
         errors.append("delivery target lock manifest mismatch")
     expected_predecessors = [
+        {
+            "platform": "Codex",
+            "lineage": "cotend-codex",
+            "artifact_id": "cotend-codex-r000008",
+            "revision": 8,
+            "source_release_id": "2026.07.23.2",
+            "framework_protocol": "cotend-collaboration-v1.65",
+            "manifest_sha256": (
+                "84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3"
+            ),
+        },
         {
             "platform": "Codex",
             "lineage": "cotend-codex",
@@ -4111,23 +4130,23 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     ]
     if target_lock.get("legacy_receipt_mappings") != expected_legacy_mappings:
         errors.append("delivery target lock legacy mapping mismatch")
-    identity_evidence_path = "docs/evidence/NATIVE-IMPLEMENTATION-PASS-TARGET-R8.md"
+    identity_evidence_path = "docs/evidence/NATIVE-VERIFICATION-PASS-TARGET-R9.md"
     if identity_evidence_path not in candidates:
         errors.append("target artifact identity evidence is missing or ignored")
     else:
         evidence = read(identity_evidence_path)
         for marker in (
-            "current_target_artifact_id: cotend-codex-r000008",
-            "current_target_revision: 8",
-            "current_target_manifest_sha256: 84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3",
-            "predecessor_target_artifact_id: cotend-codex-r000007",
-            "predecessor_target_revision: 7",
-            "predecessor_target_manifest_sha256: 246b16c990a85a2e183e0033c0b3a15a087e793ce0ace1f18e3d736f5a8fd045",
+            "current_target_artifact_id: cotend-codex-r000009",
+            "current_target_revision: 9",
+            "current_target_manifest_sha256: 32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072",
+            "predecessor_target_artifact_id: cotend-codex-r000008",
+            "predecessor_target_revision: 8",
+            "predecessor_target_manifest_sha256: 84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3",
             "source_framework_lock_changed: false",
             "package_candidate: cotend@0.1.0-rc.2_immutable",
             "package_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
-            "TD04-implementation-pass",
-            "predecessor_source_commit: 6400d093dc4c458d669891d820536625b2e216dd",
+            "TD05-verification-pass",
+            "runtime_trellis_inventory: 20_mentions_10_files",
         ):
             if marker not in evidence:
                 errors.append(f"target artifact identity evidence is missing: {marker}")
@@ -4255,6 +4274,14 @@ def main() -> int:
         errors.append(
             "native implementation-pass artifacts are missing or ignored: "
             f"{sorted(missing_native_implementation)}"
+        )
+    missing_native_verification = (
+        EXPECTED_NATIVE_VERIFICATION_FILES - candidates
+    )
+    if missing_native_verification:
+        errors.append(
+            "native verification-pass artifacts are missing or ignored: "
+            f"{sorted(missing_native_verification)}"
         )
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
@@ -4451,6 +4478,11 @@ def main() -> int:
             native_implementation.verify_repository(ROOT)
         except native_implementation.NativeImplementationPassError as exc:
             errors.append(f"native implementation pass: {exc}")
+    if not missing_native_verification:
+        try:
+            native_verification.verify_repository(ROOT)
+        except native_verification.NativeVerificationPassError as exc:
+            errors.append(f"native verification pass: {exc}")
 
     github_marketplace_carrier_evidence_path = (
         "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md"

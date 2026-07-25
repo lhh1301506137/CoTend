@@ -113,8 +113,8 @@ def make_updated_artifact(fixture: Path, baseline: Artifact) -> Artifact:
     return Artifact.from_directory(
         source,
         source_release_id=baseline.source_release_id,
-        artifact_id="cotend-codex-r000009",
-        revision=9,
+        artifact_id="cotend-codex-r000010",
+        revision=10,
         protocol=baseline.protocol,
     )
 
@@ -791,8 +791,8 @@ def run_concurrency_worker(
     candidate = Artifact.from_directory(
         source,
         source_release_id=baseline.source_release_id,
-        artifact_id="cotend-codex-r000009",
-        revision=9,
+        artifact_id="cotend-codex-r000010",
+        revision=10,
         protocol=baseline.protocol,
     )
     manager = DeliveryManager(project)

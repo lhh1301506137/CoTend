@@ -36,7 +36,7 @@ REQUIRED_RUNTIME_MARKERS = (
     "`conflict`",
     "## External Framework Classification",
     "Never write CoTend state, profile, dispatch, or migration metadata into external framework files.",
-    "Any remaining compatibility invocation must be explicitly listed",
+    "Any remaining closeout compatibility invocation must be explicitly listed",
     "1. a user-explicit current-session selection;",
     "2. one valid native project record;",
     "3. one unambiguous project-local legacy selection",
@@ -65,11 +65,10 @@ REQUIRED_DOCUMENT_MARKERS = (
     "cotend-codex-r000006",
     "current / dormant / conflict",
     "delegated_pair / inline",
-    "TD05、TD07",
+    "当前只保留 TD07 closeout 兼容过程",
     "G03、G04、G06",
 )
 REQUIRED_COMPATIBILITY_COMMANDS = (
-    "trellis-check",
     "trellis-finish",
 )
 FORBIDDEN_STATE_PATTERNS = {

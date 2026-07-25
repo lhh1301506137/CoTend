@@ -340,9 +340,9 @@ def source_skill_manifest() -> dict[str, str]:
     if actual_directories != EXPECTED_SKILLS:
         raise PluginPackageError("repository Skill directory inventory drifted")
     manifest = path_hash_manifest(SOURCE_SKILLS_ROOT)
-    if len(manifest) != 38:
+    if len(manifest) != 39:
         raise PluginPackageError(
-            f"expected 38 repository Skill files, found {len(manifest)}"
+            f"expected 39 repository Skill files, found {len(manifest)}"
         )
     for skill in EXPECTED_SKILLS:
         if f"{skill}/SKILL.md" not in manifest:
@@ -386,6 +386,7 @@ def validate_historical_source_commit(commit: Any) -> str:
 @functools.lru_cache(maxsize=4)
 def _historical_source_skill_entries(
     commit: str,
+    expected_file_count: int = 37,
 ) -> tuple[tuple[str, bytes], ...]:
     commit = validate_historical_source_commit(commit)
     listed = _run_git(["ls-tree", "-r", "-z", commit, "--", "skills"])
@@ -449,9 +450,9 @@ def _historical_source_skill_entries(
     )
     if actual_directories != EXPECTED_SKILLS:
         raise PluginPackageError("historical Skill directory inventory drifted")
-    if len(entries) != 37:
+    if len(entries) != expected_file_count:
         raise PluginPackageError(
-            f"expected 37 historical Skill files, found {len(entries)}"
+            f"expected {expected_file_count} historical Skill files, found {len(entries)}"
         )
     relative_paths = {relative for relative, _ in entries}
     for skill in EXPECTED_SKILLS:
@@ -539,8 +540,8 @@ def validate_contract() -> dict[str, Any]:
     if (
         target.get("platform") != "Codex"
         or target.get("lineage") != "cotend-codex"
-        or target.get("artifact_id") != "cotend-codex-r000008"
-        or target.get("revision") != 8
+        or target.get("artifact_id") != "cotend-codex-r000009"
+        or target.get("revision") != 9
         or not isinstance(target.get("manifest_sha256"), str)
         or len(target["manifest_sha256"]) != 64
     ):

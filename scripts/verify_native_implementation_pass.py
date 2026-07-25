@@ -58,10 +58,13 @@ ResumeState = Literal[
 ]
 
 REMOVED_TD04_COMMAND = "trellis-implement"
-REQUIRED_REMAINING_COMMANDS = ("trellis-check", "trellis-finish")
-EXPECTED_TRELLIS_MENTIONS = 28
-EXPECTED_TRELLIS_FILES = 15
-EXPECTED_SKILL_FILES = 38
+REQUIRED_REMAINING_COMMANDS = ("trellis-finish",)
+EXPECTED_TRELLIS_MENTIONS = 20
+EXPECTED_TRELLIS_FILES = 10
+EXPECTED_SKILL_FILES = 39
+EXPECTED_R8_MANIFEST = (
+    "84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3"
+)
 EXPECTED_R7_MANIFEST = (
     "246b16c990a85a2e183e0033c0b3a15a087e793ce0ace1f18e3d736f5a8fd045"
 )
@@ -83,26 +86,26 @@ REQUIRED_IMPLEMENTATION_MARKERS = (
 REQUIRED_COLLABORATION_MARKERS = (
     "read `references/implementation-pass.md`",
     "Full delegates its native Implementer role and Adaptive executes the same contract inline",
-    "The remaining `trellis-check` name is a temporary TD05 compatibility procedure only.",
+    "Full dispatches an independent Checker role and Adaptive enters the same Checker contract inline",
 )
 REQUIRED_RUNTIME_MARKERS = (
-    "The Implementer always executes the native contract in `implementation-pass.md`",
+    "The Implementer executes `implementation-pass.md` through a bounded role packet",
     "The Primary executes the native `implementation-pass.md` contract",
-    "capability: verification | closeout",
-    "The remaining compatibility names belong only to TD05 verification and TD07 closeout",
+    "capability: closeout",
+    "The remaining compatibility mapping belongs only to closeout",
 )
 REQUIRED_ORCHESTRATION_MARKERS = (
-    "The Implementer always uses the native `implementation-pass.md` contract.",
+    "The Implementer always uses the native `implementation-pass.md` contract",
     "dispatch the Implementer through `implementation-pass.md`",
 )
 REQUIRED_PROJECT_INIT_MARKERS = (
-    "Both profiles implement through `cotend-collaboration/references/implementation-pass.md`.",
+    "Both profiles implement through `cotend-collaboration/references/implementation-pass.md` and check through `cotend-collaboration/references/verification-pass.md`.",
     "dispatch a bounded native Implementer",
-    "capability: verification | closeout",
+    "capability: closeout",
 )
 REQUIRED_MODEL_MARKERS = (
     "The Implementer always uses CoTend's native Implementation Pass",
-    "an authorized available `trellis-check` procedure may temporarily provide the Checker role",
+    "the Checker always uses its native Verification Pass",
 )
 REQUIRED_MODEL_PACKET_MARKERS = (
     "framework_fixed_behavior: native_implementation_pass -> checker_contract",
@@ -114,8 +117,8 @@ REQUIRED_DOCUMENT_MARKERS = (
     "cotend-codex-r000008",
     "Full 与 Adaptive",
     "15 类行为场景",
-    "28 处、15 个文件",
-    "TD05",
+    "20 处、10 个文件",
+    "Verification Pass",
     "TD07",
 )
 
@@ -469,23 +472,23 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000008"
-        or target.get("revision") != 8
+        target.get("artifact_id") != "cotend-codex-r000009"
+        or target.get("revision") != 9
         or target.get("manifest_sha256") != digest
         or lock.get("skill_count") != 8
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
     ):
-        raise NativeImplementationPassError("r8 target identity or manifest drifted")
+        raise NativeImplementationPassError("current target identity or manifest drifted")
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000007",
-        "revision": 7,
+        "artifact_id": "cotend-codex-r000008",
+        "revision": 8,
         "source_release_id": "2026.07.23.2",
         "framework_protocol": "cotend-collaboration-v1.65",
-        "manifest_sha256": EXPECTED_R7_MANIFEST,
+        "manifest_sha256": EXPECTED_R8_MANIFEST,
     }:
-        raise NativeImplementationPassError("r7 predecessor identity drifted")
+        raise NativeImplementationPassError("r8 predecessor identity drifted")
     if len(files) != EXPECTED_SKILL_FILES:
         raise NativeImplementationPassError("current Skill file inventory drifted")
     _require_markers(
@@ -493,7 +496,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         (
             "current_target_artifact_id: cotend-codex-r000008",
             "current_target_revision: 8",
-            f"current_target_manifest_sha256: {digest}",
+            f"current_target_manifest_sha256: {EXPECTED_R8_MANIFEST}",
             "predecessor_target_artifact_id: cotend-codex-r000007",
             f"predecessor_target_manifest_sha256: {EXPECTED_R7_MANIFEST}",
             "runtime_trellis_inventory: 28_mentions_15_files",

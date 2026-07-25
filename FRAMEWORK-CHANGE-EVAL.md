@@ -2,6 +2,74 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-07-25 L68 原生检查阶段
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: workflow_behavior
+change_summary: 只把 TD05 实现后检查、范围内修复、重跑和 Checker 结果合同迁移到 CoTend 第一方责任链
+intent: 在不新增用户命令、不替代正式审查或用户验收且不提前删除 TD07 的前提下，移除外部框架的检查运行依赖
+expected_benefit:
+  - Checker 从当前项目真相和实际工作树独立推导范围，不只信任 Implementer 报告
+  - Full 独立 Checker 与 Adaptive 内联 Checker 使用同一状态、检查、修复和证据合同
+  - 范围内 finding 修复后必须绑定新实现身份并重跑受影响检查
+  - 正式自审、AI UAT、用户验收、Done 与发布权限继续分离
+possible_harm:
+  - 内联 Checker 若没有明确阶段边界，可能退化为实现者自证
+  - 自动修复边界过宽可能覆盖无关用户或并发修改
+  - 只完成 TD05 时 TD07 仍存在，不能宣称完整运行时解耦
+affected_workflows:
+  - implementation_to_checker_handoff
+  - full_and_adaptive_execution
+  - acceptance_test_selection_and_evidence
+  - in_scope_fix_and_retest
+  - formal_self_review_handoff
+  - target_artifact_delivery
+deviations:
+  - source release 与 framework.lock 继续保持 v1.65/37 文件；L68 是 CoTend 产品 overlay
+  - 当前根载体推进为 cotend-codex-r000009；r8-r2 与 cotend@0.1.0-rc.2 均保持不可变
+  - 只替换 TD05；TD07 继续进入独立叶
+mechanism_budget:
+  added_context_surface: one_reference_cold_path_one_public_contract_one_deterministic_verifier
+  ordinary_load_impact: none_until_nontrivial_implementation_handoff
+  ceremony_added: none_for_small_direct_edits
+  duplication_check: reuses_Implementation_Pass_Acceptance_Harness_Review_AI_UAT_and_existing_status_carriers
+  cheaper_alternative_considered: 仅把现有分散检查规则重新命名；因不能锁定统一结果、修复后身份和 Full/Adaptive 等价而拒绝
+  retirement_or_thinning_trigger: 真实项目证明某些非宪法检查维度长期无价值时通过 Model Upgrade/FCE 缩减，结果与权限边界不移除
+  expected_failure_prevented: implementer_self_certification_skipped_required_checks_stale_post_fix_evidence_scope_creep_and_acceptance_overclaim
+validation_scenarios:
+  - scenario: native_verification_pass_matrix
+    expected: 正常、修复、失败、阻塞、恢复和幂等路径均由 CoTend Checker 决定
+    validation_result_type: executed
+    result: twenty_three_scenarios_full_adaptive_same_result_contract
+  - scenario: exact_td05_inventory_change
+    expected: 只移除 TD05 检查命令和 verification 兼容映射，TD07 保留
+    validation_result_type: inspection
+    result: current_20_mentions_10_files_td05_zero_td07_present
+  - scenario: r8_to_r9_delivery
+    expected: 可信 r8 可确定升级到当前 r9，r2 历史包仍可复现
+    validation_result_type: executed
+    result: predecessor_and_historical_package_tests_passed
+real_project_validation:
+  - scenario: native_checker_in_real_writable_project
+    expected: 真实项目中检查、修复、正式审查和用户验收边界保持
+    validation_result_type: deferred
+    result: G06_not_started
+decision: watch
+rollback_triggers:
+  - Full 与 Adaptive 的检查、状态或权限合同分叉
+  - Checker 只接受 Implementer 报告或跳过必需检查
+  - 修复后沿用旧实现身份、未重跑受影响检查或覆盖无关修改
+  - Checker 声称正式审查、AI UAT、用户验收、完成或发布权限
+  - TD07、r8-r2 身份或 rc.2 摘要发生变化
+review_after: TD07_and_G03_G04_G06
+watch_closure:
+  - keep_watch
+  - evidence: docs/NATIVE-VERIFICATION-PASS.md
+```
+
+本次不执行真实用户安装、push、tag、Release、Portal、submission、publish 或身份验证。`G02` 当前完成 `7/8`；只剩 TD07 收尾能力尚未通过单项原生等价。
+
 ## 2026-07-24 L65 原生工作流状态与运行档位
 
 ```yaml

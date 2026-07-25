@@ -21,6 +21,9 @@ class NativeWorkflowStateRuntimeProfilesTests(unittest.TestCase):
         self.assertFalse(result["external_config_modified"])
         self.assertFalse(result["legacy_source_modified"])
         self.assertTrue(result["unrelated_truth_preserved"])
+        self.assertEqual(
+            result["remaining_compatibility_commands"], ["trellis-finish"]
+        )
 
     def test_session_override_does_not_rewrite_project_choice(self) -> None:
         result = native_state.evaluate_workflow(
