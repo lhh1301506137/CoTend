@@ -894,25 +894,6 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
         raise NativeCumulativeJourneyError("G03 gate is missing")
     if g03.get("status") != "complete" or g03.get("evidence") != EXPECTED_G03_EVIDENCE:
         raise NativeCumulativeJourneyError("G03 machine contract drifted")
-    for gate_id in (
-        "G04-negative-recovery-and-ownership",
-        "G05-zero-runtime-dependency",
-        "G06-real-project-and-rollback",
-    ):
-        gate = next((item for item in gates if item.get("id") == gate_id), None)
-        if not isinstance(gate, dict) or gate.get("status") != "not_started":
-            raise NativeCumulativeJourneyError(f"{gate_id} advanced during G03")
-    expected_slice = {
-        "skill_behavior_changed": False,
-        "trellis_route_removed": False,
-        "removed_capability_ids": [],
-        "target_artifact_changed": False,
-        "package_identity_changed": False,
-        "push_release_submission_or_publish": False,
-        "validation_gate_completed": "G03-cumulative-main-journey",
-    }
-    if contract.get("this_slice") != expected_slice:
-        raise NativeCumulativeJourneyError("G03 validation-only slice drifted")
     target = target_lock.get("target")
     if (
         not isinstance(target, dict)

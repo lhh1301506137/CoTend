@@ -357,7 +357,7 @@
         "failed_check_and_recovery",
         "unrelated_files_and_truth_preserved"
       ],
-      "status": "not_started"
+      "status": "complete"
     },
     {
       "id": "G05-zero-runtime-dependency",
@@ -387,6 +387,6 @@
     "target_artifact_changed": false,
     "package_identity_changed": false,
     "push_release_submission_or_publish": false,
-    "validation_gate_completed": "G03-cumulative-main-journey"
+    "validation_gate_completed": "G04-negative-recovery-and-ownership"
   }
 }

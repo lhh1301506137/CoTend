@@ -17,6 +17,7 @@ import verify_native_implementation_pass as native_implementation
 import verify_native_verification_pass as native_verification
 import verify_native_closeout_pass as native_closeout
 import verify_native_cumulative_main_journey as native_cumulative_journey
+import verify_native_negative_recovery_ownership as native_negative_recovery
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -439,6 +440,12 @@ EXPECTED_NATIVE_CUMULATIVE_JOURNEY_FILES = {
     "docs/evidence/NATIVE-CUMULATIVE-MAIN-JOURNEY-G03.md",
     "scripts/verify_native_cumulative_main_journey.py",
     "tests/test_native_cumulative_main_journey.py",
+}
+EXPECTED_NATIVE_NEGATIVE_RECOVERY_FILES = {
+    "docs/NATIVE-NEGATIVE-RECOVERY-AND-OWNERSHIP.md",
+    "docs/evidence/NATIVE-NEGATIVE-RECOVERY-OWNERSHIP-G04.md",
+    "scripts/verify_native_negative_recovery_ownership.py",
+    "tests/test_native_negative_recovery_ownership.py",
 }
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
@@ -4334,6 +4341,14 @@ def main() -> int:
             "native cumulative main-journey artifacts are missing or ignored: "
             f"{sorted(missing_native_cumulative_journey)}"
         )
+    missing_native_negative_recovery = (
+        EXPECTED_NATIVE_NEGATIVE_RECOVERY_FILES - candidates
+    )
+    if missing_native_negative_recovery:
+        errors.append(
+            "native negative-recovery artifacts are missing or ignored: "
+            f"{sorted(missing_native_negative_recovery)}"
+        )
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
     if upstream_registry_path not in candidates:
@@ -4544,6 +4559,11 @@ def main() -> int:
             native_cumulative_journey.verify_repository(ROOT)
         except native_cumulative_journey.NativeCumulativeJourneyError as exc:
             errors.append(f"native cumulative main journey: {exc}")
+    if not missing_native_negative_recovery:
+        try:
+            native_negative_recovery.verify_repository(ROOT)
+        except native_negative_recovery.NativeNegativeRecoveryError as exc:
+            errors.append(f"native negative recovery and ownership: {exc}")
 
     github_marketplace_carrier_evidence_path = (
         "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md"

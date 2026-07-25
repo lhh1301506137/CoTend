@@ -17,6 +17,7 @@ import verify_native_implementation_pass as native_implementation
 import verify_native_verification_pass as native_verification
 import verify_native_closeout_pass as native_closeout
 import verify_native_cumulative_main_journey as native_cumulative_journey
+import verify_native_negative_recovery_ownership as native_negative_recovery
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,8 +66,9 @@ EXPECTED_DOCUMENT_MARKERS = [
     "### L68 / TD05 已完成",
     "### L69 / TD07 已完成",
     "### L70 / G03 已完成",
+    "### L71 / G04 已完成",
     "### G05 运行时零依赖",
-    "G03 不修改 Skill 字节",
+    "G04 不修改 Skill 字节",
 ]
 EXPECTED_BASELINE_INVENTORY_SHA256 = (
     "a1c9893a7462d7abd925b1ae468a3dd97366fae850e2881a23546e5471e93aeb"
@@ -510,7 +512,18 @@ def validate_contract(
             ]
         ):
             raise TrellisDecouplingPlanError("G03 evidence contract drifted")
-        expected_status = "complete" if index in {0, 1, 2} else "not_started"
+        if (
+            gate.get("id") == "G04-negative-recovery-and-ownership"
+            and gate.get("evidence")
+            != [
+                "foreign_framework_conflict",
+                "unknown_or_drifted_state",
+                "failed_check_and_recovery",
+                "unrelated_files_and_truth_preserved",
+            ]
+        ):
+            raise TrellisDecouplingPlanError("G04 evidence contract drifted")
+        expected_status = "complete" if index in {0, 1, 2, 3} else "not_started"
         if gate.get("status") != expected_status:
             raise TrellisDecouplingPlanError(
                 f"{gate['id']} status advanced without executed evidence"
@@ -523,10 +536,10 @@ def validate_contract(
         "target_artifact_changed": False,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
-        "validation_gate_completed": "G03-cumulative-main-journey",
+        "validation_gate_completed": "G04-negative-recovery-and-ownership",
     }:
         raise TrellisDecouplingPlanError(
-            "L70 G03 validation-only slice boundary drifted"
+            "L71 G04 validation-only slice boundary drifted"
         )
 
     for marker in EXPECTED_DOCUMENT_MARKERS:
@@ -580,6 +593,14 @@ def validate_contract(
         raise TrellisDecouplingPlanError(
             "G03 native cumulative main-journey verifier did not pass"
         )
+    negative_recovery_result = native_negative_recovery.verify_repository(ROOT)
+    if (
+        negative_recovery_result.get("status")
+        != "native_negative_recovery_ownership_verified"
+    ):
+        raise TrellisDecouplingPlanError(
+            "G04 native negative-recovery verifier did not pass"
+        )
 
     return {
         "status": contract["status"],
@@ -590,7 +611,7 @@ def validate_contract(
         "trellis_runtime_paths": 0,
         "skill_behavior_changed": False,
         "native_capabilities_verified": 8,
-        "cumulative_gates_verified": 1,
+        "cumulative_gates_verified": 2,
     }
 
 
@@ -615,6 +636,7 @@ def main() -> int:
         subprocess.CalledProcessError,
         TrellisDecouplingPlanError,
         native_cumulative_journey.NativeCumulativeJourneyError,
+        native_negative_recovery.NativeNegativeRecoveryError,
     ) as exc:
         print("TRELLIS_DECOUPLING_PLAN_FAILED")
         print(f"- {exc}")

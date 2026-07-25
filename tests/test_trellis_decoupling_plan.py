@@ -44,7 +44,7 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
         self.assertEqual(result["runtime_files"], 6)
         self.assertFalse(result["skill_behavior_changed"])
         self.assertEqual(result["native_capabilities_verified"], 8)
-        self.assertEqual(result["cumulative_gates_verified"], 1)
+        self.assertEqual(result["cumulative_gates_verified"], 2)
 
     def test_immutable_baseline_change_is_rejected(self) -> None:
         changed = copy.deepcopy(self.contract)
@@ -143,7 +143,24 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 
-    def test_g03_validation_only_slice_cannot_claim_behavior_change(self) -> None:
+    def test_g04_evidence_and_completion_cannot_be_removed(self) -> None:
+        changed = copy.deepcopy(self.contract)
+        changed["gates"][3]["evidence"].pop()
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(changed)
+
+        changed = copy.deepcopy(self.contract)
+        changed["gates"][3]["status"] = "not_started"
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(changed)
+
+    def test_g05_cannot_advance_during_g04(self) -> None:
+        changed = copy.deepcopy(self.contract)
+        changed["gates"][4]["status"] = "complete"
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(changed)
+
+    def test_g04_validation_only_slice_cannot_claim_behavior_change(self) -> None:
         changed = copy.deepcopy(self.contract)
         changed["this_slice"]["skill_behavior_changed"] = True
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):

@@ -2,6 +2,67 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-07-26 G04 原生负向恢复与所有权验证
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: workflow_behavior
+change_summary: 用 CoTend 原生 evaluator 和 disposable 文件夹具验证外部冲突、状态漂移、检查失败恢复、正式自审刷新及非拥有文件保护
+intent: 在删除剩余外部框架兼容路径前，证明异常路径不会交出项目权限、复用陈旧证据、静默重置状态或覆盖用户文件
+expected_benefit:
+  - C01-C19、八项 Skill 角色、八项 G02 原生能力和 G03 累计旅程作为同一不降级基线复验
+  - Full 与 Adaptive 在外部冲突、漂移、恢复成功和恢复失败时保持相同结果合同
+  - 检查失败后必须生成新实现、新检查和新正式自审身份，才能进入 Closeout
+  - 项目真相、用户文件、无关源文件和外部已暂存内容由逐字节摘要保护
+possible_harm:
+  - 合成 evaluator 可能被误写成真实项目或真实用户验收
+  - 只验证当前 target r10 不能证明 G05 修改后的最终运行包仍不退化
+affected_workflows:
+  - external_framework_conflict_and_authority
+  - unknown_or_drifted_state_handback
+  - failed_check_recovery_review_and_closeout
+  - rollback_and_non_owned_file_protection
+deviations:
+  - none
+mechanism_budget:
+  added_context_surface: verification_script_test_contract_and_evidence
+  ordinary_load_impact: none
+  ceremony_added: none_to_runtime
+  duplication_check: composes_existing_evaluators_and_closeout_fixture_without_new_runtime_state
+  cheaper_alternative_considered: 只依赖各专项单测；因无法证明异常阶段之间的身份、权限和文件所有权连续性而拒绝
+  retirement_or_thinning_trigger: G06 真实项目 harness 能稳定覆盖相同负向矩阵并保留确定性 mutation 后，可合并重复的合成编排层
+  expected_failure_prevented: external_owner_takeover_silent_state_reset_stale_review_reuse_unsafe_rollback_and_false_acceptance
+validation_scenarios:
+  - scenario: four_group_negative_recovery_matrix
+    expected: 12 个 Full/Adaptive incident 与 1 个文件保护 fixture 保持权限、检查点和结果等价
+    validation_result_type: executed
+    result: G04_13_scenarios_passed
+  - scenario: mutation_and_identity_chain
+    expected: 外部 owner、陈旧恢复身份、损坏 HANDOFF、用户文件改写或阶段断链均失败
+    validation_result_type: executed
+    result: focused_42_tests_passed_including_12_G04_tests
+  - scenario: full_repository_and_delivery_regression
+    expected: 19 项能力、完整测试、冻结 rc.2、交付、Plugin 和 Marketplace 载体不回退
+    validation_result_type: executed
+    result: repository_256_19_19_tests_337_delivery_11_5_8_6_8_plugin_17_5_marketplace_15_5_passed
+real_project_validation:
+  - scenario: native_cotend_writable_project_without_external_framework_runtime
+    expected: 真实用户项目完成初始化、开发、检查、验收、交接和恢复
+    validation_result_type: deferred
+    result: G06_not_started
+decision: watch
+rollback_triggers:
+  - G05 修改 Skill 后任一 C01-C19、G02、G03 或 G04 验证失败
+  - 外部框架重新取得 owner、陈旧检查或正式自审身份可进入 Closeout
+  - rollback 覆盖用户、无关、并发或外部已暂存内容
+  - 合成 fixture 被描述为真实项目、用户验收、发布或 rc.3 就绪
+review_after: G05_zero_runtime_and_G06_real_project
+watch_closure:
+  - keep_watch
+  - re_review_date: G06 completion
+  - evidence: docs/evidence/NATIVE-NEGATIVE-RECOVERY-OWNERSHIP-G04.md
+```
+
 ## 2026-07-26 G03 原生累计主旅程验证
 
 ```yaml
