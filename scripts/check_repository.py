@@ -16,6 +16,7 @@ import verify_native_init_resume_before_development as native_project_entry
 import verify_native_implementation_pass as native_implementation
 import verify_native_verification_pass as native_verification
 import verify_native_closeout_pass as native_closeout
+import verify_native_cumulative_main_journey as native_cumulative_journey
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -432,6 +433,12 @@ EXPECTED_NATIVE_CLOSEOUT_FILES = {
     "scripts/verify_native_closeout_pass.py",
     "skills/cotend-collaboration/references/closeout-pass.md",
     "tests/test_native_closeout_pass.py",
+}
+EXPECTED_NATIVE_CUMULATIVE_JOURNEY_FILES = {
+    "docs/NATIVE-CUMULATIVE-MAIN-JOURNEY.md",
+    "docs/evidence/NATIVE-CUMULATIVE-MAIN-JOURNEY-G03.md",
+    "scripts/verify_native_cumulative_main_journey.py",
+    "tests/test_native_cumulative_main_journey.py",
 }
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
@@ -4319,6 +4326,14 @@ def main() -> int:
             "native closeout-pass artifacts are missing or ignored: "
             f"{sorted(missing_native_closeout)}"
         )
+    missing_native_cumulative_journey = (
+        EXPECTED_NATIVE_CUMULATIVE_JOURNEY_FILES - candidates
+    )
+    if missing_native_cumulative_journey:
+        errors.append(
+            "native cumulative main-journey artifacts are missing or ignored: "
+            f"{sorted(missing_native_cumulative_journey)}"
+        )
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
     if upstream_registry_path not in candidates:
@@ -4524,6 +4539,11 @@ def main() -> int:
             native_closeout.verify_repository(ROOT)
         except native_closeout.NativeCloseoutPassError as exc:
             errors.append(f"native closeout pass: {exc}")
+    if not missing_native_cumulative_journey:
+        try:
+            native_cumulative_journey.verify_repository(ROOT)
+        except native_cumulative_journey.NativeCumulativeJourneyError as exc:
+            errors.append(f"native cumulative main journey: {exc}")
 
     github_marketplace_carrier_evidence_path = (
         "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md"

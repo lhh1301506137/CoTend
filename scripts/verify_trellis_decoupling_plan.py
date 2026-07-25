@@ -16,6 +16,7 @@ import verify_native_init_resume_before_development as native_project_entry
 import verify_native_implementation_pass as native_implementation
 import verify_native_verification_pass as native_verification
 import verify_native_closeout_pass as native_closeout
+import verify_native_cumulative_main_journey as native_cumulative_journey
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -63,8 +64,9 @@ EXPECTED_DOCUMENT_MARKERS = [
     "### L67 / TD04 已完成",
     "### L68 / TD05 已完成",
     "### L69 / TD07 已完成",
+    "### L70 / G03 已完成",
     "### G05 运行时零依赖",
-    "当前只移除 TD07",
+    "G03 不修改 Skill 字节",
 ]
 EXPECTED_BASELINE_INVENTORY_SHA256 = (
     "a1c9893a7462d7abd925b1ae468a3dd97366fae850e2881a23546e5471e93aeb"
@@ -498,26 +500,33 @@ def validate_contract(
         if not isinstance(gate, dict):
             raise TrellisDecouplingPlanError("parity gate must be an object")
         _require_non_empty_strings(gate.get("evidence"), f"{gate['id']}.evidence")
-        expected_status = (
-            "complete"
-            if index in {0, 1}
-            else "not_started"
-        )
+        if (
+            gate.get("id") == "G03-cumulative-main-journey"
+            and gate.get("evidence")
+            != [
+                "init_to_implementation_to_check_to_acceptance",
+                "interruption_and_route_rebase",
+                "handoff_and_new_session_recovery",
+            ]
+        ):
+            raise TrellisDecouplingPlanError("G03 evidence contract drifted")
+        expected_status = "complete" if index in {0, 1, 2} else "not_started"
         if gate.get("status") != expected_status:
             raise TrellisDecouplingPlanError(
                 f"{gate['id']} status advanced without executed evidence"
             )
 
     if contract.get("this_slice") != {
-        "skill_behavior_changed": True,
-        "trellis_route_removed": True,
-        "removed_capability_ids": ["TD07-closeout-archive-and-recovery"],
-        "target_artifact_changed": True,
+        "skill_behavior_changed": False,
+        "trellis_route_removed": False,
+        "removed_capability_ids": [],
+        "target_artifact_changed": False,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
+        "validation_gate_completed": "G03-cumulative-main-journey",
     }:
         raise TrellisDecouplingPlanError(
-            "L69 slice boundary drifted"
+            "L70 G03 validation-only slice boundary drifted"
         )
 
     for marker in EXPECTED_DOCUMENT_MARKERS:
@@ -563,6 +572,14 @@ def validate_contract(
         raise TrellisDecouplingPlanError(
             "TD07 native closeout verifier did not pass"
         )
+    cumulative_result = native_cumulative_journey.verify_repository(ROOT)
+    if (
+        cumulative_result.get("status")
+        != "native_cumulative_main_journey_verified"
+    ):
+        raise TrellisDecouplingPlanError(
+            "G03 native cumulative main-journey verifier did not pass"
+        )
 
     return {
         "status": contract["status"],
@@ -571,8 +588,9 @@ def validate_contract(
         "runtime_mentions": sum(actual_inventory.values()),
         "runtime_files": len(actual_inventory),
         "trellis_runtime_paths": 0,
-        "skill_behavior_changed": True,
+        "skill_behavior_changed": False,
         "native_capabilities_verified": 8,
+        "cumulative_gates_verified": 1,
     }
 
 
@@ -592,7 +610,12 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
 def main() -> int:
     try:
         result = verify_repository()
-    except (OSError, subprocess.CalledProcessError, TrellisDecouplingPlanError) as exc:
+    except (
+        OSError,
+        subprocess.CalledProcessError,
+        TrellisDecouplingPlanError,
+        native_cumulative_journey.NativeCumulativeJourneyError,
+    ) as exc:
         print("TRELLIS_DECOUPLING_PLAN_FAILED")
         print(f"- {exc}")
         return 1
@@ -600,8 +623,9 @@ def main() -> int:
         "TRELLIS_DECOUPLING_PLAN_OK "
         f"capabilities={result['capabilities']} gates={result['gates']} "
         f"runtime_mentions={result['runtime_mentions']} "
-        f"runtime_files={result['runtime_files']} behavior_changed=true "
-        f"native_verified={result['native_capabilities_verified']}"
+        f"runtime_files={result['runtime_files']} behavior_changed=false "
+        f"native_verified={result['native_capabilities_verified']} "
+        f"cumulative_gates={result['cumulative_gates_verified']}"
     )
     return 0
 

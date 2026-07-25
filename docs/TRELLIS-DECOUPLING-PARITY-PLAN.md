@@ -44,14 +44,14 @@ Trellis 可以继续出现在竞品研究、固定来源和历史采用说明中
 
 | 顺序 | Trellis 专属接口 | 必须保留的结果 | CoTend 自有承接 | 当前判断 | 删除前最低门槛 |
 |---:|---|---|---|---|---|
-| 1 | Trellis task / PRD / spec / coding guidelines 的最高权限 | 单一可恢复项目真相；目标、阶段、叶子、需求、验收和编码约束可追踪 | Plan Tree、PROJECT-UNDERSTANDING、决策日志、STATUS、项目 PRD/spec、AGENTS.md | **TD08 已完成**：唯一角色型权限合同和六类场景通过；外部框架只可 reference/history/conflict | 后续累计主旅程和真实项目仍由 G03/G06 验证，不回退为外部框架权限 |
-| 2 | `trellis-brainstorm` | 一次一问；模糊输入不冒充确认真相；用户决定可恢复 | grill-me、Idea to Consensus、Semantic Alignment、决策日志 | **TD03 已完成**：八类场景、Init handback、裸继续停止、决定先记录和外部证据隔离通过 | 后续累计主旅程和真实小白验收仍由 G03/G06 验证，不恢复外部 brainstorm 路由 |
-| 3 | `trellis-update-spec` | L0-L2 含义与 L3-L4 执行分离；受影响路线从可靠边界重基 | Semantic Alignment、Route Rebase、Plan Tree、Knowledge Changelog | **TD06 已完成**：十类场景覆盖权限、接受/拒绝、隔离、证据失效、中断恢复与外部冲突 | 后续累计主旅程和真实项目仍由 G03/G06 验证，不恢复外部 spec 写入或 update 路由 |
-| 4 | `.trellis/`、`trellis.mode`、`.trellis/config.yaml` | 判断当前/历史/冲突状态；持久化 Full/Adaptive；迁移不破坏真相 | Project Init、Collaboration、Plan Tree、STATUS | **TD01 已完成**：原生 `current / dormant / conflict`、Full/Adaptive 和 `delegated_pair / inline` 的 16 类场景通过 | 后续累计主旅程、负向恢复集成和真实项目仍由 G03/G04/G06 验证，不恢复外部状态/config owner |
-| 5 | `trellis-start`、`trellis-before-dev` | 初始化、更新、修复、迁移、续接幂等；开发前加载真相和代码上下文 | CoTend Init、Project Init、Code Context Harness | **TD02 已完成**：13 类入口与 9 类开发前场景通过；一次 handback、专属决定停止和真相优先顺序成立 | 后续累计主旅程、负向恢复集成和真实项目仍由 G03/G04/G06 验证，不恢复外部启动/开发前路由 |
-| 6 | `trellis-implement` | 只实现已授权叶子；写入责任和依赖清楚；产生相称测试与证据 | CoTend 原生 Implementer、Native Agent Orchestration、Plan Tree | **TD04 已完成**：Full 独立角色与 Adaptive 内联执行使用同一结果合同，15 类授权、依赖、范围、测试和恢复场景通过 | 后续累计主旅程、负向恢复集成和真实项目仍由 G03/G04/G06 验证，不恢复外部实现路由 |
-| 7 | `trellis-check` | 检查差异、规格、测试和失败路径；可修范围内问题；不替代用户验收 | CoTend 原生 Checker、Acceptance Harness、自审、AI UAT | **TD05 已完成**：Full 独立 Checker 与 Adaptive 内联 Checker 使用同一结果合同，23 类检查/修复/失败/恢复场景通过 | 后续累计主旅程、负向恢复集成和真实项目仍由 G03/G04/G06 验证，不恢复外部检查路由 |
-| 8 | `trellis-finish`、archive、journal | 验证后收尾；保存状态、审查、决定、交接和真相；本地提交不等于发布 | Native Closeout Pass、Goal Completion、STATUS、REVIEW、HANDOFF | **TD07 已完成**：23 类成功、失败、回滚、中断、漂移、幂等和权限隔离场景通过 | 后续累计主旅程、负向恢复集成、零运行库存和真实项目仍由 G03-G06 验证，不恢复外部收尾路由 |
+| 1 | Trellis task / PRD / spec / coding guidelines 的最高权限 | 单一可恢复项目真相；目标、阶段、叶子、需求、验收和编码约束可追踪 | Plan Tree、PROJECT-UNDERSTANDING、决策日志、STATUS、项目 PRD/spec、AGENTS.md | **TD08 已完成**：唯一角色型权限合同和六类场景通过；外部框架只可 reference/history/conflict | G03 已累计验证；真实项目仍由 G06 验证，不回退为外部框架权限 |
+| 2 | `trellis-brainstorm` | 一次一问；模糊输入不冒充确认真相；用户决定可恢复 | grill-me、Idea to Consensus、Semantic Alignment、决策日志 | **TD03 已完成**：八类场景、Init handback、裸继续停止、决定先记录和外部证据隔离通过 | G03 已累计验证；真实小白验收仍由 G06 验证，不恢复外部 brainstorm 路由 |
+| 3 | `trellis-update-spec` | L0-L2 含义与 L3-L4 执行分离；受影响路线从可靠边界重基 | Semantic Alignment、Route Rebase、Plan Tree、Knowledge Changelog | **TD06 已完成**：十类场景覆盖权限、接受/拒绝、隔离、证据失效、中断恢复与外部冲突 | G03 已累计验证；真实项目仍由 G06 验证，不恢复外部 spec 写入或 update 路由 |
+| 4 | `.trellis/`、`trellis.mode`、`.trellis/config.yaml` | 判断当前/历史/冲突状态；持久化 Full/Adaptive；迁移不破坏真相 | Project Init、Collaboration、Plan Tree、STATUS | **TD01 已完成**：原生 `current / dormant / conflict`、Full/Adaptive 和 `delegated_pair / inline` 的 16 类场景通过 | G03 已累计验证；负向恢复集成和真实项目仍由 G04/G06 验证，不恢复外部状态/config owner |
+| 5 | `trellis-start`、`trellis-before-dev` | 初始化、更新、修复、迁移、续接幂等；开发前加载真相和代码上下文 | CoTend Init、Project Init、Code Context Harness | **TD02 已完成**：13 类入口与 9 类开发前场景通过；一次 handback、专属决定停止和真相优先顺序成立 | G03 已累计验证；负向恢复集成和真实项目仍由 G04/G06 验证，不恢复外部启动/开发前路由 |
+| 6 | `trellis-implement` | 只实现已授权叶子；写入责任和依赖清楚；产生相称测试与证据 | CoTend 原生 Implementer、Native Agent Orchestration、Plan Tree | **TD04 已完成**：Full 独立角色与 Adaptive 内联执行使用同一结果合同，15 类授权、依赖、范围、测试和恢复场景通过 | G03 已累计验证；负向恢复集成和真实项目仍由 G04/G06 验证，不恢复外部实现路由 |
+| 7 | `trellis-check` | 检查差异、规格、测试和失败路径；可修范围内问题；不替代用户验收 | CoTend 原生 Checker、Acceptance Harness、自审、AI UAT | **TD05 已完成**：Full 独立 Checker 与 Adaptive 内联 Checker 使用同一结果合同，23 类检查/修复/失败/恢复场景通过 | G03 已累计验证；负向恢复集成和真实项目仍由 G04/G06 验证，不恢复外部检查路由 |
+| 8 | `trellis-finish`、archive、journal | 验证后收尾；保存状态、审查、决定、交接和真相；本地提交不等于发布 | Native Closeout Pass、Goal Completion、STATUS、REVIEW、HANDOFF | **TD07 已完成**：23 类成功、失败、回滚、中断、漂移、幂等和权限隔离场景通过 | G03 已累计验证；负向恢复、零运行库存和真实项目仍由 G04-G06 验证，不恢复外部收尾路由 |
 
 ## 为什么先替换权限，再替换命令
 
@@ -125,9 +125,13 @@ CoTend Collaboration 现在用内部 Native Closeout Pass 承接验证和正式�
 
 每个接口至少覆盖 success、blocked、failure、stop，固定 CoTend owner、状态迁移、测试和回滚，再删除对应旧路径。当前 G02 已完成 8/8：TD08、TD03、TD06、TD01、TD02、TD04、TD05 与 TD07 均已通过单项原生等价门。
 
-### G03 累计主旅程
+### L70 / G03 已完成
 
-从 Init、需求确认、计划、实现、检查、证据、用户验收到新会话恢复完整通过；单项测试不能代替主旅程。
+累计验证器直接调用八项原生 evaluator，把同一个目标、决定、活动叶、route revision、实现身份、检查身份、证据和验收状态逐阶段传递。Full 与 Adaptive 两条完整旅程结果等价；第三条旅程在 L3/L4 Route Rebase 的 `applying` 阶段中断，从可靠边界恢复后失效旧实现/检查身份并重新闭环。
+
+三条旅程都先证明裸 `continue` 不能越过验收门，再由明确标注的 disposable synthetic acceptance fixture 推进到 `accepted_synthetic`；随后通过摘要保护的 HANDOFF 在新对象中执行 `current_resume`，恢复同一目标、决定、路线、检查证据和验收状态。该状态不是用户真实验收，G06 继续独立。
+
+G03 不修改 Skill 字节、target r10、7/6 运行库存或冻结 rc.2，也不删除任何剩余 Trellis 词项。机器合同只把 G03 标为 complete；G04、G05、G06 仍为 `not_started`。
 
 ### G04 负向、恢复与所有权
 
@@ -157,10 +161,10 @@ CoTend Collaboration 现在用内部 Native Closeout Pass 承接验证和正式�
 - G06 通过前，框架变更评估保持 `watch`，不得宣称“完全独立且无能力退化”。
 - 官方 Plugin 身份验证路线暂时停放；产品核心变化闭合后再恢复。
 
-## L69 本切片不做
+## L70 本切片不做
 
-- 不推进 G03 累计主旅程、G04 集成负向恢复、G05 零运行库存或 G06 真实项目验收。
-- 不新增用户可见的 Closeout 命令。
+- 不推进 G04 集成负向恢复、G05 零运行库存或 G06 真实项目验收。
+- 不新增用户可见命令、Skill 或状态树。
 - 不创建 `.cotend/` 新状态布局。
 - 不修改 dual-ai upstream，也不要求其删除私人 Trellis 集成。
 - 不构建或发布 rc.3，不执行真实安装、push、release、Portal、submission 或 publish。

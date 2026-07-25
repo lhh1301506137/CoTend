@@ -15,6 +15,7 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - CoTend-native Implementation Pass with bounded leaf authority, write ownership, dependency, failure, interruption, and Full/Adaptive parity scenarios.
 - CoTend-native Verification Pass with direct diff/spec/test inspection, authorized fix and rerun evidence, failure/stop recovery, and Full/Adaptive Checker parity.
 - CoTend-native Closeout Pass with durable-record synchronization, optional local commits, pre/post-commit failure isolation, interrupted recovery, and Full/Adaptive parity.
+- CoTend-native cumulative main-journey validation composing all eight evaluators across Full, Adaptive, interrupted Route Rebase, explicit synthetic acceptance, and new-session HANDOFF recovery.
 
 ### Changed
 
@@ -30,11 +31,12 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - Advanced the repository carrier through targets `cotend-codex-r000007`, `r000008`, and `r000009`, preserving every prior target as an exact predecessor.
 - Advanced the repository carrier to `cotend-codex-r000010`, preserving r9 through r2 as exact predecessors while keeping the rc.2 package immutable.
 - Removed the active external implementation, checking, and closeout routes; all eight G02 capability replacements now have native parity evidence.
+- Completed the G03 cumulative journey gate without changing Skill bytes, target r10, the frozen rc.2 package, or the remaining runtime reference inventory.
 
 ### Boundaries
 
 - TD08 project-truth authority, TD03 requirements clarification, TD06 specification change/Route Rebase, TD01 workflow state/runtime profiles, TD02 init/pre-development, TD04 implementation, TD05 verification, and TD07 closeout have per-capability native parity.
-- G03 cumulative journeys, G04 integrated negative recovery, G05 zero runtime mentions, and G06 real-project/user acceptance remain separate incomplete gates.
+- G03 cumulative journeys are complete with disposable synthetic acceptance fixtures; G04 integrated negative recovery, G05 zero runtime mentions, and G06 real-project/user acceptance remain separate incomplete gates.
 - Plugin package identity, release tag, remote repository, real-user installation, and submission state did not change.
 - The next Plugin candidate will not advance beyond rc.2 until cumulative CoTend-native parity is implemented and verified.
 

@@ -346,7 +346,7 @@
         "interruption_and_route_rebase",
         "handoff_and_new_session_recovery"
       ],
-      "status": "not_started"
+      "status": "complete"
     },
     {
       "id": "G04-negative-recovery-and-ownership",
@@ -381,13 +381,12 @@
     }
   ],
   "this_slice": {
-    "skill_behavior_changed": true,
-    "trellis_route_removed": true,
-    "removed_capability_ids": [
-      "TD07-closeout-archive-and-recovery"
-    ],
-    "target_artifact_changed": true,
+    "skill_behavior_changed": false,
+    "trellis_route_removed": false,
+    "removed_capability_ids": [],
+    "target_artifact_changed": false,
     "package_identity_changed": false,
-    "push_release_submission_or_publish": false
+    "push_release_submission_or_publish": false,
+    "validation_gate_completed": "G03-cumulative-main-journey"
   }
 }

@@ -2,6 +2,38 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-07-26 G03 原生累计主旅程验证
+
+```yaml
+g03_slice_type: validation_only
+g03_summary: 直接组合八项原生 evaluator，验证 Full、Adaptive、Route Rebase 中断恢复、显式合成验收和 HANDOFF 新会话恢复
+intent: 证明 G02 的单项等价能够组成同一目标上的可信闭环，而不是把专项通过数量冒充端到端结果
+expected_benefit:
+  - 阶段输出身份必须成为下一阶段输入，能够发现集成断链
+  - Full 与 Adaptive 保持同结果合同，同时允许执行形态不同
+  - 裸 continue、隐式 AI 验收和损坏 HANDOFF 无法越权
+possible_harm:
+  - synthetic acceptance 可能被误写成真实用户验收
+  - 编排器若只汇总 verifier 状态会形成假阳性
+mechanism_budget:
+  added_context_surface: verification_script_test_contract_and_evidence
+  ordinary_load_impact: none
+  ceremony_added: none_to_runtime
+  duplication_check: composes_existing_evaluators_without_copying_runtime_rules
+  retirement_or_thinning_trigger: 更高层真实生命周期 harness 完整覆盖相同阶段连续性并能保留确定性负向变异
+validation_scenarios:
+  - full_main_journey
+  - adaptive_main_journey
+  - interrupted_L3_L4_route_rebase_and_recovery
+  - digest_protected_handoff_new_session_recovery
+  - bare_continue_then_explicit_disposable_synthetic_acceptance
+g03_result: keep_validation_gate_complete
+g03_skill_behavior_changed: false
+g03_target_artifact: cotend-codex-r000010
+g03_real_user_acceptance_claimed: false
+g03_later_gates: G04_G05_G06_not_started
+```
+
 ## 2026-07-26 L69 原生收尾、归档与恢复
 
 ```yaml
