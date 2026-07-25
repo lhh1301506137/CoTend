@@ -64,6 +64,10 @@ SKILLS = {
     },
 }
 
+NATIVE_TARGET_ADDITIONS = {
+    "cotend-collaboration": {"references/implementation-pass.md"},
+}
+
 DISPLAY_NAMES = {
     "cotend-init": "CoTend Init",
     "cotend-project-init": "CoTend Project Init",
@@ -214,11 +218,15 @@ def verify_source_topology(upstream_repo: Path, errors: list[str]) -> None:
         if source_tree != record["tree"]:
             errors.append(f"tagged source tree drift: {source_id}")
         target_files = target_inventory(target_dir)
-        if source_files != target_files:
+        native_additions = NATIVE_TARGET_ADDITIONS.get(target_id, set())
+        expected_target_files = sorted(set(source_files) | native_additions)
+        if expected_target_files != target_files:
             errors.append(
                 f"source/target file topology drift: {source_id} -> {target_id}"
             )
-        if len(target_files) != record["files"]:
+        if len(source_files) != record["files"]:
+            errors.append(f"tagged source file count drift: {source_id}")
+        if len(target_files) != record["files"] + len(native_additions):
             errors.append(f"target file count drift: {target_id}")
 
 
@@ -292,8 +300,8 @@ def verify_references(errors: list[str]) -> None:
             errors.append(
                 f"collaboration reference is not discoverable from SKILL.md: {name}"
             )
-    if len(reference_names) != 21:
-        errors.append("cotend-collaboration reference count must be 21")
+    if len(reference_names) != 22:
+        errors.append("cotend-collaboration reference count must be 22")
     packet = (
         ROOT
         / "skills"
@@ -558,14 +566,25 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         "target": {
             "platform": "Codex",
             "lineage": "cotend-codex",
-            "artifact_id": "cotend-codex-r000007",
-            "revision": 7,
+            "artifact_id": "cotend-codex-r000008",
+            "revision": 8,
             "manifest_sha256": carrier_manifest,
         },
         "product": {"version": None},
         "skill_count": 8,
-        "skill_file_count": 37,
+        "skill_file_count": 38,
         "predecessor_targets": [
+            {
+                "platform": "Codex",
+                "lineage": "cotend-codex",
+                "artifact_id": "cotend-codex-r000007",
+                "revision": 7,
+                "source_release_id": "2026.07.23.2",
+                "framework_protocol": "cotend-collaboration-v1.65",
+                "manifest_sha256": (
+                    "246b16c990a85a2e183e0033c0b3a15a087e793ce0ace1f18e3d736f5a8fd045"
+                ),
+            },
             {
                 "platform": "Codex",
                 "lineage": "cotend-codex",
@@ -725,10 +744,10 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
                 or len(adapted) != len(set(adapted))
                 or set(imported) & set(adapted)
                 or recorded != actual
-                or len(actual) != 37
+                or len(actual) != 38
             ):
                 errors.append(
-                    "framework candidate inventory does not equal the 37 Skill files"
+                    "framework candidate inventory does not equal the 38 current Skill files"
                 )
         if candidate_adoption.get("final_framework_lock_exists") is not True:
             errors.append("framework candidate does not record the final lock")
@@ -894,7 +913,7 @@ def main() -> int:
     print(
         "ADOPTED_SKILL_SET_VERIFICATION_OK "
         f"mode={'pre_lock' if args.pre_lock else 'final'} "
-        "skills=8 files=37 capabilities=19"
+        "skills=8 files=38 capabilities=19"
     )
     return 0
 

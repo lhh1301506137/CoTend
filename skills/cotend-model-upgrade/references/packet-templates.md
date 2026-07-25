@@ -702,7 +702,7 @@ Missing long-run evidence may support only a low-confidence recommendation or a 
 ```yaml
 orchestration_overlap:
   platform_native_behavior:
-  framework_fixed_behavior: trellis-implement -> trellis-check
+  framework_fixed_behavior: native_implementation_pass -> checker_contract
   duplicated_context_or_work:
     -
   adaptive_behavior: primary_inline_implementation_plus_inline_check_and_tests
@@ -712,7 +712,7 @@ orchestration_overlap:
   work_never_avoided:
     - task/spec and required-module reading
     - implementation
-    - inline Trellis check procedure
+    - inline Checker contract
     - relevant tests and evidence
     - formal review when triggered
     - user confirmation and critical/release stops

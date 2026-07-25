@@ -16,10 +16,10 @@ class NativeInitResumeBeforeDevelopmentTests(unittest.TestCase):
     def test_repository_contract_and_exact_runtime_inventory(self) -> None:
         result = native_entry.verify_repository()
         self.assertEqual(result["status"], "native_parity_verified")
-        self.assertEqual(result["runtime_mentions"], 38)
-        self.assertEqual(result["runtime_files"], 16)
+        self.assertEqual(result["runtime_mentions"], 28)
+        self.assertEqual(result["runtime_files"], 15)
         self.assertEqual(result["td02_commands"], 0)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000007")
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000008")
 
     def test_all_entry_modes_and_stops_are_covered(self) -> None:
         result = native_entry.verify_repository()
@@ -101,7 +101,7 @@ class NativeInitResumeBeforeDevelopmentTests(unittest.TestCase):
         self.assertFalse(repeated.generated_index_write)
         self.assertEqual(first.scope_signature, repeated.scope_signature)
 
-    def test_td02_commands_are_removed_but_later_routes_remain(self) -> None:
+    def test_td02_and_td04_commands_are_removed_but_later_routes_remain(self) -> None:
         text = "\n".join(
             path.read_text(encoding="utf-8")
             for path in sorted((ROOT / "skills").rglob("*"))

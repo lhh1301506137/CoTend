@@ -7,7 +7,7 @@ scope: project_meaning_requirements_route_decisions_status_reality_and_local_con
 runtime_contract: ../skills/cotend-collaboration/references/authority-and-triggers.md
 executable_verifier: ../scripts/verify_native_project_truth_authority.py
 introduced_target_artifact: cotend-codex-r000003
-current_target_artifact: cotend-codex-r000007
+current_target_artifact: cotend-codex-r000008
 rollback_candidate: cotend@0.1.0-rc.2_local_unpublished
 analysis_language: zh-CN
 ```
@@ -59,11 +59,11 @@ L62 只关闭 TD08“项目真相权限”缺口。以下是当时仍保留的�
 - Init/resume/before-development（TD02 已由 L66 原生化）；
 - requirements clarification（TD03 已由 L63 原生化）；
 - spec update 与完整 Route Rebase 迁移（TD06 已由 L64 原生化）；
-- Implementer；
+- Implementer（TD04 已由 L67 原生化）；
 - Checker；
 - finish/archive/recovery。
 
-L62 首次形成内部 target `cotend-codex-r000003`；L63 推进到 `cotend-codex-r000004`；L64 推进到 `cotend-codex-r000005`；L65 推进到 `cotend-codex-r000006`；L66 再推进到当前 `cotend-codex-r000007`。这些都表示同一 Codex lineage 的开发字节，不是公开产品版本。`cotend@0.1.0-rc.2` 仍是未发布回滚候选，固定到其已验证 Git 来源提交，包体和 ZIP 摘要不能随 r3-r7 开发态改变。只有全部 G01-G05 完成后才构建 rc.3。
+L62 首次形成内部 target `cotend-codex-r000003`；L63 推进到 `cotend-codex-r000004`；L64 推进到 `cotend-codex-r000005`；L65 推进到 `cotend-codex-r000006`；L66 推进到 `cotend-codex-r000007`；L67 再推进到当前 `cotend-codex-r000008`。这些都表示同一 Codex lineage 的开发字节，不是公开产品版本。`cotend@0.1.0-rc.2` 仍是未发布回滚候选，固定到其已验证 Git 来源提交，包体和 ZIP 摘要不能随 r3-r8 开发态改变。只有全部 G01-G05 完成后才构建 rc.3。
 
 ## 已执行验证
 

@@ -87,8 +87,8 @@ CodeGraph 已安装且根目录明确时，可以安全初始化或刷新项目�
 
 ## 能力与版本边界
 
-第一方运行 Skills 中 `trellis-start` 与 `trellis-before-dev` 已归零。Trellis 运行库存从 TD01 检查点的 43 处、16 个文件下降为 38 处、16 个文件；减少只发生在 Project Init 已审计的 TD02 表面。
+第一方运行 Skills 中 `trellis-start` 与 `trellis-before-dev` 已归零。TD02 检查点曾把 Trellis 运行库存从 43 处、16 个文件下降为 38 处、16 个文件；后续 TD04 原生化后，当前库存为 28 处、15 个文件。
 
-TD04、TD05、TD07 的实现、检查和收尾兼容过程继续保留。当前 target 是 r7，r6 是精确 predecessor。未发布 rc.2 仍由固定历史 r2 source commit 构建，不吸收当前开发态字节。
+TD04 的实现过程后来已由 r8 Native Implementation Pass 原生化；TD05、TD07 的检查和收尾兼容过程继续保留。当前 target 是 r8，r7 是精确 predecessor。未发布 rc.2 仍由固定历史 r2 source commit 构建，不吸收当前开发态字节。
 
 TD02 单项原生等价不代表整个解耦完成。G03 累计主旅程、G04 负向恢复/所有权和 G06 真实项目/用户验收仍未通过。

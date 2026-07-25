@@ -79,7 +79,7 @@ REQUIRED_INTEGRATION_MARKERS = {
     ),
     INIT_SKILL_PATH: (
         "existing CoTend-owned Plan Tree/project-spec/STATUS/decision/knowledge carrier",
-        "implementation/check/finish procedure",
+        "check/finish procedure",
     ),
 }
 REQUIRED_DOCUMENT_MARKERS = (

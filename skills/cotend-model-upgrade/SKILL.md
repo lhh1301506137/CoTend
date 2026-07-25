@@ -207,7 +207,7 @@ The first formal review may evaluate only reversible scaffold changes. Initial c
 - Plan Tree progressive load-policy granularity -> `widen_threshold` or `cold_path_only` candidate for strong long-context models.
 - Output ritual fields, such as repeated `loaded_protocol_modules` declarations -> on-demand declaration or merge candidate.
 
-The Full Implementer -> Checker pair is evaluated through the runtime-profile assessment, not by deleting review/checking. An authorized available `trellis-implement -> trellis-check` compatibility pair may temporarily provide those roles; otherwise CoTend uses bounded internal role packets. When platform-native orchestration creates overlap, Adaptive may replace only the unconditional child-agent dispatch with direct implementation plus inline check/tests. Full remains the public/default fallback.
+The Full Implementer -> Checker pair is evaluated through the runtime-profile assessment, not by deleting review/checking. The Implementer always uses CoTend's native Implementation Pass; an authorized available `trellis-check` procedure may temporarily provide the Checker role until its separate parity gate closes. When platform-native orchestration creates overlap, Adaptive may replace only the unconditional child-agent dispatch with the same Implementation Pass inline, followed by inline checking/tests. Full remains the public/default fallback.
 
 First-round actions allowed:
 

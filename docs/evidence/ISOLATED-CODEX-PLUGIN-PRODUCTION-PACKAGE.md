@@ -29,7 +29,7 @@ metadata:
 
 CoTend 现在具有一份可执行的 skills-only Public Plugin **生产候选包契约**：仓库固定候选 manifest 与 package lock，构建器在 gitignored 隔离目录组装完整包体。rc.2 的 Skill 语义源固定为 Git commit `37e657f0a1e2ddb7b2094f8e4708c2b7563380c1` 下的 `skills/`，仓库没有跟踪第二份 Skill 树。
 
-当前根 `skills/` 已推进到 target r7，因此不能再作为 rc.2 的即时源。两次相互独立的构建都生成 48 个文件，path/hash manifest 完全相同；其中 8 个 Skill、37 个 Skill 文件与锁定提交逐字节一致，4 个品牌资产与 package lock v2 的白名单/哈希一致，六个 CoTend 自有入口继续保留 N3 的友好 display name。当前 Plugin Creator validator：`passed`。
+当前根 `skills/` 已推进到 target r8，因此不能再作为 rc.2 的即时源。两次相互独立的构建都生成 48 个文件，path/hash manifest 完全相同；其中 8 个 Skill、37 个 Skill 文件与锁定提交逐字节一致，4 个品牌资产与 package lock v2 的白名单/哈希一致，六个 CoTend 自有入口继续保留 N3 的友好 display name。当前 Plugin Creator validator：`passed`。
 
 `cotend@0.1.0-rc.2` 是本次上游更新后绑定的首次提交候选；它不构成 release 或 publish 授权，也不证明 Portal 接受 `-rc.2` 预发布版本。若 Portal 拒绝该版本，必须重开 Q02；当前没有生成 Marketplace，没有安装或卸载 Plugin，也没有执行 submission、release、publish 或 push。
 

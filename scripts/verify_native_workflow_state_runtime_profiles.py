@@ -65,11 +65,10 @@ REQUIRED_DOCUMENT_MARKERS = (
     "cotend-codex-r000006",
     "current / dormant / conflict",
     "delegated_pair / inline",
-    "TD04、TD05、TD07",
+    "TD05、TD07",
     "G03、G04、G06",
 )
 REQUIRED_COMPATIBILITY_COMMANDS = (
-    "trellis-implement",
     "trellis-check",
     "trellis-finish",
 )

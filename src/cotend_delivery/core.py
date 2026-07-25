@@ -24,7 +24,8 @@ EXPECTED_SKILLS = (
 )
 FIRST_PARTY_SKILLS = EXPECTED_SKILLS[:6]
 SHAREABLE_COMPANION_SKILLS = EXPECTED_SKILLS[6:]
-EXPECTED_FILE_COUNT = 37
+EXPECTED_FILE_COUNT = 38
+SOURCE_FRAMEWORK_FILE_COUNT = 37
 RECEIPT_SCHEMA = "cotend.delivery-receipt"
 CHECKPOINT_SCHEMA = "cotend.delivery-checkpoint"
 TARGET_LOCK_SCHEMA = "cotend.target-artifact-lock"
@@ -136,6 +137,14 @@ def _canonical_digest(value: Any) -> str:
 
 def _target_artifact_id(lineage: str, revision: int) -> str:
     return f"{lineage}-r{revision:06d}"
+
+
+def _expected_file_count(revision: int) -> int:
+    if revision >= 8:
+        return EXPECTED_FILE_COUNT
+    if revision >= 2:
+        return SOURCE_FRAMEWORK_FILE_COUNT
+    return 30
 
 
 def _is_sha256(value: Any) -> bool:
@@ -566,10 +575,11 @@ class Artifact:
                 )
 
         files = _directory_manifest(source, EXPECTED_SKILLS)
-        if len(files) != EXPECTED_FILE_COUNT:
+        expected_file_count = _expected_file_count(revision)
+        if len(files) != expected_file_count:
             raise DeliveryError(
                 "artifact_file_inventory",
-                f"Expected {EXPECTED_FILE_COUNT} artifact files, found {len(files)}",
+                f"Expected {expected_file_count} artifact files, found {len(files)}",
             )
         manifest_sha256 = _manifest_digest(files)
         legacy_keys: set[tuple[int, str, str, str]] = set()
@@ -732,8 +742,11 @@ class Artifact:
         )
         if lock.get("skill_count") != len(artifact.skills):
             raise DeliveryError("framework_lock_mismatch", "Skill count differs from lock")
-        if lock.get("skill_file_count") != len(artifact.files):
-            raise DeliveryError("framework_lock_mismatch", "File count differs from lock")
+        if lock.get("skill_file_count") != SOURCE_FRAMEWORK_FILE_COUNT:
+            raise DeliveryError(
+                "framework_lock_mismatch",
+                "Source framework file count differs from the adopted release lock",
+            )
         if (
             target_lock.get("skill_count") != len(artifact.skills)
             or target_lock.get("skill_file_count") != len(artifact.files)

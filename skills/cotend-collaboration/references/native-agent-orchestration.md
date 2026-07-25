@@ -17,7 +17,7 @@ A subagent may explore, implement, test, or review one bounded packet. It cannot
 
 For every extra/optional agent and every proposal to split the selected workflow into more packets, delegate only when expected benefit is positive after counting additional model/tool tokens, repeated discovery, coordination, write conflicts, integration effort, machine resources, and verification cost.
 
-The Full profile's fixed Implementer -> Checker pair is a profile-authorized quality baseline, not an optional dispatch decision. An explicitly authorized available `trellis-implement -> trellis-check` procedure pair may temporarily provide those roles; otherwise use internal role packets. Do not use this gate to cancel the pair. Apply the rest of this module to both roles, and require positive net benefit before either role creates additional agents or the root decomposes the work beyond the fixed pair.
+The Full profile's fixed Implementer -> Checker pair is a profile-authorized quality baseline, not an optional dispatch decision. The Implementer always uses the native `implementation-pass.md` contract. An explicitly authorized available `trellis-check` procedure may temporarily provide the Checker role; otherwise use the current CoTend Checker/harness route. Do not use this gate to cancel the pair. Apply the rest of this module to both roles, and require positive net benefit before either role creates additional agents or the root decomposes the work beyond the fixed pair.
 
 Positive signals include:
 
@@ -101,7 +101,7 @@ The packet may reference canonical project truth; it must not copy or redefine i
 ## Execution And Integration
 
 1. The root binds the current goal and confirmed route, then builds the dependency graph.
-2. Run the selected profile's baseline route. For a Full fixed implement/check role, dispatch the role under the profile contract; for every additional/optional packet, dispatch only when it is independent, `ready`, and net-positive.
+2. Run the selected profile's baseline route. For a Full fixed pair, dispatch the Implementer through `implementation-pass.md`, then dispatch the Checker under its profile contract; for every additional/optional packet, dispatch only when it is independent, `ready`, and net-positive.
 3. Continue useful root work that does not depend on their outputs; wait when integration or a user-facing conclusion does depend on them.
 4. Require each worker to return a compressed result and direct evidence, not raw intermediate narration.
 5. The single integration owner checks current workspace state, reconciles concurrent changes, incorporates outputs, and reruns affected integration checks.

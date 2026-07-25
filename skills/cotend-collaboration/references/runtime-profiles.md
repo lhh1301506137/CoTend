@@ -46,7 +46,7 @@ cotend_workflow:
       affects_current_route: true | false
       evidence_pointer:
       compatibility_procedures:
-        - capability: implementation | verification | closeout
+        - capability: verification | closeout
           procedure_id:
           status: authorized | disabled
           authority: cotend_native_record | user_explicit
@@ -130,20 +130,19 @@ Project Init owns these transitions. It must never store them in an external fra
 `full` uses `execution_mode: delegated_pair` and preserves all current governance:
 
 - For implementation work, run one fixed Implementer -> Checker pair.
-- When the native record explicitly authorizes both remaining `trellis-implement -> trellis-check` compatibility procedures and they are available, they may supply those roles until TD04 and TD05 are replaced.
-- Otherwise create bounded internal Implementer and Checker role packets through `native-agent-orchestration.md`. This fallback preserves Full behavior but does not claim the dedicated TD04/TD05 contracts or parity gates are complete.
-- Both roles follow the CoTend-owned route and classified evidence. They do not gain task/spec authority from a compatibility procedure and do not replace the actual Primary model's formal self-review unless that role is explicitly recorded.
+- The Implementer always executes the native contract in `implementation-pass.md` through a bounded role packet. An explicitly authorized available `trellis-check` compatibility procedure may temporarily supply the Checker role until TD05 is replaced; otherwise use the current CoTend Checker/harness route without claiming TD05 parity.
+- Both roles follow the CoTend-owned route and classified evidence. The Checker does not gain task/spec authority from a compatibility procedure, and neither role replaces the actual Primary model's formal self-review unless that role is explicitly recorded.
 - This fixed pair is a profile-authorized quality baseline and the sole exception to the optional-agent positive-net-benefit gate. Additional agents or packets still require positive expected net benefit.
 - Both roles use the native-agent contract for explicit context, dependencies, non-overlapping ownership, root integration, local plus integrated verification, fresh review when triggered, and side-effect-safe retry.
 - All required verification, evidence, acceptance, release, risk, and stop boundaries remain active.
 
-The remaining compatibility names above belong only to TD04/TD05 and must not be used as state, profile, truth, or route owners.
+The remaining compatibility names belong only to TD05 verification and TD07 closeout; they must not be used as state, profile, truth, implementation, or route owners.
 
 ## Adaptive Execution Contract
 
 `adaptive` uses `execution_mode: inline` and changes only reversible orchestration scaffolding:
 
-- The Primary implements the authorized CoTend leaf inline.
+- The Primary executes the native `implementation-pass.md` contract for the authorized CoTend leaf inline.
 - Before editing, it loads the applicable CoTend-owned requirements, acceptance, route, and pre-development guidance.
 - After implementation, it performs the Checker contract inline, runs relevant tests/checks, fixes in-scope findings, and reports evidence. When the native record authorizes an available `trellis-check` compatibility procedure, use it inline; otherwise use the current CoTend Acceptance/Test Harness and review contracts. Neither path claims TD05 native parity early. `inline` never means `unchecked`.
 - Optional agents require positive expected net benefit: independent parallel work, context isolation, specialist capability, independent challenge, or repeated failure.
@@ -200,7 +199,7 @@ external_frameworks:
     affects_current_route: true | false
     evidence_pointer:
     compatibility_procedures:
-      - capability: implementation | verification | closeout
+      - capability: verification | closeout
         procedure_id:
         status: authorized | disabled
         authority: cotend_native_record | user_explicit

@@ -6,7 +6,7 @@
   "decision": "preserve_governance_capabilities_replace_trellis_identity_authority_and_runtime_dependency",
   "current_candidate": "cotend@0.1.0-rc.2_local_unpublished",
   "target_candidate": "cotend@0.1.0-rc.3_after_parity",
-  "development_target_artifact": "cotend-codex-r000007",
+  "development_target_artifact": "cotend-codex-r000008",
   "source_boundary": {
     "trellis_relationship": "restricted_design_inspiration_and_legacy_runtime_integration",
     "trellis_source_adoption": "none",
@@ -58,24 +58,23 @@
   "current_runtime": {
     "scope": "skills/",
     "case_insensitive_term": "trellis",
-    "mention_count": 38,
-    "file_count": 16,
+    "mention_count": 28,
+    "file_count": 15,
     "file_mentions": {
-      "skills/cotend-collaboration/SKILL.md": 2,
+      "skills/cotend-collaboration/SKILL.md": 1,
       "skills/cotend-collaboration/references/acceptance-test-harness.md": 1,
       "skills/cotend-collaboration/references/authority-and-triggers.md": 1,
       "skills/cotend-collaboration/references/continuous-and-unattended.md": 3,
       "skills/cotend-collaboration/references/framework-change-evaluation.md": 1,
-      "skills/cotend-collaboration/references/native-agent-orchestration.md": 2,
+      "skills/cotend-collaboration/references/native-agent-orchestration.md": 1,
       "skills/cotend-collaboration/references/plan-tree.md": 3,
       "skills/cotend-collaboration/references/quality-sentinel.md": 1,
       "skills/cotend-collaboration/references/risk-and-approval.md": 4,
-      "skills/cotend-collaboration/references/runtime-profiles.md": 3,
+      "skills/cotend-collaboration/references/runtime-profiles.md": 2,
       "skills/cotend-collaboration/references/templates.md": 2,
       "skills/cotend-collaboration/references/upstream-dependency-review.md": 1,
-      "skills/cotend-model-upgrade/SKILL.md": 2,
-      "skills/cotend-model-upgrade/references/packet-templates.md": 3,
-      "skills/cotend-project-init/SKILL.md": 8,
+      "skills/cotend-model-upgrade/SKILL.md": 1,
+      "skills/cotend-project-init/SKILL.md": 5,
       "skills/cotend-semantic-alignment/SKILL.md": 1
     }
   },
@@ -199,10 +198,16 @@
         "Native Agent Orchestration",
         "Plan Tree"
       ],
-      "native_coverage": "partial_rule_set_exists",
-      "known_gap": "full_profile_implementer_contract_is_still_named_and_dispatched_through_trellis",
-      "status": "baseline_frozen",
-      "removal_gate": "native_parity_verified"
+      "native_coverage": "verified_native_contract",
+      "known_gap": "none_within_TD04_implementation_scope; TD05 Checker, TD07 closeout, cumulative journey, negative recovery integration, and real-project acceptance remain",
+      "status": "native_parity_verified",
+      "removal_gate": "native_parity_verified",
+      "evidence": [
+        "docs/NATIVE-IMPLEMENTATION-PASS.md",
+        "skills/cotend-collaboration/references/implementation-pass.md",
+        "scripts/verify_native_implementation_pass.py",
+        "tests/test_native_implementation_pass.py"
+      ]
     },
     {
       "id": "TD05-verification-pass",
@@ -328,7 +333,7 @@
         "native_owner_and_state_transition",
         "focused_regression_tests"
       ],
-      "status": "in_progress_5_of_8"
+      "status": "in_progress_6_of_8"
     },
     {
       "id": "G03-cumulative-main-journey",
@@ -376,7 +381,7 @@
     "skill_behavior_changed": true,
     "trellis_route_removed": true,
     "removed_capability_ids": [
-      "TD02-init-resume-and-before-development"
+      "TD04-implementation-pass"
     ],
     "target_artifact_changed": true,
     "package_identity_changed": false,

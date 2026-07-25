@@ -68,7 +68,7 @@ CoTend 不向外部配置写入状态、档位、dispatch 或迁移元数据。�
 
 尚未原生化的兼容过程必须由原生记录中的 `compatibility_procedures` 明确允许；缺失或禁用就不调用。这里只保存最小的能力/过程映射，不复制外部框架生命周期状态。
 
-Full 固定的是 Implementer→Checker 双角色结果，而不是外部命令依赖。已授权且可用的兼容过程可以暂时提供角色；否则由 Native Agent Orchestration 创建内部角色包。Adaptive 同样在无兼容 Checker 时使用现有 Acceptance/Test Harness 与审查合同内联检查。这些 fallback 保持行为连续，但不提前宣称 TD04/TD05 已通过原生等价门。
+Full 固定的是 Implementer→Checker 双角色结果，而不是外部命令依赖。TD04 后来已经由原生 Implementation Pass 承接 Implementer；已授权且可用的兼容过程只可暂时提供 TD05 Checker 或 TD07 closeout。Adaptive 同样在无兼容 Checker 时使用现有 Acceptance/Test Harness 与审查合同内联检查。这些 fallback 保持行为连续，但不提前宣称 TD05/TD07 已通过原生等价门。
 
 ## 旧项目迁移
 
@@ -118,7 +118,7 @@ Full 固定的是 Implementer→Checker 双角色结果，而不是外部命令�
 TD01 只替换状态、档位和执行模式所有权；其检查点当时不提前删除后续能力：
 
 - TD02 的初始化、续接和开发前门后来已在 r7 原生化；
-- TD04 的 `trellis-implement` 仍保留；
+- TD04 的实现过程后来已在 r8 由 CoTend Native Implementation Pass 原生化；
 - TD05 的 `trellis-check` 仍保留；
 - TD07 的 `trellis-finish` 收尾过程仍保留。
 
@@ -126,6 +126,6 @@ TD01 只替换状态、档位和执行模式所有权；其检查点当时不提
 
 ## 当前结论与剩余门
 
-运行 Skills 中旧状态路径、旧 mode 字段和旧 dispatch 字段已经清零。TD01 检查点把库存从 L64 的 158 处、21 文件降为 43 处、16 文件；后续 TD02 又降到 38 处、16 文件。当前剩余内容属于 TD04、TD05、TD07 的兼容过程及历史/来源边界。
+运行 Skills 中旧状态路径、旧 mode 字段和旧 dispatch 字段已经清零。TD01 检查点把库存从 L64 的 158 处、21 文件降为 43 处、16 文件；后续 TD02 降到 38 处、16 文件，TD04 再降到当前 28 处、15 文件。当前剩余内容属于 TD05、TD07 的兼容过程及历史/来源边界。
 
 TD01 单项原生等价已经成立，但不能据此宣称整个解耦完成。G03、G04、G06 仍需分别验证累计主旅程、负向恢复/所有权以及真实可写项目与用户验收。

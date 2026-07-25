@@ -56,13 +56,12 @@ LOAD_ORDER = (
 )
 REMOVED_TD02_COMMANDS = ("trellis-start", "trellis-before-dev")
 REQUIRED_REMAINING_COMMANDS = (
-    "trellis-implement",
     "trellis-check",
     "trellis-finish",
 )
-EXPECTED_TRELLIS_MENTIONS = 38
-EXPECTED_TRELLIS_FILES = 16
-EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS = 8
+EXPECTED_TRELLIS_MENTIONS = 28
+EXPECTED_TRELLIS_FILES = 15
+EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS = 5
 
 REQUIRED_PROJECT_INIT_MARKERS = (
     "## Native Initialization And Resume Boundary",
@@ -95,8 +94,8 @@ REQUIRED_DOCUMENT_MARKERS = (
     "cotend-codex-r000007",
     "入口侧共 13 类场景",
     "开发前侧共 9 类场景",
-    "38 处、16 个文件",
-    "TD04、TD05、TD07",
+    "28 处、15 个文件",
+    "TD05、TD07",
 )
 REQUIRED_EVIDENCE_MARKERS = (
     "current_target_artifact_id: cotend-codex-r000007",
@@ -598,13 +597,13 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     _require_markers(
         combined_skills,
         REQUIRED_REMAINING_COMMANDS,
-        "remaining TD04/TD05/TD07 routes",
+        "remaining TD05/TD07 routes",
     )
     if "capability: startup | pre_development" in runtime_profiles:
         raise NativeProjectEntryError(
             "native record still exposes TD02 compatibility capabilities"
         )
-    if "capability: implementation | verification | closeout" not in (
+    if "capability: verification | closeout" not in (
         runtime_profiles
     ):
         raise NativeProjectEntryError(
@@ -619,7 +618,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         != EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS
     ):
         raise NativeProjectEntryError(
-            "TD02 runtime inventory is not the exact 38/16 checkpoint"
+            "current runtime inventory is not the exact 28/15 checkpoint"
         )
 
     entry_results: dict[str, dict[str, object]] = {}
@@ -690,14 +689,24 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     )
     target = target_lock.get("target", {})
     predecessors = target_lock.get("predecessor_targets", [])
+    lineage = [target, *predecessors]
+    r7 = next(
+        (
+            item
+            for item in lineage
+            if item.get("artifact_id") == "cotend-codex-r000007"
+            and item.get("revision") == 7
+        ),
+        None,
+    )
     if (
-        target.get("artifact_id") != "cotend-codex-r000007"
-        or target.get("revision") != 7
-        or not predecessors
-        or predecessors[0].get("artifact_id") != "cotend-codex-r000006"
-        or predecessors[0].get("revision") != 6
+        not isinstance(target.get("revision"), int)
+        or target.get("revision") < 7
+        or r7 is None
+        or r7.get("manifest_sha256")
+        != "246b16c990a85a2e183e0033c0b3a15a087e793ce0ace1f18e3d736f5a8fd045"
     ):
-        raise NativeProjectEntryError("r7 target/predecessor identity drifted")
+        raise NativeProjectEntryError("verified r7 target lineage drifted")
 
     return {
         "status": "native_parity_verified",
