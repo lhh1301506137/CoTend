@@ -30,7 +30,7 @@ metadata:
 
 ## 结论
 
-当前精确 `cotend@0.1.0-rc.2` 48 文件生产候选已经在真实 Codex CLI 0.144.1 中完成完全隔离的安装生命周期。验证不是重新制作一份近似 fixture：两个场景都直接调用 `scripts/build_codex_plugin.py`，随后再次校验 package lock v2 与完整 path/hash manifest。包摘要保持 `a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2`，8 个 Skill、37 个 Skill 文件继续与 package lock 指定的 Git source commit 下 `skills/` 逐字节一致，4 个品牌资产保持锁定。当前根 Skill 已推进到 r10，生命周期仍构建冻结的 rc.2，而不会静默采用开发态字节。
+当前精确 `cotend@0.1.0-rc.2` 48 文件生产候选已经在真实 Codex CLI 0.144.1 中完成完全隔离的安装生命周期。验证不是重新制作一份近似 fixture：两个场景都直接调用 `scripts/build_codex_plugin.py`，随后再次校验 package lock v2 与完整 path/hash manifest。包摘要保持 `a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2`，8 个 Skill、37 个 Skill 文件继续与 package lock 指定的 Git source commit 下 `skills/` 逐字节一致，4 个品牌资产保持锁定。当前根 Skill 已推进到 r11，生命周期仍构建冻结的 rc.2，而不会静默采用开发态字节。
 
 正常场景完成 17 步：local Marketplace add/list、Plugin available/add/list、空项目发现、standalone Skills 共存发现、remove/缺席发现、reinstall/重新发现、最终 remove、最终缺席发现、Marketplace remove 与最终缺席确认。安装时 app-server 发现 8 个 `cotend:<skill>` Plugin Skill；共存项目同时保留 8 个 repo-scope standalone Skill。移除 Plugin 后，standalone 项仍存在，没有被接管或删除。
 

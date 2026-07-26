@@ -21,7 +21,7 @@ Alias transition:
 
 - Accepted aliases in this table remain valid and must not be treated as invalid during migration.
 - New or actively edited framework files should prefer `primary_ai_*` unless preserving compatibility with an existing project schema.
-- Historical logs, archived Trellis tasks, and old handoffs do not need mechanical renames.
+- Historical logs, archived external-framework tasks, and old handoffs do not need mechanical renames.
 - When validating metadata, report accepted aliases as migration suggestions, not failures, unless a local project has already adopted a stricter schema.
 
 ## CoTend Project Truth Authority

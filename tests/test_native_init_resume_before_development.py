@@ -16,11 +16,11 @@ class NativeInitResumeBeforeDevelopmentTests(unittest.TestCase):
     def test_repository_contract_and_exact_runtime_inventory(self) -> None:
         result = native_entry.verify_repository()
         self.assertEqual(result["status"], "native_parity_verified")
-        self.assertEqual(result["runtime_mentions"], 7)
-        self.assertEqual(result["runtime_files"], 6)
+        self.assertEqual(result["runtime_mentions"], 0)
+        self.assertEqual(result["runtime_files"], 0)
         self.assertEqual(result["td02_commands"], 0)
         self.assertEqual(result["remaining_commands"], 0)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000010")
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000011")
 
     def test_all_entry_modes_and_stops_are_covered(self) -> None:
         result = native_entry.verify_repository()

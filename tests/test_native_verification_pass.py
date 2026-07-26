@@ -17,12 +17,12 @@ class NativeVerificationPassTests(unittest.TestCase):
         result = verification.verify_repository()
         self.assertEqual(result["status"], "native_parity_verified")
         self.assertEqual(result["scenario_count"], 23)
-        self.assertEqual(result["runtime_mentions"], 7)
-        self.assertEqual(result["runtime_files"], 6)
+        self.assertEqual(result["runtime_mentions"], 0)
+        self.assertEqual(result["runtime_files"], 0)
         self.assertEqual(result["td05_commands"], 0)
         self.assertEqual(result["remaining_commands"], 0)
         self.assertEqual(result["skill_files"], 40)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000010")
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000011")
 
     def test_full_and_adaptive_use_the_same_result_contract(self) -> None:
         full = verification.evaluate_verification(profile="full")

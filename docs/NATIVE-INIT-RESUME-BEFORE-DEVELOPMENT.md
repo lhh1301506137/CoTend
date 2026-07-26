@@ -87,8 +87,8 @@ CodeGraph 已安装且根目录明确时，可以安全初始化或刷新项目�
 
 ## 能力与版本边界
 
-第一方运行 Skills 中 `trellis-start` 与 `trellis-before-dev` 已归零。TD02 检查点曾把 Trellis 运行库存从 43 处、16 个文件下降为 38 处、16 个文件；后续 TD04 原生化后为 28 处、15 个文件，TD05 原生化后为 20 处、10 个文件，TD07 原生化后当前为 7 处、6 个文件。
+第一方运行 Skills 中 `trellis-start` 与 `trellis-before-dev` 已归零。TD02 检查点曾把 Trellis 运行库存从 43 处、16 个文件下降为 38 处、16 个文件；后续 TD04 原生化后为 28 处、15 个文件，TD05 原生化后为 20 处、10 个文件，TD07 原生化后为 7 处、6 个文件；G05 已把当前第一方运行库存进一步降为 0 处、0 个文件。
 
-TD04 的实现过程后来已由 r8 Native Implementation Pass 原生化，TD05 的检查过程又由 r9 Native Verification Pass 原生化；TD07 已由 Native Closeout Pass 承接。当前 target 是 r10，r9 是精确 predecessor。未发布 rc.2 仍由固定历史 r2 source commit 构建，不吸收当前开发态字节。
+TD04 的实现过程后来已由 r8 Native Implementation Pass 原生化，TD05 的检查过程又由 r9 Native Verification Pass 原生化；TD07 已由 Native Closeout Pass 承接。当前 target 是 r11，r10 是精确 predecessor。未发布 rc.2 仍由固定历史 r2 source commit 构建，不吸收当前开发态字节。
 
-TD02 单项原生等价不代表整个解耦完成。G03 累计主旅程、G04 负向恢复/所有权和 G06 真实项目/用户验收仍未通过。
+TD02 单项原生等价本身不代表整个解耦完成；后续 G03 累计主旅程、G04 负向恢复/所有权和 G05 零运行依赖现已通过。G06 真实项目/用户验收仍未执行。

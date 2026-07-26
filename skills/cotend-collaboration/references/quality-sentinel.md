@@ -30,7 +30,7 @@ When repeated rework, low-value cycles, review disagreement, or implementation/p
 
 ## Harness Ratchet
 
-When the same AI/process failure happens twice in one task/project, or once with high impact, do more than repair the current output. Check whether a small durable prevention would reduce recurrence. Signals include a skipped required Skill/module/Trellis phase/review/verification step, a returning bug/finding class, a handoff that omits material intent/risk/acceptance evidence, a misclassified risk/release/`继续` boundary, repeated symptom patching, or the user/reviewer correcting the same workflow misunderstanding again.
+When the same AI/process failure happens twice in one task/project, or once with high impact, do more than repair the current output. Check whether a small durable prevention would reduce recurrence. Signals include a skipped required Skill/module/external-framework phase/review/verification step, a returning bug/finding class, a handoff that omits material intent/risk/acceptance evidence, a misclassified risk/release/`继续` boundary, repeated symptom patching, or the user/reviewer correcting the same workflow misunderstanding again.
 
 Choose the smallest owner-aligned prevention:
 

@@ -67,14 +67,15 @@ EXPECTED_DOCUMENT_MARKERS = [
     "### L69 / TD07 已完成",
     "### L70 / G03 已完成",
     "### L71 / G04 已完成",
-    "### G05 运行时零依赖",
+    "### L72 / G05 已完成",
     "G04 不修改 Skill 字节",
+    "G05 不构建 rc.3",
 ]
 EXPECTED_BASELINE_INVENTORY_SHA256 = (
     "a1c9893a7462d7abd925b1ae468a3dd97366fae850e2881a23546e5471e93aeb"
 )
 EXPECTED_CURRENT_INVENTORY_SHA256 = (
-    "65836d7213adba37f7c44eb15e595e2190d4391052b5c089a45890530cc10abe"
+    "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
 )
 AUTHORIZED_TD08_INVENTORY_REDUCTIONS = {
     "skills/cotend-collaboration/SKILL.md",
@@ -213,7 +214,7 @@ def validate_contract(
         raise TrellisDecouplingPlanError("Trellis decoupling schema drifted")
     if contract.get("schema_version") != 2:
         raise TrellisDecouplingPlanError("Trellis decoupling schema version drifted")
-    if contract.get("status") != "native_replacement_in_progress":
+    if contract.get("status") != "native_runtime_decoupled_waiting_real_project":
         raise TrellisDecouplingPlanError(
             "native replacement state drifted"
         )
@@ -226,7 +227,7 @@ def validate_contract(
         raise TrellisDecouplingPlanError("current candidate identity drifted")
     if contract.get("target_candidate") != "cotend@0.1.0-rc.3_after_parity":
         raise TrellisDecouplingPlanError("target candidate identity drifted")
-    if contract.get("development_target_artifact") != "cotend-codex-r000010":
+    if contract.get("development_target_artifact") != "cotend-codex-r000011":
         raise TrellisDecouplingPlanError("development target artifact drifted")
 
     source = contract.get("source_boundary")
@@ -299,7 +300,11 @@ def validate_contract(
     ).hexdigest()
     if current_digest != EXPECTED_CURRENT_INVENTORY_SHA256:
         raise TrellisDecouplingPlanError(
-            "exact L69 7/6 runtime Trellis inventory changed"
+            "exact L72 zero runtime inventory changed"
+        )
+    if actual_inventory:
+        raise TrellisDecouplingPlanError(
+            "G05 requires zero runtime Trellis inventory"
         )
     changed_inventory_paths = {
         path
@@ -523,23 +528,23 @@ def validate_contract(
             ]
         ):
             raise TrellisDecouplingPlanError("G04 evidence contract drifted")
-        expected_status = "complete" if index in {0, 1, 2, 3} else "not_started"
+        expected_status = "complete" if index in {0, 1, 2, 3, 4} else "not_started"
         if gate.get("status") != expected_status:
             raise TrellisDecouplingPlanError(
                 f"{gate['id']} status advanced without executed evidence"
             )
 
     if contract.get("this_slice") != {
-        "skill_behavior_changed": False,
-        "trellis_route_removed": False,
+        "skill_behavior_changed": True,
+        "trellis_route_removed": True,
         "removed_capability_ids": [],
-        "target_artifact_changed": False,
+        "target_artifact_changed": True,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
-        "validation_gate_completed": "G04-negative-recovery-and-ownership",
+        "validation_gate_completed": "G05-zero-runtime-dependency",
     }:
         raise TrellisDecouplingPlanError(
-            "L71 G04 validation-only slice boundary drifted"
+            "L72 G05 zero-runtime slice boundary drifted"
         )
 
     for marker in EXPECTED_DOCUMENT_MARKERS:
@@ -609,9 +614,9 @@ def validate_contract(
         "runtime_mentions": sum(actual_inventory.values()),
         "runtime_files": len(actual_inventory),
         "trellis_runtime_paths": 0,
-        "skill_behavior_changed": False,
+        "skill_behavior_changed": True,
         "native_capabilities_verified": 8,
-        "cumulative_gates_verified": 2,
+        "cumulative_gates_verified": 3,
     }
 
 
@@ -645,7 +650,7 @@ def main() -> int:
         "TRELLIS_DECOUPLING_PLAN_OK "
         f"capabilities={result['capabilities']} gates={result['gates']} "
         f"runtime_mentions={result['runtime_mentions']} "
-        f"runtime_files={result['runtime_files']} behavior_changed=false "
+        f"runtime_files={result['runtime_files']} behavior_changed=true "
         f"native_verified={result['native_capabilities_verified']} "
         f"cumulative_gates={result['cumulative_gates_verified']}"
     )

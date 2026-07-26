@@ -323,7 +323,7 @@ After explicit confirmation:
 13. only then derive or resume L3+ implementation work; when `align_then_repair` affects an important current-MVP L2/main-chain step, enter `cotend-collaboration/references/semantic-implementation-closure.md` before implementation and keep that parent node open until its gate passes;
 14. let Plan Tree close the rebase and advance navigation only after all blocking dispositions, current completion evidence, and material closure gates support the resulting route.
 
-Do not claim product repair from documentation changes alone. If implementation repair was authorized, use the normal risk, Trellis, semantic implementation closure, test, review, AI UAT, and Done Gate routes. Semantic confirmation still proves meaning only; the closure route determines whether the implementation may advance.
+Do not claim product repair from documentation changes alone. If implementation repair was authorized, use the normal risk, Plan Tree, implementation, verification, semantic implementation closure, formal review, AI UAT, and Done Gate routes. Semantic confirmation still proves meaning only; the closure route determines whether the implementation may advance.
 
 ## Output
 

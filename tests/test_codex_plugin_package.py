@@ -81,7 +81,7 @@ class CodexPluginPackageTests(unittest.TestCase):
             "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
         )
 
-    def test_rc2_build_uses_locked_historical_skills_not_current_r10(self) -> None:
+    def test_rc2_build_uses_locked_historical_skills_not_current_r11(self) -> None:
         output = self.build("historical-source")
         contract = package.validate_contract()
         packaged = package.path_hash_manifest(output / "skills")

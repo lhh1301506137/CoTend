@@ -104,8 +104,8 @@ Full 与 Adaptive 使用完全相同的输入、阶段、状态、记录所有�
 
 ## 本叶边界
 
-第一方运行 Skills 中 TD07 专属命令、archive/journal 字段和 closeout compatibility mapping 已归零。运行时 Trellis 库存从 TD05 的 20 处、10 个文件下降到 7 处、6 个文件；剩余内容属于仍待 G05 处理的通用外部框架边界、历史或来源说明，不再承担收尾执行。
+第一方运行 Skills 中 TD07 专属命令、archive/journal 字段和 closeout compatibility mapping 已归零。运行时 Trellis 库存在本叶从 TD05 的 20 处、10 个文件下降到 7 处、6 个文件；这些剩余通用边界、历史或来源说明随后由 G05 泛化，当前第一方运行库存为 0 处、0 个文件。
 
-当前开发根目标是 `cotend-codex-r000010`，r9 是精确 predecessor。未发布 `cotend@0.1.0-rc.2` 继续从历史 r2 source commit 构建，固定的 37 个 Skill 来源文件、48 文件包体、包摘要和 ZIP 摘要均不随 r10 开发字节改变。
+当前开发根目标是 `cotend-codex-r000011`，r10 是精确 predecessor。未发布 `cotend@0.1.0-rc.2` 继续从历史 r2 source commit 构建，固定的 37 个 Skill 来源文件、48 文件包体、包摘要和 ZIP 摘要均不随 r11 开发字节改变。
 
-本叶只关闭 G02 的第八项能力等价门，不代表 G03-G06 已完成，也不授权真实安装、全局更新、push、tag、Release、Portal、submission 或 publish。
+本叶当时只关闭 G02 的第八项能力等价门，不代表 G03-G06 已完成；当前 G03-G05 已由后续独立 Gate 证明，G06 仍未执行。任何这些结果都不授权真实安装、全局更新、push、tag、Release、Portal、submission 或 publish。

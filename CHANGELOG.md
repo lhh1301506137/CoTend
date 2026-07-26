@@ -17,6 +17,7 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - CoTend-native Closeout Pass with durable-record synchronization, optional local commits, pre/post-commit failure isolation, interrupted recovery, and Full/Adaptive parity.
 - CoTend-native cumulative main-journey validation composing all eight evaluators across Full, Adaptive, interrupted Route Rebase, explicit synthetic acceptance, and new-session HANDOFF recovery.
 - CoTend-native negative recovery and ownership validation covering external-framework conflicts, state drift, failed-check recovery, damaged handoffs, and byte-exact protection of non-owned files.
+- CoTend-native zero-runtime-dependency validation covering source and disposable runtime scans, seven retained capability surfaces, r11 identity continuity, frozen rc.2 reproducibility, and fail-closed mutations.
 
 ### Changed
 
@@ -34,13 +35,16 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - Removed the active external implementation, checking, and closeout routes; all eight G02 capability replacements now have native parity evidence.
 - Completed the G03 cumulative journey gate without changing Skill bytes, target r10, the frozen rc.2 package, or the remaining runtime reference inventory.
 - Completed the G04 negative-recovery and ownership gate while preserving the same Skill bytes, target r10, frozen rc.2 package, and runtime reference inventory.
+- Generalized the final seven first-party runtime references without deleting conflict, migration, recovery, review, quality, or provenance behavior.
+- Advanced the repository carrier to `cotend-codex-r000011`, with r10 as its first exact predecessor and the unpublished rc.2 package unchanged.
+- Completed G05 with zero specific external-framework names, commands, state paths, or task/PRD/spec authority in first-party runtime Skills and their disposable runtime copy.
 
 ### Boundaries
 
 - TD08 project-truth authority, TD03 requirements clarification, TD06 specification change/Route Rebase, TD01 workflow state/runtime profiles, TD02 init/pre-development, TD04 implementation, TD05 verification, and TD07 closeout have per-capability native parity.
-- G03 cumulative journeys and G04 integrated negative-recovery/ownership evidence are complete with disposable fixtures; G05 zero runtime mentions and G06 real-project/user acceptance remain separate incomplete gates.
+- G03 cumulative journeys, G04 integrated negative-recovery/ownership, and G05 zero-runtime-dependency evidence are complete with disposable fixtures; G06 real-project/user acceptance remains a separate incomplete gate.
 - Plugin package identity, release tag, remote repository, real-user installation, and submission state did not change.
-- The next Plugin candidate will not advance beyond rc.2 until cumulative CoTend-native parity is implemented and verified.
+- G01-G05 completion satisfies the technical prerequisite for a future rc.3 build, but does not authorize that build or any release action.
 
 ## [0.1.0-rc.2] - Unreleased
 

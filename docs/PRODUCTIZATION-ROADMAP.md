@@ -74,7 +74,7 @@ Gate：确定性 fixtures 和至少一个真实本地项目都完成端到端验
 - 每个原生替代项通过 success、blocked、failure、stop、恢复和无关文件保护后，才删除对应 Trellis 路径。
 - 最终第一方运行时 Skills 中不保留 Trellis 命令、状态路径或任务/规格权限；竞品研究和来源归属继续保留真实名称。
 
-Gate：[`TRELLIS-DECOUPLING-PARITY-PLAN.md`](TRELLIS-DECOUPLING-PARITY-PLAN.md) 的 G01-G05 全部通过后才构建 rc.3；G06 真实项目和用户验收通过前保持 `watch`。当前 G01-G04 已完成：八项能力分别取得原生等价，G03 证明 Full、Adaptive、中断恢复与 HANDOFF 的累计连续性，G04 又证明外部冲突、状态漂移、检查失败恢复和非拥有文件保护。两门均使用合成夹具，不是用户真实验收；下一门是 G05 最终打包运行时零依赖，G06 仍独立。内部 target r10 不是 rc.3 包。
+Gate：[`TRELLIS-DECOUPLING-PARITY-PLAN.md`](TRELLIS-DECOUPLING-PARITY-PLAN.md) 的 G01-G05 已全部通过：八项能力分别取得原生等价，G03 证明 Full、Adaptive、中断恢复与 HANDOFF 的累计连续性，G04 证明外部冲突、状态漂移、检查失败恢复和非拥有文件保护，G05 又把第一方运行 Skills 的特定外部开发框架名称、命令、状态路径和 task/PRD/spec 权限降为零，并在 target r11 上重验 G02-G04。以上仍以合成夹具和 disposable 运行副本为主，不是用户真实验收。rc.3 技术前置门虽已满足，但构建仍需独立授权；G06 真实项目和用户验收通过前继续保持 `watch`，内部 target r11 也不是 rc.3 包。
 
 ### P5 - 完成保留能力与差异改进
 

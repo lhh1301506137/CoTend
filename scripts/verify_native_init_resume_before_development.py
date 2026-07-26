@@ -56,8 +56,8 @@ LOAD_ORDER = (
 )
 REMOVED_TD02_COMMANDS = ("trellis-start", "trellis-before-dev")
 REQUIRED_REMAINING_COMMANDS: tuple[str, ...] = ()
-EXPECTED_TRELLIS_MENTIONS = 7
-EXPECTED_TRELLIS_FILES = 6
+EXPECTED_TRELLIS_MENTIONS = 0
+EXPECTED_TRELLIS_FILES = 0
 EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS = 0
 
 REQUIRED_PROJECT_INIT_MARKERS = (
@@ -609,7 +609,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         != EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS
     ):
         raise NativeProjectEntryError(
-            "current runtime inventory is not the exact 7/6 checkpoint"
+            "current runtime inventory is not the zero-dependency checkpoint"
         )
 
     entry_results: dict[str, dict[str, object]] = {}

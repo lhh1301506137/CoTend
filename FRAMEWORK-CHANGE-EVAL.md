@@ -2,6 +2,75 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-07-26 G05 第一方运行包零外部开发框架依赖
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: workflow_behavior
+change_summary: 泛化第一方运行 Skills 最后 7 处特定外部开发框架引用，建立 target r11，并在零名称、命令、状态路径和外部 task/PRD/spec 权限下重验原生能力
+intent: 让 CoTend 自己拥有项目真相、计划、实现、检查、收尾、冲突和恢复流程，同时不以删词换取表面独立或能力退化
+expected_benefit:
+  - 第一方源 Skills 与 disposable 运行副本的四类外部运行依赖均为零
+  - 七处原有语义保留为 CoTend 原生流程或通用 external-framework evidence 能力
+  - C01-C19、八项 Skill 角色、G02 八项能力、G03 累计旅程和 G04 负向恢复在 r11 上继续通过
+  - r10 成为首个精确 predecessor，冻结 rc.2 仍可由历史 r2 source commit 确定重建
+possible_harm:
+  - 文本泛化可能误删外部冲突、迁移、历史链接、质量哨兵或来源审计能力
+  - 当前合成证据可能被误表述为真实项目、真实用户验收或稳定版完成
+  - r11 开发字节可能被错误塞入仍标识为 rc.2 的冻结包
+affected_workflows:
+  - semantic_repair_to_native_delivery_route
+  - plan_tree_external_change_classification
+  - quality_sentinel_and_internal_link_checks
+  - upstream_range_classification
+  - target_artifact_delivery_and_frozen_package_reproduction
+deviations:
+  - 只泛化第一方 runtime Skills；研究、来源、许可证和历史 Gate 继续保留准确 Trellis 名称与归因
+  - 不构建 rc.3，不修改冻结 rc.2，不执行真实安装、全局更新或公开动作
+mechanism_budget:
+  added_context_surface: one_cold_path_contract_one_verifier_one_evidence_record
+  ordinary_load_impact: no_new_runtime_stage_or_user_command
+  ceremony_added: none
+  duplication_check: reuses_existing_G02_G04_evaluators_target_identity_and_package_contracts
+  cheaper_alternative_considered: 只扫描字符串；因不能证明命令、状态、权限和能力保留而拒绝
+  retirement_or_thinning_trigger: G06 真实项目 harness 稳定覆盖相同运行包与负向变异后，可合并重复编排但保留四类零依赖断言
+  expected_failure_prevented: hidden_external_framework_backend_authority_takeover_capability_deletion_identity_aliasing_and_rc2_drift
+validation_scenarios:
+  - scenario: source_and_disposable_runtime_zero_inventory
+    expected: 名称、命令、状态路径和外部 task/PRD/spec 权限均为零，七项保留能力均存在
+    validation_result_type: executed
+    result: G05_11_tests_and_standalone_verifier_passed_zero_0_0_0_0_retained_7
+  - scenario: native_capability_and_recovery_regression
+    expected: G02-G04、Plan contract、C01-C19、八项 Skill 与 Full/Adaptive 结果合同保持
+    validation_result_type: executed
+    result: focused_G02_G04_109_G05_11_plan_21_and_full_unit_350_passed
+  - scenario: target_identity_and_frozen_rc2
+    expected: r11 精确绑定当前 40 个 Skill 文件，r10-r2 predecessor 顺序不变，rc.2 package 与 ZIP 摘要不变
+    validation_result_type: executed
+    result: adopted_8_40_19_delivery_11_5_8_6_8_package_48_plugin_17_5_marketplace_15_5_passed
+  - scenario: repository_and_skill_quality
+    expected: 仓库合同、官方 Skill validator、Ruff、compileall 和 diff check 通过
+    validation_result_type: executed
+    result: repository_260_19_19_official_skill_8_of_8_static_checks_passed
+real_project_validation:
+  - scenario: novice_writable_project_without_external_framework_runtime
+    expected: 真实用户从初始化到开发、检查、验收、交接和恢复均不降级
+    validation_result_type: deferred
+    result: G06_not_started
+decision: watch
+rollback_triggers:
+  - 任一四类运行依赖重新出现或外部框架取得 binding owner
+  - 七项保留能力、C01-C19、八项 Skill、G02-G04 或 Full/Adaptive 结果合同退化
+  - r11 身份链、r10 predecessor 或冻结 rc.2 package/ZIP 摘要漂移
+  - 合成证据被描述为真实项目、用户验收、rc.3、发布或稳定版完成
+review_after: G06_real_project_and_user_acceptance
+watch_closure:
+  - keep_watch
+  - evidence: docs/evidence/NATIVE-ZERO-RUNTIME-DEPENDENCY-G05.md
+```
+
+G05 关闭的是第一方运行依赖和本地不降级门。它没有创建新用户入口、状态树或执行阶段，也没有授权 rc.3、安装、push、Release、Portal、submission 或 publish。G06 仍是“实际使用是否不降级”的独立决定性证据。
+
 ## 2026-07-26 G04 原生负向恢复与所有权验证
 
 ```yaml

@@ -7,7 +7,7 @@ scope: project_meaning_requirements_route_decisions_status_reality_and_local_con
 runtime_contract: ../skills/cotend-collaboration/references/authority-and-triggers.md
 executable_verifier: ../scripts/verify_native_project_truth_authority.py
 introduced_target_artifact: cotend-codex-r000003
-current_target_artifact: cotend-codex-r000010
+current_target_artifact: cotend-codex-r000011
 rollback_candidate: cotend@0.1.0-rc.2_local_unpublished
 analysis_language: zh-CN
 ```
@@ -60,15 +60,15 @@ L62 只关闭 TD08“项目真相权限”缺口。以下是当时仍保留的�
 - requirements clarification（TD03 已由 L63 原生化）；
 - spec update 与完整 Route Rebase 迁移（TD06 已由 L64 原生化）；
 - Implementer（TD04 已由 L67 原生化）；
-- Checker；
-- finish/archive/recovery。
+- Checker（TD05 已由 L68 原生化）；
+- finish/archive/recovery（TD07 已由 L69 原生化）。
 
-L62 首次形成内部 target `cotend-codex-r000003`；L63 推进到 `cotend-codex-r000004`；L64 推进到 `cotend-codex-r000005`；L65 推进到 `cotend-codex-r000006`；L66 推进到 `cotend-codex-r000007`；L67 推进到 `cotend-codex-r000008`；L68 推进到 `cotend-codex-r000009`；L69 再推进到当前 `cotend-codex-r000010`。这些都表示同一 Codex lineage 的开发字节，不是公开产品版本。`cotend@0.1.0-rc.2` 仍是未发布回滚候选，固定到其已验证 Git 来源提交，包体和 ZIP 摘要不能随 r3-r10 开发态改变。只有全部 G01-G05 完成后才构建 rc.3。
+L62 首次形成内部 target `cotend-codex-r000003`；L63 推进到 `cotend-codex-r000004`；L64 推进到 `cotend-codex-r000005`；L65 推进到 `cotend-codex-r000006`；L66 推进到 `cotend-codex-r000007`；L67 推进到 `cotend-codex-r000008`；L68 推进到 `cotend-codex-r000009`；L69 推进到 `cotend-codex-r000010`；L72 在清除第一方运行依赖并完成不降级复验后推进到当前 `cotend-codex-r000011`。这些都表示同一 Codex lineage 的开发字节，不是公开产品版本。`cotend@0.1.0-rc.2` 仍是未发布回滚候选，固定到其已验证 Git 来源提交，包体和 ZIP 摘要不能随 r3-r11 开发态改变。G01-G05 现已完成，但这只满足 rc.3 的技术前置门；构建 rc.3 仍需独立授权，且不能替代 G06 真实项目与用户验收。
 
 ## 已执行验证
 
 - 规范文字检查：唯一 owner、三类外部状态、分层冲突、受影响路径停止和不重复真相均存在；
 - 行为场景：无外部框架、对齐、过时、L0-L2 冲突、L3-L4 冲突、未知依赖六类均由可执行模型验证；
 - 负向检查：恢复“active Trellis 拥有/绑定项目真相”等让权语句会失败；
-- 迁移检查：241/22 作为不可变历史基线保留，当前库存独立记录；TD08、TD03 与 TD06 已分别推进为 `native_parity_verified`；
+- 迁移检查：241/22 作为不可变历史基线保留，当前第一方运行库存为 0/0；八项原生能力、G03 累计旅程、G04 负向恢复和 G05 零运行依赖均有独立证据；
 - 发布边界：没有真实用户安装、push、tag、Release、Portal、submission、publish 或身份验证。

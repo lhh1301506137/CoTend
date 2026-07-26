@@ -1,12 +1,12 @@
 # CoTend 原生工作流与 Trellis 解耦等价计划
 
 ```yaml
-status: native_replacement_in_progress
+status: native_runtime_decoupled_waiting_real_project
 authority: product_owner_confirmed_2026-07-24
 scope: packaged_CoTend_runtime_and_first_party_Skills
 current_candidate: cotend@0.1.0-rc.2_local_unpublished
 target_candidate: cotend@0.1.0-rc.3_after_parity
-development_target_artifact: cotend-codex-r000010
+development_target_artifact: cotend-codex-r000011
 machine_contract: ../upstream/TRELLIS-DECOUPLING-PLAN.json
 analysis_language: zh-CN
 ```
@@ -22,8 +22,8 @@ Trellis 可以继续出现在竞品研究、固定来源和历史采用说明中
 ## 当前事实
 
 - L61 冻结基线是根 `skills/` 中 241 处不区分大小写的 `Trellis`，分布在 22 个第一方 Skill 文件；它作为不可变历史量尺保留。
-- L62 完成 TD08 权限替换后的检查点库存是 174 处、21 个文件；L63 完成 TD03 主动澄清路由替换后为 163 处、21 个文件；L64 完成 TD06 规格变化权限替换后为 158 处、21 个文件；L65 完成 TD01 原生状态与档位替换后为 43 处、16 个文件；L66 完成 TD02 初始化/续接/开发前门后为 38 处、16 个文件；L67 完成 TD04 原生实现阶段后为 28 处、15 个文件；L68 完成 TD05 原生检查阶段后为 20 处、10 个文件；L69 完成 TD07 原生收尾后，当前库存是 7 处、6 个文件。每次减少均限定在已审计表面。
-- 当前根 Skill 字节属于内部 target r10；r9、r8、r7、r6、r5、r4、r3 和 r2 依次保留为精确 predecessor。rc.2 不再从当前工作树取 Skill，而从其已验证历史 r2 提交复现，因此不会把 L62-L69 字节静默塞进同一候选身份。
+- L62 完成 TD08 权限替换后的检查点库存是 174 处、21 个文件；L63 完成 TD03 主动澄清路由替换后为 163 处、21 个文件；L64 完成 TD06 规格变化权限替换后为 158 处、21 个文件；L65 完成 TD01 原生状态与档位替换后为 43 处、16 个文件；L66 完成 TD02 初始化/续接/开发前门后为 38 处、16 个文件；L67 完成 TD04 原生实现阶段后为 28 处、15 个文件；L68 完成 TD05 原生检查阶段后为 20 处、10 个文件；L69 完成 TD07 原生收尾后为 7 处、6 个文件；L72 最终把当前第一方运行库存降为 0 处、0 文件。每次减少均限定在已审计表面。
+- 当前根 Skill 字节属于内部 target r11；r10、r9、r8、r7、r6、r5、r4、r3 和 r2 依次保留为精确 predecessor。rc.2 不再从当前工作树取 Skill，而从其已验证历史 r2 提交复现，因此不会把 r3-r11 开发字节静默塞进同一候选身份。
 - 仓库没有跟踪 `.trellis/`，也没有位于 Skill、源码、交付、打包或插件运行时路径下的 Trellis 命名文件、Trellis 源码、模板、hooks、二进制或依赖包。本计划、研究、来源说明和验证器可以保留 Trellis 名称，以准确描述替换对象和来源边界。
 - `requirements-ci.txt` 只固定 PyYAML；Plugin/package manifest 没有 Trellis 组件或许可证载体。
 - 因此当前问题是**运行时框架集成与权限依赖**，不是已经复制 Trellis 源码。
@@ -51,7 +51,7 @@ Trellis 可以继续出现在竞品研究、固定来源和历史采用说明中
 | 5 | `trellis-start`、`trellis-before-dev` | 初始化、更新、修复、迁移、续接幂等；开发前加载真相和代码上下文 | CoTend Init、Project Init、Code Context Harness | **TD02 已完成**：13 类入口与 9 类开发前场景通过；一次 handback、专属决定停止和真相优先顺序成立 | G03/G04 已验证累计、冲突 handback 和损坏交接拒绝；真实项目仍由 G06 验证 |
 | 6 | `trellis-implement` | 只实现已授权叶子；写入责任和依赖清楚；产生相称测试与证据 | CoTend 原生 Implementer、Native Agent Orchestration、Plan Tree | **TD04 已完成**：Full 独立角色与 Adaptive 内联执行使用同一结果合同，15 类授权、依赖、范围、测试和恢复场景通过 | G03/G04 已验证累计和失败后新身份恢复；真实项目仍由 G06 验证 |
 | 7 | `trellis-check` | 检查差异、规格、测试和失败路径；可修范围内问题；不替代用户验收 | CoTend 原生 Checker、Acceptance Harness、自审、AI UAT | **TD05 已完成**：Full 独立 Checker 与 Adaptive 内联 Checker 使用同一结果合同，23 类检查/修复/失败/恢复场景通过 | G03/G04 已验证累计、检查失败和陈旧证据拒绝；真实项目仍由 G06 验证 |
-| 8 | `trellis-finish`、archive、journal | 验证后收尾；保存状态、审查、决定、交接和真相；本地提交不等于发布 | Native Closeout Pass、Goal Completion、STATUS、REVIEW、HANDOFF | **TD07 已完成**：23 类成功、失败、回滚、中断、漂移、幂等和权限隔离场景通过 | G03/G04 已验证累计、恢复失败和文件所有权；G05/G06 仍独立 |
+| 8 | `trellis-finish`、archive、journal | 验证后收尾；保存状态、审查、决定、交接和真相；本地提交不等于发布 | Native Closeout Pass、Goal Completion、STATUS、REVIEW、HANDOFF | **TD07 已完成**：23 类成功、失败、回滚、中断、漂移、幂等和权限隔离场景通过 | G03-G05 已验证累计、恢复失败、文件所有权和零运行依赖；真实项目仍由 G06 验证 |
 
 ## 为什么先替换权限，再替换命令
 
@@ -139,16 +139,13 @@ G04 直接组合八项原生 evaluator 和 G03 累计旅程，覆盖四组 13 �
 
 Full 与 Adaptive 的停止原因、可靠恢复边界、所有权和结果合同等价；disposable 临时目录的逐字节哈希证明非拥有文件不变。G04 不修改 Skill 字节、target r10、7/6 运行库存或冻结 rc.2，也不冒充真实项目或用户验收。G05 与 G06 仍为 `not_started`。
 
-### G05 运行时零依赖
+### L72 / G05 已完成
 
-最终打包的第一方 Skills 中：
+当前第一方 `skills/` 和从其逐字节复制到 disposable 目录的目标运行包副本均已通过四类独立检查：特定外部框架名称为 0、对应命令为 0、对应状态路径为 0、外部 task/PRD/spec authority 为 0。七处原有文本没有被简单删除，而分别迁移为 Plan Tree/实现-检查-收尾原生路线或通用 `external-framework` 冲突、历史、质量和来源分类。
 
-- `Trellis` 提及为 0；
-- `trellis-*` 调用为 0；
-- `.trellis/` 状态路径为 0；
-- Trellis task/PRD/spec 权限为 0。
+G05 重新执行 C01-C19、八项 Skill 角色、G02 八项 evaluator、G03 累计主旅程和 G04 负向恢复，并用名称、命令、状态路径、外部权限、能力删除、r10 predecessor 与 rc.2 漂移变异证明门会失败关闭。当前 Skill manifest 固定为 target r11，r10 是第一精确 predecessor；研究、来源、许可证和迁移历史继续保留准确名称、commit 与归因。
 
-研究和来源文档继续保留准确名称、commit、许可证与 `no_source_adoption`。
+G05 不构建 rc.3，也不冒充 G06 真实可写项目或真实用户验收。冻结 rc.2 继续从历史 r2 source commit 构建，包体和摘要不变。
 
 ### G06 真实项目与回滚
 
@@ -158,15 +155,15 @@ Full 与 Adaptive 的停止原因、可靠恢复边界、所有权和结果合�
 
 - rc.2 保持为本地未发布的 v1.65 累计采用基线和回滚锚点。
 - 能力替换期间不推送、不创建 tag/Release、不提交 Portal。
-- 当前内部 target r10 只表示同 lineage Skill 字节推进，不是 rc.3 包。
+- 当前内部 target r11 只表示同 lineage Skill 字节推进，不是 rc.3 包。
 - 只有 G01-G05 通过后才构建 rc.3。
 - G06 通过前，框架变更评估保持 `watch`，不得宣称“完全独立且无能力退化”。
 - 官方 Plugin 身份验证路线暂时停放；产品核心变化闭合后再恢复。
 
-## L71 本切片不做
+## L72 本切片不做
 
-- 不推进 G05 零运行库存或 G06 真实项目验收。
+- 不推进 G06 真实项目验收。
 - 不新增用户可见命令、Skill 或状态树。
 - 不创建 `.cotend/` 新状态布局。
-- 不修改 dual-ai upstream，也不要求其删除私人 Trellis 集成。
+- 不修改 dual-ai upstream，也不要求其删除私人外部框架集成。
 - 不构建或发布 rc.3，不执行真实安装、push、release、Portal、submission 或 publish。

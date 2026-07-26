@@ -82,11 +82,14 @@ ResumeState = Literal[
 
 REMOVED_TD05_COMMAND = "trellis-check"
 REQUIRED_REMAINING_COMMANDS: tuple[str, ...] = ()
-EXPECTED_TRELLIS_MENTIONS = 7
-EXPECTED_TRELLIS_FILES = 6
+EXPECTED_TRELLIS_MENTIONS = 0
+EXPECTED_TRELLIS_FILES = 0
 EXPECTED_SKILL_FILES = 40
 EXPECTED_R9_MANIFEST = (
     "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"
+)
+EXPECTED_R10_MANIFEST = (
+    "0715c20f517f906996d4882e47c664449a23cf6f7747b6a2d42835f35591b8a9"
 )
 EXPECTED_R8_MANIFEST = (
     "84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3"
@@ -725,24 +728,24 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000010"
-        or target.get("revision") != 10
+        target.get("artifact_id") != "cotend-codex-r000011"
+        or target.get("revision") != 11
         or target.get("manifest_sha256") != digest
         or lock.get("skill_count") != 8
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
         or len(files) != EXPECTED_SKILL_FILES
     ):
-        raise NativeVerificationPassError("r10 target identity or manifest drifted")
+        raise NativeVerificationPassError("r11 target identity or manifest drifted")
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000009",
-        "revision": 9,
+        "artifact_id": "cotend-codex-r000010",
+        "revision": 10,
         "source_release_id": "2026.07.23.2",
         "framework_protocol": "cotend-collaboration-v1.65",
-        "manifest_sha256": EXPECTED_R9_MANIFEST,
+        "manifest_sha256": EXPECTED_R10_MANIFEST,
     }:
-        raise NativeVerificationPassError("r9 predecessor identity drifted")
+        raise NativeVerificationPassError("r10 predecessor identity drifted")
 
     _require_markers(
         texts["evidence"],

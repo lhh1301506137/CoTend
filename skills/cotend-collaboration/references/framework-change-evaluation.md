@@ -29,7 +29,7 @@ Classify the change first:
 |---|---|---|
 | `doc_only` | User-facing docs only; no agent behavior changes. | Mention in summary; no record required unless useful. |
 | `low_behavior` | Wording, metadata, output field, or non-routing template tweak. | Quick validation and short note. |
-| `workflow_behavior` | Changes init/resume/continue/review/risk/Plan Tree/Trellis/CodeGraph routing. | Evaluation record required. |
+| `workflow_behavior` | Changes init/resume/continue/review/risk/Plan Tree/external-framework/CodeGraph routing. | Evaluation record required. |
 | `high_impact` | Changes defaults, permissions, closeout/commit, critical boundaries, external sync, public/share behavior. | Evaluation record required; user confirmation required before declaring stable/syncing externally. |
 
 If uncertain, choose the stricter class.

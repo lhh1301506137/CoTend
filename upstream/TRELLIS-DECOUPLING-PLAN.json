@@ -1,12 +1,12 @@
 {
   "schema": "cotend.trellis-decoupling-plan",
   "schema_version": 2,
-  "status": "native_replacement_in_progress",
+  "status": "native_runtime_decoupled_waiting_real_project",
   "authority": "product_owner_confirmed_2026-07-24",
   "decision": "preserve_governance_capabilities_replace_trellis_identity_authority_and_runtime_dependency",
   "current_candidate": "cotend@0.1.0-rc.2_local_unpublished",
   "target_candidate": "cotend@0.1.0-rc.3_after_parity",
-  "development_target_artifact": "cotend-codex-r000010",
+  "development_target_artifact": "cotend-codex-r000011",
   "source_boundary": {
     "trellis_relationship": "restricted_design_inspiration_and_legacy_runtime_integration",
     "trellis_source_adoption": "none",
@@ -58,16 +58,9 @@
   "current_runtime": {
     "scope": "skills/",
     "case_insensitive_term": "trellis",
-    "mention_count": 7,
-    "file_count": 6,
-    "file_mentions": {
-      "skills/cotend-collaboration/references/authority-and-triggers.md": 1,
-      "skills/cotend-collaboration/references/framework-change-evaluation.md": 1,
-      "skills/cotend-collaboration/references/plan-tree.md": 2,
-      "skills/cotend-collaboration/references/quality-sentinel.md": 1,
-      "skills/cotend-collaboration/references/upstream-dependency-review.md": 1,
-      "skills/cotend-semantic-alignment/SKILL.md": 1
-    }
+    "mention_count": 0,
+    "file_count": 0,
+    "file_mentions": {}
   },
   "target": {
     "packaged_runtime_trellis_mentions": 0,
@@ -274,7 +267,7 @@
         "local closeout"
       ],
       "native_coverage": "verified_native_contract",
-      "known_gap": "none_within_TD07_closeout_scope; cumulative journey, negative recovery integration, zero-runtime inventory, and real-project acceptance remain",
+      "known_gap": "none_within_TD07_closeout_scope; real-project acceptance remains",
       "status": "native_parity_verified",
       "removal_gate": "native_parity_verified",
       "evidence": [
@@ -367,7 +360,7 @@
         "zero_trellis_commands_and_state_paths",
         "research_and_provenance_mentions_remain_attributed"
       ],
-      "status": "not_started"
+      "status": "complete"
     },
     {
       "id": "G06-real-project-and-rollback",
@@ -381,12 +374,12 @@
     }
   ],
   "this_slice": {
-    "skill_behavior_changed": false,
-    "trellis_route_removed": false,
+    "skill_behavior_changed": true,
+    "trellis_route_removed": true,
     "removed_capability_ids": [],
-    "target_artifact_changed": false,
+    "target_artifact_changed": true,
     "package_identity_changed": false,
     "push_release_submission_or_publish": false,
-    "validation_gate_completed": "G04-negative-recovery-and-ownership"
+    "validation_gate_completed": "G05-zero-runtime-dependency"
   }
 }

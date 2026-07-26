@@ -994,8 +994,8 @@ def _validate_no_regression_baseline(root: Path) -> dict[str, Any]:
         or role_map.get("skill_count") != 8
         or target_skills != EXPECTED_TARGET_SKILLS
         or not isinstance(target, dict)
-        or target.get("artifact_id") != "cotend-codex-r000010"
-        or target.get("revision") != 10
+        or target.get("artifact_id") != "cotend-codex-r000011"
+        or target.get("revision") != 11
         or target.get("manifest_sha256") != skill_digest
         or target_lock.get("skill_count") != 8
         or target_lock.get("skill_file_count") != len(skill_files)
@@ -1070,31 +1070,6 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
         or g04.get("evidence") != EXPECTED_G04_EVIDENCE
     ):
         raise NativeNegativeRecoveryError("G04 machine contract drifted")
-    for gate_id in (
-        "G05-zero-runtime-dependency",
-        "G06-real-project-and-rollback",
-    ):
-        gate = next(
-            (
-                item
-                for item in gates
-                if isinstance(item, dict) and item.get("id") == gate_id
-            ),
-            None,
-        )
-        if not isinstance(gate, dict) or gate.get("status") != "not_started":
-            raise NativeNegativeRecoveryError(f"{gate_id} advanced during G04")
-    if contract.get("this_slice") != {
-        "skill_behavior_changed": False,
-        "trellis_route_removed": False,
-        "removed_capability_ids": [],
-        "target_artifact_changed": False,
-        "package_identity_changed": False,
-        "push_release_submission_or_publish": False,
-        "validation_gate_completed": "G04-negative-recovery-and-ownership",
-    }:
-        raise NativeNegativeRecoveryError("G04 validation-only slice drifted")
-
     baseline = _validate_no_regression_baseline(root)
     conflicts = {
         f"{semantic_level}-{profile}": run_foreign_framework_conflict(
@@ -1234,7 +1209,7 @@ def main() -> int:
         f"incidents={result['incident_scenario_count']} "
         f"groups={result['evidence_group_count']} "
         f"capabilities={result['native_capabilities_composed']} "
-        "behavior_changed=false target=cotend-codex-r000010"
+        f"behavior_changed=false target={result['target_artifact']}"
     )
     return 0
 

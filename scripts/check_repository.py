@@ -18,6 +18,7 @@ import verify_native_verification_pass as native_verification
 import verify_native_closeout_pass as native_closeout
 import verify_native_cumulative_main_journey as native_cumulative_journey
 import verify_native_negative_recovery_ownership as native_negative_recovery
+import verify_native_zero_runtime_dependency as native_zero_runtime
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -446,6 +447,12 @@ EXPECTED_NATIVE_NEGATIVE_RECOVERY_FILES = {
     "docs/evidence/NATIVE-NEGATIVE-RECOVERY-OWNERSHIP-G04.md",
     "scripts/verify_native_negative_recovery_ownership.py",
     "tests/test_native_negative_recovery_ownership.py",
+}
+EXPECTED_NATIVE_ZERO_RUNTIME_FILES = {
+    "docs/NATIVE-ZERO-RUNTIME-DEPENDENCY.md",
+    "docs/evidence/NATIVE-ZERO-RUNTIME-DEPENDENCY-G05.md",
+    "scripts/verify_native_zero_runtime_dependency.py",
+    "tests/test_native_zero_runtime_dependency.py",
 }
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
@@ -2690,7 +2697,7 @@ def production_plugin_package_errors(
             errors.append(f"production Plugin package evidence mismatch: {key}")
     for marker in (
         "rc.2 的 Skill 语义源固定为 Git commit",
-        "当前根 `skills/` 已推进到 target r10",
+        "当前根 `skills/` 已推进到 target r11",
         "48 个文件",
         "逐字节一致",
         "17 类负向边界",
@@ -2946,7 +2953,7 @@ def github_marketplace_root_carrier_errors(
         "semantic_source": {"skills/"},
         "semantic_sources": {"1"},
         "source_skill_manifest_sha256": {
-            "0715c20f517f906996d4882e47c664449a23cf6f7747b6a2d42835f35591b8a9"
+            "eac48844295f9ba12d64df469aa25fab9e76a8c9ceb9817857350b5029767627"
         },
         "package_manifest_sha256": {
             "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2"
@@ -2959,9 +2966,9 @@ def github_marketplace_root_carrier_errors(
         "write_roots_redirected": {"15"},
         "protected_user_boundaries": {"8"},
         "focused_tests": {"12"},
-        "full_unit_tests": {"311"},
+        "full_unit_tests": {"350"},
         "repository_check": {
-            "passed_248_public_candidates_19_capabilities_19_specs"
+            "passed_260_public_candidates_19_capabilities_19_specs"
         },
         "official_validator": {"passed"},
         "local_marketplace_repeat_add": {"idempotent_success"},
@@ -3788,8 +3795,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             "confirmation_gate_zero_write",
             "stale_plan_toctou_zero_write",
             "terminated_recovery_retains_dual_evidence",
-            'artifact_id="cotend-codex-r000011"',
-            "revision=11",
+            'artifact_id="cotend-codex-r000012"',
+            "revision=12",
         ):
             if marker not in harness_text:
                 errors.append(f"delivery lifecycle harness marker is missing: {marker}")
@@ -4027,8 +4034,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     expected_target = {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000010",
-        "revision": 10,
+        "artifact_id": "cotend-codex-r000011",
+        "revision": 11,
     }
     if not isinstance(target, dict) or any(
         target.get(key) != expected for key, expected in expected_target.items()
@@ -4052,6 +4059,17 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if not isinstance(target, dict) or target.get("manifest_sha256") != carrier_manifest:
         errors.append("delivery target lock manifest mismatch")
     expected_predecessors = [
+        {
+            "platform": "Codex",
+            "lineage": "cotend-codex",
+            "artifact_id": "cotend-codex-r000010",
+            "revision": 10,
+            "source_release_id": "2026.07.23.2",
+            "framework_protocol": "cotend-collaboration-v1.65",
+            "manifest_sha256": (
+                "0715c20f517f906996d4882e47c664449a23cf6f7747b6a2d42835f35591b8a9"
+            ),
+        },
         {
             "platform": "Codex",
             "lineage": "cotend-codex",
@@ -4167,28 +4185,33 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     ]
     if target_lock.get("legacy_receipt_mappings") != expected_legacy_mappings:
         errors.append("delivery target lock legacy mapping mismatch")
-    identity_evidence_path = "docs/evidence/NATIVE-CLOSEOUT-PASS-TARGET-R10.md"
+    identity_evidence_path = "docs/evidence/NATIVE-ZERO-RUNTIME-DEPENDENCY-G05.md"
     if identity_evidence_path not in candidates:
         errors.append("target artifact identity evidence is missing or ignored")
     else:
         evidence = read(identity_evidence_path)
         for marker in (
-            "current_target_artifact_id: cotend-codex-r000010",
-            "current_target_revision: 10",
-            "current_target_manifest_sha256: 0715c20f517f906996d4882e47c664449a23cf6f7747b6a2d42835f35591b8a9",
-            "predecessor_target_artifact_id: cotend-codex-r000009",
-            "predecessor_target_revision: 9",
-            "predecessor_target_manifest_sha256: 32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072",
+            "development_target_artifact: cotend-codex-r000011",
+            "development_target_revision: 11",
+            "development_target_manifest: eac48844295f9ba12d64df469aa25fab9e76a8c9ceb9817857350b5029767627",
+            "predecessor_target_artifact: cotend-codex-r000010",
+            "predecessor_target_manifest: 0715c20f517f906996d4882e47c664449a23cf6f7747b6a2d42835f35591b8a9",
             "source_framework_lock_changed: false",
             "package_candidate: cotend@0.1.0-rc.2_immutable",
             "package_source_commit: 37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
-            "TD07-closeout-archive-and-recovery",
-            "runtime_trellis_inventory: 7_mentions_6_files",
-            "full_unit_tests: 311_passed",
+            "G05-zero-runtime-dependency",
+            "runtime_trellis_inventory: 0_mentions_0_files",
+            "g05_focused_tests: 11_passed",
+            "g02_g04_focused_regression: 109_passed",
+            "decoupling_plan_tests: 21_passed",
+            "full_unit_tests: 350_passed",
+            "repository_check: passed_260_public_candidates_19_capabilities_19_specs",
+            "adopted_skill_verifier: passed_8_skills_40_files_19_capabilities",
             "official_skill_quick_validate: passed_8_of_8",
-            "repository_check: passed_248_public_candidates_19_capabilities_19_specs",
+            "ruff: passed",
+            "compileall: passed",
+            "git_diff_check: passed",
             "delivery_lifecycle: passed_11_steps_5_identity_8_negative_6_concurrency_8_recovery",
-            "writable_lifecycle: passed_4_scenarios_9_negative",
             "production_plugin_lifecycle: passed_17_steps_5_recovery",
             "github_marketplace_carrier: passed_15_steps_5_recovery",
         ):
@@ -4348,6 +4371,14 @@ def main() -> int:
         errors.append(
             "native negative-recovery artifacts are missing or ignored: "
             f"{sorted(missing_native_negative_recovery)}"
+        )
+    missing_native_zero_runtime = (
+        EXPECTED_NATIVE_ZERO_RUNTIME_FILES - candidates
+    )
+    if missing_native_zero_runtime:
+        errors.append(
+            "native zero-runtime artifacts are missing or ignored: "
+            f"{sorted(missing_native_zero_runtime)}"
         )
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
@@ -4564,6 +4595,11 @@ def main() -> int:
             native_negative_recovery.verify_repository(ROOT)
         except native_negative_recovery.NativeNegativeRecoveryError as exc:
             errors.append(f"native negative recovery and ownership: {exc}")
+    if not missing_native_zero_runtime:
+        try:
+            native_zero_runtime.verify_repository(ROOT)
+        except native_zero_runtime.NativeZeroRuntimeDependencyError as exc:
+            errors.append(f"native zero runtime dependency: {exc}")
 
     github_marketplace_carrier_evidence_path = (
         "docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md"

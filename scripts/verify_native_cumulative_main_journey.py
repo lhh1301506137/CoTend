@@ -897,7 +897,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
     target = target_lock.get("target")
     if (
         not isinstance(target, dict)
-        or target.get("artifact_id") != "cotend-codex-r000010"
+        or target.get("artifact_id") != "cotend-codex-r000011"
     ):
         raise NativeCumulativeJourneyError("G03 changed the target artifact")
 
@@ -963,7 +963,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
         "bare_continue_blocked_at_acceptance": True,
         "real_user_acceptance_claimed": False,
         "skill_behavior_changed": False,
-        "target_artifact": "cotend-codex-r000010",
+        "target_artifact": target["artifact_id"],
         "results": {
             "full": asdict(full),
             "adaptive": asdict(adaptive),
@@ -985,7 +985,7 @@ def main() -> int:
         f"journeys={result['journey_scenario_count']} "
         f"groups={result['evidence_group_count']} "
         f"capabilities={result['native_capabilities_composed']} "
-        "behavior_changed=false target=cotend-codex-r000010"
+        f"behavior_changed=false target={result['target_artifact']}"
     )
     return 0
 

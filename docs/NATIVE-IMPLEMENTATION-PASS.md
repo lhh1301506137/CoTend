@@ -79,8 +79,8 @@ Implementer 可以在确认祖先内选择可逆 L3/L4 技术细节、编辑自�
 
 ## 本叶边界
 
-TD04 检查点把运行 Skills 中 `trellis-implement` 归零，并将 Trellis 库存由 L66 的 38 处、16 个文件下降到 28 处、15 个文件。后续 TD05 由原生 Verification Pass 降为 20 处、10 个文件，TD07 又由 Native Closeout Pass 降到当前 7 处、6 个文件。
+TD04 检查点把运行 Skills 中 `trellis-implement` 归零，并将 Trellis 库存由 L66 的 38 处、16 个文件下降到 28 处、15 个文件。后续 TD05 由原生 Verification Pass 降为 20 处、10 个文件，TD07 又由 Native Closeout Pass 降到 7 处、6 个文件；G05 已把当前第一方运行库存降为 0 处、0 个文件。
 
-本合同自身由 `cotend-codex-r000008` 首次固定，r7 是其精确 predecessor；当前开发根已推进到 r10，并把 r9 作为精确 predecessor。未发布 `cotend@0.1.0-rc.2` 继续从历史 r2 source commit 构建，其包体和 ZIP 摘要不因 r8-r10 开发字节改变。
+本合同自身由 `cotend-codex-r000008` 首次固定，r7 是其精确 predecessor；当前开发根已推进到 r11，并把 r10 作为精确 predecessor。未发布 `cotend@0.1.0-rc.2` 继续从历史 r2 source commit 构建，其包体和 ZIP 摘要不因 r8-r11 开发字节改变。
 
-本叶不代表 G03 累计主旅程、G04 负向恢复集成、G05 运行时零依赖或 G06 真实项目/用户验收已经完成，也不授权真实安装、全局更新、push、tag、Release、Portal、submission 或 publish。
+本叶自身不代表 G03 累计主旅程、G04 负向恢复集成、G05 运行时零依赖或 G06 真实项目/用户验收已经完成；当前 G03-G05 已由后续独立 Gate 证明，G06 仍未执行。任何这些结果都不授权真实安装、全局更新、push、tag、Release、Portal、submission 或 publish。
