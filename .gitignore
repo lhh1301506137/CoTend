@@ -5,6 +5,7 @@ __pycache__/
 *.pyc
 
 # Local AI development governance; never include in the public repository.
+/MODEL-UPGRADE/
 /STATUS.md
 /REVIEW-LOG.md
 /QUALITY-SIGNALS.md
