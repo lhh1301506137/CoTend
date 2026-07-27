@@ -8,7 +8,7 @@ Plan Tree is an auditable navigation system, not a new product truth source.
 
 - `PROJECT-PLAN-TREE.md` is the compact index: tree, active path, node states, and links.
 - `PROJECT-PLAN-NODES/` stores node understanding/plan docs for important nodes.
-- `PROJECT-UNDERSTANDING/` stores expanded user-readable understanding docs for user review, advisor/takeover, and major replanning.
+- `PROJECT-UNDERSTANDING/` stores expanded understanding docs in Project Init's resolved user-facing governance language for user review, advisor/takeover, and major replanning.
 - `PROJECT-DECISION-LOG.md` stores user-facing questions and decisions from CoTend clarification/grill-me, classified external brainstorm evidence, direct user corrections, advisor questions, and model-role/risk/release gates.
 - `PROJECT-KNOWLEDGE-CHANGELOG.md` records material changes to plan nodes, understanding docs, linked evidence docs, and consensus status when those changes are not already captured as `resulting_changes` on the decision that caused them.
 - Full project understanding is established during init/rebuild or major replanning, then reused through summaries and links.
@@ -68,7 +68,7 @@ metadata:
   expanded_understanding_dir: PROJECT-UNDERSTANDING
   decision_log: PROJECT-DECISION-LOG.md
   knowledge_changelog: PROJECT-KNOWLEDGE-CHANGELOG.md
-  understanding_language: <project language; English by default>
+  understanding_language: <user_facing_language_resolution.normalized_tag>
   root_goal:
   mvp_goal:
   semantic_baseline: <canonical standing schema from templates.md>
@@ -127,7 +127,7 @@ Allowed node states: `planned`, `active`, `done`, `blocked`, `deferred`, `supers
 
 Create node docs for root goal, MVP/current stage, and active/high-value leaves. Add other node docs only when the node carries understanding, decisions, dependencies, or acceptance that future work must preserve.
 
-Understanding sections in node docs must use the project's recorded user-facing language, or English by default. Technical identifiers, file paths, model names, and command names may stay unchanged.
+Understanding sections in node docs must use Project Init's resolved normalized tag. Technical identifiers, file paths, model names, schema fields, and commands remain technical and need not be translated.
 
 ```markdown
 # <NODE_ID> <Title>
@@ -140,7 +140,7 @@ metadata:
   node_type: root_goal | mvp | stage | capability | leaf
   semantic_level: L0 | L1 | L2 | L3 | L4
   mvp_scope: current | future | out_of_scope
-  language: <BCP-47 project language | en>
+  language: <user_facing_language_resolution.normalized_tag>
   last_reviewed_commit:
   evidence_sources:
     -
@@ -160,7 +160,7 @@ metadata:
 
 ## Summary
 
-One short paragraph in the project's user-facing language that can be read during normal continue.
+One short paragraph in the resolved governance language that can be read during normal continue.
 
 ## Confirmed Understanding
 
@@ -193,7 +193,7 @@ Node IDs and semantic levels are different namespaces. `G0`, `M1`, `S1`, `F1`, `
 
 ## Expanded Understanding Contract
 
-Use `PROJECT-UNDERSTANDING/` for complete, user-readable understanding that would be too long for Plan Tree or node summaries. This layer exists so the user can audit whether the active AI still understands the project correctly without forcing every development turn to load the full text.
+Use `PROJECT-UNDERSTANDING/` for complete, user-readable understanding in the resolved governance language that would be too long for Plan Tree or node summaries. This layer exists so the user can audit whether the active AI still understands the project correctly without forcing every development turn to load the full text.
 
 Create or update expanded understanding docs for:
 
@@ -204,15 +204,17 @@ Create or update expanded understanding docs for:
 
 Do not create expanded understanding docs for every small leaf by default.
 
+The adapter owns localized headings and template wording. The shared contract requires the semantic sections below but does not prescribe English titles:
+
 ```markdown
-# <NODE_ID> Expanded Understanding: <title in project language>
+# <NODE_ID> <adapter-localized expanded-understanding title>
 
 metadata:
   node_id:
   linked_plan_node:
   semantic_level: L0 | L1 | L2 | L3 | L4
   mvp_scope: current | future | out_of_scope
-  language: <project language; English by default>
+  language: <user_facing_language_resolution.normalized_tag>
   status: user_confirmed | primary_ai_proposed_delta | pending_user_confirmation | superseded
   authority: user_confirmed | pending_user_confirmation
   source_consensus:
@@ -230,33 +232,33 @@ metadata:
     replan: read_relevant
     advisor_or_takeover: read_full
 
-## Complete Understanding
+## <adapter-localized complete-understanding heading>
 
-Explain the active AI's complete understanding of this node's goal, stage, or capability in the project's recorded user-facing language, or English by default.
+<Complete prose in the resolved governance language describing the goal, stage, or capability.>
 
-## User-Confirmed Consensus
-
--
-
-## AI Inferences Not Yet Confirmed
+## <adapter-localized user-confirmed-consensus heading>
 
 -
 
-## Boundaries That Must Not Drift
+## <adapter-localized unconfirmed-inference heading>
 
 -
 
-## Plan Tree Relationship
+## <adapter-localized boundaries heading>
+
+-
+
+## <adapter-localized Plan Tree relationship heading>
 
 - parent:
 - child_or_leaf_nodes:
 - current_route_meaning:
 
-## Questions Requiring Later Confirmation
+## <adapter-localized open-questions heading>
 
 -
 
-## Evidence Links
+## <adapter-localized evidence-links heading>
 
 -
 ```
@@ -279,7 +281,7 @@ The user confirms the structure and complete meaning of current-MVP L0-L2; the P
 
 Use the replacement-impact test when assigning `semantic_level`: if replacing the node changes what the product can do, what the user obtains, how the main user chain completes, or the user-recognized effect of an important feature, classify it at least L2. The Primary AI must not label product meaning L3 merely to avoid confirmation.
 
-Complete L0-L2 semantics are narrative product understanding, not a rigid technical contract. In the project's recorded user-facing language, or English by default, make clear:
+Complete L0-L2 semantics are narrative product understanding, not a rigid technical contract. In the resolved user-facing governance language, make clear:
 
 - what the product/area/feature is trying to accomplish for the user;
 - why it exists and what responsibility it carries in its parent;
@@ -589,34 +591,33 @@ Stop for user confirmation before product implementation when any is true:
 - external-framework/PRD/STATUS conflict requires choosing between incompatible L0-L2 meanings, scope, or user-visible outcomes;
 - the user explicitly asks to "敲定" the plan tree before continuing.
 
-Use this concise confirmation shape:
+Use this concise semantic shape. The active adapter renders every label, explanation, and menu item in the resolved governance language; shared core owns the fields and authority semantics, not localized headings:
 
 ```markdown
-## Plan Tree Confirmation Is Needed
+## <adapter-localized Plan Tree confirmation title>
 
-**Current understanding of the complete goal**:
-**Semantic baseline status**: not_required | absent | partial | confirmed | stale | conflict
-**Current-MVP L0-L2 coverage**:
+complete_goal:
+semantic_baseline_status: not_required | absent | partial | confirmed | stale | conflict
+current_mvp_l0_l2_coverage:
 - L0:
 - L1:
 - L2:
-**Confirmed paths that may continue autonomously**:
-**Supporting documents**:
-- root goal:
-- MVP/current stage:
-- current leaf:
-**Expanded understanding documents**:
-- complete project understanding:
-- MVP/stage understanding:
-**Knowledge changelog**:
-- recent relevant entries:
-**MVP/current stage**:
-**Recommended current leaf**:
-**User-confirmed facts**:
-**AI inferences**:
-**Why this is next**:
-**What happens after confirmation**:
-**Recommendation**: 1 confirm the Plan Tree and continue / 2 revise the Plan Tree / 3 explain more first
+unaffected_confirmed_paths:
+supporting_docs:
+  root_goal:
+  mvp_or_current_stage:
+  active_leaf:
+expanded_understanding_docs:
+  full_project:
+  mvp_or_stage:
+knowledge_changelog_recent_entries:
+mvp_or_current_stage:
+recommended_current_leaf:
+user_confirmed:
+primary_ai_inference:
+why_now:
+after_confirmation:
+recommendation_menu: <adapter-localized confirm/modify/explain choices>
 ```
 
 Within `$cotend-semantic-alignment`, if the user accepts option `1`, bind only the exact L0-L2 nodes and wording shown in that confirmation packet to separate verified decision-log contracts, then mark those exact nodes `user_confirmed` and continue from the selected leaf. Never infer confirmation or reuse a contract for an unseen descendant.

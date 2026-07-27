@@ -75,8 +75,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         return Artifact.from_directory(
             source,
             source_release_id=self.artifact.source_release_id,
-            artifact_id="cotend-codex-r000012",
-            revision=12,
+            artifact_id="cotend-codex-r000013",
+            revision=13,
             protocol=self.artifact.protocol,
         )
 
@@ -155,9 +155,9 @@ class DeliveryLifecycleTests(unittest.TestCase):
     def test_artifact_identity_dry_run_and_idempotent_install(self) -> None:
         self.assertEqual(len(self.artifact.skills), 8)
         self.assertEqual(len(self.artifact.files), 40)
-        self.assertEqual(self.artifact.source_release_id, "2026.07.23.2")
-        self.assertEqual(self.artifact.artifact_id, "cotend-codex-r000011")
-        self.assertEqual(self.artifact.revision, 11)
+        self.assertEqual(self.artifact.source_release_id, "2026.07.28.1")
+        self.assertEqual(self.artifact.artifact_id, "cotend-codex-r000012")
+        self.assertEqual(self.artifact.revision, 12)
         before = tree_manifest(self.project)
 
         preview = self.manager.execute("install", self.artifact)
@@ -243,6 +243,18 @@ class DeliveryLifecycleTests(unittest.TestCase):
         )
         self.assert_protected_unchanged()
 
+    def test_repository_artifact_loads_exact_predecessor_chain(self) -> None:
+        self.assertEqual(len(self.artifact.predecessor_targets), 10)
+        first = self.artifact.predecessor_targets[0]
+        self.assertEqual(first.artifact_id, "cotend-codex-r000011")
+        self.assertEqual(first.revision, 11)
+        self.assertEqual(first.source_release_id, "2026.07.23.2")
+        self.assertEqual(first.protocol, "cotend-collaboration-v1.65")
+        self.assertEqual(
+            first.manifest_sha256,
+            "eac48844295f9ba12d64df469aa25fab9e76a8c9ceb9817857350b5029767627",
+        )
+
     def test_locked_r1_predecessor_updates_across_protocol_and_inventory(self) -> None:
         self.install()
         removed_files = {
@@ -319,9 +331,9 @@ class DeliveryLifecycleTests(unittest.TestCase):
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         self.assertEqual(updated["state_after"]["managed_files"], 40)
         current_receipt = self.load_receipt()
-        self.assertEqual(current_receipt["artifact_id"], "cotend-codex-r000011")
-        self.assertEqual(current_receipt["target_revision"], 11)
-        self.assertEqual(current_receipt["protocol"], "cotend-collaboration-v1.65")
+        self.assertEqual(current_receipt["artifact_id"], "cotend-codex-r000012")
+        self.assertEqual(current_receipt["target_revision"], 12)
+        self.assertEqual(current_receipt["protocol"], "cotend-collaboration-v1.66")
         self.assertTrue(
             (
                 self.project
@@ -373,7 +385,7 @@ class DeliveryLifecycleTests(unittest.TestCase):
         )
         self.assert_protected_unchanged()
 
-    def test_locked_r2_payload_updates_to_current_r11(self) -> None:
+    def test_locked_r2_payload_updates_to_current_r12(self) -> None:
         source = self.temp_root / "artifact-r2"
         for relative, payload in plugin_package._historical_source_skill_entries(
             "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1"
@@ -395,12 +407,43 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000011")
-        self.assertEqual(receipt["target_revision"], 11)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000012")
+        self.assertEqual(receipt["target_revision"], 12)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
-    def test_locked_r3_payload_updates_to_current_r11(self) -> None:
+    def test_legacy_target_mapping_cannot_bypass_source_release_identity(self) -> None:
+        source = self.temp_root / "artifact-r2-wrong-source"
+        for relative, payload in plugin_package._historical_source_skill_entries(
+            "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1"
+        ):
+            path = source / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(payload)
+        predecessor = Artifact.from_directory(
+            source,
+            source_release_id="2026.07.23.2",
+            artifact_id="cotend-codex-r000002",
+            revision=2,
+            protocol="cotend-collaboration-v1.65",
+        )
+        self.manager.execute("install", predecessor, apply=True)
+        receipt = self.load_receipt()
+        receipt["source_release_id"] = "untrusted-release"
+        self.manager.receipt_path.write_text(
+            json.dumps(receipt, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+        before = self.manager.inspect(self.artifact)
+        self.assertEqual(before["candidate_relation"], "incompatible")
+        self.assertIn("target_predecessor_unmapped", before["diagnostics"])
+        with self.assertRaisesRegex(DeliveryError, "update is blocked"):
+            self.manager.execute("update", self.artifact, apply=True)
+        self.assertEqual(self.load_receipt()["source_release_id"], "untrusted-release")
+        self.assert_protected_unchanged()
+
+    def test_locked_r3_payload_updates_to_current_r12(self) -> None:
         source = self.temp_root / "artifact-r3"
         for relative, payload in plugin_package._historical_source_skill_entries(
             "87b51ee119e7596da8ee4e9eb3b1212ffd85fa4d"
@@ -422,12 +465,12 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000011")
-        self.assertEqual(receipt["target_revision"], 11)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000012")
+        self.assertEqual(receipt["target_revision"], 12)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
-    def test_locked_r4_payload_updates_to_current_r11(self) -> None:
+    def test_locked_r4_payload_updates_to_current_r12(self) -> None:
         source = self.temp_root / "artifact-r4"
         for relative, payload in plugin_package._historical_source_skill_entries(
             "713a78c877852903d77f38ed15ad6448ad9abf31"
@@ -449,12 +492,12 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000011")
-        self.assertEqual(receipt["target_revision"], 11)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000012")
+        self.assertEqual(receipt["target_revision"], 12)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
-    def test_locked_r5_payload_updates_to_current_r11(self) -> None:
+    def test_locked_r5_payload_updates_to_current_r12(self) -> None:
         source = self.temp_root / "artifact-r5"
         for relative, payload in plugin_package._historical_source_skill_entries(
             "d2c78fe12262bd18beb5f46ded8d1850e9f44207"
@@ -476,12 +519,12 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000011")
-        self.assertEqual(receipt["target_revision"], 11)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000012")
+        self.assertEqual(receipt["target_revision"], 12)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
-    def test_locked_r6_payload_updates_to_current_r11(self) -> None:
+    def test_locked_r6_payload_updates_to_current_r12(self) -> None:
         source = self.temp_root / "artifact-r6"
         for relative, payload in plugin_package._historical_source_skill_entries(
             "d69b719f2d94ceda0f8e3396eee71bdd378050ce"
@@ -503,12 +546,12 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000011")
-        self.assertEqual(receipt["target_revision"], 11)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000012")
+        self.assertEqual(receipt["target_revision"], 12)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
-    def test_locked_r7_payload_updates_to_current_r11(self) -> None:
+    def test_locked_r7_payload_updates_to_current_r12(self) -> None:
         source = self.temp_root / "artifact-r7"
         for relative, payload in plugin_package._historical_source_skill_entries(
             "6400d093dc4c458d669891d820536625b2e216dd"
@@ -530,12 +573,12 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000011")
-        self.assertEqual(receipt["target_revision"], 11)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000012")
+        self.assertEqual(receipt["target_revision"], 12)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
-    def test_locked_r8_payload_updates_to_current_r11(self) -> None:
+    def test_locked_r8_payload_updates_to_current_r12(self) -> None:
         source = self.temp_root / "artifact-r8"
         for relative, payload in plugin_package._historical_source_skill_entries(
             "38371898ffd010ff09e23e357bffa4a3293c205d",
@@ -558,12 +601,12 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000011")
-        self.assertEqual(receipt["target_revision"], 11)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000012")
+        self.assertEqual(receipt["target_revision"], 12)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
-    def test_locked_r9_payload_updates_to_current_r11(self) -> None:
+    def test_locked_r9_payload_updates_to_current_r12(self) -> None:
         source = self.temp_root / "artifact-r9"
         for relative, payload in plugin_package._historical_source_skill_entries(
             "8bdf87e73063271df385b9ac5829e28d0deb8e3d",
@@ -586,12 +629,12 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000011")
-        self.assertEqual(receipt["target_revision"], 11)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000012")
+        self.assertEqual(receipt["target_revision"], 12)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
-    def test_locked_r10_payload_updates_to_current_r11(self) -> None:
+    def test_locked_r10_payload_updates_to_current_r12(self) -> None:
         source = self.temp_root / "artifact-r10"
         for relative, payload in plugin_package._historical_source_skill_entries(
             "f2ed9cf35351e2f93c28bbcdc2691841073203c9",
@@ -614,9 +657,69 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000011")
-        self.assertEqual(receipt["target_revision"], 11)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000012")
+        self.assertEqual(receipt["target_revision"], 12)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
+        self.assert_protected_unchanged()
+
+    def test_locked_r11_payload_updates_to_current_r12(self) -> None:
+        source = self.temp_root / "artifact-r11"
+        for relative, payload in plugin_package._historical_source_skill_entries(
+            "13c2f51868a554c7568892c4aeaefa2fd814cb26",
+            expected_file_count=40,
+        ):
+            path = source / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(payload)
+        predecessor = Artifact.from_directory(
+            source,
+            source_release_id="2026.07.23.2",
+            artifact_id="cotend-codex-r000011",
+            revision=11,
+            protocol="cotend-collaboration-v1.65",
+        )
+        self.manager.execute("install", predecessor, apply=True)
+
+        before = self.manager.inspect(self.artifact)
+        self.assertEqual(before["candidate_relation"], "update_available")
+        updated = self.manager.execute("update", self.artifact, apply=True)
+        self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
+        receipt = self.load_receipt()
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000012")
+        self.assertEqual(receipt["target_revision"], 12)
+        self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
+        self.assert_protected_unchanged()
+
+    def test_predecessor_source_release_must_match_target_lock(self) -> None:
+        source = self.temp_root / "artifact-r11-wrong-source"
+        for relative, payload in plugin_package._historical_source_skill_entries(
+            "13c2f51868a554c7568892c4aeaefa2fd814cb26",
+            expected_file_count=40,
+        ):
+            path = source / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(payload)
+        predecessor = Artifact.from_directory(
+            source,
+            source_release_id="2026.07.23.2",
+            artifact_id="cotend-codex-r000011",
+            revision=11,
+            protocol="cotend-collaboration-v1.65",
+        )
+        self.manager.execute("install", predecessor, apply=True)
+        receipt = self.load_receipt()
+        receipt["source_release_id"] = "untrusted-release"
+        self.manager.receipt_path.write_text(
+            json.dumps(receipt, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+        before = self.manager.inspect(self.artifact)
+        self.assertEqual(before["candidate_relation"], "incompatible")
+        self.assertIn("target_predecessor_unmapped", before["diagnostics"])
+        with self.assertRaisesRegex(DeliveryError, "update is blocked"):
+            self.manager.execute("update", self.artifact, apply=True)
+        self.assertEqual(self.load_receipt()["source_release_id"], "untrusted-release")
         self.assert_protected_unchanged()
 
     def test_protocol_change_is_incompatible_even_at_higher_revision(self) -> None:
@@ -624,8 +727,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         candidate = Artifact.from_directory(
             self.artifact.root,
             source_release_id=self.artifact.source_release_id,
-            artifact_id="cotend-codex-r000011",
-            revision=11,
+            artifact_id="cotend-codex-r000012",
+            revision=12,
             protocol="cotend-collaboration-v99",
         )
 

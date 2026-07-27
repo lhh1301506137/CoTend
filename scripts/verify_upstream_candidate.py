@@ -284,10 +284,13 @@ def main() -> int:
 
     candidate = load_json(args.candidate.resolve())
     role_map = load_json(args.role_map.resolve())
+    carriers = candidate.get("carriers", {})
+    claude = carriers.get("claude", {}) if isinstance(carriers, dict) else {}
     print(
         "UPSTREAM_CANDIDATE_VERIFICATION_OK "
         f"release={candidate['release_id']} "
-        f"codex_skills={role_map['skill_count']} claude_skills=3"
+        f"codex_skills={role_map['skill_count']} "
+        f"claude_skills={claude.get('skill_count', 'unknown')}"
     )
     return 0
 

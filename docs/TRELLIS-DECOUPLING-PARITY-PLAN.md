@@ -6,7 +6,7 @@ authority: product_owner_confirmed_2026-07-24
 scope: packaged_CoTend_runtime_and_first_party_Skills
 current_candidate: cotend@0.1.0-rc.2_local_unpublished
 target_candidate: cotend@0.1.0-rc.3_after_parity
-development_target_artifact: cotend-codex-r000011
+development_target_artifact: cotend-codex-r000012
 machine_contract: ../upstream/TRELLIS-DECOUPLING-PLAN.json
 analysis_language: zh-CN
 ```

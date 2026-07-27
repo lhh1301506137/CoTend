@@ -227,7 +227,7 @@ def validate_contract(
         raise TrellisDecouplingPlanError("current candidate identity drifted")
     if contract.get("target_candidate") != "cotend@0.1.0-rc.3_after_parity":
         raise TrellisDecouplingPlanError("target candidate identity drifted")
-    if contract.get("development_target_artifact") != "cotend-codex-r000011":
+    if contract.get("development_target_artifact") != "cotend-codex-r000012":
         raise TrellisDecouplingPlanError("development target artifact drifted")
 
     source = contract.get("source_boundary")

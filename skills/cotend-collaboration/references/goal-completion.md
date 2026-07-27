@@ -94,23 +94,9 @@ Do not use intent drift review to reopen every implementation detail. It is for 
 
 ## Rule
 
-If `mvp_status: likely_complete`, require the exact MVP claim to be `supported` or use the Harness's safe partial/blocked/unknown wording. Do not keep developing by default merely to hide a gap, and do not call the MVP complete from a candidate slice. Explain the stage and ask the user to join:
+If `mvp_status: likely_complete`, require the exact MVP claim to be `supported` or use the Harness's safe partial/blocked/unknown wording. Do not keep developing by default merely to hide a gap, and do not call the MVP complete from a candidate slice. Use the canonical Human Rejoin semantic fields from `templates.md`, rendered by the adapter in the resolved governance language. Explain that the MVP may be complete and continued work may be low-value or drift; offer localized choices for user acceptance, release cleanup, a next-stage goal, or continued scoped development.
 
-```markdown
-## Your Decision Is Needed
-
-**Current stage/step**: MVP completion decision
-**What the project is doing now**: <current goal>
-**Why you are needed now**: The core behavior may be complete, so more development may become low-value polish or drift from the goal.
-**What you need to decide/approve/accept**: Enter acceptance, prepare for release, define the next goal, or continue feature work.
-**Why this matters**: It prevents unattended development from extending a completed goal without product value.
-**Affected scope**: <feature/app scope>
-**Recommendation**: 1 enter AI UAT / 2 enter release preparation / 3 define the next goal / 4 continue development
-**What happens after approval**: <next mode>
-**Safer alternative if declined**: <safe fallback>
-```
-
-When recommending `user_acceptance`, include or prepare a concise user acceptance walkthrough from `ai-uat.md` in the project's recorded user-facing language, or English by default. This is the same user-facing control surface as `ai_uat.user_walkthrough`; `goal_completion.user_acceptance_walkthrough` may reference or summarize it at the Done Gate. Do not ask the user to read code as the default acceptance path.
+When recommending `user_acceptance`, include or prepare a concise user acceptance walkthrough in the resolved governance language from `ai-uat.md`. This is the same user-facing control surface as `ai_uat.user_walkthrough`; `goal_completion.user_acceptance_walkthrough` may reference or summarize it at the Done Gate. Do not ask the user to read code as the default acceptance path.
 
 Full goal acceptance is stricter than MVP completion. It usually requires AI UAT, no blocking reviews, release hardening if public, and user acceptance.
 

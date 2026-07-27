@@ -55,7 +55,7 @@ Do not load it for fully specified small edits, obvious bug fixes, or implementa
    - acceptance expectations.
 4. Ask only high-leverage questions the repo/docs cannot answer. Apply the CoTend Native Requirements Clarification contract above.
 5. Preserve decision-worthy answers as source evidence for the direct Alignment flow; if an external-framework brainstorm already records them, classify and link aligned content as `reference_only` rather than creating a parallel truth source. Do not mark protected semantics active from this preparatory module.
-6. Route the draft and evidence directly to `$cotend-semantic-alignment new_baseline`. That Skill teaches back current-MVP L0-L2 in the project's recorded user-facing language, or English by default, and obtains explicit confirmation for each protected node or exact grouped packet. For L2, it confirms the semantic charter before classifying or confirming rules; an intake rule list remains candidate evidence and never substitutes for the charter. Confirmation of L0 does not confirm AI-derived L1/L2.
+6. Route the draft and evidence directly to `$cotend-semantic-alignment new_baseline`. That Skill teaches back current-MVP L0-L2 in the resolved user-facing governance language and obtains explicit confirmation for each protected node or exact grouped packet. For L2, it confirms the semantic charter before classifying or confirming rules; an intake rule list remains candidate evidence and never substitutes for the charter. Confirmation of L0 does not confirm AI-derived L1/L2.
 7. Only the direct Alignment flow absorbs confirmed protected consensus into existing durable documents: PRD/brief, Plan Tree or active plan, `STATUS.md`, and relevant decision/knowledge records. Classify L3+ as delegated inference, not user-confirmed truth.
 8. Mark the original idea artifact `absorbed` only after the direct Alignment flow persists the confirmed baseline; otherwise leave it `temporary` or explicitly archive it. Do not delete it silently.
 9. Do not begin broad autonomous implementation until the direct Alignment result sets `ready_for_delegated_execution` to `yes` or remaining future/non-MVP unknowns are explicitly scoped as safe to defer.
@@ -101,7 +101,7 @@ Use `draft_pending_user_confirmation` when MVP, final shape, scope boundary, ris
 
 ## Output Discipline
 
-- Keep user-facing explanations in the project's recorded language, or English by default.
+- Keep user-facing explanations in Project Init's resolved governance language.
 - Avoid low-level implementation questions unless the decision really affects product direction, risk, cost, or maintainability.
 - Prefer concrete options with tradeoffs over open-ended questions.
 - If an external-framework brainstorm/PRD exists, classify and link it under the CoTend Project Truth Authority contract rather than creating a parallel truth source; direct Semantic Alignment alone owns protected confirmation/persistence.

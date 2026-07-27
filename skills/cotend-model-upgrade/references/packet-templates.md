@@ -102,7 +102,7 @@ Read human intent and confirmed consensus first. Use this manifest to find the o
 | Document | Path / Location | Why It Matters | Source Type | Freshness | Stale / Superseded Risk |
 |---|---|---|---|---|---|
 
-Include relevant `PROJECT-UNDERSTANDING/*.md` docs here when present, especially root/full project, MVP/stage, and active-path understanding. They are the expanded user-readable consensus layer; still verify claims against source docs, active truth, and code evidence.
+Include relevant `PROJECT-UNDERSTANDING/*.md` docs here when present, especially root/full project, MVP/stage, and active-path understanding. They are the expanded consensus layer in Project Init's resolved governance language; still verify claims against source docs, active truth, and code evidence.
 
 Include `USER-DEVELOPMENT-PROFILE.md` when present as `skim_for_context`. Use it to understand the user's confirmed development style, delegation preferences, and safety boundaries; do not let preferences override explicit project truth or safety/authority rules.
 
@@ -612,7 +612,7 @@ Single authority: see `EXECUTION-HANDOFF.md`. In this file, include only takeove
 
 ## User Decision Recommendation
 
-Give the recommendation in the project's recorded user-facing language, or English by default. Explain whether premium-model takeover is worthwhile, advisor-only use is better, or the current model should repair the packet first. Never present advisor recommendations as user-confirmed facts.
+Use Project Init's persisted governance language. Explain whether premium-model takeover is worthwhile, advisor-only use is better, or the current model should repair the packet first. Never present advisor recommendations as user-confirmed facts.
 
 ## Questions Before Takeover
 ```
@@ -920,7 +920,7 @@ Optional thin summary only. Keep this file to 15 lines or fewer. Do not duplicat
 - alignment: aligned | direction_risk | misaligned | insufficient_context
 - pointer: see `EXECUTION-HANDOFF.md` for execution plan, thesis, challenge, strengths, risks, and final menu.
 - pointer: see `UNDERSTANDING-AUDIT.md` for read depth, skipped files, freshness, and verification.
-- user summary: <write in the project language, or English by default>
+- user summary: <write in Project Init's resolved governance language>
 ```
 
 ## CONSENSUS-DELTA.md

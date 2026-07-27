@@ -15,6 +15,7 @@ This module chooses the verification surface and owns capability-completion evid
 - Product meaning, implementation, data, integration, verification, and operational readiness are different facts. Do not promote one proven slice into a broader capability claim.
 - A material Route Rebase may classify old completion evidence as needing refresh or invalidation, but it cannot set a completion result. This Harness alone re-derives the exact-scope claim from current evidence.
 - In multi-agent work, every write packet still proves its exact local scope before integration. The root then proves the integrated path; a centralized terminal batch cannot replace skipped packet-level verification.
+- Project Init alone resolves user-facing governance language. This Harness consumes the persisted normalized tag and verifies changed governance bytes; it never infers or re-resolves a language.
 
 ## Verification Ladder
 
@@ -67,6 +68,7 @@ acceptance_test_harness:
   result: pass | pass_with_notes | fail | blocked
   skipped_checks:
     -
+  governance_language_evidence: <use the canonical gate below when governance files changed; otherwise omit>
   claim_to_evidence:
     - claim:
       decision_relevance: high | medium | low
@@ -77,6 +79,39 @@ acceptance_test_harness:
 ```
 
 Keep the record short. Detailed logs belong in test output, screenshots, traces, or review artifacts.
+
+## User-Facing Governance Language Gate
+
+Trigger this gate whenever the current operation creates or changes user-visible governance prose, including STATUS or its mapped equivalent, Plan Tree/understanding, decision, review, handoff, Human Rejoin, AI UAT, acceptance, and Done/release records. Project Init's persisted declaration and the actual changed prose are independent required evidence. A structured packet, model self-report, filename, or declared `normalized_tag` cannot by itself prove the body language.
+
+Derive the changed-governance file set from the real VCS diff plus operation write receipts, including untracked files; do not trust only a hand-authored `changed_files` list. Read the current bytes for every in-scope file. The CoTend adapter owns localized titles/templates and its body-language checker, including any script/character/token thresholds. The shared contract owns only the evidence and result rules and must not freeze one language heuristic as universal behavior.
+
+```yaml
+governance_language_evidence:
+  status: checked | blocked | not_applicable
+  canonical_resolution_pointer: <STATUS.md or mapped equivalent>#user_facing_language_resolution
+  declared_normalized_tag: <normalized BCP 47 tag> | missing
+  changed_file_set_source: vcs_diff_plus_write_receipts | write_receipts_no_vcs
+  adapter_checker: <adapter-owned checker/version> | missing
+  files:
+    - path:
+      actual_bytes_checked: yes | no
+      user_visible_prose: present | absent
+      body_result: match | mismatch | technical_only | unchecked
+      excluded_technical_segments:
+        - none | schema_key | enum | identifier | path | hash | command | code | model_name | machine_field
+      evidence_pointer:
+  result: pass | fail | blocked | not_applicable
+```
+
+Derive `result` deterministically:
+
+1. `not_applicable` only when the real changed set contains no user-facing governance file;
+2. `blocked` when Project Init's resolution is missing/`human_needed`, the changed file set cannot be established, actual bytes cannot be read, or the required adapter checker is unavailable;
+3. `fail` when the declaration differs from the canonical normalized tag, an in-scope changed file is omitted, any user-visible prose is `mismatch | unchecked`, or the only support is structured self-report;
+4. `pass` only when every changed governance file's actual bytes were inspected and every user-visible prose segment matches the canonical tag. A technical-only file may use `technical_only` with concrete exclusions and does not fail merely because identifiers remain untranslated.
+
+Technical identifiers, schema keys, enum/status values, code, paths, hashes, commands, model names, URLs, and machine-readable fields are not user-facing prose and must not be counted as translation failures. Natural-language headings, explanations, recommendations, decision menus, summaries, and acceptance meaning remain prose even when adjacent to machine fields. Full and Adaptive execute this identical gate and must return the same result for the same resolution and bytes.
 
 ## Done / Review Gate
 
@@ -99,7 +134,7 @@ Apply this to claims that would change a user decision in a Human Rejoin prompt,
 - `not_run` or `deferred` must not be described as "verified".
 - `inspection` must not be described as behavior-level executed validation.
 - UI/product usability claims should prefer real interaction, Playwright/browser evidence, or an explicit AI UAT caveat.
-- `user_readable_meaning` must use the project's recorded user-facing language, or English by default, unless the value is an untranslated technical identifier.
+- `user_readable_meaning` must use Project Init's resolved normalized tag unless the value is an untranslated technical identifier covered by the governance-language exclusions.
 - `ai_generated_acceptance` is an AI-UAT label, not an evidence-type value. If AI actually exercised the path, the related claim can use `executed` with an AI-UAT caveat; if it did not, use the real evidence type such as `inspection` or `not_run`.
 - Ordinary minor summary statements do not need a table unless they affect user decisions.
 

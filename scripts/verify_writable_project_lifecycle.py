@@ -520,7 +520,7 @@ def validate_project_result(
         require_markers(
             project / "STATUS.md",
             (
-                "cotend-collaboration-v1.65",
+                "cotend-collaboration-v1.66",
                 "auto_mode: fresh_init",
                 "adoption_profile: lite",
                 "readiness: continue_ready",
@@ -537,7 +537,7 @@ def validate_project_result(
     if scenario_id == "current-resume":
         require_markers(
             project / "STATUS.md",
-            ("cotend-collaboration-v1.65", "adoption_profile: lite"),
+            ("cotend-collaboration-v1.66", "adoption_profile: lite"),
         )
     elif scenario_id == "pending-decision":
         require_markers(

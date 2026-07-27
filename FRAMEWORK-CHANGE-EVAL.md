@@ -1145,3 +1145,212 @@ watch_closure:
 ```
 
 L55 已关闭该分发载体 watch：真实 `owner/repo` fetch、同 revision refresh、洁净隔离安装、失败恢复和清理均通过。Desktop、真实用户状态和跨版本升级属于后续独立验证面，不回滚当前根载体。该项没有修改 CoTend 的共享框架行为、七个 Skill 字节或产品协议，因此不发起上游反馈或外部 reviewer 同步。
+
+## 2026-07-27 G06 治理语言机器验收与上游候选
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: workflow_behavior
+change_summary: 为 G06 real Init 增加独立于模型自报的治理语言 oracle，并把 L26/G06 证据整理为 upstream-first 版本化审计候选
+intent: 阻止“结构化结果通过但实际治理语言违反项目指令”的 false pass，同时不让 CoTend 绕过已锁定上游维护源先行修改共享 Skill
+expected_benefit:
+  - fresh Init 的 canonical 语言声明和实际 changed governance 内容必须一致
+  - 声称 zh-CN 但正文英文、正文中文但声明 en 两类违约均可重复失败
+  - 把 L26 已知缺口与 G06 真实证据合并，避免再次把未解决语言路径当成累计旅程前提已满足
+  - 上游包准确区分 dual-ai 私有中文默认与 CoTend 可移植产品适配缺口
+possible_harm:
+  - G06 专用字符数和比例阈值可能阻止合法但过短或机器字段占比很高的中文治理文件
+  - 若把 G06 oracle 阈值直接复制成共享框架语义，会把测试实现细节误当产品合同
+  - 若 upstream 包被误当补丁或实施授权，会破坏稳定前权威顺序
+affected_workflows:
+  - G06_real_Init_behavioral_acceptance
+  - fresh_Init_language_resolution_and_persistence_candidate
+  - CoTend_to_named_upstream_feedback_handoff
+deviations:
+  - 初步诊断曾把 locked upstream 描述为同样使用 recorded-language/English fallback；复核 release tag 后修正为 dual-ai 固定中文、CoTend 产品化适配不完整
+  - 不在本轮修改 r11 Skill；只修测试 harness 并生成审计候选
+mechanism_budget:
+  added_context_surface: script_test_fixture_and_private_cold_path_package
+  ordinary_load_impact: none
+  ceremony_added: none_for_ordinary_projects
+  duplication_check: extends_existing_G06_acceptance_harness_and_upstream_feedback_contract
+  cheaper_alternative_considered: 只在结构化结果增加 language 字段；因模型可自报合规而实际文件仍错误，拒绝
+  retirement_or_thinning_trigger: upstream release 提供确定性语言解析和更可靠的实际输出验证后，可降低或替换 G06 字符阈值，但不得移除声明与正文一致性检查
+  expected_failure_prevented: language_instruction_violation_structured_false_pass_parent_context_inference_and_parallel_shared_Skill_patch
+validation_scenarios:
+  - scenario: declared zh-CN with English governance files
+    expected: run-init fails on actual content despite the declaration
+    validation_result_type: executed
+    result: focused_negative_test_passed
+  - scenario: Chinese governance with declared en
+    expected: run-init fails on canonical declaration mismatch
+    validation_result_type: executed
+    result: focused_negative_test_passed
+  - scenario: Chinese governance with normalized zh-CN
+    expected: run-init returns language acceptance evidence without weakening file, Git, delivery, runtime or boundary checks
+    validation_result_type: executed
+    result: focused_positive_and_41_test_suite_passed
+  - scenario: full repository regression
+    expected: delivery, native workflow, package, marketplace, submission and repository contracts remain unchanged
+    validation_result_type: executed
+    result: 391_tests_Ruff_compileall_repository_check_270_19_19_passed
+  - scenario: upstream package integrity and authority
+    expected: exact inventory/hash, no Skill or patch payload, no machine-local path, and read-only first phase
+    validation_result_type: executed
+    result: COTEND_FEEDBACK_PACKAGE_OK_10_files_1_proposal_10_scenarios
+real_project_validation:
+  - scenario: existing failed G06 Init
+    expected: preserved as failed evidence and never reclassified by the new harness
+    validation_result_type: inspection
+    result: r11_HEAD_1effa32_and_three_expected_untracked_English_governance_files_unchanged
+  - scenario: corrected upstream language behavior in a new retained project
+    expected: project-local zh-CN instruction is resolved, persisted and reflected in actual governance before product implementation
+    validation_result_type: deferred
+    result: upstream_read_only_audit_REVISE_requires_user_authorized_implementation_new_release_CoTend_adoption_and_new_UAT
+decision: watch
+rollback_triggers:
+  - all-English governance passes the language oracle
+  - valid Chinese governance repeatedly fails only because machine identifiers are English
+  - the verifier trusts structured language output without actual file evidence
+  - CoTend edits shared r11 Skills before an adopted upstream release
+  - the feedback package causes the named upstream maintainer to implement before a user-confirmed disposition
+review_after: user-authorized upstream implementation and new release, or first new-release G06 fresh Init
+watch_closure:
+  - keep_watch
+  - evidence: REVIEW-R291_and_local_no_model_harness_validation
+  - upstream_disposition: REVIEW-R292_adopt_partial_normalized_REVISE
+  - implementation_authority: user_confirmed_upstream_implementation_and_release
+  - upstream_candidate: Dual_2026_07_27_1
+  - candidate_adoption_review: REVIEW-R293_BLOCK_release_closure_and_fresh_checkout_reproducibility
+```
+
+本轮没有修改当前采用的八个 Skill、framework lock 或 target artifact。`decision: watch` 已获得 R292 `REVISE` 和用户确认的上游实施授权；Dual `.27.1` 的语言实现已经生成，但 R293 证明该 tag 的发布状态与 fresh Windows checkout 验证不可复现，因此仍没有 CoTend 可采用字节，也不关闭 G06。
+
+## 2026-07-28 Dual 2026.07.27.1 采用前发布复验
+
+```yaml
+current_framework_version: cotend-collaboration-v1.65
+change_type: workflow_behavior
+change_summary: 对 CTD-FB-003 上游实现 release 执行不可变 tag、当前 HEAD 与 fresh Windows checkout 三面采用前复验
+intent: 防止核心行为测试通过但消费者拿到自相矛盾或无法从全新 checkout 复验的发布载体
+expected_benefit:
+  - CoTend 只采用 tag 内发布真相自洽且跨 checkout 可复现的上游版本
+  - clean-filter 与 CRLF 不再制造 package source parity 假失败
+  - 历史 release 回归不再用“当前版本”硬编码阻止后继发布
+possible_harm:
+  - 增加一次 successor release 和采用延迟
+  - 若错误修改既有 tag 会破坏不可变历史，因此明确禁止
+affected_workflows:
+  - upstream_release_adoption
+  - G06_language_contract_recovery
+  - immutable_release_verification
+deviations: none
+mechanism_budget:
+  added_context_surface: cold_path_review_record_only
+  ordinary_load_impact: none
+  ceremony_added: none_for_ordinary_projects
+  duplication_check: reuses_existing_upstream_review_and_tag_walkthrough
+  cheaper_alternative_considered: 直接采用 `.27.1` 后在 CoTend 绕过 verifier；因会隐藏不可重建发布事实而拒绝
+  retirement_or_thinning_trigger: successor_tag_passes_current_HEAD_and_fresh_checkout_full_walkthrough
+  expected_failure_prevented: immutable_tag_self_contradiction_platform_specific_false_drift_and_stale_current_release_assertion
+validation_scenarios:
+  - scenario: current upstream maintainer HEAD walkthrough
+    validation_result_type: executed
+    result: failed_v163_stale_current_release_assertion
+  - scenario: immutable tag metadata consistency
+    validation_result_type: inspection
+    result: failed_tag_says_23_2_current_and_v166_pending
+  - scenario: detached tag fresh Windows checkout walkthrough
+    validation_result_type: executed
+    result: failed_false_source_drift_on_semantic_contract_mjs
+  - scenario: Git object identity for reported drift
+    validation_result_type: executed
+    result: same_blob_45eb3ca11be030eaabeb78fce00ffbf7c4e80554_size_16136_clean_filter_matches
+decision: watch
+rollback_triggers:
+  - existing_2026_07_27_1_tag_is_moved_deleted_or_rewritten
+  - successor_tag_still_requires_post_tag_commit_to_learn_its_release_is_current
+  - successor_full_walkthrough_fails_from_current_HEAD_or_fresh_Windows_checkout
+  - CoTend_lock_or_r11_changes_before_successor_adoption_review
+review_after: successor_immutable_Dual_release_returns
+watch_closure:
+  - keep_watch
+  - evidence: REVIEW-R293-CodexSelf-20260728-293_BLOCK
+```
+
+## 2026-07-28 Dual 2026.07.28.1 / CoTend r12 采用
+
+```yaml
+current_framework_version: cotend-collaboration-v1.66
+change_type: workflow_behavior
+change_summary: 采用可复现的 Dual v1.66 后继 release，把 CoTend Codex target 推进到 r12，并让交付核心实际消费精确 predecessor_targets
+intent: 在不并行发明共享规则、不恢复外部开发框架依赖的前提下，关闭 G06 暴露的语言 false pass 和交付前代宽松放行缺口
+expected_benefit:
+  - Project Init 唯一解析并持久化治理语言，冲突在写入前停止
+  - Acceptance 读取真实 changed governance 正文，不再只信结构化自报
+  - Full 与 Adaptive 得到相同语言解析、冲突和验收结果
+  - r11 到 r12 更新必须精确命中 platform、lineage、release、artifact、revision、protocol 和 manifest
+  - 未登记、部分匹配或伪造 predecessor 在任何 payload 修改前失败关闭
+possible_harm:
+  - 更严格的 predecessor 身份会拒绝过去依赖宽松同协议递增规则的未知 receipt
+  - G06 中文正文阈值仍可能对合法短文档产生误报，需要真实旅程校准
+  - 目标源码已推进到 r12，但公开 rc.2 仍冻结在历史字节，容易被错误表述为同一发布物
+affected_workflows:
+  - fresh_and_resume_project_init
+  - governance_language_resolution_and_acceptance
+  - project_scoped_delivery_update_and_rollback
+  - G06_real_project_preparation
+deviations:
+  - cotend-init 从历史 rename_only 更正为 platform_adaptation，因为它传播持久化语言结果并使用 CoTend adapter 表面
+  - `.27.1` 保持不可变但不可采用，采用锚点直接推进到后继 `.28.1`
+mechanism_budget:
+  added_context_surface: no_new_skill_no_new_ledger_existing_Project_Init_STATUS_and_Acceptance_owners_only
+  ordinary_load_impact: bounded_v1_66_contract_delta
+  ceremony_added: none_for_ordinary_projects
+  duplication_check: reuses_existing_language_carrier_delivery_lock_and_acceptance_harness
+  cheaper_alternative_considered: 保留宽松 revision 比较并只在测试中声明 predecessor；因旧实现从未消费 lock 声明，拒绝
+  retirement_or_thinning_trigger: 首个正确 r12 真实 Init 若证明字符阈值过严，可调整 adapter 测试阈值但保留声明与正文一致性合同
+  expected_failure_prevented: governance_language_false_pass_undeclared_cross_protocol_update_partial_predecessor_spoof
+validation_scenarios:
+  - scenario: immutable successor release from current HEAD and detached tag checkout
+    validation_result_type: executed
+    result: passed_80_manifest_entries_complete_v166_walkthrough_CRLF_clean_filter_and_tamper_rejection
+  - scenario: LANG01 through LANG10 and Full Adaptive equivalence
+    validation_result_type: executed
+    result: passed
+  - scenario: adopted CoTend Skill source and official Skill validation
+    validation_result_type: executed
+    result: passed_8_skills_40_target_files_and_8_of_8_official_validator
+  - scenario: exact r11 to r12 delivery and malformed predecessor rejection
+    validation_result_type: executed
+    result: passed_62_delivery_tests_including_legacy_target_source_release_spoof_rejection
+  - scenario: G06 no-model language and retained-project harness
+    validation_result_type: executed
+    result: passed_41_tests
+  - scenario: full repository regression
+    validation_result_type: executed
+    result: passed_395_tests_Ruff_compileall_and_repository_check_270_19_19
+real_project_validation:
+  - scenario: new retained r12 project and real CoTend Init
+    expected: r11 installs, r12 updates, zh-CN project instruction persists and actual governance prose matches before handback
+    validation_result_type: deferred
+    result: explicit_one_time_model_call_authorization_required
+  - scenario: old r11 failed UAT
+    expected: remains immutable failure history and is not upgraded in place
+    validation_result_type: inspection
+    result: frozen_not_reclassified
+decision: watch
+rollback_triggers:
+  - r11 updates without exact declared predecessor identity
+  - unknown or forged predecessor mutates payload before rejection
+  - changed governance prose can pass with a conflicting persisted language
+  - Full and Adaptive produce different language or stop outcomes
+  - frozen rc2 or public rc1 bytes change without an independent release gate
+review_after: first_new_r12_real_Init_then_full_G06_completion
+watch_closure:
+  - upstream_release_reproducibility_watch_closed_by_2026_07_28_1
+  - repository_adoption_approved_with_notes_by_REVIEW_R294
+  - G06_real_project_and_user_acceptance_watch_remains_open
+```
+
+本次采用不新增 Skill、语言 ledger 或每步复核，也不恢复 Trellis 运行依赖。它只固定仓库内 v1.66/r12 候选；真实模型调用、新 UAT、产品实现、全局更新、rc.3、push、tag、Release、submission 和 publish 均未执行。

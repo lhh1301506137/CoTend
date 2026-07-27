@@ -94,6 +94,9 @@ EXPECTED_R9_MANIFEST = (
 EXPECTED_R10_MANIFEST = (
     "0715c20f517f906996d4882e47c664449a23cf6f7747b6a2d42835f35591b8a9"
 )
+EXPECTED_R11_MANIFEST = (
+    "eac48844295f9ba12d64df469aa25fab9e76a8c9ceb9817857350b5029767627"
+)
 REMOVED_TD07_TERMS = (
     "trellis-finish",
     "trellis_finish_archive_done",
@@ -821,24 +824,24 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000011"
-        or target.get("revision") != 11
+        target.get("artifact_id") != "cotend-codex-r000012"
+        or target.get("revision") != 12
         or target.get("manifest_sha256") != digest
         or lock.get("skill_count") != 8
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
         or len(files) != EXPECTED_SKILL_FILES
     ):
-        raise NativeCloseoutPassError("r11 target identity or manifest drifted")
+        raise NativeCloseoutPassError("r12 target identity or manifest drifted")
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000010",
-        "revision": 10,
+        "artifact_id": "cotend-codex-r000011",
+        "revision": 11,
         "source_release_id": "2026.07.23.2",
         "framework_protocol": "cotend-collaboration-v1.65",
-        "manifest_sha256": EXPECTED_R10_MANIFEST,
+        "manifest_sha256": EXPECTED_R11_MANIFEST,
     }:
-        raise NativeCloseoutPassError("r10 predecessor identity drifted")
+        raise NativeCloseoutPassError("r11 predecessor identity drifted")
 
     _require_markers(
         texts["evidence"],

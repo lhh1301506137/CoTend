@@ -1,0 +1,10 @@
+{
+  "schema": "cotend.g06-governance-language-acceptance",
+  "schema_version": 1,
+  "scenario_id": "g06-real-fresh-init",
+  "expected_language": "zh-CN",
+  "status_path": "STATUS.md",
+  "status_field": "user_facing_language_resolution.normalized_tag",
+  "minimum_cjk_characters_per_changed_document": 16,
+  "minimum_cjk_to_latin_ratio": 0.05
+}

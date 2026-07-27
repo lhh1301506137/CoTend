@@ -1,12 +1,12 @@
 ---
 name: cotend-project-init
 description: >-
-  Initialize, update, repair, migrate, or resume a coding project workflow for CoTend, including migration from legacy project truth. Auto-classifies native workflow and foreign-framework state; reports the protected multidimensional L0-L2 semantic baseline and derived status without forcing a legacy rebuild; emits a non-nested semantic-onboarding handoff for fresh idea/intake projects with an unresolved baseline; separates carrier/provider/actual-model/role identity from runtime-profile selection; preserves user-selected Full/Adaptive across framework updates; applies CoTend Full only when no prior choice exists; maps the effective selection to delegated_pair or inline execution; validates delegation-maturity state; and preserves review, evidence, risk, acceptance, release, and explicit-handback boundaries.
+  Initialize, update, repair, migrate, or resume a coding project workflow for CoTend, including migration from legacy project truth. Auto-classifies native workflow and foreign-framework state; exclusively resolves, normalizes, conflict-checks, and persists the user-facing governance language before affected writes; reports the protected multidimensional L0-L2 semantic baseline and derived status without forcing a legacy rebuild; emits a non-nested semantic-onboarding handoff for fresh idea/intake projects with an unresolved baseline; separates carrier/provider/actual-model/role identity from runtime-profile selection; preserves user-selected Full/Adaptive across framework updates; applies CoTend Full only when no prior choice exists; maps the effective selection to delegated_pair or inline execution; validates delegation-maturity state; and preserves review, evidence, risk, acceptance, release, and explicit-handback boundaries.
 ---
 
 # CoTend Project Init
 
-Protocol target: `cotend-collaboration-v1.65`
+Protocol target: `cotend-collaboration-v1.66`
 
 Initialize a project for the user's current AI development workflow without requiring them to paste a long prompt.
 
@@ -21,6 +21,8 @@ This skill is an orchestrator. Prefer loading or following these skills when ava
 ## Auto Mode
 
 Default behavior is automatic. When the user invokes `/cotend-init`, `$cotend-project-init`, "初始化开发框架", "更新开发框架", "修复开发框架", "接入 CoTend", or similar, do **not** ask whether this is a new project or an old project. Inspect first, classify the state, perform safe setup/repair, then report what happened.
+
+Auto Mode inspection is read-only until the user-facing governance language is resolved below. A language conflict blocks every affected governance write, including creating or updating `STATUS.md`, Plan Tree, handoff, review, decision, acceptance, or understanding prose; report `human_needed` without partially materializing another language.
 
 Auto Mode is initialization-only. It may classify and report the standing `semantic_baseline`, affected paths, gaps, and unaffected confirmed paths, but it must not classify, execute, load, call, delegate, or wrap `$cotend-semantic-alignment` or `$cotend-diagnose-only`. It must not draft a semantic confirmation packet, create or advance a pending semantic decision, or silently start a rebaseline.
 
@@ -84,15 +86,58 @@ An absent/partial/stale/conflicting baseline blocks only product paths that depe
 
 An active material Route Rebase is likewise scoped. `evaluating` may be `continue_ready` only for materiality/semantic-impact/authority classification and cannot activate the candidate. `pending_user_confirmation` makes the exact semantic decision the one affected-route handback and bare `继续` cannot answer it. `applying` / `revalidating` may be `continue_ready` only when no human gate is pending and the next action starts at the recorded reliable boundary. `blocked` prevents only dependent leaves; an unrelated route may continue when its own protected ancestors are already explicitly user-confirmed and dependency isolation is evidenced. Init must not ask for a new confirmation merely because another route is rebasing. Never revive the previous path merely because Init changed sessions/models.
 
+## User-Facing Governance Language Resolution
+
+Project Init is the sole owner of `user_facing_language_resolution`. `cotend-init`, Collaboration, Plan Tree, Acceptance/Test Harness, Semantic Alignment, Model Upgrade, and adapters consume the resolved record; they must not implement a second resolver, silently choose a competing source, or infer a replacement value.
+
+Resolve only an explicit governance-language instruction. Speaking a language in the current conversation is not a selection. Do not infer from session language, carrier or host locale, account preference, model output language, repository-majority text, filenames, source comments, or the language of an intake artifact.
+
+Inspect these candidates:
+
+1. a current user instruction that explicitly selects the language for user-facing project governance;
+2. the canonical `user_facing_language_resolution.normalized_tag` in `STATUS.md` or the already-mapped project-equivalent status carrier;
+3. an applicable project-local instruction that explicitly sets user-facing governance language, such as an in-scope `AGENTS.md` or project workflow instruction;
+4. the installed CoTend adapter default `en` only when the first three do not resolve a value.
+
+Apply conflict guards before precedence:
+
+- Different valid canonical and project-local tags are `conflict: canonical_vs_project_local` and `status: human_needed`, even when the current request happens to match one side. A plain language choice is not conflict-repair authorization.
+- A current explicit choice that differs from an applicable project-local instruction is `conflict: current_vs_project_local` and `status: human_needed`. It cannot bypass the project instruction. The user must explicitly authorize changing or revoking that exact instruction in a later conflict-resolution action.
+- Multiple applicable project-local instructions with different normalized tags, or a malformed explicit/canonical/project-local value, also fail closed. Do not fall through to another source or the adapter default.
+- When canonical and project-local values agree, canonical remains the selected source. When no project-local conflict exists, a current explicit choice may replace an older canonical value. Otherwise select the first available candidate in the order above.
+
+Normalize before comparison and persistence. Accept an explicit BCP 47 tag, trim whitespace, replace `_` with `-`, lowercase the primary language subtag, title-case a four-letter script subtag, and uppercase a two-letter or three-digit region subtag. Normalize the explicit aliases `zh`, `zh-CN`, `zh_Hans`, `中文`, and `简体中文` to `zh-CN`; normalize `zh-TW`, `繁體中文`, and `繁体中文` to `zh-TW`; normalize `en`, `English`, `英文`, and `英语` to `en`. Preserve other well-formed subtags under the same casing rules. Ambiguous or malformed values require `human_needed`; never guess a locale from prose.
+
+On `status: resolved`, materialize the normalized tag in the existing status carrier before another affected governance write. Reuse the mapped equivalent when the project does not call it `STATUS.md`; on fresh init, put the record in the status file that Init already creates. A current explicit choice and the adapter default are both persisted. Do not create `LANGUAGE.md`, a language ledger, another truth file, or per-step language checkpoints. Re-running with unchanged inputs must be byte-idempotent.
+
+```yaml
+user_facing_language_resolution:
+  contract: cotend.user-facing-language-resolution.v1
+  status: resolved | human_needed
+  normalized_tag: <normalized BCP 47 tag> | unresolved
+  source: current_user_explicit | canonical | project_local_explicit | adapter_default | unresolved
+  adapter: cotend
+  canonical_carrier: STATUS.md | <project-equivalent status carrier> | pending_creation | none
+  canonical_before: absent | <normalized tag> | invalid
+  project_local_instruction: absent | <normalized tag> | invalid | conflicting
+  persisted: yes | already_current | no
+  conflict: none | canonical_vs_project_local | current_vs_project_local | multiple_project_local | invalid_explicit_source
+  evidence:
+    - <current request or exact carrier/path>
+```
+
+`normalized_tag` controls user-visible governance prose and adapter-owned headings/templates. Schema keys, enum values, technical identifiers, code, paths, hashes, commands, model names, and machine-readable fields remain unchanged unless a separate contract requires localization. Runtime profile is not a language input: Full and Adaptive must produce the same resolution, stop, persistence, and acceptance outcome.
+
 ## Native Initialization And Resume Boundary
 
 Project Init owns the complete native entry lifecycle. It must finish these phases in order:
 
 1. classify exactly one Auto Mode;
-2. resolve the native workflow state and runtime profile;
-3. preserve or safely repair durable CoTend truth and control-plane files;
-4. run post-init consistency checks;
-5. report readiness and return control exactly once.
+2. resolve and persist user-facing governance language or stop affected writes;
+3. resolve the native workflow state and runtime profile;
+4. preserve or safely repair durable CoTend truth and control-plane files;
+5. run post-init consistency checks;
+6. report readiness and return control exactly once.
 
 Safe setup, update, repair, and migration writes are idempotent. Preserve user-authored truth and unrelated files; a second run with unchanged inputs must produce no diff. A dormant record requires explicit resume. A conflicting record, route-affecting external conflict, invalid profile, ambiguous migration, or missing specialized human decision fails closed before affected development.
 
@@ -124,11 +169,11 @@ Never read, import, translate, or infer a CoTend selection from a private Dual o
 
 Resolve without reading model, carrier, provider, role, reasoning configuration, Model Upgrade eligibility, self-assessment, historical performance, delegation maturity, or safety evidence. Those facts may be reported or used for a separate advisory recommendation, but they cannot activate, reject, invalidate, restore, or migrate the profile.
 
-Preserve a valid existing project `runtime_profile` across framework updates. Derive the new display name from the current protocol version and the stable machine value: v1.64 `adaptive` becomes `v1.65-A`, and v1.64 `full` becomes `v1.65-full`. Do not ask again merely because the framework or model changed.
+Preserve a valid existing project `runtime_profile` across framework updates. Derive the new display name from the current protocol version and the stable machine value: an earlier `adaptive` selection becomes `v1.66-A`, and an earlier `full` selection becomes `v1.66-full`. Do not ask again merely because the framework or model changed.
 
 Write a project profile only after explicit project-persistence intent or when materializing a first-use product default. A session-only choice changes the current execution route without rewriting the project. Bare `继续`, silence, an AI recommendation, or a model-role decision is not a profile change.
 
-Migrate a v1.54-v1.64 project record only when exactly one project-local value and its project scope are unambiguous. Retain its valid `runtime_profile`, write it to the native status carrier with `runtime_profile_source: migrated_existing_selection`, and leave the source file byte-identical. Do not import foreign tasks, specs, route state, activation state, or unrelated metadata. Invalid, duplicate, ambiguous, or route-conflicting candidates require a user choice before profile-sensitive implementation.
+Migrate a v1.54-v1.65 project record only when exactly one project-local value and its project scope are unambiguous. Retain its valid `runtime_profile`, write it to the native status carrier with `runtime_profile_source: migrated_existing_selection`, and leave the source file byte-identical. Do not import foreign tasks, specs, route state, activation state, or unrelated metadata. Invalid, duplicate, ambiguous, or route-conflicting candidates require a user choice before profile-sensitive implementation.
 
 Map the effective result only in the native record: `adaptive -> execution_mode: inline`; `full -> execution_mode: delegated_pair`. When the persistent selection changes from Adaptive to Full, explicitly restore `delegated_pair`; never leave `inline`. Never write CoTend profile or execution metadata into an external framework configuration.
 
@@ -378,7 +423,13 @@ Do not start large product development until this workflow is complete.
    - If the mode is `blocked_human_decision`, stop with Human Rejoin format.
    - Otherwise complete safe setup/update/repair before continuing.
 
-2. Resolve native workflow state.
+2. Resolve user-facing governance language.
+   - Execute the sole `user_facing_language_resolution` contract before creating or changing governance prose.
+   - Pass the resolved record to Collaboration and every triggered governance module unchanged. Do not let runtime profile, session language, repository content, or a downstream module re-resolve it.
+   - When an existing status carrier is present, persist the resolved record there before any other affected governance write. On fresh init, make the language record part of the first status-carrier write.
+   - On `human_needed`, make the language conflict the one outer handback and perform no affected governance writes.
+
+3. Resolve native workflow state.
    - Inspect the single native record in `STATUS.md` or its explicit mapping, then inventory relevant foreign-framework artifacts without treating their presence as activation.
    - Set detection to `absent | present` and state to `current | dormant | conflict`.
    - For `absent`, create one current native record when migration/default selection is unambiguous.
@@ -386,9 +437,9 @@ Do not start large product development until this workflow is complete.
    - For `dormant`, inspect/report only; require an explicit resume before product work.
    - For `conflict`, or for a route-affecting external conflict, stop with Human Rejoin. Do not write a profile.
 
-3. Select the runtime profile, then load collaboration rules.
+4. Select the runtime profile, then load collaboration rules.
    - Load `cotend-collaboration/references/runtime-profiles.md`, preserve a session/project selection across framework and model changes, use the applicable product default only when no choice exists, ignore model/Model Upgrade facts as selector inputs, and map the effective profile to `delegated_pair | inline` idempotently in the native record.
-   - Use `cotend-collaboration` v1.65 semantics.
+   - Use `cotend-collaboration` v1.66 semantics.
    - Treat `cotend-collaboration` as modular: load core first, then required `references/*.md` modules by trigger.
    - Load `cotend-collaboration/references/authority-and-triggers.md` whenever exact authority labels, stop boundaries, Chrome/release/decision triggers, or checkpoint measurement rules are needed.
    - Always include `loaded_protocol_modules` in initialization, handoff, review, unattended wake-up, approval, acceptance, Done Gate, and release-hardening outputs.
@@ -396,24 +447,24 @@ Do not start large product development until this workflow is complete.
    - Use `lite` only for one-off low-risk work.
    - Use `full` only when the project needs long unattended windows, AI UAT, Gemini advisory review, or complex multi-AI state.
 
-4. Create or inspect durable files.
+5. Create or inspect durable files.
    - Required for `lite`: `STATUS.md`, `REVIEW-LOG.md`.
    - Required for `standard`: `STATUS.md`, `REVIEW-LOG.md`, and `QUALITY-SIGNALS.md` or a `STATUS.md` Quality Sentinel section.
    - Conditional for standard/full multi-stage projects or projects with repeated user/grill/advisor decisions: `PROJECT-PLAN-TREE.md`, targeted `PROJECT-PLAN-NODES/` docs, linked `PROJECT-UNDERSTANDING/` docs, `PROJECT-DECISION-LOG.md`, and `PROJECT-KNOWLEDGE-CHANGELOG.md`. During Init, create only structural/index surfaces or copy already user-confirmed facts; do not draft proposed protected meaning, create a pending semantic state, or create a separate semantic tree/file.
    - Optional for larger projects: `COLLAB-HANDOFF.md`, `COLLAB-CONTEXT.md`, `COLLAB-TASK-INDEX.md`, legacy/project-specific `PLAN-CHANGELOG.md`.
    - If equivalent project-local names already exist, use them instead of duplicating files.
 
-5. Identify active truth.
+6. Identify active truth.
    - List current CoTend PRD/spec/STATUS/route records, then classify applicable external-framework docs as `reference_only`, `historical`, or `conflict`.
    - Separate explicit user-confirmed intent, original idea evidence, AI-written requirements/Plan Tree, and current implementation/product behavior. The latter two are not automatic user authority.
    - If multiple documents conflict, mark the conflict. A framework-setup conflict may use one concise Init-owned question; an L0-L2 meaning conflict is report-only during Init and points to direct `$cotend-semantic-alignment`, without drafting a confirmation packet or advancing semantic state.
 
-6. Determine project stage.
+7. Determine project stage.
    - Classify as `personal_dev`, `prototype`, `internal_test`, or `public_release`.
    - Infer from README, deployment config, env examples, auth/payment code, data sources, package scripts, classified external-framework/STATUS/PRD records, and the user's latest statements.
    - If ambiguous and it changes risk boundaries, ask one concise question with option `1` as the recommended default.
 
-7. Set continuous-development authority.
+8. Set continuous-development authority.
    - Default `max_continuous_risk: dev_high` for confirmed `personal_dev` / early `prototype`, local-only projects with no other people's private data, no public deployment, no real payment, and only user-owned or disposable data.
    - Use `max_continuous_risk: medium` only as a temporary fallback while project stage, local-only status, data scope, payment/cost exposure, or public/release posture is not yet known.
    - Once inspection confirms the local personal conditions, upgrade the recorded authorization to `dev_high` without asking again.
@@ -434,7 +485,7 @@ Do not start large product development until this workflow is complete.
      - validation failure, unexplained corruption, P0/P1, high-impact AI disagreement, or bypassing a recorded stop boundary.
    - When stopping for user approval, acceptance, scope expansion, Done Gate, release hardening, or any operation outside skill authority, explain the current stage/step, what the project is doing, why human input is needed now, what the operation does, its impact scope, what happens if approved, and the safer fallback if not approved.
 
-8. Establish review cadence.
+9. Establish review cadence.
    - Do not interrupt for every small change.
    - Use the External Advisor Trigger Map in `cotend-collaboration/references/review-and-self-review.md` to decide when actual-primary self-review is enough and when a separately identified external model should be recommended.
    - Cut or recommend review checkpoints at runnable feature slices, materially large diffs (typically about 8+ material files or about 1000 meaningful changed lines), about 5 task units, unclear verification failure, Quality Sentinel signal, or before any non-preauthorized commit/release/archive.
@@ -442,7 +493,7 @@ Do not start large product development until this workflow is complete.
    - If `local_closeout_authorization.status: active`, native closeout records plus an optional local commit may be part of checkpoint closeout after verification and formal self-review.
    - If asked for Claude/Codex review later, prepare the batch from the last completed review boundary, not only the latest change.
 
-8a. Inspect delegation maturity.
+9a. Inspect delegation maturity.
    - Load `cotend-collaboration/references/delegation-maturity.md` only when `PROJECT-DECISION-LOG.md` / `STATUS.md` contains maturity samples/state, a 10-sample window may have completed, the user asks to reduce repeated questions, or a restoration trigger may have fired.
    - Always report an effective level. When no maturity record exists, use `effective_level: ask_each_time` and `evidence_state: no_record_default`; do not omit the field or infer delegation from runtime profile, project adoption profile, `dev_high`, repeated `继续`, user silence, or historical acceptance alone.
    - Treat `project_key + category + current primary model/material configuration + user-confirmed protected L0-L2 scope` as one stable qualification key. A copied log, renamed scope, model/configuration change, category change, or missing key cannot inherit a prior window.
@@ -453,12 +504,12 @@ Do not start large product development until this workflow is complete.
    - Check automatic restoration: model/configuration change; two recent matching adverse delegated outcomes; one serious related review/P0/P1/security finding; scope/irreversibility/release boundary; or user request. On refusal or restoration, set a durable `evidence_reset_entry`, clear qualification counts, report the safe fallback, and require 10 new user-visible recommendation samples resolved after that entry.
    - Keep only the active category/level/scope and restoration summary in `STATUS.md`; retain compact evidence/history in the existing decision log. Do not create a new project file. Runtime profile, project adoption, risk authorization and maturity remain four separate fields.
 
-9. Configure plan review and slicing.
+10. Configure plan review and slicing.
    - Select and report the post-init dynamic route; do not execute product diagnosis, semantic alignment, brainstorming, or implementation during Init.
    - Decide whether Plan Review Gate is needed.
    - For complex work, draft vertical slices before execution.
 
-10. Configure Plan Tree.
+11. Configure Plan Tree.
     - Load `cotend-collaboration/references/plan-tree.md` when the project is standard/full with multiple stages, unattended/continuous development, high-value next-step selection, plan-external work, or drift/confusion risk.
     - If required and missing, create only the minimum structural `PROJECT-PLAN-TREE.md` index and related directories/records needed by the selected profile, populated from already user-confirmed facts. Do not propose or persist new L0/L1/L2 meaning during Init. Direct `$cotend-semantic-alignment new_baseline` owns the minimum semantic structure and truth updates when protected meaning is absent.
     - During init/rebuild, read active truth fully enough to record canonical `semantic_baseline` `coverage / authority / currency / consistency` and derive `status: not_required | absent | partial | confirmed | stale | conflict`; during ordinary resume, read only the compact derived status/non-default gaps, current work summary/acceptance, protected parent-chain summaries, per-node contract references, and unresolved/recent decision/knowledge entries that affect the route.
@@ -483,53 +534,53 @@ Do not start large product development until this workflow is complete.
     - Before declaring the project `continue_ready`, run the Plan Tree Post-Init Consistency Self-Check, including multidimensional `semantic_baseline_coverage`, triggered semantic-contract binding verification, active truth/navigation pointer closure, and material Route Rebase continuity when referenced. Fix safe control-plane drift when clearly in scope; never repair product meaning or re-sign a contract without user confirmation.
     - Run the Triggered Semantic Reconciliation depth needed to report Init safety: check protected lineage first, then inspect the active path/recent decisions and changes for init/update/resume/repair. Run deeper comparison only when an anomaly or possible self-consistent wrong baseline is needed to classify `stale` / `conflict`; report the result without drafting replacement meaning. Include the standing baseline and four-state reconciliation result when reconciliation runs.
 
-11. Configure unattended development when requested.
+12. Configure unattended development when requested.
    - Pre-seeded `继续` tokens continue only the current authorized unattended window.
    - Each checkpoint must be durable: `review_pending` or valid `self_reviewed`.
    - Never label unreviewed work as externally approved.
    - When review debt limit is reached, stop new product coding and consolidate logs, verification, and handoffs.
 
-12. Configure Acceptance/Test Harness when verification matters.
+13. Configure Acceptance/Test Harness when verification matters.
    - Load `cotend-collaboration/references/acceptance-test-harness.md` when recent work is implemented, UI/browser flow changed, handoff/review needs evidence, AI UAT is about to run, verification looks weak, or Chrome login/session/extension/OAuth/current-tab state may matter.
    - For web UI changes, choose between `browser:control-in-app-browser`, `playwright`, and `chrome:control-chrome` by the module's routing table.
    - If a canonical Chrome escalation trigger from `cotend-collaboration/references/authority-and-triggers.md` appears and Chrome is not used, record the reason.
    - Keep AI UAT separate from user acceptance.
    - Load the Harness's conditional `capability_completion_claim` only for decision-relevant delivery-state intent in a capability statement or question—including completion/availability/integration/readiness/activity/end-to-end delivery, implementation/build, working/runnable, landing, or equivalent wording—a semantic write that changed `status/current/active/next`, or an active Route Rebase that invalidated/requires revalidation of completion evidence. Ordinary Init readiness and compact baseline reporting do not require a six-dimension table or another user question.
 
-13. Configure AI UAT when useful.
+14. Configure AI UAT when useful.
    - If no high-value next development remains but recent work needs acceptance, run AI Simulated Acceptance / AI UAT.
    - Use the Acceptance/Test Harness first to choose Browser/Playwright/Chrome or equivalent real interaction when the app can run.
    - Judge against product goal and feature responsibility, not just clickability.
    - Record `ai_simulated_acceptance` as `ai_generated_acceptance`, not user-confirmed acceptance. If summarizing it through claim-to-evidence, map actually exercised paths to `executed` with an AI-UAT caveat and unexercised paths to `inspection` or `not_run` as appropriate.
 
-14. Configure Goal Completion / Done Gate.
+15. Configure Goal Completion / Done Gate.
    - If MVP/full goal may be complete, only polish remains, or `继续` would extend low-value work, load `references/goal-completion.md`.
    - Report whether MVP/full goal is likely complete and recommend `AI UAT`, `release_hardening`, `user_acceptance`, `new_goal_needed`, or justified `continue_dev`.
    - At milestone, long unattended, acceptance, or release boundaries, include intent drift review: whether the current product still matches the original idea and user-confirmed active truth.
    - Do not keep inventing work after Done Gate triggers.
 
-15. Configure Release Hardening.
+16. Configure Release Hardening.
    - If the user says deploy/release/public/上线/发布/给别人用, or any canonical Release / Public Trigger Word from `cotend-collaboration/references/authority-and-triggers.md` appears, load `references/release-hardening.md`.
    - Convert prior `dev_high` local shortcuts into cleanup/blocker items before public/internal use.
 
-16. Apply Karpathy guidelines.
+17. Apply Karpathy guidelines.
    - State assumptions and success criteria.
    - Make the smallest surgical change that solves the request.
    - Avoid speculative abstractions and unrelated cleanup.
    - Verify important work with tests, type checks, lint, smoke, or a clear explanation of why not.
 
-17. Use grill-me style for fuzzy requirements.
+18. Use grill-me style for fuzzy requirements.
     - During Init, use this style only for an Init-owned framework setup decision, one question at a time with recommended option `1`.
     - Do not use grill-me, an external-framework brainstorm, or idea-to-consensus inside Init to clarify, confirm, or persist product semantics. Report that independent post-init route into direct `$cotend-semantic-alignment new_baseline` instead.
     - If a framework-setup answer can be discovered from the codebase, inspect the codebase instead of asking.
     - Record only the framework-setup decision that Init owns. Product-semantic decisions and protected truth are recorded by the independent direct Alignment flow.
 
-18. Configure Harness Ratchet.
+19. Configure Harness Ratchet.
     - If initializing a new project, record the CoTend-owned or explicitly mapped project carrier where repeated process/quality failures should be captured (`STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, or project convention). External task/spec files may be linked as evidence but do not become the default owner.
     - If repairing an old project, scan recent status/review/task records for repeated misses and propose the smallest durable prevention.
     - Do not update global skills from project-local evidence unless the user asks or the failure is clearly cross-project.
 
-19. Configure Code Context Harness.
+20. Configure Code Context Harness.
     - If the project is current and `standard` or `full`, large, unfamiliar, cross-module, architecture-heavy, or likely to need external review, load `references/code-context-harness.md`.
     - During Init, provider/index setup is framework preparation only. Do not mark the native pre-development gate satisfied and do not start product work in the same response.
     - After the Init handback is satisfied, require the native pre-development order before broad edits: current CoTend truth -> active leaf and route -> requirements/acceptance/risk -> code-context provider and impact set -> direct file verification.
@@ -543,7 +594,7 @@ Do not start large product development until this workflow is complete.
 
 ## Required Initialization Report
 
-After initialization, report in the project's recorded user-facing language, or English by default. Do not reduce initialization quality to save tokens. Deep-read active truth, native workflow/profile evidence, external-framework classifications, Plan Tree, node docs, expanded understanding, decision log, knowledge changelog, Code Context Harness, and framework files as needed for the selected mode. The optimization is presentation-layer only: default to a compact decision report, and include the detailed audit only when useful or requested.
+After initialization, render user-facing prose in `user_facing_language_resolution.normalized_tag`. Do not reduce initialization quality to save tokens. Deep-read active truth, native workflow/profile evidence, external-framework classifications, Plan Tree, node docs, expanded understanding, decision log, knowledge changelog, Code Context Harness, and framework files as needed for the selected mode. The optimization is presentation-layer only: default to a compact decision report, and include the detailed audit only when useful or requested. Headings and prompt wording are adapter-owned renderings; the English strings below are the CoTend `en` adapter examples, not shared-language authority.
 
 Use this order:
 
@@ -554,6 +605,7 @@ Use this order:
 Never omit these from the user-facing report when present:
 
 - blockers or human-needed decisions;
+- resolved user-facing governance language, source, canonical carrier/persistence, or the exact conflict that prevented all affected governance writes;
 - semantic-baseline coverage/authority/currency/consistency, derived status, current-MVP L0-L2 confirmation gaps, and unaffected confirmed paths;
 - appended-request status and the independent direct next action when Init was explicitly invoked in composite form;
 - fresh-intake semantic-onboarding status, exact intake paths, non-execution guards, and its one outer handback when applicable;
@@ -579,7 +631,7 @@ Never omit these from the user-facing report when present:
 
 Every report must include a one-line Never-Omit coverage statement, such as:
 
-`Never-Omit Coverage: blockers=<not_present|not_relevant|present_unchanged|present>; semantic_baseline=<...>; semantic_contract_binding=<not_triggered|verified_active_scope|legacy_migration_at_trigger|affected_stale_or_unknown>; semantic_onboarding_handoff=<...>; appended_request=<...>; pending_confirmations=<...>; existing_or_observed_high_level_understanding=<...>; active_path_or_route=<...>; route_rebase=<...>; semantic_implementation_closure=<...>; decision_log=<...>; delegation_maturity=<...>; user_interruption=<...>; post_init_consistency=<...>; semantic_reconciliation=<...>; native_workflow_and_profiles=<...>; external_frameworks=<...>; risk_and_critical_boundaries=<...>; review_debt_or_sentinel=<...>; done_or_release_gate=<...>; intent_drift=<...>; acceptance_harness=<...>; code_context=<...>; durable_files=<...>; explicit_skill_handback=<...>; readiness_and_next_step=<...>.`
+`Never-Omit Coverage: blockers=<not_present|not_relevant|present_unchanged|present>; user_facing_language_resolution=<resolved|human_needed>; semantic_baseline=<...>; semantic_contract_binding=<not_triggered|verified_active_scope|legacy_migration_at_trigger|affected_stale_or_unknown>; semantic_onboarding_handoff=<...>; appended_request=<...>; pending_confirmations=<...>; existing_or_observed_high_level_understanding=<...>; active_path_or_route=<...>; route_rebase=<...>; semantic_implementation_closure=<...>; decision_log=<...>; delegation_maturity=<...>; user_interruption=<...>; post_init_consistency=<...>; semantic_reconciliation=<...>; native_workflow_and_profiles=<...>; external_frameworks=<...>; risk_and_critical_boundaries=<...>; review_debt_or_sentinel=<...>; done_or_release_gate=<...>; intent_drift=<...>; acceptance_harness=<...>; code_context=<...>; durable_files=<...>; explicit_skill_handback=<...>; readiness_and_next_step=<...>.`
 
 Default compact summary:
 
@@ -589,6 +641,7 @@ Default compact summary:
 - readiness: continue_ready | review_pending | human_needed | done_gate
 - can_continue: yes | no
 - current_goal_or_target:
+- user_facing_language_resolution: <use the sole canonical record owned above>
 - user_cockpit:
   status: present | created | updated | not_needed
   note:
@@ -615,7 +668,7 @@ Default compact summary:
   external_framework_owner: false
 - runtime_profile:
   effective: full | adaptive
-  display_name: v1.65-full | v1.65-A
+  display_name: v1.66-full | v1.66-A
   source: session_explicit | project_persistent | cotend_product_default | migrated_legacy_project_selection | invalid
   persistence: session | project | product_default
   user_selected: true | false
@@ -675,7 +728,7 @@ Detailed audit template:
 ## Detailed Initialization Audit
 
 Project initialization report:
-- protocol: cotend-collaboration-v1.65
+- protocol: cotend-collaboration-v1.66
 - report_mode: summary_only | summary_plus_detail | full_audit | blocked_decision
 - detail_policy: full_required | changed_or_relevant_only
 - omitted_unchanged_sections:
@@ -694,6 +747,7 @@ Project initialization report:
 - missing_required_modules:
   - none
 - role_assignment:
+- user_facing_language_resolution: <use the sole canonical record owned above>
 - runtime_profile_selection: <use the canonical schema from cotend-collaboration/references/runtime-profiles.md>
 - project_adoption_profile: lite | standard | full
 - cotend_workflow_state: <use the canonical schema from cotend-collaboration/references/runtime-profiles.md>
@@ -766,6 +820,8 @@ Project initialization report:
 - post_init_consistency:
   status: passed | warnings | failed | not_applicable
   checked:
+    - user_facing_language_resolution_persisted_before_governance_writes
+    - changed_governance_body_matches_resolved_language_when_acceptance_triggered
     - semantic_baseline_coverage
     - semantic_contract_binding
     - plan_tree_current_leaf_vs_external_compatibility_task

@@ -10,7 +10,7 @@ metadata:
 
 Version: 1.11
 
-Compatibility baseline: `cotend-collaboration-v1.65`.
+Compatibility baseline: `cotend-collaboration-v1.66`.
 
 Use this skill to coordinate a cost-efficient current model and a stronger premium model on the same project, including one-shot advice, user-approved takeover, milestone re-entry advisor rounds, non-authorizing runtime-profile recommendations, and cold-path framework thinning review after the user confirms a new primary development model.
 
@@ -507,7 +507,7 @@ At takeover depth, advisor output across the file set must mark:
 
 The single authority for independent thesis, strongest challenge, detailed strengths/risks, and must/should/could guidance is `EXECUTION-HANDOFF.md`. Other files may carry short local verdicts or references only.
 
-User-facing decision sections, including `TAKEOVER-VALUE-PROPOSAL.md` recommendation text and the final `EXECUTION-HANDOFF.md` decision menu, must use the project's recorded user-facing language, or English by default. Machine-readable field names and status values stay English.
+User-facing decision sections, including `TAKEOVER-VALUE-PROPOSAL.md` recommendation text and the final `EXECUTION-HANDOFF.md` decision menu, must use Project Init's persisted `user_facing_language_resolution.normalized_tag`. Consume that record without re-resolving it; when it is absent, invalid, or conflicting, delegate only Project Init's language-resolution subsection to that sole owner before writing affected governance prose. Do not run full Init or duplicate the resolver. Machine-readable field names and status values stay English.
 
 At slice depth, the required minimum is: the three verdicts, independent thesis, strongest challenge, classified recommendations, evidence checked, questions for the user, packet-quality notes, and user-confirmed answers.
 

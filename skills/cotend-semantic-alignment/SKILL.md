@@ -5,13 +5,15 @@ description: Use as the direct, independent writable entry when the user wants t
 
 # CoTend Semantic Alignment
 
-Companion version: `cotend-collaboration-v1.65`
+Companion version: `cotend-collaboration-v1.66`
 
 Align product meaning before implementation details. Preserve one Plan Tree and its linked truth files; do not create a second semantic tree.
 
+Before showing or writing user-facing governance prose, consume Project Init's persisted `user_facing_language_resolution` from `STATUS.md` or the mapped equivalent. When it is absent, invalid, or conflicting, delegate only Project Init's `User-Facing Governance Language Resolution` subsection to that sole owner, persist or return its result, and then continue or stop accordingly. Do not run full Init/Auto Mode, copy the source order here, infer from the conversation/repository/host, or create a competing record. This narrow delegation preserves the direct entry and does not give Init semantic-alignment authority. Full and Adaptive use the same language result. The English headings and labels shown in packet examples below are the CoTend `en` adapter rendering; another adapter must localize them to the resolved `normalized_tag` without changing the fields or authority semantics.
+
 ## Independent Entry And Minimum Truth
 
-Invoke this Skill directly. Do not run, require, or load `cotend-init` or `cotend-project-init` first.
+Invoke this Skill directly. Do not run or require `cotend-init` or full `cotend-project-init` Auto Mode first; the sole-language-resolver delegation above is the only preparatory exception.
 
 Read only the minimum project truth needed for the requested scope, in this order:
 
@@ -144,7 +146,7 @@ If the pre-write inventory or post-write closure changes decision-relevant deliv
 
 Follow the material route lifecycle owned by `plan-tree.md` and instantiate only the canonical `route_rebase` packet from `templates.md`. Do not define another packet, create a standing route file, or treat every semantic edit as a route rebase.
 
-When a candidate materially changes L0-L2, keep the packet `pending_user_confirmation` and pause only the affected route. Before asking, explain in plain language using the project's recorded user-facing language, or English by default:
+When a candidate materially changes L0-L2, keep the packet `pending_user_confirmation` and pause only the affected route. Before asking, explain in plain, nontechnical prose in the resolved governance language:
 
 - the exact original confirmed meaning;
 - the new discovery and why the old route is no longer preferred or sufficient;
@@ -170,7 +172,7 @@ If the user rejects the candidate, do not write candidate semantics as active tr
 
 ## Build The Alignment Draft
 
-For each protected node, write natural language that lets a nontechnical user recognize the intended product. Use the project's recorded user-facing language, or English by default. Do not reduce meaning to technical input/output fields. For each L2, the fields below form its semantic charter and are required unless one is genuinely inapplicable and the reason is shown. Treat them as semantic coverage, not a form: combine adjacent points into concise natural prose when that is clearer, but never hide a missing boundary behind a shorter summary.
+For each protected node, write natural prose in the resolved governance language that lets a nontechnical user recognize the intended product. Do not reduce meaning to technical input/output fields. For each L2, the fields below form its semantic charter and are required unless one is genuinely inapplicable and the reason is shown. Treat them as semantic coverage, not a form: combine adjacent points into concise natural prose when that is clearer, but never hide a missing boundary behind a shorter summary.
 
 Cover, as applicable:
 
@@ -191,7 +193,7 @@ For every current-MVP L2 that is new, reconstructed, stale, conflicting, or mate
 1. `charter_draft`: explain the L2's position, complete goal, responsibility inside L1, included and excluded functionality, user-visible delivery, upstream/downstream relationships, ideal final form, current MVP boundary, one success scenario, and one plausible but semantically wrong outcome.
 2. `charter_confirmation`: ask the user to confirm only that semantic charter. Do not present a dense numbered rule set, ask the user to confirm rules, or let rules define the charter in the same first-seen packet.
 3. `rule_classification`: only after exact charter confirmation, classify existing and proposed rules as:
-   - `protected_product_rule`: it adds a user-significant invariant or choice inside the confirmed charter that affects product behavior, acceptance, safety, or another protected product decision; show it in plain user-facing language and obtain exact user confirmation;
+   - `protected_product_rule`: it adds a user-significant invariant or choice inside the confirmed charter that affects product behavior, acceptance, safety, or another protected product decision; show it in plain, nontechnical prose in the resolved governance language and obtain exact user confirmation;
    - `derived_acceptance_rule`: it tests the confirmed charter without adding new product meaning; AI may derive, report, and verify it without claiming user-confirmed authority;
    - `implementation_rule`: it controls L3/L4 workflow, code, API, data, tool, or internal mechanics without changing protected meaning; AI owns it inside normal risk and review boundaries.
 4. `rule_confirmation_or_delegation`: ask only about `protected_product_rule` items. Keep derived acceptance and implementation rules visibly separate and AI-owned.
@@ -249,7 +251,7 @@ For a material `semantic_change` that also changes the active route, precede the
 
 ## Build And Bind The Semantic Contract
 
-For every new or materially changed current-MVP L0-L2 node, build one `cotend.semantic-contract.v1` payload for the exact protected confirmation stage using the single schema and canonicalization rules in `../cotend-collaboration/references/templates.md`. Build it before asking and render the user-facing packet from its protected fields in the project's recorded language, or English by default. For every new or materially changed charter-first stage, use `protected_product_rules: []`; keep all prior/proposed rules at `candidate_rules_pending_charter` until the new charter is confirmed and they are reclassified. Do not show or ask the user to inspect the JSON, hash, contract ID, or implementation mechanics.
+For every new or materially changed current-MVP L0-L2 node, build one `cotend.semantic-contract.v1` payload for the exact protected confirmation stage using the single schema and canonicalization rules in `../cotend-collaboration/references/templates.md`. Build it before asking and render the user-facing packet from its protected fields in the resolved governance language. For every new or materially changed charter-first stage, use `protected_product_rules: []`; keep all prior/proposed rules at `candidate_rules_pending_charter` until the new charter is confirmed and they are reclassified. Do not show or ask the user to inspect the JSON, hash, contract ID, or implementation mechanics.
 
 The payload and user-facing packet must be semantically equivalent. A shorter machine summary that omits a shown responsibility, boundary, relationship, scenario, or protected rule is invalid. Persist the same prebuilt payload after the answer; do not reconstruct it from memory. One confirmation packet may contain several separately named nodes, but each node gets its own contract ID, payload, digest, and decision-log binding; confirmation never inherits through the packet or parent chain.
 
@@ -327,7 +329,7 @@ Do not claim product repair from documentation changes alone. If implementation 
 
 ## Output
 
-Use the project's recorded user-facing language, or English by default, and keep user decisions free of code jargon.
+Use the resolved governance language and keep user decisions free of code jargon.
 
 ```yaml
 语义对齐摘要:

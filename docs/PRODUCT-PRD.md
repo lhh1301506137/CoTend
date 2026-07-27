@@ -60,7 +60,7 @@ CoTend Core 本身是唯一拥有项目开发治理权的框架。计划、规�
 
 19 类能力已按照 [`docs/BEHAVIOR-SPECIFICATION-STANDARD.md`](BEHAVIOR-SPECIFICATION-STANDARD.md) 整理为平台中立、架构中立的可观察行为契约，并全部达到 `active_user_confirmed`；[`docs/BEHAVIOR-SPEC-INDEX.md`](BEHAVIOR-SPEC-INDEX.md) 负责唯一覆盖和依赖顺序。
 
-这些契约现在是产品化覆盖和验收护栏：直接改名或适配不得静默丢失任何已确认能力，但契约本身不要求把 dual-ai 重写成一套新流程。当前 CoTend adoption 已完整覆盖 dual-ai v1.53-v1.65，C01-C19 映射到 8 个仓库内 Codex Skill、37 个文件；隔离 Plugin、项目载体、已交付运行时、卸载/回滚和精确 v1.52 predecessor 更新已经验证，真实用户全局更新和 rc.2 远端重验仍需独立执行。
+这些契约现在是产品化覆盖和验收护栏：直接改名或适配不得静默丢失任何已确认能力，但契约本身不要求把 dual-ai 重写成一套新流程。当前 CoTend adoption 已完整覆盖 dual-ai v1.53-v1.66，C01-C19 映射到 8 个仓库内 Codex Skill；上游 Skill 源为 37 个文件，r12 target 为 40 个文件。隔离 Plugin、项目载体、已交付运行时、卸载/回滚和精确 predecessor 更新已经验证，真实 r12 项目、真实用户全局更新和 rc.2 远端重验仍需独立执行。
 
 ## 产品与测试载体边界（已确认）
 

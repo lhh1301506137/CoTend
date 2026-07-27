@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "scenario_id": {"type": "string", "const": "g06-real-fresh-init"},
+    "invoked_skill": {"type": "string", "const": "cotend-init"},
+    "skill_source_path": {"type": "string", "const": ".agents/skills/cotend-init/SKILL.md"},
+    "skill_source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "auto_mode": {"type": "string", "enum": ["fresh_init", "legacy_update"]},
+    "readiness": {"type": "string", "enum": ["continue_ready", "human_needed"]},
+    "adoption_profile": {"type": "string", "enum": ["standard", "full"]},
+    "runtime_profile": {"type": "string", "const": "full"},
+    "durable_files_created": {"type": "array", "items": {"type": "string"}},
+    "durable_files_updated": {"type": "array", "items": {"type": "string"}},
+    "product_implementation_started": {"type": "boolean", "const": false},
+    "protected_product_files_modified": {"type": "boolean", "const": false},
+    "git_commit_created": {"type": "boolean", "const": false},
+    "handback_required": {"type": "boolean", "const": true},
+    "summary": {"type": "string"}
+  },
+  "required": [
+    "scenario_id",
+    "invoked_skill",
+    "skill_source_path",
+    "skill_source_sha256",
+    "auto_mode",
+    "readiness",
+    "adoption_profile",
+    "runtime_profile",
+    "durable_files_created",
+    "durable_files_updated",
+    "product_implementation_started",
+    "protected_product_files_modified",
+    "git_commit_created",
+    "handback_required",
+    "summary"
+  ],
+  "additionalProperties": false
+}

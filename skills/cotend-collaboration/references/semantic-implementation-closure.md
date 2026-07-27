@@ -172,7 +172,7 @@ A user-confirmed degraded behavior may close when the charter explicitly permits
 Implementation discovery may improve the route without changing product meaning:
 
 - L3/L4 data structures, APIs, algorithms, refactors, tests, performance work, and internal decomposition remain AI-owned inside confirmed ancestors and risk boundaries. Record them without asking the user.
-- If discovery would change L0, L1, or L2 responsibility, inputs/outputs, core behavior, user result, main-chain position, or current-MVP boundary, stop only the affected implementation. Explain the original meaning, proposed meaning, reason, affected product behavior, and recommendation in the project's recorded user-facing language, or English by default, then route directly to `$cotend-semantic-alignment`.
+- If discovery would change L0, L1, or L2 responsibility, inputs/outputs, core behavior, user result, main-chain position, or current-MVP boundary, stop only the affected implementation. Explain the original meaning, proposed meaning, reason, affected product behavior, and recommendation in the resolved governance language, then route directly to `$cotend-semantic-alignment`.
 - The Plan Tree owner records this material candidate through the canonical Route Rebase lifecycle. Do not create a second packet here, and do not let an unrelated independently confirmed path inherit the block without dependency evidence.
 - A bare `继续`, runtime profile, unattended authorization, or successful test cannot confirm the semantic delta.
 

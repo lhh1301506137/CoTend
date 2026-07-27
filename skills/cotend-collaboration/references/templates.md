@@ -2,6 +2,8 @@
 
 Use only when exact packet shape is needed.
 
+Project Init's persisted `user_facing_language_resolution.normalized_tag` controls all user-visible prose rendered from these schemas. Adapters own localized headings, labels, and templates. Shared schemas keep machine keys/enums stable and must not infer or re-resolve language.
+
 ## Canonical Schemas
 
 ### `plan_tree_alignment`
@@ -40,7 +42,7 @@ plan_tree_alignment:
     mvp_or_stage_summary:
     user_confirmed:
     primary_ai_proposed_delta:
-    language: <project language; English by default>
+    language: <user_facing_language_resolution.normalized_tag>
   semantic_baseline_status: not_required | absent | partial | confirmed | stale | conflict
   why_this_is_highest_value_now:
   reconciliation_done: yes | no | not_required
@@ -114,7 +116,7 @@ Historical explicit confirmations may enter as `legacy_unbound`. Do not invalida
 
 This subsection is the single canonical owner of the content-addressed confirmation payload and binding rules. It does not create a new project file or semantic tree. The exact payload is stored inside the existing `PROJECT-DECISION-LOG.md` confirmation entry; Plan Tree, node/understanding metadata, `semantic_baseline.confirmation_evidence`, handoffs, and reviews reference its `contract_id`, decision entry, and digest.
 
-The user confirms the natural-language charter and any separately presented protected product rules, never the hash or JSON mechanics. Before each protected confirmation stage, Semantic Alignment must build the payload from which that packet's protected user-facing content is rendered in the project's recorded language, or English by default. After confirmation it persists that unchanged payload and verifies the binding before marking the affected node current. For every new or materially changed charter stage, `protected_product_rules` is `[]`; prior/proposed rules remain `candidate_rules_pending_charter` until the charter is confirmed and reclassified. If a later rule packet adds, retains, removes, or changes protected product rules, build a new successor payload and contract ID before showing that packet, keep the verified charter fields unchanged, show the complete charter as the already-confirmed basis plus the exact complete rule-set delta, and link the successor decision through `supersedes`. The current combined payload then has cumulative authority from the prior charter decision plus the new rule decision; supersede the earlier binding only after the rule packet is confirmed and verified.
+The user confirms the natural-language charter and any separately presented protected product rules, never the hash or JSON mechanics. Before each protected confirmation stage, Semantic Alignment must build the payload from which that packet's protected content is rendered in the resolved governance language. After confirmation it persists that unchanged payload and verifies the binding before marking the affected node current. For every new or materially changed charter stage, `protected_product_rules` is `[]`; prior/proposed rules remain `candidate_rules_pending_charter` until the charter is confirmed and reclassified. If a later rule packet adds, retains, removes, or changes protected product rules, build a new successor payload and contract ID before showing that packet, keep the verified charter fields unchanged, show the complete charter as the already-confirmed basis plus the exact complete rule-set delta, and link the successor decision through `supersedes`. The current combined payload then has cumulative authority from the prior charter decision plus the new rule decision; supersede the earlier binding only after the rule packet is confirmed and verified.
 
 ```json
 {
@@ -364,7 +366,7 @@ claim_to_evidence:
     decision_relevance: high | medium | low
     evidence_type: executed | inspection | asserted_by_rule | deferred | not_run
     evidence_pointer:
-    user_readable_meaning: # Project language, or English by default; technical identifiers may remain unchanged.
+    user_readable_meaning: # Resolved governance language unless this is an excluded technical identifier.
     caveat:
 capability_completion_claim: <use the complete conditional canonical schema, including freshness_basis, from acceptance-test-harness.md only when its trigger fires; otherwise omit>
 acceptance_test_harness: <use the exact canonical acceptance_test_harness schema and enums from acceptance-test-harness.md when relevant; otherwise omit>
@@ -515,16 +517,18 @@ verdict: APPROVE | APPROVE_WITH_NOTES | DISCUSS | REQUEST_CHANGES
 
 ## Human Rejoin
 
-```markdown
-## Your Decision Is Needed
+Render these semantic fields with adapter-owned headings and option text in the resolved governance language:
 
-**Current stage/step**:
-**What the project is doing now**:
-**Why you are needed now**:
-**What you need to decide/approve/accept**:
-**Why this matters**:
-**Affected scope**:
-**Recommendation**: 1 approve / 2 decline / 3 explain more first
-**What happens after approval**:
-**Safer alternative if declined**:
+```markdown
+## <adapter-localized Human Rejoin title>
+
+current_stage_or_step:
+current_project_activity:
+why_human_is_needed:
+decision_approval_or_acceptance_needed:
+purpose:
+impact_scope:
+recommendation_menu: <adapter-localized accept/reject/explain choices>
+if_accepted:
+safer_alternative:
 ```

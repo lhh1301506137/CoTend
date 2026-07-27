@@ -62,22 +62,7 @@ When tightening, convert previous `dev_high` shortcuts into blockers or cleanup 
 
 ## Human Rejoin Explanation
 
-Use this for user approval, user acceptance, scope expansion, product direction choice, release/deploy, destructive operation, or any stop boundary.
-
-```markdown
-## Your Decision Is Needed
-
-**Current stage/step**:
-**What the project is doing now**:
-**Why you are needed now**:
-**What you need to decide/approve/accept**:
-**Why this matters**:
-**Affected scope**:
-**Risk tier**:
-**Recommendation**: 1 approve / 2 decline / 3 explain more first
-**What happens after approval**:
-**Safer alternative if declined**:
-```
+Use this for user approval, user acceptance, scope expansion, product direction choice, release/deploy, destructive operation, or any stop boundary. Render the canonical Human Rejoin semantic fields from `templates.md` through the active adapter in the resolved governance language, adding the risk tier and exact technical evidence where required.
 
 Keep it short and non-technical. If exact commands, destructive targets, costs, secrets, or public exposure are involved, include exact path/command, backup/rollback status, and verification plan.
 

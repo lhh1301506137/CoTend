@@ -1,9 +1,9 @@
-# dual-ai release 2026.07.23.2 产品化采用记录
+# dual-ai release 2026.07.28.1 产品化采用记录
 
 ```yaml
 status: adopted_verified
 authority: adopted_productization_record
-candidate_release: 2026.07.23.2
+candidate_release: 2026.07.28.1
 candidate_record: upstream/FRAMEWORK-CANDIDATE.json
 role_map: upstream/CODEX-SKILL-ROLE-MAP.json
 role_layer_status: user_confirmed
@@ -27,20 +27,20 @@ analysis_language: zh-CN
 5. `dual-model-upgrade` 是模型顾问、试用、接手、回退和复诊的进阶能力。
 6. `grill-me` 和 `karpathy-guidelines` 是 MIT 伴随 Skill，不拥有产品生命周期或项目真相。
 
-用户已确认保留这套分层。六个用户原创 Skill 使用 `cotend-` 前缀，两个 MIT 伴随 Skill 保留原身份。仓库内 8 个 Skill、37 个文件已完成 v1.53-v1.65 的产品化适配；普通 Init 只报告语义状态，只有独立 `cotend-semantic-alignment` 可写 L0-L2 含义。GitHub Open Beta 与本地 Plugin 载体已存在，但 rc.2 推送、Public Plugin Directory、Claude v1.65 适配和任何发布动作仍需独立授权与验证。
+用户已确认保留这套分层。六个用户原创 Skill 使用 `cotend-` 前缀，两个 MIT 伴随 Skill 保留原身份。仓库内 8 个 Skill、37 个上游对应文件已完成 v1.53-v1.66 的产品化适配；普通 Init 只报告语义状态，只有独立 `cotend-semantic-alignment` 可写 L0-L2 含义。v1.66 进一步把治理语言解析集中到 Project Init，并要求验收读取真实变更正文。GitHub Open Beta 与本地 Plugin 载体已存在，但 rc.2 推送、Public Plugin Directory、Claude v1.66 语言能力适配和任何发布动作仍需独立授权与验证。
 
 ## 候选 release 证据
 
 | 证据 | 结果 | 含义 |
 |---|---|---|
-| Release ID | `2026.07.23.2` | 当前固定候选版本。 |
-| Annotated tag | `dual-ai-share-2026.07.23.2` | 可从 Git 对象重建，不依赖工作树。 |
-| Tag object | `b8df9fc4c1c30694e3574410a44e7c72de779e07` | 锚定本次复验对象。 |
-| Release commit | `6b0dc0a80e35dd1296a17d0ecdb8f1bacc785a00` | 完整发布提交。 |
-| Package tree | `71c49b0463528fb8a2b3deabace6bfb942a67b6c` | 完整分享包目录树。 |
-| Manifest SHA-256 | `5dd76ae856f596176583fd73681c4ec9c8a365aa84313715a727ecd28182081a` | 72 项 manifest 的内容锚点。 |
-| Tag verifier | `executed: passed` | 72 项 hash 与 package tree 全部通过。 |
-| Consumer range handoff | `executed: passed` | 从 2026.07.11.3 到 2026.07.23.2 的 201 个提交已全部分类，16 个中间 release 已纳入。 |
+| Release ID | `2026.07.28.1` | 当前固定可采用版本；`.27.1` 保持不可变但不可采用。 |
+| Annotated tag | `dual-ai-share-2026.07.28.1` | 可从 Git 对象重建，不依赖工作树。 |
+| Tag object | `e5ed9ec097251d3bca24f27801ed818a09de1e7a` | 锚定本次复验对象。 |
+| Release commit | `e3d3245efc3843851d007cf0a6de2f3bebf418fc` | 完整发布提交。 |
+| Package tree | `7ab401fde46aae48e1cf9da49b5b1c670434c4b6` | 完整分享包目录树。 |
+| Manifest SHA-256 | `7def9da0459ffe99373c738988d2aae14d0c7095ccbdb222556d3763b87b016c` | 80 项 manifest 的内容锚点。 |
+| Tag verifier | `executed: passed` | 80 项 hash、package tree 与 annotated tag 全部通过。 |
+| Successor range review | `executed: passed` | 从 `.23.2` release commit 到 `.28.1` release commit 的 16 个提交已分类；15 个 source/history 提交加 1 个 successor release commit。 |
 | 发布者身份 | `not authenticated` | 可证明内容身份，不能证明远端发布者密码学身份。 |
 
 机器可读来源证据见 [`FRAMEWORK-CANDIDATE.json`](FRAMEWORK-CANDIDATE.json)，最终采用锚点见 [`framework.lock.json`](framework.lock.json)。
@@ -49,7 +49,7 @@ analysis_language: zh-CN
 
 | Upstream Skill | 真实角色 | 当前用户可见性 | 最终处置 | CoTend 名称状态 |
 |---|---|---|---|---|
-| `dual-ai-init` | 统一入口 | 默认入口 | `adapted` + `rename_only` | 已确认 `cotend-init`。 |
+| `dual-ai-init` | 统一入口 | 默认入口 | `adapted` + `platform_adaptation` | 已确认 `cotend-init`；传播 CoTend 的治理语言记录和标题。 |
 | `dual-ai-project-init` | 内部 Auto Mode 引擎 | 委派为主，显式调用仅作 fallback | `adapted` + `platform_adaptation` | 已确认 `cotend-project-init`。 |
 | `dual-ai-collaboration` | 共享治理核心 | 隐式核心；审查等情境可显式进入 | `adapted` + `platform_adaptation` | 已确认 `cotend-collaboration`。 |
 | `diagnose-only` | 只读诊断 | 自然语言优先的情境入口 | `adapted` + `platform_adaptation` | 已确认 `cotend-diagnose-only`。 |
@@ -97,11 +97,11 @@ analysis_language: zh-CN
 
 CodeGraph、Playwright、Git、Python 和 PowerShell 保持 external runtime；Codex、Claude 和 Chrome 保持 platform capability。CoTend 可以按产品合同检测或调用它们，但不把其源码、二进制、账号状态或平台内部实现并入产品。
 
-Trellis 与这些单用途工具不同：它本身是端到端开发治理框架。v1.65 adopted source 仍保留其运行时协调分支，但用户已把该状态确认为产品化缺口。L61 已冻结八类能力与 241 处/22 文件历史基线；L62 已用 CoTend 原生合同替换 TD08 项目真相权限，当前库存独立记录为 174 处/21 文件。其余 TD01-TD07 仍必须逐项通过等价 gate；最终 Core 不调用、不激活也不向 Trellis 让出任务/规格权限。该产品 overlay 不否定 `2026.07.23.2` 来源 lock，也不授权在缺少等价证据时提前删除现有能力。
+Trellis 与这些单用途工具不同：它本身是端到端开发治理框架。CoTend 已通过 TD01-TD08、G03-G05 把活动运行路径替换为第一方合同，并保留历史来源与兼容证据；最终 Core 不调用、不激活也不向 Trellis 让出任务/规格权限。v1.66 adoption 不恢复已移除的 Trellis 运行依赖，也不把上游仍兼容 Trellis 的分支重新变成 CoTend 的活动 owner。
 
 ### Claude 载体
 
-Claude 包只含 3 个 Skill，并明确没有 Codex 的 project-init 引擎。Codex 是已确认的首发适配器，因此 Claude 载体整体 `deferred`，等 Codex 纵向切片通过后再单独做平台适配，不需要本轮重新询问。
+分享包包含 6 个 Claude Skill，但其协议仍是 v1.65，明确没有采用 v1.66 的治理语言解析合同。Codex 是已确认的首发适配器，因此 Claude 载体整体 `deferred`；本轮不把 6 个目录的存在误写成 v1.66 行为等价。
 
 ## 已确认的 CoTend 分层与名称
 
@@ -124,7 +124,7 @@ Claude 包只含 3 个 Skill，并明确没有 Codex 的 project-init 引擎。C
 ```yaml
 candidate_integrity: passed
 release_notes_reviewed: yes
-changed_surfaces: cumulative_update_v1_53_through_v1_65
+changed_surfaces: cumulative_update_v1_53_through_v1_66_with_language_resolution
 role_layers: user_confirmed
 user_owned_skill_names: user_confirmed
 MIT_companion_bundling: user_confirmed

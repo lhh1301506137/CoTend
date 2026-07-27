@@ -136,18 +136,19 @@ prevents historical samples from satisfying cooldown or immediate requalificatio
 
 ## Downgrade Offer
 
-Ask at a material checkpoint, not in the middle of an active batch. Keep the explanation in the project's recorded user-facing language, or English by default:
+Ask at a material checkpoint, not in the middle of an active batch. Keep the explanation user-readable and render it through the adapter in the resolved governance language:
 
-```markdown
-## Delegation Maturity Recommendation
-
-In the last 10 `<category>` decisions, 9 produced clean results after you explicitly accepted the recommendation; the window contains no serious rework, safety issue, P0/P1 finding, or review rejection.
-
-**Proposed change**: Move from "ask each time" to "apply the recommended answer inside the confirmed scope, then report at checkpoints."
-**Applies only to**: <project, category, and per-node confirmed current-MVP L0-L2 scope>
-**Still asks separately for**: <summary of non-delegable topics>
-**Automatic restoration triggers**: <Primary model change, two adverse outcomes, serious finding, boundary/release event, or user request>
-**Recommendation**: 1 approve / 2 keep ask_each_time / 3 revise the scope
+```yaml
+delegation_maturity_offer:
+  title: <adapter-localized title>
+  evidence_summary: <10 resolved samples, at least 9 accepted_clean, no serious disqualifier>
+  proposed_change: ask_each_time -> act_then_report
+  applies_only_to: <project/category/per-node-confirmed current-MVP L0-L2 scope>
+  still_asks_separately:
+    - <non-delegable boundary summary>
+  automatic_restore_conditions:
+    - <model/configuration change, two adverse outcomes, serious finding, boundary/release, or user request>
+  recommendation_menu: <adapter-localized accept/keep ask_each_time/adjust scope choices>
 ```
 
 A bare `继续` does not answer this offer. Record the offer and answer in `PROJECT-DECISION-LOG.md`.
@@ -237,7 +238,7 @@ These always remain `ask_each_time`, regardless of acceptance history:
 - push, deploy, release, publish, public sharing or making the product available to others;
 - Done Gate, AI UAT interpretation that needs the user, and final user acceptance;
 - primary/reviewer/advisor role, model takeover, framework thinning, authority or safety-boundary change;
-- any specialized pending `Your Decision Is Needed` question.
+- any specialized pending Human Rejoin question.
 
 This list summarizes routing. The canonical stop and authority rules remain in `authority-and-triggers.md` and `risk-and-approval.md`.
 

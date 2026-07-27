@@ -9,7 +9,7 @@ Use this module when CoTend clarification/grill-me, classified external brainsto
 It complements but does not replace:
 
 - `PROJECT-PLAN-TREE.md` and `PROJECT-PLAN-NODES/` for route and plan structure;
-- `PROJECT-UNDERSTANDING/` for expanded user-readable product understanding;
+- `PROJECT-UNDERSTANDING/` for expanded product understanding in the resolved governance language;
 - `PROJECT-KNOWLEDGE-CHANGELOG.md` for material changes to understanding, route, links, or consensus status;
 - a CoTend-owned project PRD, spec, or brief for current detailed requirements.
 

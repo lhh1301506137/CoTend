@@ -308,8 +308,36 @@ class LegacyReceiptMapping:
     def matches_target(self, receipt: dict[str, Any]) -> bool:
         return (
             receipt.get("schema_version") != LEGACY_SCHEMA_VERSION
+            and receipt.get("source_release_id") == self.artifact_id
             and receipt.get("artifact_id") == self.target_artifact_id
             and receipt.get("target_revision") == self.target_revision
+            and receipt.get("protocol") == self.protocol
+            and receipt.get("manifest_sha256") == self.manifest_sha256
+        )
+
+
+@dataclass(frozen=True)
+class TargetPredecessor:
+    platform: str
+    lineage: str
+    artifact_id: str
+    revision: int
+    source_release_id: str
+    protocol: str
+    manifest_sha256: str
+
+    @property
+    def target_revision(self) -> int:
+        return self.revision
+
+    def matches_target(self, receipt: dict[str, Any]) -> bool:
+        return (
+            receipt.get("schema_version") != LEGACY_SCHEMA_VERSION
+            and receipt.get("platform") == self.platform
+            and receipt.get("source_release_id") == self.source_release_id
+            and receipt.get("artifact_lineage") == self.lineage
+            and receipt.get("artifact_id") == self.artifact_id
+            and receipt.get("target_revision") == self.revision
             and receipt.get("protocol") == self.protocol
             and receipt.get("manifest_sha256") == self.manifest_sha256
         )
@@ -513,6 +541,7 @@ class Artifact:
     files: dict[str, str]
     manifest_sha256: str
     legacy_receipt_mappings: tuple[LegacyReceiptMapping, ...]
+    predecessor_targets: tuple[TargetPredecessor, ...]
 
     @classmethod
     def from_directory(
@@ -526,6 +555,7 @@ class Artifact:
         platform: str = TARGET_PLATFORM,
         lineage: str = TARGET_LINEAGE,
         legacy_receipt_mappings: tuple[LegacyReceiptMapping, ...] = (),
+        predecessor_targets: tuple[TargetPredecessor, ...] = (),
     ) -> "Artifact":
         string_identity = (
             source_release_id,
@@ -627,6 +657,37 @@ class Artifact:
                     "Legacy receipt mapping does not match the target artifact",
                 )
             legacy_keys.add(key)
+        predecessor_revisions: set[int] = set()
+        previous_revision = revision
+        for predecessor in predecessor_targets:
+            if not isinstance(predecessor, TargetPredecessor):
+                raise DeliveryError(
+                    "artifact_identity_invalid",
+                    "Target predecessor has an invalid type",
+                )
+            if (
+                predecessor.platform != platform
+                or predecessor.lineage != lineage
+                or isinstance(predecessor.revision, bool)
+                or not isinstance(predecessor.revision, int)
+                or predecessor.revision < 1
+                or predecessor.revision >= revision
+                or predecessor.revision >= previous_revision
+                or predecessor.revision in predecessor_revisions
+                or predecessor.artifact_id
+                != _target_artifact_id(lineage, predecessor.revision)
+                or not isinstance(predecessor.source_release_id, str)
+                or not predecessor.source_release_id
+                or not isinstance(predecessor.protocol, str)
+                or not predecessor.protocol
+                or not _is_sha256(predecessor.manifest_sha256)
+            ):
+                raise DeliveryError(
+                    "artifact_identity_invalid",
+                    "Target predecessor identity is invalid or out of order",
+                )
+            predecessor_revisions.add(predecessor.revision)
+            previous_revision = predecessor.revision
         return cls(
             source_release_id=source_release_id,
             platform=platform,
@@ -639,6 +700,7 @@ class Artifact:
             files=files,
             manifest_sha256=manifest_sha256,
             legacy_receipt_mappings=legacy_receipt_mappings,
+            predecessor_targets=predecessor_targets,
         )
 
     @classmethod
@@ -736,6 +798,39 @@ class Artifact:
                     "target_lock_invalid",
                     "Legacy receipt mapping is missing an identity field",
                 ) from exc
+        predecessors_value = target_lock.get("predecessor_targets")
+        if not isinstance(predecessors_value, list):
+            raise DeliveryError(
+                "target_lock_invalid",
+                "Target predecessors are not a list",
+            )
+        predecessor_keys = {
+            "platform",
+            "lineage",
+            "artifact_id",
+            "revision",
+            "source_release_id",
+            "framework_protocol",
+            "manifest_sha256",
+        }
+        predecessors: list[TargetPredecessor] = []
+        for value in predecessors_value:
+            if not isinstance(value, dict) or set(value) != predecessor_keys:
+                raise DeliveryError(
+                    "target_lock_invalid",
+                    "Target predecessor fields are invalid",
+                )
+            predecessors.append(
+                TargetPredecessor(
+                    platform=value["platform"],
+                    lineage=value["lineage"],
+                    artifact_id=value["artifact_id"],
+                    revision=value["revision"],
+                    source_release_id=value["source_release_id"],
+                    protocol=value["framework_protocol"],
+                    manifest_sha256=value["manifest_sha256"],
+                )
+            )
         artifact = cls.from_directory(
             root.joinpath(*carrier.parts),
             source_release_id=str(source_identity.get("release_id", "")),
@@ -745,6 +840,7 @@ class Artifact:
             revision=target_identity.get("revision"),
             protocol=str(lock.get("framework_protocol", "")),
             legacy_receipt_mappings=tuple(mappings),
+            predecessor_targets=tuple(predecessors),
         )
         if lock.get("skill_count") != len(artifact.skills):
             raise DeliveryError("framework_lock_mismatch", "Skill count differs from lock")
@@ -2066,11 +2162,14 @@ class DeliveryManager:
     def _target_mapping(
         receipt: dict[str, Any],
         candidate: Artifact,
-    ) -> LegacyReceiptMapping | None:
+    ) -> TargetPredecessor | LegacyReceiptMapping | None:
         return next(
             (
                 mapping
-                for mapping in candidate.legacy_receipt_mappings
+                for mapping in (
+                    *candidate.predecessor_targets,
+                    *candidate.legacy_receipt_mappings,
+                )
                 if mapping.matches_target(receipt)
             ),
             None,
@@ -2160,6 +2259,11 @@ class DeliveryManager:
             and predecessor.target_revision < candidate.revision
         ):
             return "update_available", []
+        if (
+            candidate.predecessor_targets
+            and receipt["target_revision"] < candidate.revision
+        ):
+            return "incompatible", ["target_predecessor_unmapped"]
         if receipt["protocol"] != candidate.protocol:
             return "incompatible", ["protocol_incompatible"]
         if receipt["target_revision"] == candidate.revision:

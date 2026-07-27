@@ -11,24 +11,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_ROOT = "dual-ai-collaboration-skill-share"
-TAG = "dual-ai-share-2026.07.23.2"
+TAG = "dual-ai-share-2026.07.28.1"
 
 SKILLS = {
     "dual-ai-init": {
         "target": "cotend-init",
-        "tree": "10d067b679fb810be4a449a047c13d2747b48259",
+        "tree": "689f5088f950dcb18c56846e03f3e8ea549c6b0b",
         "mode": "adapted",
         "files": 2,
     },
     "dual-ai-project-init": {
         "target": "cotend-project-init",
-        "tree": "e71864611f7ec7ef0a9a4cc6314083da86ff9068",
+        "tree": "d28d2858e540996f787e1ba9c77e9953e44fb7fd",
         "mode": "adapted",
         "files": 2,
     },
     "dual-ai-collaboration": {
         "target": "cotend-collaboration",
-        "tree": "f1387d19a8c2dba2738b886276e6d1987602e332",
+        "tree": "3eb2c5db3b07b1f4963e2eb96cd1465825de510a",
         "mode": "adapted",
         "files": 23,
     },
@@ -40,13 +40,13 @@ SKILLS = {
     },
     "dual-ai-semantic-alignment": {
         "target": "cotend-semantic-alignment",
-        "tree": "df5e63b3cd8ff315ac09973666a71eb20825f094",
+        "tree": "e7f019bfd5ee99f1d0f518bcba177de6ae90f5fb",
         "mode": "adapted",
         "files": 3,
     },
     "dual-model-upgrade": {
         "target": "cotend-model-upgrade",
-        "tree": "940081225626250a6680cef9499f9b14003147da",
+        "tree": "7f4e6fba55bded5f8a18917be9fa6e1f09fd01cc",
         "mode": "adapted",
         "files": 3,
     },
@@ -84,11 +84,13 @@ DISPLAY_NAMES = {
 REQUIRED_MARKERS = {
     "cotend-init": (
         "Load and follow `cotend-project-init` Auto Mode",
+        "user-facing governance language resolution",
         ".codex\\skills\\cotend-project-init\\SKILL.md",
         ".codex/skills/cotend-project-init/SKILL.md",
     ),
     "cotend-project-init": (
-        "Protocol target: `cotend-collaboration-v1.65`",
+        "Protocol target: `cotend-collaboration-v1.66`",
+        "Project Init is the sole owner of `user_facing_language_resolution`",
         "**cotend-collaboration** owns collaboration governance",
         "`$cotend-diagnose-only`",
         "`karpathy-guidelines` for coding behavior",
@@ -98,7 +100,8 @@ REQUIRED_MARKERS = {
         "references/code-context-harness.md",
     ),
     "cotend-collaboration": (
-        "Protocol version: `cotend-collaboration-v1.65`",
+        "Protocol version: `cotend-collaboration-v1.66`",
+        "inspect their actual prose against the persisted resolved language",
         "CoTend Core never grants project-truth authority",
         "through `cotend-project-init` Auto Mode",
         "`$cotend-diagnose-only` owns read-only checks",
@@ -114,7 +117,7 @@ REQUIRED_MARKERS = {
         "milestone re-entry",
     ),
     "cotend-semantic-alignment": (
-        "Companion version: `cotend-collaboration-v1.65`",
+        "Companion version: `cotend-collaboration-v1.66`",
         "`cotend.semantic-contract.v1`",
         "scripts/semantic-contract.mjs",
         "Independent Entry And Minimum Truth",
@@ -508,13 +511,13 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         return
     expected_lock = {
         "schema": "cotend.framework-lock",
-        "release_id": "2026.07.23.2",
-        "framework_protocol": "cotend-collaboration-v1.65",
+        "release_id": "2026.07.28.1",
+        "framework_protocol": "cotend-collaboration-v1.66",
         "model_upgrade_packet_family": "cotend-model-upgrade-v1.11",
         "skill_count": 8,
         "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
         "adoption_record": (
-            "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-23-2-v1-65-adoption"
+            "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-1-v1-66-adoption"
         ),
     }
     for key, expected in expected_lock.items():
@@ -522,12 +525,12 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
             errors.append(f"framework lock mismatch: {key}")
     expected_source_release = {
         "tag": TAG,
-        "tag_object": "b8df9fc4c1c30694e3574410a44e7c72de779e07",
-        "release_commit": "6b0dc0a80e35dd1296a17d0ecdb8f1bacc785a00",
-        "source_framework_commit": "4233d7439fc9d9b787803b3df7cdbe9d57ce9323",
-        "package_tree": "71c49b0463528fb8a2b3deabace6bfb942a67b6c",
+        "tag_object": "e5ed9ec097251d3bca24f27801ed818a09de1e7a",
+        "release_commit": "e3d3245efc3843851d007cf0a6de2f3bebf418fc",
+        "source_framework_commit": "208626912ddfaf51f5b09e2dc29d069a2dce7d3a",
+        "package_tree": "7ab401fde46aae48e1cf9da49b5b1c670434c4b6",
         "manifest_sha256": (
-            "5dd76ae856f596176583fd73681c4ec9c8a365aa84313715a727ecd28182081a"
+            "7def9da0459ffe99373c738988d2aae14d0c7095ccbdb222556d3763b87b016c"
         ),
     }
     if lock.get("status") != "adopted_verified":
@@ -570,14 +573,25 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         "target": {
             "platform": "Codex",
             "lineage": "cotend-codex",
-            "artifact_id": "cotend-codex-r000011",
-            "revision": 11,
+            "artifact_id": "cotend-codex-r000012",
+            "revision": 12,
             "manifest_sha256": carrier_manifest,
         },
         "product": {"version": None},
         "skill_count": 8,
         "skill_file_count": 40,
         "predecessor_targets": [
+            {
+                "platform": "Codex",
+                "lineage": "cotend-codex",
+                "artifact_id": "cotend-codex-r000011",
+                "revision": 11,
+                "source_release_id": "2026.07.23.2",
+                "framework_protocol": "cotend-collaboration-v1.65",
+                "manifest_sha256": (
+                    "eac48844295f9ba12d64df469aa25fab9e76a8c9ceb9817857350b5029767627"
+                ),
+            },
             {
                 "platform": "Codex",
                 "lineage": "cotend-codex",
@@ -681,8 +695,8 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         "legacy_receipt_mappings": [
             {
                 "receipt_schema_version": 1,
-                "artifact_id": lock.get("release_id"),
-                "protocol": lock.get("framework_protocol"),
+                "artifact_id": "2026.07.23.2",
+                "protocol": "cotend-collaboration-v1.65",
                 "manifest_sha256": (
                     "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b"
                 ),
@@ -720,9 +734,7 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
                 "adapted" if record["mode"] == "adapted" else "adopted"
             )
             expected_mode = (
-                "rename_only"
-                if source_id == "dual-ai-init"
-                else "direct_adoption"
+                "direct_adoption"
                 if record["mode"] == "adopted"
                 else "platform_adaptation"
             )
@@ -826,9 +838,7 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
                 "adapted" if record["mode"] == "adapted" else "adopted"
             )
             expected_mode = (
-                "rename_only"
-                if source_id == "dual-ai-init"
-                else "direct_adoption"
+                "direct_adoption"
                 if record["mode"] == "adopted"
                 else "platform_adaptation"
             )
@@ -844,8 +854,8 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
     else:
         log_text = adoption_log.read_text(encoding="utf-8")
         for marker in (
-            "## release-2026-07-23-2-v1-65-adoption",
-            "status: adopted_verified",
+            "## release-2026-07-28-1-v1-66-adoption",
+            "status: adopted_verified_local",
             "resulting_CoTend_commit: containing_commit",
         ):
             if marker not in log_text:

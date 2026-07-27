@@ -361,3 +361,62 @@ push_release_or_publish: not_performed
 L66 继续作为 CoTend 产品 overlay：Init 与 Project Init 原生拥有初始化、更新、修复、迁移、续接、冲突停止和一次 handback；Code Context Harness 原生拥有真相优先的开发前门。13 类入口与 9 类开发前场景通过，外部开发框架不取得 owner，重复检查保持幂等。
 
 根 `skills/` 推进为同 lineage target r7，L65 的 r6 成为精确 predecessor，r5、r4、r3 与 r2 继续保留。未发布 rc.2 仍由历史 r2 source commit 重建，48 文件 package 与 ZIP 摘要不变。TD04、TD05、TD07 兼容过程保持，且本叶不构成 rc.3、push、release、submission 或 publish 授权。
+
+## release-2026-07-28-1-v1-66-adoption
+
+```yaml
+status: adopted_verified_local
+source_release: 2026.07.28.1
+source_tag: dual-ai-share-2026.07.28.1
+source_tag_object: e5ed9ec097251d3bca24f27801ed818a09de1e7a
+source_release_commit: e3d3245efc3843851d007cf0a6de2f3bebf418fc
+source_framework_commit: 208626912ddfaf51f5b09e2dc29d069a2dce7d3a
+source_package_tree: 7ab401fde46aae48e1cf9da49b5b1c670434c4b6
+source_manifest_sha256: 7def9da0459ffe99373c738988d2aae14d0c7095ccbdb222556d3763b87b016c
+manifest_entries: 80
+framework_protocol: cotend-collaboration-v1.66
+model_upgrade_packet_family: cotend-model-upgrade-v1.11
+previous_adoptable_release: 2026.07.23.2
+superseded_non_adoptable_release: 2026.07.27.1
+reviewed_commit_range: 16_commits_from_previous_release_commit_exclusive_to_successor_release_inclusive
+skill_count: 8
+upstream_skill_file_count: 37
+target_skill_file_count: 40
+target_artifact_id: cotend-codex-r000012
+target_revision: 12
+target_manifest_sha256: 44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276
+predecessor_target_artifact_id: cotend-codex-r000011
+predecessor_manifest_sha256: eac48844295f9ba12d64df469aa25fab9e76a8c9ceb9817857350b5029767627
+resulting_CoTend_commit: containing_commit
+live_install_performed: false
+model_call_performed: false
+push_release_or_publish: not_performed
+```
+
+### 区间分类
+
+从上一可采用 release commit `6b0dc0a` 到本 release commit 共 16 个提交：
+
+- 1 个 CoTend v1.65 消费者交接生成提交、2 个任务归档/日志提交：历史与交接证据，不直接改变 CoTend 运行行为。
+- 1 个 Claude v1.65 + DMU v1.11 安装提交：仅说明分享包 Claude 载体扩展到 6 个 Skill；不构成 CoTend Claude 适配或 v1.66 语言等价。
+- 1 个 v1.66 治理语言行为提交：本轮必须产品化采用的共享行为。
+- 1 个 `.27.1` release、1 个 release 证据提交和 2 个归档/日志修正提交：保留为不可采用历史，不能成为 CoTend lock。
+- 1 个 Dual-CoTend 双向演进说明和 2 个归档/日志提交：治理关系说明；当前稳定前仍由 Dual release 先落地、CoTend 后采用。
+- 2 个 release closure 修复提交：修复 current-head/fresh-checkout 可复现性与 v1.64 回归隔离，属于采用前完整性前置。
+- 1 个 `.28.1` successor release 提交：形成当前可采用 annotated tag 与不可变对象锚点。
+
+### 产品化适配结论
+
+CoTend 保留 Project Init 作为唯一治理语言解析 owner，默认适配器语言为 `en`。当前用户明确选择、canonical 记录、项目局部明确指令与 adapter 默认按合同解析；任何 canonical/project-local 或 current/project-local 冲突都在受影响治理写入前进入 `human_needed`。不得从会话语言、locale、账号偏好、文件名或仓库文本隐式推断。
+
+语言结果继续写入既有 STATUS 载体，不新增 ledger。Collaboration、Plan Tree、Semantic Alignment、Model Upgrade、Human Rejoin、AI UAT 和 Done/Release 记录只消费该持久化结果。Acceptance 从真实 VCS diff 与写入回执建立 changed-governance 集合，读取实际字节，并验证声明与正文一致；结构化自报不能单独证明通过。Full 与 Adaptive 必须得到相同解析、冲突、持久化和验收结果。
+
+`cotend-init` 因传播持久化语言记录并使用 CoTend adapter 标题，处置从历史 `rename_only` 纠正为 `platform_adaptation`。CoTend 原生 `current/dormant/conflict` 状态、`delegated_pair/inline` 执行、三 pass 链和零 Trellis 活动运行依赖继续保留；本次上游采用不恢复外部开发框架 owner。
+
+### 独立验证与边界
+
+- detached annotated tag 中的对象验证通过：80 条 manifest、package tree、release commit 和 tag object 全部匹配。
+- 完整 v1.66 walkthrough 通过 LANG01-LANG10、Full/Adaptive 等价、真实 changed-body 证据、CRLF/clean-filter 等价、真实篡改拒绝和 8/6 fake-home 安装恢复。
+- 两个 MIT Skill 的 source tree 未变化，目标字节与上游 release 保持一致。
+- `.27.1` 保持不可变但不可采用；上一可采用 `.23.2` 继续作为来源和 r11 前代历史。
+- 本记录只授权并描述仓库内 Codex source adoption 与本地 r12 身份。它不授权全局 Skill/Plugin 更新、真实模型调用、G06 用户验收、rc.3、Claude v1.66 适配、push、tag、Release、submission 或 publish。

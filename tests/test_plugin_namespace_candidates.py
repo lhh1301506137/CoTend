@@ -59,9 +59,9 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         self.assertEqual(
             inventory["by_identifier"],
             {
-                "cotend-collaboration": 77,
+                "cotend-collaboration": 76,
                 "cotend-diagnose-only": 25,
-                "cotend-init": 12,
+                "cotend-init": 13,
                 "cotend-model-upgrade": 11,
                 "cotend-project-init": 15,
                 "cotend-semantic-alignment": 48,

@@ -1,0 +1,4 @@
+.agents/
+.codegraph/
+__pycache__/
+*.pyc

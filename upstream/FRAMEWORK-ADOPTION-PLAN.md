@@ -1,12 +1,12 @@
-# CoTend Codex 技能累计更新与适配计划
+# CoTend Codex v1.66 后继版更新与适配计划
 
 > 范围说明：本文固定当前累计采用 release 与其 containing-commit lock。历史 rc.1 与首次 GitHub Open Beta 证据保持不变；rc.2 的远端状态只能在用户授权推送后更新。
 
 ```yaml
 status: implemented_verified
 authority: implementation_record
-candidate_release: 2026.07.23.2
-release_anchor: dual-ai-share-2026.07.23.2
+candidate_release: 2026.07.28.1
+release_anchor: dual-ai-share-2026.07.28.1
 target_platform: Codex
 target_source_carrier: skills/
 live_install_target: not_authorized
@@ -19,7 +19,7 @@ analysis_language: zh-CN
 
 ## 目标
 
-把 CoTend 从已采用的 v1.52 基线累计更新到 v1.65，完整吸收 v1.53-v1.65，而不是只摘取最近两次变更。实现完成后，仓库应包含六个 CoTend 用户原创 Skill 和两个保持第三方身份的 MIT 伴随 Skill；默认入口、独立语义入口、渐进模块、运行档位、原生代理编排、路线重基、语义实现闭环、停止边界、证据、恢复和模型生命周期保持产品化语义等价。
+把 CoTend 从已采用的 `2026.07.23.2 / v1.65` 更新到可复现后继版 `2026.07.28.1 / v1.66`。既有 v1.53-v1.65 累计能力全部保留；本轮新增治理语言唯一解析 owner、冲突停止、规范化持久化、真实正文验收和 Full/Adaptive 结果等价，不新增长期 Skill、第二本语言台账或逐步骤复核。
 
 仓库当前唯一源为根 `skills/`，满足官方 Plugin contract；上游固定 release 内部仍使用 `codex-skills/`。该仓库源不是用户全局 `$CODEX_HOME/skills`，本次更新不授权修改本机已安装 Skill、推送或发布。
 
@@ -27,11 +27,11 @@ analysis_language: zh-CN
 
 | 输入 | 固定值 |
 |---|---|
-| 发布版 | `2026.07.23.2` |
-| 附注标签 | `dual-ai-share-2026.07.23.2` |
-| 发布提交 | `6b0dc0a80e35dd1296a17d0ecdb8f1bacc785a00` |
-| 包目录树 | `71c49b0463528fb8a2b3deabace6bfb942a67b6c` |
-| 清单 SHA-256 | `5dd76ae856f596176583fd73681c4ec9c8a365aa84313715a727ecd28182081a` |
+| 发布版 | `2026.07.28.1` |
+| 附注标签 | `dual-ai-share-2026.07.28.1` |
+| 发布提交 | `e3d3245efc3843851d007cf0a6de2f3bebf418fc` |
+| 包目录树 | `7ab401fde46aae48e1cf9da49b5b1c670434c4b6` |
+| 清单 SHA-256 | `7def9da0459ffe99373c738988d2aae14d0c7095ccbdb222556d3763b87b016c` |
 | Codex 技能文件 | 8 个技能目录，共 37 个文件 |
 | 来源与许可证 | `THIRD-PARTY-SOURCES.json`、`THIRD-PARTY-NOTICES.md`、两个独立 MIT 文本 |
 
@@ -41,12 +41,12 @@ analysis_language: zh-CN
 
 | 标记发布版中的源技能 | 文件数 | 源目录树 | CoTend 目标 | 计划状态 | 处理方式 |
 |---|---:|---|---|---|---|
-| `dual-ai-init` | 2 | `10d067b679fb810be4a449a047c13d2747b48259` | `skills/cotend-init/` | `adapted` | 保留薄入口；普通初始化只报告语义状态和独立下一动作。 |
-| `dual-ai-project-init` | 2 | `e71864611f7ec7ef0a9a4cc6314083da86ff9068` | `skills/cotend-project-init/` | `adapted` | 保留 Auto Mode；增加档位持久化、语义绑定检查和路线重基恢复。 |
-| `dual-ai-collaboration` | 23 | `f1387d19a8c2dba2738b886276e6d1987602e332` | `skills/cotend-collaboration/` | `adapted` | 保留渐进治理核心和 21 个参考模块；移除私有维护者默认与机器路径。 |
+| `dual-ai-init` | 2 | `689f5088f950dcb18c56846e03f3e8ea549c6b0b` | `skills/cotend-init/` | `adapted` | 保留薄入口；传播 Project Init 的语言解析记录并使用 CoTend 本地化标题。 |
+| `dual-ai-project-init` | 2 | `d28d2858e540996f787e1ba9c77e9953e44fb7fd` | `skills/cotend-project-init/` | `adapted` | 保留 Auto Mode；唯一负责语言解析、冲突停止和首次持久化。 |
+| `dual-ai-collaboration` | 23 | `3eb2c5db3b07b1f4963e2eb96cd1465825de510a` | `skills/cotend-collaboration/` | `adapted` | 保留渐进治理核心和 21 个参考模块；消费已解析语言并验证真实正文。 |
 | `diagnose-only` | 2 | `06e8b6bd4c2f916d80e57544edd7bd4ec1db60f5` | `skills/cotend-diagnose-only/` | `adapted` | 保持只读诊断与可写语义入口的清晰分界。 |
-| `dual-ai-semantic-alignment` | 3 | `df5e63b3cd8ff315ac09973666a71eb20825f094` | `skills/cotend-semantic-alignment/` | `adapted` | 新增独立可写语义入口及零依赖内容寻址 helper。 |
-| `dual-model-upgrade` | 3 | `940081225626250a6680cef9499f9b14003147da` | `skills/cotend-model-upgrade/` | `adapted` | 保留完整模型生命周期，升级到数据包族 v1.11。 |
+| `dual-ai-semantic-alignment` | 3 | `e7f019bfd5ee99f1d0f518bcba177de6ae90f5fb` | `skills/cotend-semantic-alignment/` | `adapted` | 保留独立可写语义入口并消费持久化语言。 |
+| `dual-model-upgrade` | 3 | `7f4e6fba55bded5f8a18917be9fa6e1f09fd01cc` | `skills/cotend-model-upgrade/` | `adapted` | 保留完整模型生命周期和数据包族 v1.11，并消费持久化语言。 |
 | `grill-me` | 1 | `70df660726ef12349a40dc0353a681c82414fe95` | `skills/grill-me/` | `adopted` | 从标记发布包字节复用，不添加 CoTend 前缀，不改变语义。 |
 | `karpathy-guidelines` | 1 | `e119339197d600aa39a24fd7a95c946800c9c949` | `skills/karpathy-guidelines/` | `adopted` | 从标记发布包字节复用，不添加 CoTend 前缀，不改变语义。 |
 
@@ -66,12 +66,13 @@ analysis_language: zh-CN
 
 ### 协议与版本世代
 
-- 活动协议标识使用 `cotend-collaboration-v1.65`，完整继承上游行为世代。
+- 活动协议标识使用 `cotend-collaboration-v1.66`，完整继承上游行为世代。
 - 模型数据包族使用 `cotend-model-upgrade-v1.11`。
 - CoTend 产品发布版本与上述行为世代分开管理；本叶不决定首个公开产品版本号。
 - `dual-ai-*` 只可出现在上游来源记录、明确的旧项目迁移检测或迁移说明中，不得继续作为活动产品输出、默认提示词、主调用名或新项目协议值。
 - 旧名称迁移兼容必须是输入侧允许清单：识别后写出 CoTend 新真相，不长期双写两套活动协议。
-- 面向用户的生成内容使用项目已记录语言；没有记录时默认英文。中文自然语言短语可作为兼容输入别名，但不得强制英文首发用户接收中文报告或模板。
+- 治理语言只由 `cotend-project-init` 解析：先做 canonical/project-local 和 current/project-local 冲突检查，再按当前明确选择、canonical、项目局部明确指令、CoTend 默认 `en` 解析。不得从会话语言、locale、账号偏好、文件名或仓库主要语言推断。
+- 解析结果必须在受影响治理写入前保存到现有 STATUS 载体；Acceptance 必须核对声明和真实 changed governance bytes。Full/Adaptive 结果必须等价。
 - 删除仅适用于原维护者机器、私有配置 helper、内部决策编号、旧分享包同步和固定 Claude 目录迁移的规则；平台集成必须使用公开、可验证并经授权的目标平台流程。
 
 ### 行为保真
@@ -136,7 +137,7 @@ change_class:
   - platform_or_carrier
   - documentation_or_metadata
   - workflow_behavior_equivalence_validation
-intended_behavior_change: preserve_governance_with_english_default_and_remove_private_maintainer_bindings
+intended_behavior_change: add_deterministic_governance_language_resolution_and_actual_body_acceptance_while_preserving_cotend_native_ownership
 mechanisms_added:
   - adopted_skill_set_verifier
   - legacy_brand_allowlist_scan

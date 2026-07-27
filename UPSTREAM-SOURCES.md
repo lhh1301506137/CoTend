@@ -2,9 +2,9 @@
 
 ```yaml
 status: active_productization_and_research_registry
-checked_at: 2026-07-24
+checked_at: 2026-07-28
 relationship: primary_user_owned_productization_source_plus_secondary_public_references
-implementation_dependency: pinned_dual_ai_release_2026_07_23_2
+implementation_dependency: pinned_dual_ai_release_2026_07_28_1
 source_copying: scoped_6_adapted_plus_2_byte_identical_skills
 update_policy: manual_pinned_review_before_architecture_adoption_or_release
 ```
@@ -19,8 +19,14 @@ update_policy: manual_pinned_review_before_architecture_adoption_or_release
 role: primary_productization_source
 product_relationship: user_owned_upstream_framework
 source: public_distribution_location_pending
-reviewed_release: 2026.07.23.2
-release_anchor: dual-ai-share-2026.07.23.2
+reviewed_release: 2026.07.28.1
+release_anchor: dual-ai-share-2026.07.28.1
+previous_adoptable_release: 2026.07.23.2
+superseded_non_adoptable_release: 2026.07.27.1
+latest_reviewed_candidate: 2026.07.28.1
+latest_candidate_anchor: dual-ai-share-2026.07.28.1
+latest_candidate_status: adopted_verified_local
+successor_candidate: none_current
 declared_license_scope: Apache-2.0_for_user_owned_content_with_separate_MIT_components
 relationship: rename_first_preserve_first_adopted_source
 adoption_status: repository_source_adopted_verified
@@ -29,12 +35,14 @@ codex_role_map: upstream/CODEX-SKILL-ROLE-MAP.json
 adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md
 adoption_plan: upstream/FRAMEWORK-ADOPTION-PLAN.md
 capability_map: upstream/CAPABILITY-IMPLEMENTATION-MAP.json
-adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-23-2-v1-65-adoption
+adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-1-v1-66-adoption
 adopted_skill_verifier: scripts/verify_adopted_skill_set.py
 mapping_status: codex_skill_source_set_adopted_live_delivery_pending
 final_framework_lock: upstream/framework.lock.json
 automatic_update: forbidden
 ```
+
+`2026.07.27.1` 保持不可变但不可采用：tag 内发布状态、current-HEAD walkthrough 与 Windows checkout 字节比较曾无法形成可复现消费者载体。后继 `2026.07.28.1` 已修复 release closure，并在 detached annotated tag 中通过对象验证、完整 v1.66 walkthrough、LANG01-LANG10、clean-filter 等价与真实篡改拒绝。CoTend 因此把 lock 从 `.23.2` 移到 `.28.1`；`.23.2` 仍是上一可采用历史和 r11 来源锚点。
 
 审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容直接改名或适配，对两个内置 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。仓库源树、逐文件 adoption、final lock、本地隔离根载体与真实 GitHub `owner/repo` Open Beta 生命周期已完成。远端 refresh 只验证同 revision，不冒充跨版本升级；真实用户/Desktop 生命周期、Claude 载体和发布者身份认证仍未完成。
 

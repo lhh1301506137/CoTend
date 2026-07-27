@@ -7,7 +7,7 @@ scope: project_meaning_requirements_route_decisions_status_reality_and_local_con
 runtime_contract: ../skills/cotend-collaboration/references/authority-and-triggers.md
 executable_verifier: ../scripts/verify_native_project_truth_authority.py
 introduced_target_artifact: cotend-codex-r000003
-current_target_artifact: cotend-codex-r000011
+current_target_artifact: cotend-codex-r000012
 rollback_candidate: cotend@0.1.0-rc.2_local_unpublished
 analysis_language: zh-CN
 ```

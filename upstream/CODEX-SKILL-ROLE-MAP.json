@@ -2,7 +2,7 @@
   "schema": "cotend.codex-skill-role-map",
   "schema_version": 1,
   "status": "adopted_verified",
-  "candidate_release": "2026.07.23.2",
+  "candidate_release": "2026.07.28.1",
   "platform": "Codex",
   "launch_adapter": true,
   "public_interface_authority": "codex_skill_source_set_adopted_live_delivery_pending",
@@ -21,7 +21,7 @@
   "skills": [
     {
       "source_skill_id": "dual-ai-init",
-      "source_tree": "10d067b679fb810be4a449a047c13d2747b48259",
+      "source_tree": "689f5088f950dcb18c56846e03f3e8ea549c6b0b",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "unified_visible_entry",
@@ -35,7 +35,7 @@
         "PROMPTS.md and FRAMEWORK-INTRO.md recommend dual-ai-init for ordinary and long-running projects"
       ],
       "adoption_status": "adapted",
-      "implementation_mode": "rename_only",
+      "implementation_mode": "platform_adaptation",
       "target_skill_id": "cotend-init",
       "naming_status": "user_confirmed",
       "preserve": [
@@ -47,7 +47,7 @@
     },
     {
       "source_skill_id": "dual-ai-project-init",
-      "source_tree": "e71864611f7ec7ef0a9a4cc6314083da86ff9068",
+      "source_tree": "d28d2858e540996f787e1ba9c77e9953e44fb7fd",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "internal_auto_mode_engine",
@@ -78,7 +78,7 @@
     },
     {
       "source_skill_id": "dual-ai-collaboration",
-      "source_tree": "f1387d19a8c2dba2738b886276e6d1987602e332",
+      "source_tree": "3eb2c5db3b07b1f4963e2eb96cd1465825de510a",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "shared_governance_core",
@@ -131,7 +131,7 @@
     },
     {
       "source_skill_id": "dual-ai-semantic-alignment",
-      "source_tree": "df5e63b3cd8ff315ac09973666a71eb20825f094",
+      "source_tree": "e7f019bfd5ee99f1d0f518bcba177de6ae90f5fb",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "direct_writable_semantic_alignment",
@@ -160,7 +160,7 @@
     },
     {
       "source_skill_id": "dual-model-upgrade",
-      "source_tree": "940081225626250a6680cef9499f9b14003147da",
+      "source_tree": "7f4e6fba55bded5f8a18917be9fa6e1f09fd01cc",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "advanced_model_role_lifecycle",
@@ -230,14 +230,17 @@
   "deferred_platform_carriers": [
     {
       "platform": "Claude",
-      "skill_count": 3,
+      "skill_count": 6,
       "skills": [
         "diagnose-only",
         "dual-ai-collaboration",
+        "dual-ai-init",
+        "dual-ai-project-init",
+        "dual-ai-semantic-alignment",
         "dual-model-upgrade"
       ],
       "adoption_status": "deferred",
-      "reason": "Codex is the confirmed launch adapter and the Claude carrier intentionally omits the Codex project-init engine"
+      "reason": "Codex is the confirmed launch adapter; the packaged Claude carrier remains v1.65 and does not claim v1.66 governance-language parity"
     }
   ],
   "adoption": {
@@ -255,7 +258,7 @@
     "repository_source_carrier": "skills/",
     "repository_source_implemented": true,
     "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-23-2-v1-65-adoption",
+    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-1-v1-66-adoption",
     "live_install_authorized": false,
     "live_install_performed": false,
     "plugin_or_marketplace_carrier": "github_root_candidate_local_verified",

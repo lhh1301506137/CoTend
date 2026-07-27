@@ -593,6 +593,11 @@ FRAMEWORK_SOURCE_ALLOWED_PATTERN_LABELS = {
     "local decision log reference",
     "internal authority label",
 }
+FRAMEWORK_SOURCE_ALLOWED_PATTERN_PATHS = {
+    "local decision log reference": {
+        "scripts/verify_native_real_project_acceptance.py",
+    },
+}
 FORBIDDEN_SKILL_MAINTAINER_PATTERNS = {
     "personal maintainer profile": re.compile(r"\bthis user's\b", re.IGNORECASE),
     "machine-specific instruction": re.compile(
@@ -1244,7 +1249,7 @@ def reference_study_errors(study_text: str, registry_text: str) -> list[str]:
             errors.append(f"reference study metadata mismatch: {key}")
 
     if metadata_values(registry_text, "implementation_dependency") != {
-        "pinned_dual_ai_release_2026_07_23_2"
+        "pinned_dual_ai_release_2026_07_28_1"
     }:
         errors.append("upstream registry must pin the adopted primary productization source")
     if metadata_values(registry_text, "source_copying") != {
@@ -1463,14 +1468,14 @@ def productization_truth_errors(
     for required_text in (
         "## UP01 dual-ai 分享包",
         "role: primary_productization_source",
-        "reviewed_release: 2026.07.23.2",
+        "reviewed_release: 2026.07.28.1",
         "adoption_status: repository_source_adopted_verified",
         "candidate_record: upstream/FRAMEWORK-CANDIDATE.json",
         "codex_role_map: upstream/CODEX-SKILL-ROLE-MAP.json",
         "adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md",
         "adoption_plan: upstream/FRAMEWORK-ADOPTION-PLAN.md",
         "capability_map: upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-        "adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-23-2-v1-65-adoption",
+        "adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-1-v1-66-adoption",
         "final_framework_lock: upstream/framework.lock.json",
     ):
         if required_text not in registry_text:
@@ -1594,30 +1599,30 @@ def upstream_adoption_errors(
         ("schema_version",): 1,
         ("status",): "adopted_verified",
         ("candidate_only",): False,
-        ("release_id",): "2026.07.23.2",
-        ("framework_protocol_version",): "1.65",
+        ("release_id",): "2026.07.28.1",
+        ("framework_protocol_version",): "1.66",
         ("dual_model_upgrade_version",): "1.11",
         ("package_schema_version",): 2,
-        ("source_framework_commit",): "4233d7439fc9d9b787803b3df7cdbe9d57ce9323",
+        ("source_framework_commit",): "208626912ddfaf51f5b09e2dc29d069a2dce7d3a",
         ("release_anchor", "type"): "annotated_git_tag",
-        ("release_anchor", "tag"): "dual-ai-share-2026.07.23.2",
-        ("release_anchor", "tag_object"): "b8df9fc4c1c30694e3574410a44e7c72de779e07",
-        ("release_anchor", "release_commit"): "6b0dc0a80e35dd1296a17d0ecdb8f1bacc785a00",
-        ("release_anchor", "package_tree"): "71c49b0463528fb8a2b3deabace6bfb942a67b6c",
+        ("release_anchor", "tag"): "dual-ai-share-2026.07.28.1",
+        ("release_anchor", "tag_object"): "e5ed9ec097251d3bca24f27801ed818a09de1e7a",
+        ("release_anchor", "release_commit"): "e3d3245efc3843851d007cf0a6de2f3bebf418fc",
+        ("release_anchor", "package_tree"): "7ab401fde46aae48e1cf9da49b5b1c670434c4b6",
         ("release_anchor", "publisher_identity_authenticated"): False,
         ("integrity", "manifest_sha256"): (
-            "5dd76ae856f596176583fd73681c4ec9c8a365aa84313715a727ecd28182081a"
+            "7def9da0459ffe99373c738988d2aae14d0c7095ccbdb222556d3763b87b016c"
         ),
-        ("integrity", "manifest_entries"): 72,
-        ("integrity", "provenance_covered_files"): 73,
+        ("integrity", "manifest_entries"): 80,
+        ("integrity", "provenance_covered_files"): 81,
         ("integrity", "verification"): "passed",
         ("carriers", "codex", "skill_count"): 8,
-        ("carriers", "claude", "skill_count"): 3,
+        ("carriers", "claude", "skill_count"): 6,
         ("adoption", "state"): "adopted",
         ("adoption", "source_carrier"): "skills/",
         ("adoption", "capability_map"): "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
         ("adoption", "adoption_record"): (
-            "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-23-2-v1-65-adoption"
+            "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-1-v1-66-adoption"
         ),
         ("adoption", "final_framework_lock_exists"): True,
     }
@@ -1626,11 +1631,11 @@ def upstream_adoption_errors(
             errors.append(f"upstream candidate mismatch: {'.'.join(keys)}")
     expected_skill_trees = {
         "diagnose-only": "06e8b6bd4c2f916d80e57544edd7bd4ec1db60f5",
-        "dual-ai-collaboration": "f1387d19a8c2dba2738b886276e6d1987602e332",
-        "dual-ai-init": "10d067b679fb810be4a449a047c13d2747b48259",
-        "dual-ai-project-init": "e71864611f7ec7ef0a9a4cc6314083da86ff9068",
-        "dual-ai-semantic-alignment": "df5e63b3cd8ff315ac09973666a71eb20825f094",
-        "dual-model-upgrade": "940081225626250a6680cef9499f9b14003147da",
+        "dual-ai-collaboration": "3eb2c5db3b07b1f4963e2eb96cd1465825de510a",
+        "dual-ai-init": "689f5088f950dcb18c56846e03f3e8ea549c6b0b",
+        "dual-ai-project-init": "d28d2858e540996f787e1ba9c77e9953e44fb7fd",
+        "dual-ai-semantic-alignment": "e7f019bfd5ee99f1d0f518bcba177de6ae90f5fb",
+        "dual-model-upgrade": "7f4e6fba55bded5f8a18917be9fa6e1f09fd01cc",
         "grill-me": "70df660726ef12349a40dc0353a681c82414fe95",
         "karpathy-guidelines": "e119339197d600aa39a24fd7a95c946800c9c949",
     }
@@ -1679,7 +1684,7 @@ def upstream_adoption_errors(
         errors.append("Codex role map schema mismatch")
     if role_map.get("status") != "adopted_verified":
         errors.append("Codex role map is not finalized as adopted")
-    if role_map.get("candidate_release") != "2026.07.23.2":
+    if role_map.get("candidate_release") != "2026.07.28.1":
         errors.append("Codex role map release mismatch")
     if role_map.get("public_interface_authority") != (
         "codex_skill_source_set_adopted_live_delivery_pending"
@@ -1716,7 +1721,7 @@ def upstream_adoption_errors(
             "user_owned_original",
             "unified_visible_entry",
             "adapted",
-            "rename_only",
+            "platform_adaptation",
             "cotend-init",
         ),
         "dual-ai-project-init": (
@@ -1828,7 +1833,7 @@ def upstream_adoption_errors(
             "repository_source_implemented": True,
             "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
             "adoption_record": (
-                "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-23-2-v1-65-adoption"
+                "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-1-v1-66-adoption"
             ),
             "live_install_authorized": False,
             "live_install_performed": False,
@@ -1842,7 +1847,7 @@ def upstream_adoption_errors(
     if metadata_values(proposal_text, "status") != {"adopted_verified"}:
         errors.append("framework adoption proposal is not finalized as adopted")
     exact_proposal_metadata = {
-        "candidate_release": {"2026.07.23.2"},
+        "candidate_release": {"2026.07.28.1"},
         "role_layer_status": {"user_confirmed"},
         "role_layer_decision": {"product_owner_confirmed"},
         "user_owned_skill_name_status": {"user_confirmed"},
@@ -1872,7 +1877,7 @@ def upstream_adoption_errors(
     if metadata_values(adoption_plan_text, "status") != {"implemented_verified"}:
         errors.append("framework adoption plan is not finalized as implemented")
     exact_plan_metadata = {
-        "candidate_release": {"2026.07.23.2"},
+        "candidate_release": {"2026.07.28.1"},
         "target_platform": {"Codex"},
         "target_source_carrier": {"skills/"},
         "live_install_target": {"not_authorized"},
@@ -1895,7 +1900,7 @@ def upstream_adoption_errors(
         "skills/cotend-semantic-alignment/",
         "skills/grill-me/",
         "skills/karpathy-guidelines/",
-        "cotend-collaboration-v1.65",
+        "cotend-collaboration-v1.66",
         "cotend-model-upgrade-v1.11",
         "mechanism_budget: three_repository_integrity_mechanisms_no_new_user_workflow",
         "不新增命令层、路由层、状态目录或重复内核",
@@ -1935,15 +1940,15 @@ def upstream_adoption_errors(
         ("schema",): "cotend.framework-lock",
         ("schema_version",): 1,
         ("status",): "adopted_verified",
-        ("release_id",): "2026.07.23.2",
-        ("framework_protocol",): "cotend-collaboration-v1.65",
+        ("release_id",): "2026.07.28.1",
+        ("framework_protocol",): "cotend-collaboration-v1.66",
         ("model_upgrade_packet_family",): "cotend-model-upgrade-v1.11",
-        ("source_release", "tag"): "dual-ai-share-2026.07.23.2",
-        ("source_release", "tag_object"): "b8df9fc4c1c30694e3574410a44e7c72de779e07",
-        ("source_release", "release_commit"): "6b0dc0a80e35dd1296a17d0ecdb8f1bacc785a00",
-        ("source_release", "package_tree"): "71c49b0463528fb8a2b3deabace6bfb942a67b6c",
+        ("source_release", "tag"): "dual-ai-share-2026.07.28.1",
+        ("source_release", "tag_object"): "e5ed9ec097251d3bca24f27801ed818a09de1e7a",
+        ("source_release", "release_commit"): "e3d3245efc3843851d007cf0a6de2f3bebf418fc",
+        ("source_release", "package_tree"): "7ab401fde46aae48e1cf9da49b5b1c670434c4b6",
         ("source_release", "manifest_sha256"): (
-            "5dd76ae856f596176583fd73681c4ec9c8a365aa84313715a727ecd28182081a"
+            "7def9da0459ffe99373c738988d2aae14d0c7095ccbdb222556d3763b87b016c"
         ),
         ("target_platform",): "Codex",
         ("source_carrier",): "skills/",
@@ -1951,7 +1956,7 @@ def upstream_adoption_errors(
         ("skill_file_count",): 37,
         ("capability_map",): "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
         ("adoption_record",): (
-            "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-23-2-v1-65-adoption"
+            "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-1-v1-66-adoption"
         ),
         ("delivery_boundaries", "repository_source_adopted"): True,
         ("delivery_boundaries", "live_install_performed"): False,
@@ -3795,8 +3800,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             "confirmation_gate_zero_write",
             "stale_plan_toctou_zero_write",
             "terminated_recovery_retains_dual_evidence",
-            'artifact_id="cotend-codex-r000012"',
-            "revision=12",
+            'artifact_id="cotend-codex-r000013"',
+            "revision=13",
         ):
             if marker not in harness_text:
                 errors.append(f"delivery lifecycle harness marker is missing: {marker}")
@@ -4034,8 +4039,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     expected_target = {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000011",
-        "revision": 11,
+        "artifact_id": "cotend-codex-r000012",
+        "revision": 12,
     }
     if not isinstance(target, dict) or any(
         target.get(key) != expected for key, expected in expected_target.items()
@@ -4059,6 +4064,17 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if not isinstance(target, dict) or target.get("manifest_sha256") != carrier_manifest:
         errors.append("delivery target lock manifest mismatch")
     expected_predecessors = [
+        {
+            "platform": "Codex",
+            "lineage": "cotend-codex",
+            "artifact_id": "cotend-codex-r000011",
+            "revision": 11,
+            "source_release_id": "2026.07.23.2",
+            "framework_protocol": "cotend-collaboration-v1.65",
+            "manifest_sha256": (
+                "eac48844295f9ba12d64df469aa25fab9e76a8c9ceb9817857350b5029767627"
+            ),
+        },
         {
             "platform": "Codex",
             "lineage": "cotend-codex",
@@ -4164,8 +4180,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     expected_legacy_mappings = [
         {
             "receipt_schema_version": 1,
-            "artifact_id": framework_lock.get("release_id"),
-            "protocol": framework_lock.get("framework_protocol"),
+            "artifact_id": "2026.07.23.2",
+            "protocol": "cotend-collaboration-v1.65",
             "manifest_sha256": (
                 "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b"
             ),
@@ -4273,7 +4289,11 @@ def main() -> int:
         text = read(relative_path)
         for label, pattern in FORBIDDEN_PUBLIC_PATTERNS.items():
             if (
-                relative_path.startswith("skills/")
+                (
+                    relative_path.startswith("skills/")
+                    or relative_path
+                    in FRAMEWORK_SOURCE_ALLOWED_PATTERN_PATHS.get(label, set())
+                )
                 and label in FRAMEWORK_SOURCE_ALLOWED_PATTERN_LABELS
             ):
                 continue

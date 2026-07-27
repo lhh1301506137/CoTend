@@ -37,7 +37,7 @@ class NativeZeroRuntimeDependencyTests(unittest.TestCase):
         self.assertEqual(result["native_capabilities"], 8)
         self.assertEqual(result["dual_capabilities"], 19)
         self.assertEqual(result["mapped_skill_roles"], 8)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000011")
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000012")
         self.assertEqual(result["predecessor_target"], "cotend-codex-r000010")
         self.assertFalse(result["real_project_claimed"])
         self.assertFalse(result["real_user_acceptance_claimed"])

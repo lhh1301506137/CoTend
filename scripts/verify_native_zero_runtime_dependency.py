@@ -22,9 +22,12 @@ CONTRACT_PATH = ROOT / "upstream" / "TRELLIS-DECOUPLING-PLAN.json"
 TARGET_LOCK_PATH = ROOT / "delivery" / "codex-artifact.lock.json"
 PACKAGE_LOCK_PATH = ROOT / "packaging" / "codex-plugin" / "package.lock.json"
 
-EXPECTED_TARGET_ID = "cotend-codex-r000011"
-EXPECTED_TARGET_REVISION = 11
+EXPECTED_TARGET_ID = "cotend-codex-r000012"
+EXPECTED_TARGET_REVISION = 12
 EXPECTED_TARGET_MANIFEST = (
+    "44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276"
+)
+EXPECTED_R11_MANIFEST = (
     "eac48844295f9ba12d64df469aa25fab9e76a8c9ceb9817857350b5029767627"
 )
 EXPECTED_R10_MANIFEST = (
@@ -43,6 +46,7 @@ EXPECTED_PREDECESSORS = [
         manifest,
     )
     for revision, manifest in (
+        (11, EXPECTED_R11_MANIFEST),
         (10, EXPECTED_R10_MANIFEST),
         (9, "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"),
         (8, "84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3"),
@@ -99,7 +103,7 @@ REQUIRED_EVIDENCE_MARKERS = (
     "external_task_spec_authority: 0",
     "retained_capability_surfaces: 7",
     "development_target_artifact: cotend-codex-r000011",
-    f"development_target_manifest: {EXPECTED_TARGET_MANIFEST}",
+    f"development_target_manifest: {EXPECTED_R11_MANIFEST}",
     "predecessor_target_artifact: cotend-codex-r000010",
     "g02_native_capabilities: 8",
     "g03_cumulative: passed",
@@ -289,9 +293,9 @@ def validate_target_lock(
 ) -> None:
     expected_source = {
         "framework_lock": "upstream/framework.lock.json",
-        "release_id": "2026.07.23.2",
+        "release_id": "2026.07.28.1",
         "carrier": "skills/",
-        "framework_protocol": "cotend-collaboration-v1.65",
+        "framework_protocol": "cotend-collaboration-v1.66",
     }
     expected_target = {
         "platform": "Codex",
@@ -310,7 +314,7 @@ def validate_target_lock(
         or lock.get("skill_count") != 8
         or lock.get("skill_file_count") != skill_file_count
     ):
-        raise NativeZeroRuntimeDependencyError("r11 target lock envelope drifted")
+        raise NativeZeroRuntimeDependencyError("r12 target lock envelope drifted")
 
     expected_predecessors = [
         {
@@ -326,7 +330,7 @@ def validate_target_lock(
     ]
     if lock.get("predecessor_targets") != expected_predecessors:
         raise NativeZeroRuntimeDependencyError(
-            "r10-r2 predecessor identity chain drifted"
+            "r11-r2 predecessor identity chain drifted"
         )
 
 
@@ -500,7 +504,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
         runtime["skill_files"] != 40
         or runtime["manifest_sha256"] != EXPECTED_TARGET_MANIFEST
     ):
-        raise NativeZeroRuntimeDependencyError("r11 Skill manifest drifted")
+        raise NativeZeroRuntimeDependencyError("r12 Skill manifest drifted")
 
     lock = _load_json(root / TARGET_LOCK_PATH.relative_to(ROOT), "target lock")
     validate_target_lock(
