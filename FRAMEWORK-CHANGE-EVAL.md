@@ -1354,3 +1354,54 @@ watch_closure:
 ```
 
 本次采用不新增 Skill、语言 ledger 或每步复核，也不恢复 Trellis 运行依赖。它只固定仓库内 v1.66/r12 候选；真实模型调用、新 UAT、产品实现、全局更新、rc.3、push、tag、Release、submission 和 publish 均未执行。
+
+## 2026-07-28 G06 低成本模型与运行时脱敏加固
+
+```yaml
+current_framework_version: cotend-collaboration-v1.66
+change_type: workflow_behavior
+change_summary: 让 G06 同时配置并校验模型与 reasoning effort，默认改为 gpt-5.4-mini/medium，并整体脱敏含星号的部分遮罩 key 标识
+intent: 用足够而非过量的模型能力验证受约束 Init，同时让成本配置和失败证据可审计且不残留 credential 标识
+expected_benefit:
+  - 避免遗漏 reasoning effort 后继续使用 high
+  - 降低真实 Init 回归的资源消耗
+  - 成功和失败证据都能核对精确模型配置
+  - 服务端部分遮罩标识不再需要事后人工清理
+possible_harm:
+  - 较小模型可能暴露模型能力差异而非 Skill 缺陷
+  - 新运行不能与旧 gpt-5.4/high 构成严格同模型对照
+affected_workflows:
+  - G06_real_project_Init
+  - WSL_isolated_model_invocation
+  - runtime_failure_evidence
+deviations: none
+mechanism_budget:
+  added_context_surface: existing_script_and_tests_only
+  ordinary_load_impact: none
+  ceremony_added: none
+  duplication_check: extends_existing_G06_command_validator_and_redactor
+  cheaper_alternative_considered: 只在执行命令手工替换模型；因容易漏掉 high 和证据字段而拒绝
+  retirement_or_thinning_trigger: provider_exposes_a_deterministic_no_model_Skill_interpreter_or_G06_no_longer_needs_live_model_evidence
+  expected_failure_prevented: accidental_expensive_default_reasoning_evidence_configuration_drift_and_masked_credential_fragment_persistence
+validation_scenarios:
+  - scenario: explicit low-cost native and WSL model configuration
+    validation_result_type: executed
+    result: command_validation_WSL_forwarding_and_final_evidence_passed
+  - scenario: masked API key identifier in provider error
+    validation_result_type: executed
+    result: whole_identifier_replaced_and_no_sk_prefix_remains
+  - scenario: focused and full regression
+    validation_result_type: executed
+    result: 42_focused_396_full_Ruff_compileall_repository_checker_passed
+real_project_validation:
+  - scenario: exactly one gpt-5.4-mini/medium r12 Init
+    expected: account accepted_exact_configuration_recorded_Chinese_governance_created_and_handback
+    validation_result_type: deferred
+    result: separate_explicit_user_authorization_required
+decision: watch
+rollback_triggers:
+  - configured reasoning effort differs from command or final evidence
+  - masked provider identifier leaves any sk-prefix fragment in persisted evidence
+  - smaller model repeatedly fails a contract that passes under a stronger model with identical Skill bytes and environment
+review_after: next_authorized_single_G06_r12_real_Init
+```

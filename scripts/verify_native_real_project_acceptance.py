@@ -46,8 +46,8 @@ LEGACY_RELEASE_ID = "2026.07.23.2"
 LEGACY_PROTOCOL = "cotend-collaboration-v1.65"
 RELEASE_ID = "2026.07.28.1"
 PROTOCOL = "cotend-collaboration-v1.66"
-MODEL = "gpt-5.4"
-REASONING_EFFORT = "high"
+MODEL = "gpt-5.4-mini"
+REASONING_EFFORT = "medium"
 WORKSPACE_PERMISSION_CONFIG = 'default_permissions=":workspace"'
 INIT_SCHEMA = "G06-INIT-RESULT.schema.json"
 INIT_SKILL = ".agents/skills/cotend-init/SKILL.md"
@@ -1469,6 +1469,7 @@ def _build_codex_command(
     output: str,
     *,
     model: str,
+    reasoning_effort: str,
 ) -> list[str]:
     return [
         executable,
@@ -1481,7 +1482,7 @@ def _build_codex_command(
         "--disable",
         "remote_plugin",
         "-c",
-        f'model_reasoning_effort="{REASONING_EFFORT}"',
+        f'model_reasoning_effort="{reasoning_effort}"',
         "--model",
         model,
         "exec",
@@ -1501,7 +1502,13 @@ def _build_codex_command(
     ]
 
 
-def build_codex_command(project: Path, output: Path, *, model: str = MODEL) -> list[str]:
+def build_codex_command(
+    project: Path,
+    output: Path,
+    *,
+    model: str = MODEL,
+    reasoning_effort: str = REASONING_EFFORT,
+) -> list[str]:
     executable = shutil.which("codex")
     if executable is None:
         raise RealProjectAcceptanceError("Codex CLI is unavailable")
@@ -1511,6 +1518,7 @@ def build_codex_command(project: Path, output: Path, *, model: str = MODEL) -> l
         str(project / INIT_SCHEMA),
         str(output),
         model=model,
+        reasoning_effort=reasoning_effort,
     )
 
 
@@ -1521,6 +1529,7 @@ def build_wsl_codex_command(
     runtime_root: str,
     *,
     model: str = MODEL,
+    reasoning_effort: str = REASONING_EFFORT,
     wsl_executable: str | None = None,
 ) -> list[str]:
     root = guarded_wsl_runtime_root(runtime_root)
@@ -1539,6 +1548,7 @@ def build_wsl_codex_command(
         f"{project}/{INIT_SCHEMA}",
         output,
         model=model,
+        reasoning_effort=reasoning_effort,
     )
     return build_wsl_process_command(
         distribution,
@@ -1554,6 +1564,8 @@ def validate_codex_command(
     carrier: str = "native",
     expected_project: str | None = None,
     expected_output: str | None = None,
+    expected_model: str = MODEL,
+    expected_reasoning_effort: str = REASONING_EFFORT,
     wsl_distribution: str | None = None,
     wsl_runtime_root: str | None = None,
 ) -> None:
@@ -1597,6 +1609,20 @@ def validate_codex_command(
     ]
     if permission_values != [WORKSPACE_PERMISSION_CONFIG]:
         raise RealProjectAcceptanceError("Codex command permission profile drifted")
+    reasoning_values = [
+        value
+        for value in config_values
+        if value.startswith("model_reasoning_effort=")
+    ]
+    expected_reasoning_config = (
+        f'model_reasoning_effort="{expected_reasoning_effort}"'
+    )
+    if reasoning_values != [expected_reasoning_config]:
+        raise RealProjectAcceptanceError("Codex command reasoning effort drifted")
+    if "--model" not in command:
+        raise RealProjectAcceptanceError("Codex command model is missing")
+    if command[command.index("--model") + 1] != expected_model:
+        raise RealProjectAcceptanceError("Codex command model drifted")
     command_project = expected_project or str(project)
     if command[command.index("--cd") + 1] != command_project:
         raise RealProjectAcceptanceError("Codex command project root drifted")
@@ -1907,7 +1933,7 @@ def redact_runtime_text(value: str) -> str:
         redacted,
     )
     redacted = re.sub(
-        r"\bsk-[A-Za-z0-9_-]{8,}\b",
+        r"(?<![A-Za-z0-9_-])sk-[A-Za-z0-9_*-]{4,}(?![A-Za-z0-9_-])",
         "<redacted-api-key>",
         redacted,
     )
@@ -2470,6 +2496,7 @@ def run_real_init(
     output: Path,
     *,
     model: str = MODEL,
+    reasoning_effort: str = REASONING_EFFORT,
     protected_paths: tuple[Path, ...] = (),
     observed_paths: tuple[Path, ...] = (),
     isolated_runtime_root: Path | None = None,
@@ -2510,6 +2537,7 @@ def run_real_init(
             wsl_distribution,
             wsl_runtime_root,
             model=model,
+            reasoning_effort=reasoning_effort,
             wsl_executable=wsl_executable,
         )
         validate_codex_command(
@@ -2518,6 +2546,8 @@ def run_real_init(
             carrier=carrier,
             expected_project=command_project,
             expected_output=command_output,
+            expected_model=model,
+            expected_reasoning_effort=reasoning_effort,
             wsl_distribution=wsl_distribution,
             wsl_runtime_root=wsl_runtime_root,
         )
@@ -2527,12 +2557,19 @@ def run_real_init(
             raise RealProjectAcceptanceError(
                 "native Init cannot use WSL carrier settings"
             )
-        command = build_codex_command(project, output, model=model)
+        command = build_codex_command(
+            project,
+            output,
+            model=model,
+            reasoning_effort=reasoning_effort,
+        )
         validate_codex_command(
             command,
             project,
             carrier=carrier,
             expected_output=str(output),
+            expected_model=model,
+            expected_reasoning_effort=reasoning_effort,
         )
         runtime_env = (
             build_isolated_runtime_env(isolated_runtime_root)
@@ -2680,6 +2717,7 @@ def run_real_init(
         "status": "pass",
         "carrier": carrier,
         "model": model,
+        "reasoning_effort": reasoning_effort,
         "skill_source_path": result["skill_source_path"],
         "skill_source_sha256": result["skill_source_sha256"],
         "auto_mode": result["auto_mode"],
@@ -2708,6 +2746,7 @@ def run_real_init_wsl(
     auth_source: Path,
     evidence: Path | None = None,
     model: str = MODEL,
+    reasoning_effort: str = REASONING_EFFORT,
     protected_paths: tuple[Path, ...] = (),
     observed_paths: tuple[Path, ...] = (),
     wsl_executable: str | None = None,
@@ -2805,7 +2844,7 @@ def run_real_init_wsl(
                 "status": "starting",
                 "authorized_model_calls": 1,
                 "model": model,
-                "reasoning_effort": REASONING_EFFORT,
+                "reasoning_effort": reasoning_effort,
             },
         )
         stage = "model-call"
@@ -2815,6 +2854,7 @@ def run_real_init_wsl(
             allowed_root,
             output,
             model=model,
+            reasoning_effort=reasoning_effort,
             protected_paths=protected_with_auth,
             observed_paths=observed_paths,
             carrier="wsl2",
@@ -2836,6 +2876,8 @@ def run_real_init_wsl(
             {
                 "status": "pass",
                 "model_calls_consumed": 1,
+                "model": model,
+                "reasoning_effort": reasoning_effort,
                 "result": result,
             },
         )
@@ -3090,6 +3132,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--evidence", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--model", default=MODEL)
+    parser.add_argument("--reasoning-effort", default=REASONING_EFFORT)
     parser.add_argument("--protected-path", type=Path, action="append", default=[])
     parser.add_argument("--observed-path", type=Path, action="append", default=[])
     parser.add_argument("--isolated-runtime-root", type=Path)
@@ -3151,6 +3194,7 @@ def main() -> int:
                     auth_source=args.auth_source,
                     evidence=args.evidence,
                     model=args.model,
+                    reasoning_effort=args.reasoning_effort,
                     protected_paths=protected_paths,
                     observed_paths=tuple(args.observed_path),
                 )
@@ -3168,6 +3212,7 @@ def main() -> int:
                     args.allowed_root,
                     args.output,
                     model=args.model,
+                    reasoning_effort=args.reasoning_effort,
                     protected_paths=protected_paths,
                     observed_paths=tuple(args.observed_path),
                     isolated_runtime_root=args.isolated_runtime_root,

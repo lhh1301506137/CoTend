@@ -169,6 +169,42 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
         self.assertIn("plugins", command)
         self.assertIn("remote_plugin", command)
 
+    def test_codex_command_accepts_explicit_low_cost_model_configuration(self) -> None:
+        output = ROOT / ".private-provenance" / "g06-test-output" / "init.json"
+        model = "gpt-5.4-mini"
+        reasoning_effort = "medium"
+        command = g06.build_codex_command(
+            self.project,
+            output,
+            model=model,
+            reasoning_effort=reasoning_effort,
+        )
+
+        g06.validate_codex_command(
+            command,
+            self.project,
+            expected_model=model,
+            expected_reasoning_effort=reasoning_effort,
+        )
+        self.assertEqual(command[command.index("--model") + 1], model)
+        self.assertIn(
+            f'model_reasoning_effort="{reasoning_effort}"',
+            command,
+        )
+
+        drifted = command.copy()
+        effort_index = drifted.index(
+            f'model_reasoning_effort="{reasoning_effort}"'
+        )
+        drifted[effort_index] = 'model_reasoning_effort="high"'
+        with self.assertRaises(g06.RealProjectAcceptanceError):
+            g06.validate_codex_command(
+                drifted,
+                self.project,
+                expected_model=model,
+                expected_reasoning_effort=reasoning_effort,
+            )
+
     def test_codex_command_rejects_legacy_or_missing_permission_profile(self) -> None:
         output = ROOT / ".private-provenance" / "g06-test-output" / "init.json"
         command = g06.build_codex_command(self.project, output)
@@ -404,6 +440,8 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
 
     def test_wsl_wrapper_wires_event_and_content_checkpoints(self) -> None:
         self.project.mkdir()
+        model = "gpt-5.4-mini"
+        reasoning_effort = "medium"
         auth = self.private / "opaque-auth.json"
         auth.parent.mkdir(parents=True, exist_ok=True)
         auth.write_bytes(b"opaque-test-auth")
@@ -432,9 +470,11 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
         def fake_init(
             *_: object,
             event_checkpoint: object,
-            **__: object,
+            **kwargs: object,
         ) -> dict[str, object]:
             self.assertTrue(callable(event_checkpoint))
+            self.assertEqual(kwargs["model"], model)
+            self.assertEqual(kwargs["reasoning_effort"], reasoning_effort)
             event_checkpoint(  # type: ignore[operator]
                 {
                     "status": "running",
@@ -492,11 +532,18 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
                 runtime_root="/home/cotend/g06-runtime-test",
                 auth_source=auth,
                 evidence=evidence,
+                model=model,
+                reasoning_effort=reasoning_effort,
             )
         persisted = json.loads(evidence.read_text(encoding="utf-8"))
         self.assertEqual(
             persisted["run-init-wsl-events"]["last_event_type"],
             "thread.started",
+        )
+        self.assertEqual(persisted["run-init-wsl-call"]["model"], model)
+        self.assertEqual(
+            persisted["run-init-wsl-call"]["reasoning_effort"],
+            reasoning_effort,
         )
         self.assertEqual(
             persisted["run-init-wsl-content-boundary"]["status"],
@@ -581,12 +628,14 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
     def test_runtime_redaction_handles_quoted_tokens_and_jwts(self) -> None:
         jwt = "eyJ" + "a" * 24 + "." + "b" * 16 + "." + "c" * 16
         opaque = "x" * 39 + "1"
+        masked_api_key = "sk-projectprefix***keysuffix"
         value = json.dumps(
             {
                 "access_token": "quoted-private-token",
                 "client_secret": "private-secret",
                 "nested": jwt,
                 "opaque": opaque,
+                "provider_message": f"Rejected key {masked_api_key}",
             }
         )
         redacted = g06.redact_runtime_text(value)
@@ -594,7 +643,10 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
         self.assertNotIn("private-secret", redacted)
         self.assertNotIn(jwt, redacted)
         self.assertNotIn(opaque, redacted)
+        self.assertNotIn(masked_api_key, redacted)
+        self.assertNotIn("sk-", redacted)
         self.assertIn("<redacted>", redacted)
+        self.assertIn("<redacted-api-key>", redacted)
         self.assertIn("<redacted-jwt>", redacted)
         self.assertIn("<redacted-opaque>", redacted)
 
