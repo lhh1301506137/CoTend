@@ -22,9 +22,12 @@ CONTRACT_PATH = ROOT / "upstream" / "TRELLIS-DECOUPLING-PLAN.json"
 TARGET_LOCK_PATH = ROOT / "delivery" / "codex-artifact.lock.json"
 PACKAGE_LOCK_PATH = ROOT / "packaging" / "codex-plugin" / "package.lock.json"
 
-EXPECTED_TARGET_ID = "cotend-codex-r000012"
-EXPECTED_TARGET_REVISION = 12
+EXPECTED_TARGET_ID = "cotend-codex-r000013"
+EXPECTED_TARGET_REVISION = 13
 EXPECTED_TARGET_MANIFEST = (
+    "39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd"
+)
+EXPECTED_R12_MANIFEST = (
     "44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276"
 )
 EXPECTED_R11_MANIFEST = (
@@ -46,6 +49,7 @@ EXPECTED_PREDECESSORS = [
         manifest,
     )
     for revision, manifest in (
+        (12, EXPECTED_R12_MANIFEST),
         (11, EXPECTED_R11_MANIFEST),
         (10, EXPECTED_R10_MANIFEST),
         (9, "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"),
@@ -293,9 +297,9 @@ def validate_target_lock(
 ) -> None:
     expected_source = {
         "framework_lock": "upstream/framework.lock.json",
-        "release_id": "2026.07.28.1",
+        "release_id": "2026.07.28.2",
         "carrier": "skills/",
-        "framework_protocol": "cotend-collaboration-v1.66",
+        "framework_protocol": "cotend-collaboration-v1.67",
     }
     expected_target = {
         "platform": "Codex",
@@ -314,7 +318,7 @@ def validate_target_lock(
         or lock.get("skill_count") != 8
         or lock.get("skill_file_count") != skill_file_count
     ):
-        raise NativeZeroRuntimeDependencyError("r12 target lock envelope drifted")
+        raise NativeZeroRuntimeDependencyError("r13 target lock envelope drifted")
 
     expected_predecessors = [
         {
@@ -322,15 +326,21 @@ def validate_target_lock(
             "lineage": "cotend-codex",
             "artifact_id": f"cotend-codex-r{revision:06d}",
             "revision": revision,
-            "source_release_id": "2026.07.23.2",
-            "framework_protocol": "cotend-collaboration-v1.65",
+            "source_release_id": (
+                "2026.07.28.1" if revision == 12 else "2026.07.23.2"
+            ),
+            "framework_protocol": (
+                "cotend-collaboration-v1.66"
+                if revision == 12
+                else "cotend-collaboration-v1.65"
+            ),
             "manifest_sha256": manifest,
         }
         for revision, manifest in EXPECTED_PREDECESSORS
     ]
     if lock.get("predecessor_targets") != expected_predecessors:
         raise NativeZeroRuntimeDependencyError(
-            "r11-r2 predecessor identity chain drifted"
+            "r12-r2 predecessor identity chain drifted"
         )
 
 
@@ -501,10 +511,10 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
     assert_runtime_scan_clean(source_scan, "source runtime")
     runtime = verify_disposable_runtime(root)
     if (
-        runtime["skill_files"] != 40
+        runtime["skill_files"] != 52
         or runtime["manifest_sha256"] != EXPECTED_TARGET_MANIFEST
     ):
-        raise NativeZeroRuntimeDependencyError("r12 Skill manifest drifted")
+        raise NativeZeroRuntimeDependencyError("r13 Skill manifest drifted")
 
     lock = _load_json(root / TARGET_LOCK_PATH.relative_to(ROOT), "target lock")
     validate_target_lock(
@@ -543,7 +553,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
         "mapped_skill_roles": regression["mapped_skill_roles"],
         "target_artifact": EXPECTED_TARGET_ID,
         "target_manifest_sha256": EXPECTED_TARGET_MANIFEST,
-        "predecessor_target": "cotend-codex-r000010",
+        "predecessor_target": "cotend-codex-r000012",
         "frozen_rc2": frozen,
         "real_project_claimed": False,
         "real_user_acceptance_claimed": False,

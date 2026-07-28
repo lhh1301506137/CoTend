@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -205,6 +206,28 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
             skill_text = tagged_file(
                 upstream_repo, tag, f"codex-skills/{skill_id}/SKILL.md"
             ).decode("utf-8")
+            behavior_text = skill_text
+            if skill_id == "dual-ai-project-init":
+                reference_names = sorted(
+                    set(
+                        re.findall(
+                            r"references/([a-z0-9-]+\.md)",
+                            skill_text,
+                        )
+                    )
+                )
+                if len(reference_names) != 10:
+                    errors.append(
+                        "tagged Project Init must directly reference exactly ten modules"
+                    )
+                behavior_text += "\n" + "\n".join(
+                    tagged_file(
+                        upstream_repo,
+                        tag,
+                        f"codex-skills/{skill_id}/references/{name}",
+                    ).decode("utf-8")
+                    for name in reference_names
+                )
         except (subprocess.CalledProcessError, UnicodeDecodeError) as exc:
             errors.append(f"cannot read tagged Skill {skill_id}: {exc}")
             continue
@@ -214,7 +237,7 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
         elif f"name: {skill_id}" not in frontmatter_parts[1]:
             errors.append(f"tagged Skill frontmatter name mismatch: {skill_id}")
         for marker in required_markers.get(skill_id, ()):
-            if marker not in skill_text:
+            if marker not in behavior_text:
                 errors.append(f"tagged Skill role marker missing: {skill_id}: {marker}")
 
     adoption = candidate.get("adoption")

@@ -8,6 +8,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Literal
 
+import verify_cotend_project_init as project_init_contract
+
 
 ROOT = Path(__file__).resolve().parents[1]
 IDEA_CONTRACT_PATH = (
@@ -274,9 +276,12 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     semantic_text = (
         root / "skills" / "cotend-semantic-alignment" / "SKILL.md"
     ).read_text(encoding="utf-8")
-    init_text = (
-        root / "skills" / "cotend-project-init" / "SKILL.md"
-    ).read_text(encoding="utf-8")
+    try:
+        init_text = project_init_contract.load_project_init_contract(root)[
+            "combined"
+        ]
+    except project_init_contract.ProjectInitContractError as exc:
+        raise NativeClarificationError(str(exc)) from exc
     document_text = (
         root / "docs" / "NATIVE-REQUIREMENTS-CLARIFICATION.md"
     ).read_text(encoding="utf-8")

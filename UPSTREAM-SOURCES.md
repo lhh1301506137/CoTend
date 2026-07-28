@@ -4,14 +4,14 @@
 status: active_productization_and_research_registry
 checked_at: 2026-07-28
 relationship: primary_user_owned_productization_source_plus_secondary_public_references
-implementation_dependency: pinned_dual_ai_release_2026_07_28_1
+implementation_dependency: pinned_dual_ai_release_2026_07_28_2
 source_copying: scoped_6_adapted_plus_2_byte_identical_skills
 update_policy: manual_pinned_review_before_architecture_adoption_or_release
 ```
 
 本台账同时区分 CoTend 的用户原创产品化母体和外部设计参考。只有 `UP01` 是首要产品化来源；RF01-RF06 仍只是二级比较证据，不能按竞品多数做法改变 CoTend。
 
-当前仓库已从固定 release 采用 8 个 Codex Skill、37 个文件：六个用户原创 Skill 做 CoTend 适配，两个 MIT Skill 按 release 字节复用。采用范围、来源、许可证与更新边界由 adoption log、framework lock 和自动验证共同约束；未列入记录的 upstream 文件仍不得成为实现输入。
+当前仓库已从固定 release 采用 8 个 Codex Skill：上游 49 个文件适配为 CoTend r13 的 52 个文件；六个用户原创 Skill 做 CoTend 适配，两个 MIT Skill 按 release 字节复用，另有 3 个 CoTend 原生 pass。采用范围、来源、许可证与更新边界由 adoption log、framework lock 和自动验证共同约束；未列入记录的 upstream 文件仍不得成为实现输入。
 
 ## UP01 dual-ai 分享包
 
@@ -19,12 +19,12 @@ update_policy: manual_pinned_review_before_architecture_adoption_or_release
 role: primary_productization_source
 product_relationship: user_owned_upstream_framework
 source: public_distribution_location_pending
-reviewed_release: 2026.07.28.1
-release_anchor: dual-ai-share-2026.07.28.1
-previous_adoptable_release: 2026.07.23.2
+reviewed_release: 2026.07.28.2
+release_anchor: dual-ai-share-2026.07.28.2
+previous_adoptable_release: 2026.07.28.1
 superseded_non_adoptable_release: 2026.07.27.1
-latest_reviewed_candidate: 2026.07.28.1
-latest_candidate_anchor: dual-ai-share-2026.07.28.1
+latest_reviewed_candidate: 2026.07.28.2
+latest_candidate_anchor: dual-ai-share-2026.07.28.2
 latest_candidate_status: adopted_verified_local
 successor_candidate: none_current
 declared_license_scope: Apache-2.0_for_user_owned_content_with_separate_MIT_components
@@ -35,14 +35,14 @@ codex_role_map: upstream/CODEX-SKILL-ROLE-MAP.json
 adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md
 adoption_plan: upstream/FRAMEWORK-ADOPTION-PLAN.md
 capability_map: upstream/CAPABILITY-IMPLEMENTATION-MAP.json
-adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-1-v1-66-adoption
+adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-2-v1-67-adoption
 adopted_skill_verifier: scripts/verify_adopted_skill_set.py
 mapping_status: codex_skill_source_set_adopted_live_delivery_pending
 final_framework_lock: upstream/framework.lock.json
 automatic_update: forbidden
 ```
 
-`2026.07.27.1` 保持不可变但不可采用：tag 内发布状态、current-HEAD walkthrough 与 Windows checkout 字节比较曾无法形成可复现消费者载体。后继 `2026.07.28.1` 已修复 release closure，并在 detached annotated tag 中通过对象验证、完整 v1.66 walkthrough、LANG01-LANG10、clean-filter 等价与真实篡改拒绝。CoTend 因此把 lock 从 `.23.2` 移到 `.28.1`；`.23.2` 仍是上一可采用历史和 r11 来源锚点。
+`2026.07.27.1` 保持不可变但不可采用；`2026.07.28.1` 修复 release closure 并完成 v1.66 语言解析与真实正文验收。后继 `2026.07.28.2` 在 detached annotated tag 中固定 v1.67 Project Init pre-handback 可靠性：10 个直接参考、2 个脚本、实际字节/SHA-256/stable-reread 验证和一次有界复检。CoTend 因此把 lock 从 `.28.1` 移到 `.28.2`，r12 保留为精确 predecessor；`.23.2` 继续作为更早历史与冻结 rc.2 的来源锚点。
 
 审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容直接改名或适配，对两个内置 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。仓库源树、逐文件 adoption、final lock、本地隔离根载体与真实 GitHub `owner/repo` Open Beta 生命周期已完成。远端 refresh 只验证同 revision，不冒充跨版本升级；真实用户/Desktop 生命周期、Claude 载体和发布者身份认证仍未完成。
 

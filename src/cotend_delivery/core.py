@@ -24,7 +24,9 @@ EXPECTED_SKILLS = (
 )
 FIRST_PARTY_SKILLS = EXPECTED_SKILLS[:6]
 SHAREABLE_COMPANION_SKILLS = EXPECTED_SKILLS[6:]
-EXPECTED_FILE_COUNT = 40
+EXPECTED_FILE_COUNT = 52
+CURRENT_SOURCE_FRAMEWORK_FILE_COUNT = 49
+R10_TO_R12_FILE_COUNT = 40
 R9_FILE_COUNT = 39
 R8_FILE_COUNT = 38
 SOURCE_FRAMEWORK_FILE_COUNT = 37
@@ -142,12 +144,22 @@ def _target_artifact_id(lineage: str, revision: int) -> str:
 
 
 def _expected_file_count(revision: int) -> int:
-    if revision >= 10:
+    if revision >= 13:
         return EXPECTED_FILE_COUNT
+    if revision >= 10:
+        return R10_TO_R12_FILE_COUNT
     if revision == 9:
         return R9_FILE_COUNT
     if revision == 8:
         return R8_FILE_COUNT
+    if revision >= 2:
+        return SOURCE_FRAMEWORK_FILE_COUNT
+    return 30
+
+
+def _expected_source_file_count(revision: int) -> int:
+    if revision >= 13:
+        return CURRENT_SOURCE_FRAMEWORK_FILE_COUNT
     if revision >= 2:
         return SOURCE_FRAMEWORK_FILE_COUNT
     return 30
@@ -844,7 +856,9 @@ class Artifact:
         )
         if lock.get("skill_count") != len(artifact.skills):
             raise DeliveryError("framework_lock_mismatch", "Skill count differs from lock")
-        if lock.get("skill_file_count") != SOURCE_FRAMEWORK_FILE_COUNT:
+        if lock.get("skill_file_count") != _expected_source_file_count(
+            artifact.revision
+        ):
             raise DeliveryError(
                 "framework_lock_mismatch",
                 "Source framework file count differs from the adopted release lock",

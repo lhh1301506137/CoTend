@@ -39,13 +39,13 @@ R11_ID = "cotend-codex-r000011"
 R11_REVISION = 11
 R11_MANIFEST = "eac48844295f9ba12d64df469aa25fab9e76a8c9ceb9817857350b5029767627"
 R11_SOURCE = ROOT / ".private-provenance" / "G06-real-project" / "r11-repository"
-R12_ID = "cotend-codex-r000012"
-R12_REVISION = 12
-R12_MANIFEST = "44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276"
+R13_ID = "cotend-codex-r000013"
+R13_REVISION = 13
+R13_MANIFEST = "39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd"
 LEGACY_RELEASE_ID = "2026.07.23.2"
 LEGACY_PROTOCOL = "cotend-collaboration-v1.65"
-RELEASE_ID = "2026.07.28.1"
-PROTOCOL = "cotend-collaboration-v1.66"
+RELEASE_ID = "2026.07.28.2"
+PROTOCOL = "cotend-collaboration-v1.67"
 MODEL = "gpt-5.4-mini"
 REASONING_EFFORT = "medium"
 WORKSPACE_PERMISSION_CONFIG = 'default_permissions=":workspace"'
@@ -1208,17 +1208,17 @@ def r11_artifact() -> Artifact:
     return extract_r11_source()
 
 
-def r12_artifact() -> Artifact:
+def r13_artifact() -> Artifact:
     artifact = Artifact.from_repository(ROOT)
     if (
         artifact.source_release_id != RELEASE_ID
         or artifact.protocol != PROTOCOL
-        or artifact.artifact_id != R12_ID
-        or artifact.revision != R12_REVISION
-        or artifact.manifest_sha256 != R12_MANIFEST
+        or artifact.artifact_id != R13_ID
+        or artifact.revision != R13_REVISION
+        or artifact.manifest_sha256 != R13_MANIFEST
     ):
         raise RealProjectAcceptanceError(
-            "current repository does not match the frozen r12 target"
+            "current repository does not match the frozen r13 target"
         )
     return artifact
 
@@ -1399,7 +1399,7 @@ def deliver_r10_to_r11(
     }
 
 
-def deliver_r11_to_r12(
+def deliver_r11_to_r13(
     project: Path,
     allowed_root: Path,
     source: Path,
@@ -1408,7 +1408,7 @@ def deliver_r11_to_r12(
 ) -> dict[str, Any]:
     project = guarded_project(project, allowed_root)
     predecessor = validated_r11_artifact(guarded_private_source(source))
-    current = r12_artifact()
+    current = r13_artifact()
     manager = DeliveryManager(project)
     unmanaged = file_manifest(project, excludes=SNAPSHOT_EXCLUDES)
     head = git_head(project)
@@ -1429,9 +1429,9 @@ def deliver_r11_to_r12(
             update_preview.get("status") != "planned"
             or file_manifest(project, excludes={".git"}) != update_before
         ):
-            raise RealProjectAcceptanceError("r12 update preview mutated the project")
+            raise RealProjectAcceptanceError("r13 update preview mutated the project")
         manager.execute("update", current, apply=True)
-        state = require_delivery_state(manager, current, R12_ID)
+        state = require_delivery_state(manager, current, R13_ID)
         if (
             file_manifest(project, excludes=SNAPSHOT_EXCLUDES) != unmanaged
             or git_head(project) != head
@@ -1454,7 +1454,7 @@ def deliver_r11_to_r12(
         "status": "pass",
         "project_git_head": head,
         "r11_manifest": predecessor.manifest_sha256,
-        "r12_manifest": current.manifest_sha256,
+        "r13_manifest": current.manifest_sha256,
         "installed_artifact": state["artifact_id"],
         "managed_skills": len(current.skills),
         "managed_files": len(current.files),
@@ -2509,8 +2509,8 @@ def run_real_init(
     event_checkpoint: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     project = guarded_project(project, allowed_root)
-    current = r12_artifact()
-    require_delivery_state(DeliveryManager(project), current, R12_ID)
+    current = r13_artifact()
+    require_delivery_state(DeliveryManager(project), current, R13_ID)
     output = output.expanduser().resolve()
     private_root = (ROOT / ".private-provenance").resolve()
     try:
@@ -2590,7 +2590,7 @@ def run_real_init(
     )
     prompt = (
         "$cotend-init\n\n"
-        "Initialize this retained local project from PROJECT-BRIEF.md using the project-local CoTend r12 Skills. "
+        "Initialize this retained local project from PROJECT-BRIEF.md using the project-local CoTend r13 Skills. "
         "Use the standard adoption profile and Full runtime profile. Before acting, read .agents/skills/cotend-init/SKILL.md "
         "and compute its SHA-256. Create only the minimum durable governance records, run consistency checks, report readiness, "
         "and stop for the owner's next instruction. Do not create expense_splitter.py, tests, any product implementation, or a Git commit. "
@@ -2637,7 +2637,7 @@ def run_real_init(
     except (RealProjectAcceptanceError, OSError) as exc:
         boundary_errors.append(exc)
     try:
-        require_delivery_state(DeliveryManager(project), current, R12_ID)
+        require_delivery_state(DeliveryManager(project), current, R13_ID)
     except (RealProjectAcceptanceError, DeliveryError, OSError) as exc:
         boundary_errors.append(exc)
     try:
@@ -3045,9 +3045,9 @@ def rollback_restore(
 ) -> dict[str, Any]:
     project = guarded_project(project, allowed_root)
     predecessor = validated_r11_artifact(guarded_private_source(source))
-    current = r12_artifact()
+    current = r13_artifact()
     manager = DeliveryManager(project)
-    require_delivery_state(manager, current, R12_ID)
+    require_delivery_state(manager, current, R13_ID)
     before = file_manifest(project, excludes=SNAPSHOT_EXCLUDES)
     head = git_head(project)
     protected = protected_boundary_snapshot(project, allowed_root, protected_paths)
@@ -3059,8 +3059,8 @@ def rollback_restore(
         require_delivery_state(manager, predecessor, R11_ID)
         r11_checks = run_product_checks(project) if require_product else {"automated": "not_required"}
         manager.execute("update", current, apply=True)
-        require_delivery_state(manager, current, R12_ID)
-        r12_checks = run_product_checks(project) if require_product else {"automated": "not_required"}
+        require_delivery_state(manager, current, R13_ID)
+        r13_checks = run_product_checks(project) if require_product else {"automated": "not_required"}
         if file_manifest(project, excludes=SNAPSHOT_EXCLUDES) != before or git_head(project) != head:
             raise RealProjectAcceptanceError("framework rollback or restore changed project-owned files")
     finally:
@@ -3073,12 +3073,12 @@ def rollback_restore(
     return {
         "status": "pass",
         "rollback_target": R11_ID,
-        "restored_target": R12_ID,
+        "restored_target": R13_ID,
         "project_git_head": head,
         "non_delivery_files_unchanged": True,
         "protected_user_boundaries": len(protected),
         "r11_product_checks": r11_checks,
-        "r12_product_checks": r12_checks,
+        "r13_product_checks": r13_checks,
     }
 
 
@@ -3155,7 +3155,7 @@ def main() -> int:
                 protected_paths=protected_paths,
             )
             result["r11_manifest"] = source.manifest_sha256
-            result["r12_manifest"] = r12_artifact().manifest_sha256
+            result["r13_manifest"] = r13_artifact().manifest_sha256
         elif args.phase == "recover-prepare":
             result = recover_prepared_project(
                 args.project,
@@ -3163,9 +3163,9 @@ def main() -> int:
                 protected_paths=protected_paths,
             )
             result["r11_manifest"] = source.manifest_sha256
-            result["r12_manifest"] = r12_artifact().manifest_sha256
+            result["r13_manifest"] = r13_artifact().manifest_sha256
         elif args.phase == "deliver":
-            result = deliver_r11_to_r12(
+            result = deliver_r11_to_r13(
                 args.project,
                 args.allowed_root,
                 args.r11_source,
@@ -3226,8 +3226,8 @@ def main() -> int:
             )
         else:
             project = guarded_project(args.project, args.allowed_root)
-            current = r12_artifact()
-            state = require_delivery_state(DeliveryManager(project), current, R12_ID)
+            current = r13_artifact()
+            state = require_delivery_state(DeliveryManager(project), current, R13_ID)
             validate_response_schema(project / INIT_SCHEMA)
             result = {
                 "status": "pass",

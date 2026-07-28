@@ -345,8 +345,8 @@ def verify_static(fixture: Path) -> dict[str, Any]:
     installed = project / ".agents" / "skills"
     if carrier.file_manifest(installed) != carrier.file_manifest(carrier.SOURCE_ROOT):
         raise LifecycleError("fixture Skill files differ from repository source")
-    if len(carrier.file_manifest(installed)) != 40:
-        raise LifecycleError("fixture must contain exactly 40 Skill files")
+    if len(carrier.file_manifest(installed)) != 52:
+        raise LifecycleError("fixture must contain exactly 52 Skill files")
     discovered_skills = {path.name for path in installed.iterdir() if path.is_dir()}
     if discovered_skills != carrier.EXPECTED_SKILLS:
         raise LifecycleError("fixture Skill directory inventory drift")
@@ -520,7 +520,7 @@ def validate_project_result(
         require_markers(
             project / "STATUS.md",
             (
-                "cotend-collaboration-v1.66",
+                "cotend-collaboration-v1.67",
                 "auto_mode: fresh_init",
                 "adoption_profile: lite",
                 "readiness: continue_ready",
@@ -537,7 +537,7 @@ def validate_project_result(
     if scenario_id == "current-resume":
         require_markers(
             project / "STATUS.md",
-            ("cotend-collaboration-v1.66", "adoption_profile: lite"),
+            ("cotend-collaboration-v1.67", "adoption_profile: lite"),
         )
     elif scenario_id == "pending-decision":
         require_markers(

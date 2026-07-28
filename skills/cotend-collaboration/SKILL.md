@@ -6,7 +6,7 @@ description: >-
 
 # CoTend Collaboration
 
-Protocol version: `cotend-collaboration-v1.66`
+Protocol version: `cotend-collaboration-v1.67`
 
 ## Progressive Disclosure Contract
 
@@ -28,7 +28,7 @@ This body is the always-needed governance and routing core. Detailed contracts l
 - A directly invoked Init/Project Init, formal Collaboration review, Diagnose Only, Semantic Alignment, or Model Upgrade returns control once after its authorized result. A stronger pending decision is the handback; ordinary implicit governance and confirmed Plan Tree continuation do not add one.
 - Recorded local closeout may cover verified in-scope durable-record synchronization and a local commit through the Native Closeout Pass. It never covers push/publication, shared-history rewrite, secrets, scope expansion, final acceptance, or `critical` work.
 - Use the lightest route that preserves intent, risk, evidence, verification, and reviewability.
-- Native workflow state, runtime profile, and project adoption profile are separate. Resolve `current | dormant | conflict`, `full | adaptive`, and `delegated_pair | inline` only through `references/runtime-profiles.md`: session choice overrides project choice, project choice persists across framework updates, and a missing choice uses the CoTend product default `v1.66-full`. Model, carrier, provider, role, reasoning configuration, external-framework flags, and model-upgrade evidence may support an advisory recommendation but never select or invalidate a profile.
+- Native workflow state, runtime profile, and project adoption profile are separate. Resolve `current | dormant | conflict`, `full | adaptive`, and `delegated_pair | inline` only through `references/runtime-profiles.md`: session choice overrides project choice, project choice persists across framework updates, and a missing choice uses the CoTend product default `v1.67-full`. Model, carrier, provider, role, reasoning configuration, external-framework flags, and model-upgrade evidence may support an advisory recommendation but never select or invalidate a profile.
 - Delegation maturity is also separate. Ten resolved samples with at least nine `accepted_clean` may offer one narrow `act_then_report` choice; it never activates automatically. L0-L2, risk, release, acceptance, model role, framework, and specialized pending decisions remain non-delegable.
 - Before broad autonomous implementation, require a protected current-MVP baseline: user-confirmed L0 complete goal, L1 MVP/main capabilities/main chain, and each important L2 needed by the active route. Confirmation is per node and never inherited; every new/materially changed node is content-addressed to its exact decision-log payload, while legacy nodes migrate only at relevant high-value triggers. The AI owns L3/L4 only inside confirmed ancestors.
 - For a new/reconstructed/stale/conflicting/materially changed L2, confirm its complete charter before rules. Old rules remain candidates until then; charter confirmation does not confirm rules.

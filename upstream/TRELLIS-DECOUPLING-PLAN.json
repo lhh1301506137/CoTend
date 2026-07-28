@@ -6,7 +6,7 @@
   "decision": "preserve_governance_capabilities_replace_trellis_identity_authority_and_runtime_dependency",
   "current_candidate": "cotend@0.1.0-rc.2_local_unpublished",
   "target_candidate": "cotend@0.1.0-rc.3_after_parity",
-  "development_target_artifact": "cotend-codex-r000012",
+  "development_target_artifact": "cotend-codex-r000013",
   "source_boundary": {
     "trellis_relationship": "restricted_design_inspiration_and_legacy_runtime_integration",
     "trellis_source_adoption": "none",

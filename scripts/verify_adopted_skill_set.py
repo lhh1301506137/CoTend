@@ -8,27 +8,29 @@ import subprocess
 import sys
 from pathlib import Path
 
+import verify_cotend_project_init as project_init_contract
+
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_ROOT = "dual-ai-collaboration-skill-share"
-TAG = "dual-ai-share-2026.07.28.1"
+TAG = "dual-ai-share-2026.07.28.2"
 
 SKILLS = {
     "dual-ai-init": {
         "target": "cotend-init",
-        "tree": "689f5088f950dcb18c56846e03f3e8ea549c6b0b",
+        "tree": "d365118ef0337f8d911a6854871c608d78ec6b4e",
         "mode": "adapted",
         "files": 2,
     },
     "dual-ai-project-init": {
         "target": "cotend-project-init",
-        "tree": "d28d2858e540996f787e1ba9c77e9953e44fb7fd",
+        "tree": "990f3be754243846ac8c951a22466e7a83105b19",
         "mode": "adapted",
-        "files": 2,
+        "files": 14,
     },
     "dual-ai-collaboration": {
         "target": "cotend-collaboration",
-        "tree": "3eb2c5db3b07b1f4963e2eb96cd1465825de510a",
+        "tree": "b0604ba3147ccaca37da2d3f88c043d73ced56bc",
         "mode": "adapted",
         "files": 23,
     },
@@ -40,13 +42,13 @@ SKILLS = {
     },
     "dual-ai-semantic-alignment": {
         "target": "cotend-semantic-alignment",
-        "tree": "e7f019bfd5ee99f1d0f518bcba177de6ae90f5fb",
+        "tree": "c7653b16fc102beb27853622895c66d0d6fedaae",
         "mode": "adapted",
         "files": 3,
     },
     "dual-model-upgrade": {
         "target": "cotend-model-upgrade",
-        "tree": "7f4e6fba55bded5f8a18917be9fa6e1f09fd01cc",
+        "tree": "25d867f5dd797589efbc556afc8c37a7c156a3a2",
         "mode": "adapted",
         "files": 3,
     },
@@ -72,6 +74,14 @@ NATIVE_TARGET_ADDITIONS = {
     },
 }
 
+SOURCE_TARGET_PATH_MAPPINGS = {
+    "cotend-project-init": {
+        "scripts/check_private_dual_governance_language.py": (
+            "scripts/check_cotend_governance_language.py"
+        ),
+    },
+}
+
 DISPLAY_NAMES = {
     "cotend-init": "CoTend Init",
     "cotend-project-init": "CoTend Project Init",
@@ -89,18 +99,18 @@ REQUIRED_MARKERS = {
         ".codex/skills/cotend-project-init/SKILL.md",
     ),
     "cotend-project-init": (
-        "Protocol target: `cotend-collaboration-v1.66`",
+        "Protocol target: `cotend-collaboration-v1.67`",
         "Project Init is the sole owner of `user_facing_language_resolution`",
         "**cotend-collaboration** owns collaboration governance",
         "`$cotend-diagnose-only`",
         "`karpathy-guidelines` for coding behavior",
-        "`grill-me` only for a framework-setup question",
-        "references/goal-completion.md",
-        "references/release-hardening.md",
-        "references/code-context-harness.md",
+        "Do not use grill-me",
+        "cotend.governance-language-pre-handback.v1",
+        "check_cotend_governance_language.py",
+        "at most twice total",
     ),
     "cotend-collaboration": (
-        "Protocol version: `cotend-collaboration-v1.66`",
+        "Protocol version: `cotend-collaboration-v1.67`",
         "inspect their actual prose against the persisted resolved language",
         "CoTend Core never grants project-truth authority",
         "through `cotend-project-init` Auto Mode",
@@ -117,7 +127,7 @@ REQUIRED_MARKERS = {
         "milestone re-entry",
     ),
     "cotend-semantic-alignment": (
-        "Companion version: `cotend-collaboration-v1.66`",
+        "Companion version: `cotend-collaboration-v1.67`",
         "`cotend.semantic-contract.v1`",
         "scripts/semantic-contract.mjs",
         "Independent Entry And Minimum Truth",
@@ -226,7 +236,11 @@ def verify_source_topology(upstream_repo: Path, errors: list[str]) -> None:
             errors.append(f"tagged source tree drift: {source_id}")
         target_files = target_inventory(target_dir)
         native_additions = NATIVE_TARGET_ADDITIONS.get(target_id, set())
-        expected_target_files = sorted(set(source_files) | native_additions)
+        path_mappings = SOURCE_TARGET_PATH_MAPPINGS.get(target_id, {})
+        mapped_source_files = {
+            path_mappings.get(path, path) for path in source_files
+        }
+        expected_target_files = sorted(mapped_source_files | native_additions)
         if expected_target_files != target_files:
             errors.append(
                 f"source/target file topology drift: {source_id} -> {target_id}"
@@ -244,6 +258,14 @@ def verify_skill_metadata(errors: list[str]) -> None:
         if not skill_path.is_file():
             continue
         text = skill_path.read_text(encoding="utf-8")
+        behavior_text = text
+        if target_id == "cotend-project-init":
+            try:
+                behavior_text = project_init_contract.load_project_init_contract(ROOT)[
+                    "combined"
+                ]
+            except project_init_contract.ProjectInitContractError as exc:
+                errors.append(str(exc))
         name, keys = frontmatter(text)
         if name != target_id:
             errors.append(f"Skill frontmatter name mismatch: {target_id}")
@@ -257,7 +279,7 @@ def verify_skill_metadata(errors: list[str]) -> None:
                 f"adapted Skill frontmatter has unsupported keys: {target_id}"
             )
         for marker in REQUIRED_MARKERS[target_id]:
-            if marker not in text:
+            if marker not in behavior_text:
                 errors.append(f"Skill behavior marker missing: {target_id}: {marker}")
 
         agent_path = skill_path.parent / "agents" / "openai.yaml"
@@ -294,6 +316,10 @@ def verify_skill_metadata(errors: list[str]) -> None:
 
 
 def verify_references(errors: list[str]) -> None:
+    try:
+        project_init_contract.load_project_init_contract(ROOT)
+    except project_init_contract.ProjectInitContractError as exc:
+        errors.append(str(exc))
     collaboration = ROOT / "skills" / "cotend-collaboration"
     skill_path = collaboration / "SKILL.md"
     references_dir = collaboration / "references"
@@ -511,13 +537,13 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         return
     expected_lock = {
         "schema": "cotend.framework-lock",
-        "release_id": "2026.07.28.1",
-        "framework_protocol": "cotend-collaboration-v1.66",
+        "release_id": "2026.07.28.2",
+        "framework_protocol": "cotend-collaboration-v1.67",
         "model_upgrade_packet_family": "cotend-model-upgrade-v1.11",
         "skill_count": 8,
         "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
         "adoption_record": (
-            "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-1-v1-66-adoption"
+            "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-2-v1-67-adoption"
         ),
     }
     for key, expected in expected_lock.items():
@@ -525,12 +551,12 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
             errors.append(f"framework lock mismatch: {key}")
     expected_source_release = {
         "tag": TAG,
-        "tag_object": "e5ed9ec097251d3bca24f27801ed818a09de1e7a",
-        "release_commit": "e3d3245efc3843851d007cf0a6de2f3bebf418fc",
-        "source_framework_commit": "208626912ddfaf51f5b09e2dc29d069a2dce7d3a",
-        "package_tree": "7ab401fde46aae48e1cf9da49b5b1c670434c4b6",
+        "tag_object": "d26994355921b9c43956f7300069c892884496e0",
+        "release_commit": "4540f9e0543e85c6a7cceb1d7501467feee8b440",
+        "source_framework_commit": "e40f8dec01b140e697197c038f45fd962e7fb868",
+        "package_tree": "686a507d904b08c6a43ef6c5d40c1d43083d8f1b",
         "manifest_sha256": (
-            "7def9da0459ffe99373c738988d2aae14d0c7095ccbdb222556d3763b87b016c"
+            "f96b86ba00fd1bc75bd70287c12d0af58f14f225d7dd34e43cfe4a9a99e51d00"
         ),
     }
     if lock.get("status") != "adopted_verified":
@@ -539,7 +565,7 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         errors.append("framework lock source release drift")
     if (
         lock.get("source_carrier") != "skills/"
-        or lock.get("skill_file_count") != 37
+        or lock.get("skill_file_count") != 49
     ):
         errors.append("framework lock source carrier or file count drift")
     expected_trees = {source_id: record["tree"] for source_id, record in SKILLS.items()}
@@ -573,14 +599,25 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         "target": {
             "platform": "Codex",
             "lineage": "cotend-codex",
-            "artifact_id": "cotend-codex-r000012",
-            "revision": 12,
+            "artifact_id": "cotend-codex-r000013",
+            "revision": 13,
             "manifest_sha256": carrier_manifest,
         },
         "product": {"version": None},
         "skill_count": 8,
-        "skill_file_count": 40,
+        "skill_file_count": 52,
         "predecessor_targets": [
+            {
+                "platform": "Codex",
+                "lineage": "cotend-codex",
+                "artifact_id": "cotend-codex-r000012",
+                "revision": 12,
+                "source_release_id": "2026.07.28.1",
+                "framework_protocol": "cotend-collaboration-v1.66",
+                "manifest_sha256": (
+                    "44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276"
+                ),
+            },
             {
                 "platform": "Codex",
                 "lineage": "cotend-codex",
@@ -793,10 +830,10 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
                 or len(adapted) != len(set(adapted))
                 or set(imported) & set(adapted)
                 or recorded != actual
-                or len(actual) != 40
+                or len(actual) != 52
             ):
                 errors.append(
-                    "framework candidate inventory does not equal the 40 current Skill files"
+                    "framework candidate inventory does not equal the 52 current Skill files"
                 )
         if candidate_adoption.get("final_framework_lock_exists") is not True:
             errors.append("framework candidate does not record the final lock")
@@ -854,7 +891,7 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
     else:
         log_text = adoption_log.read_text(encoding="utf-8")
         for marker in (
-            "## release-2026-07-28-1-v1-66-adoption",
+            "## release-2026-07-28-2-v1-67-adoption",
             "status: adopted_verified_local",
             "resulting_CoTend_commit: containing_commit",
         ):
@@ -960,7 +997,7 @@ def main() -> int:
     print(
         "ADOPTED_SKILL_SET_VERIFICATION_OK "
         f"mode={'pre_lock' if args.pre_lock else 'final'} "
-        "skills=8 files=40 capabilities=19"
+        "skills=8 files=52 capabilities=19"
     )
     return 0
 

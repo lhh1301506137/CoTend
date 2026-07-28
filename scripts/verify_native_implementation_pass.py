@@ -8,6 +8,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Literal
 
+import verify_cotend_project_init as project_init_contract
+
 
 ROOT = Path(__file__).resolve().parents[1]
 IMPLEMENTATION_PASS_PATH = (
@@ -61,7 +63,10 @@ REMOVED_TD04_COMMAND = "trellis-implement"
 REQUIRED_REMAINING_COMMANDS: tuple[str, ...] = ()
 EXPECTED_TRELLIS_MENTIONS = 0
 EXPECTED_TRELLIS_FILES = 0
-EXPECTED_SKILL_FILES = 40
+EXPECTED_SKILL_FILES = 52
+EXPECTED_R12_MANIFEST = (
+    "44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276"
+)
 EXPECTED_R9_MANIFEST = (
     "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"
 )
@@ -436,12 +441,18 @@ def skill_manifest(root: Path = ROOT) -> tuple[dict[str, str], str]:
 
 
 def verify_repository(root: Path = ROOT) -> dict[str, object]:
+    try:
+        project_init = project_init_contract.load_project_init_contract(root)[
+            "combined"
+        ]
+    except project_init_contract.ProjectInitContractError as exc:
+        raise NativeImplementationPassError(str(exc)) from exc
     texts = {
         "implementation": (root / IMPLEMENTATION_PASS_PATH.relative_to(ROOT)).read_text(encoding="utf-8"),
         "collaboration": (root / COLLABORATION_PATH.relative_to(ROOT)).read_text(encoding="utf-8"),
         "runtime": (root / RUNTIME_PROFILES_PATH.relative_to(ROOT)).read_text(encoding="utf-8"),
         "orchestration": (root / ORCHESTRATION_PATH.relative_to(ROOT)).read_text(encoding="utf-8"),
-        "project_init": (root / PROJECT_INIT_PATH.relative_to(ROOT)).read_text(encoding="utf-8"),
+        "project_init": project_init,
         "model_upgrade": (root / MODEL_UPGRADE_PATH.relative_to(ROOT)).read_text(encoding="utf-8"),
         "model_packet": (root / MODEL_PACKET_PATH.relative_to(ROOT)).read_text(encoding="utf-8"),
         "document": (root / DOCUMENT_PATH.relative_to(ROOT)).read_text(encoding="utf-8"),
@@ -481,8 +492,8 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000012"
-        or target.get("revision") != 12
+        target.get("artifact_id") != "cotend-codex-r000013"
+        or target.get("revision") != 13
         or target.get("manifest_sha256") != digest
         or lock.get("skill_count") != 8
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
@@ -491,13 +502,13 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000011",
-        "revision": 11,
-        "source_release_id": "2026.07.23.2",
-        "framework_protocol": "cotend-collaboration-v1.65",
-        "manifest_sha256": EXPECTED_R11_MANIFEST,
+        "artifact_id": "cotend-codex-r000012",
+        "revision": 12,
+        "source_release_id": "2026.07.28.1",
+        "framework_protocol": "cotend-collaboration-v1.66",
+        "manifest_sha256": EXPECTED_R12_MANIFEST,
     }:
-        raise NativeImplementationPassError("r11 predecessor identity drifted")
+        raise NativeImplementationPassError("r12 predecessor identity drifted")
     if len(files) != EXPECTED_SKILL_FILES:
         raise NativeImplementationPassError("current Skill file inventory drifted")
     _require_markers(

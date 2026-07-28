@@ -1,12 +1,12 @@
-# CoTend Codex v1.66 后继版更新与适配计划
+# CoTend Codex v1.67 后继版更新与适配计划
 
 > 范围说明：本文固定当前累计采用 release 与其 containing-commit lock。历史 rc.1 与首次 GitHub Open Beta 证据保持不变；rc.2 的远端状态只能在用户授权推送后更新。
 
 ```yaml
 status: implemented_verified
 authority: implementation_record
-candidate_release: 2026.07.28.1
-release_anchor: dual-ai-share-2026.07.28.1
+candidate_release: 2026.07.28.2
+release_anchor: dual-ai-share-2026.07.28.2
 target_platform: Codex
 target_source_carrier: skills/
 live_install_target: not_authorized
@@ -19,7 +19,7 @@ analysis_language: zh-CN
 
 ## 目标
 
-把 CoTend 从已采用的 `2026.07.23.2 / v1.65` 更新到可复现后继版 `2026.07.28.1 / v1.66`。既有 v1.53-v1.65 累计能力全部保留；本轮新增治理语言唯一解析 owner、冲突停止、规范化持久化、真实正文验收和 Full/Adaptive 结果等价，不新增长期 Skill、第二本语言台账或逐步骤复核。
+把 CoTend 从已采用的 `2026.07.28.1 / v1.66` 更新到可复现后继版 `2026.07.28.2 / v1.67`。既有 v1.53-v1.66 累计能力全部保留；本轮把治理语言 pre-handback 可靠性固定为可执行、只读、实际字节与 SHA-256 绑定的验证合同，并把 Project Init 拆为精简核心、10 个直接参考模块和 2 个脚本。不新增长期 Skill、第二本语言台账、自动 writer、新模型调用或逐步骤复核。
 
 仓库当前唯一源为根 `skills/`，满足官方 Plugin contract；上游固定 release 内部仍使用 `codex-skills/`。该仓库源不是用户全局 `$CODEX_HOME/skills`，本次更新不授权修改本机已安装 Skill、推送或发布。
 
@@ -27,12 +27,12 @@ analysis_language: zh-CN
 
 | 输入 | 固定值 |
 |---|---|
-| 发布版 | `2026.07.28.1` |
-| 附注标签 | `dual-ai-share-2026.07.28.1` |
-| 发布提交 | `e3d3245efc3843851d007cf0a6de2f3bebf418fc` |
-| 包目录树 | `7ab401fde46aae48e1cf9da49b5b1c670434c4b6` |
-| 清单 SHA-256 | `7def9da0459ffe99373c738988d2aae14d0c7095ccbdb222556d3763b87b016c` |
-| Codex 技能文件 | 8 个技能目录，共 37 个文件 |
+| 发布版 | `2026.07.28.2` |
+| 附注标签 | `dual-ai-share-2026.07.28.2` |
+| 发布提交 | `4540f9e0543e85c6a7cceb1d7501467feee8b440` |
+| 包目录树 | `686a507d904b08c6a43ef6c5d40c1d43083d8f1b` |
+| 清单 SHA-256 | `f96b86ba00fd1bc75bd70287c12d0af58f14f225d7dd34e43cfe4a9a99e51d00` |
+| Codex 技能文件 | 8 个技能目录，上游 49 个文件、CoTend target 52 个文件 |
 | 来源与许可证 | `THIRD-PARTY-SOURCES.json`、`THIRD-PARTY-NOTICES.md`、两个独立 MIT 文本 |
 
 实现必须从附注标签的 Git 对象重建或读取输入，不以可变工作树、ZIP 文件名或修改时间作为来源真相。
@@ -41,12 +41,12 @@ analysis_language: zh-CN
 
 | 标记发布版中的源技能 | 文件数 | 源目录树 | CoTend 目标 | 计划状态 | 处理方式 |
 |---|---:|---|---|---|---|
-| `dual-ai-init` | 2 | `689f5088f950dcb18c56846e03f3e8ea549c6b0b` | `skills/cotend-init/` | `adapted` | 保留薄入口；传播 Project Init 的语言解析记录并使用 CoTend 本地化标题。 |
-| `dual-ai-project-init` | 2 | `d28d2858e540996f787e1ba9c77e9953e44fb7fd` | `skills/cotend-project-init/` | `adapted` | 保留 Auto Mode；唯一负责语言解析、冲突停止和首次持久化。 |
-| `dual-ai-collaboration` | 23 | `3eb2c5db3b07b1f4963e2eb96cd1465825de510a` | `skills/cotend-collaboration/` | `adapted` | 保留渐进治理核心和 21 个参考模块；消费已解析语言并验证真实正文。 |
+| `dual-ai-init` | 2 | `d365118ef0337f8d911a6854871c608d78ec6b4e` | `skills/cotend-init/` | `adapted` | 保留薄入口；传播 Project Init 的语言解析与 pre-handback 结果。 |
+| `dual-ai-project-init` | 14 | `990f3be754243846ac8c951a22466e7a83105b19` | `skills/cotend-project-init/` | `adapted` | 保留 Auto Mode；唯一负责语言解析，并用 10 个直接参考与 2 个只读脚本执行可靠 pre-handback。 |
+| `dual-ai-collaboration` | 23 | `b0604ba3147ccaca37da2d3f88c043d73ced56bc` | `skills/cotend-collaboration/` | `adapted` | 保留渐进治理核心和 21 个上游参考模块，再叠加 3 个 CoTend 原生 pass；消费已解析语言并验证真实正文。 |
 | `diagnose-only` | 2 | `06e8b6bd4c2f916d80e57544edd7bd4ec1db60f5` | `skills/cotend-diagnose-only/` | `adapted` | 保持只读诊断与可写语义入口的清晰分界。 |
-| `dual-ai-semantic-alignment` | 3 | `e7f019bfd5ee99f1d0f518bcba177de6ae90f5fb` | `skills/cotend-semantic-alignment/` | `adapted` | 保留独立可写语义入口并消费持久化语言。 |
-| `dual-model-upgrade` | 3 | `7f4e6fba55bded5f8a18917be9fa6e1f09fd01cc` | `skills/cotend-model-upgrade/` | `adapted` | 保留完整模型生命周期和数据包族 v1.11，并消费持久化语言。 |
+| `dual-ai-semantic-alignment` | 3 | `c7653b16fc102beb27853622895c66d0d6fedaae` | `skills/cotend-semantic-alignment/` | `adapted` | 保留独立可写语义入口并消费持久化语言。 |
+| `dual-model-upgrade` | 3 | `25d867f5dd797589efbc556afc8c37a7c156a3a2` | `skills/cotend-model-upgrade/` | `adapted` | 保留完整模型生命周期和数据包族 v1.11，并消费持久化语言。 |
 | `grill-me` | 1 | `70df660726ef12349a40dc0353a681c82414fe95` | `skills/grill-me/` | `adopted` | 从标记发布包字节复用，不添加 CoTend 前缀，不改变语义。 |
 | `karpathy-guidelines` | 1 | `e119339197d600aa39a24fd7a95c946800c9c949` | `skills/karpathy-guidelines/` | `adopted` | 从标记发布包字节复用，不添加 CoTend 前缀，不改变语义。 |
 
@@ -66,13 +66,14 @@ analysis_language: zh-CN
 
 ### 协议与版本世代
 
-- 活动协议标识使用 `cotend-collaboration-v1.66`，完整继承上游行为世代。
+- 活动协议标识使用 `cotend-collaboration-v1.67`，完整继承上游行为世代。
 - 模型数据包族使用 `cotend-model-upgrade-v1.11`。
 - CoTend 产品发布版本与上述行为世代分开管理；本叶不决定首个公开产品版本号。
 - `dual-ai-*` 只可出现在上游来源记录、明确的旧项目迁移检测或迁移说明中，不得继续作为活动产品输出、默认提示词、主调用名或新项目协议值。
 - 旧名称迁移兼容必须是输入侧允许清单：识别后写出 CoTend 新真相，不长期双写两套活动协议。
 - 治理语言只由 `cotend-project-init` 解析：先做 canonical/project-local 和 current/project-local 冲突检查，再按当前明确选择、canonical、项目局部明确指令、CoTend 默认 `en` 解析。不得从会话语言、locale、账号偏好、文件名或仓库主要语言推断。
 - 解析结果必须在受影响治理写入前保存到现有 STATUS 载体；Acceptance 必须核对声明和真实 changed governance bytes。Full/Adaptive 结果必须等价。
+- 当 Init 创建或修改用户可见治理正文时，执行 bundled read-only validator：changed set 来自项目相对 VCS 加本次写入回执，checker 必须按 SHA-256 绑定，检查后稳定重读；一个 Init turn 最多首次验证加一次修复后复检，剩余 `fail`/`blocked` 阻止 `continue_ready`。
 - 删除仅适用于原维护者机器、私有配置 helper、内部决策编号、旧分享包同步和固定 Claude 目录迁移的规则；平台集成必须使用公开、可验证并经授权的目标平台流程。
 
 ### 行为保真
@@ -96,8 +97,8 @@ analysis_language: zh-CN
 
 ## 实施批次
 
-1. 从附注标签读取 37 个 Codex Skill 文件并核对每个源目录树。
-2. 在根 `skills/` 落位并适配 37 个文件，上游读取路径仍为发布包 `codex-skills/`。
+1. 从附注标签读取 49 个 Codex Skill 文件并核对每个源目录树。
+2. 在根 `skills/` 落位并适配为 52 个文件；额外 3 个文件是 CoTend 原生 pass，上游读取路径仍为发布包 `codex-skills/`。
 3. 机械更新六个目录、前置元数据、agent 元数据、委派、自引用、回退路径、协议与数据包族。
 4. 逐文件语义审查高风险文本，不用无上下文全局替换修改旧版迁移、来源或第三方归属。
 5. 增加许可证、许可告知、来源记录和已采用技能集验证器。
@@ -107,7 +108,7 @@ analysis_language: zh-CN
 
 ## 实施结果
 
-- 根 `skills/` 已包含 8 个 Skill 目录和 37 个文件；六个用户原创 Skill 已完成 CoTend 品牌、公开默认和 Codex 元数据适配。
+- 根 `skills/` 已包含 8 个 Skill 目录和 52 个文件；上游对应 49 个文件，六个用户原创 Skill 已完成 CoTend 品牌、公开默认和 Codex 元数据适配。
 - 两个 MIT Skill 与固定 release 中的对应文件保持字节一致，独立许可证、notice 和机器可读来源记录已落位。
 - C01-C19 已映射到实际 Skill 文件；C16 只完成仓库源树部分，live 安装与交付生命周期继续延后。
 - adoption log 与 `upstream/framework.lock.json` 使用 `containing_commit` 约定进入同一采用提交。

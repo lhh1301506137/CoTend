@@ -982,20 +982,20 @@ def _validate_no_regression_baseline(root: Path) -> dict[str, Any]:
     target = target_lock.get("target")
     skill_files, skill_digest = native_closeout.skill_manifest(root)
     if (
-        framework_lock.get("release_id") != "2026.07.28.1"
+        framework_lock.get("release_id") != "2026.07.28.2"
         or framework_lock.get("framework_protocol")
-        != "cotend-collaboration-v1.66"
+        != "cotend-collaboration-v1.67"
         or not isinstance(source_release, dict)
-        or source_release.get("tag") != "dual-ai-share-2026.07.28.1"
+        or source_release.get("tag") != "dual-ai-share-2026.07.28.2"
         or framework_lock.get("skill_count") != 8
-        or framework_lock.get("skill_file_count") != 37
+        or framework_lock.get("skill_file_count") != 49
         or capability_map.get("capability_count") != 19
         or capability_ids != EXPECTED_CAPABILITY_IDS
         or role_map.get("skill_count") != 8
         or target_skills != EXPECTED_TARGET_SKILLS
         or not isinstance(target, dict)
-        or target.get("artifact_id") != "cotend-codex-r000012"
-        or target.get("revision") != 12
+        or target.get("artifact_id") != "cotend-codex-r000013"
+        or target.get("revision") != 13
         or target.get("manifest_sha256") != skill_digest
         or target_lock.get("skill_count") != 8
         or target_lock.get("skill_file_count") != len(skill_files)

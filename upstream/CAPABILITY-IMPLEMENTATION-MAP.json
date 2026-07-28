@@ -2,8 +2,8 @@
   "schema": "cotend.capability-implementation-map",
   "schema_version": 1,
   "status": "adopted_verified",
-  "source_release": "2026.07.28.1",
-  "source_anchor": "dual-ai-share-2026.07.28.1",
+  "source_release": "2026.07.28.2",
+  "source_anchor": "dual-ai-share-2026.07.28.2",
   "target_platform": "Codex",
   "skill_set_path": "skills/",
   "capability_count": 19,
@@ -28,6 +28,9 @@
       "owners": [
         "skills/cotend-init/SKILL.md",
         "skills/cotend-project-init/SKILL.md",
+        "skills/cotend-project-init/references/governance-language-pre-handback.md",
+        "skills/cotend-project-init/scripts/check_cotend_governance_language.py",
+        "skills/cotend-project-init/scripts/validate_governance_language.py",
         "skills/cotend-collaboration/SKILL.md"
       ]
     },

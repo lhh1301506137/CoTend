@@ -420,3 +420,53 @@ CoTend 保留 Project Init 作为唯一治理语言解析 owner，默认适配�
 - 两个 MIT Skill 的 source tree 未变化，目标字节与上游 release 保持一致。
 - `.27.1` 保持不可变但不可采用；上一可采用 `.23.2` 继续作为来源和 r11 前代历史。
 - 本记录只授权并描述仓库内 Codex source adoption 与本地 r12 身份。它不授权全局 Skill/Plugin 更新、真实模型调用、G06 用户验收、rc.3、Claude v1.66 适配、push、tag、Release、submission 或 publish。
+
+## release-2026-07-28-2-v1-67-adoption
+
+```yaml
+status: adopted_verified_local
+source_release: 2026.07.28.2
+source_tag: dual-ai-share-2026.07.28.2
+source_tag_object: d26994355921b9c43956f7300069c892884496e0
+source_release_commit: 4540f9e0543e85c6a7cceb1d7501467feee8b440
+source_framework_commit: e40f8dec01b140e697197c038f45fd962e7fb868
+source_package_tree: 686a507d904b08c6a43ef6c5d40c1d43083d8f1b
+source_manifest_sha256: f96b86ba00fd1bc75bd70287c12d0af58f14f225d7dd34e43cfe4a9a99e51d00
+manifest_entries: 92
+framework_protocol: cotend-collaboration-v1.67
+model_upgrade_packet_family: cotend-model-upgrade-v1.11
+previous_adoptable_release: 2026.07.28.1
+reviewed_commit_range: 5_commits_from_previous_release_commit_exclusive_to_successor_release_inclusive
+skill_count: 8
+upstream_skill_file_count: 49
+target_skill_file_count: 52
+target_artifact_id: cotend-codex-r000013
+target_revision: 13
+target_manifest_sha256: 39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd
+predecessor_target_artifact_id: cotend-codex-r000012
+predecessor_manifest_sha256: 44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276
+resulting_CoTend_commit: containing_commit
+live_install_performed: false
+model_call_performed: false
+push_release_or_publish: not_performed
+```
+
+### 区间分类
+
+从上一可采用 release commit `e3d3245` 到本 release commit 共 5 个提交：一个 v1.66 后继证据提交、两个归档/日志提交、一个 Project Init handback 可靠性行为提交，以及一个 `.28.2` release 提交。只有 Project Init 可靠性行为与最终 release closure 改变本轮采用面；归档与日志不取得 CoTend 运行时权限。
+
+### 产品化适配结论
+
+CoTend 保留 v1.66 的唯一治理语言解析 owner、冲突停止、规范化持久化和真实正文验收，并把 v1.67 的 Init pre-handback 可靠性收口为 Project Init 的直接一层模块。`cotend-project-init` 现在固定为 14 个文件：精简核心、agent 元数据、10 个直接参考模块与 2 个只读脚本。目标适配器 checker 使用 CoTend 自有命名与原因码；共享 validator 算法按 release 行为保真适配，不引入私有 Dual owner、机器默认或项目状态。
+
+当 Init 创建或修改用户可见治理正文时，validator 读取项目相对的 VCS changed set 与本次操作写入回执，校验真实字节及 SHA-256，并在检查后稳定重读。每个 Init turn 最多调用 validator 两次：首次验证，以及至多一次有界修复后的复检。最终 `fail` 或 `blocked` 必须阻止 `continue_ready`；Full 与 Adaptive 得到相同结果。该合同不增加自动 writer、新模型调用、第二本语言台账或逐步骤仪式。
+
+CoTend 原生 `current/dormant/conflict` 状态、`delegated_pair/inline` 执行、三 pass 链和 `skills/` 零 Trellis 运行依赖继续保持。根目标推进到 r13，r12 作为精确跨协议 predecessor；r2 的冻结 rc.2 package 仍从历史 source commit 重建，identity、48 文件 package manifest 与 ZIP 摘要均不改变。
+
+### 独立验证与边界
+
+- annotated tag 对象、release commit、source commit、package tree、92 条 manifest 与 SHA256SUMS 摘要均已固定。
+- Project Init 拓扑验证通过：14 个文件、10 个核心直接引用、2 个脚本、无嵌套引用与零 Trellis 运行时文本。
+- CoTend checker 与共享 validator 的语言、SHA、稳定重读、Full/Adaptive 等价及 fail-closed 单元矩阵通过。
+- 两个 MIT Skill 的 source tree 未变化，目标字节与上游 release 保持一致。
+- 本记录只授权仓库内 Codex source adoption、r13 锁与本地非公开 artifact。它不授权全局 Skill/Plugin 更新、真实模型调用、G06 用户验收、rc.3、Claude v1.67 适配、push、tag、Release、submission 或 publish。

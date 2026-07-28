@@ -897,7 +897,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
     target = target_lock.get("target")
     if (
         not isinstance(target, dict)
-        or target.get("artifact_id") != "cotend-codex-r000012"
+        or target.get("artifact_id") != "cotend-codex-r000013"
     ):
         raise NativeCumulativeJourneyError("G03 changed the target artifact")
 

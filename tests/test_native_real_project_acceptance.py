@@ -55,7 +55,7 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
     def prepare_and_deliver(self) -> None:
         g06.extract_r11_source(self.source)
         g06.prepare_project(self.project, self.allowed)
-        g06.deliver_r11_to_r12(self.project, self.allowed, self.source)
+        g06.deliver_r11_to_r13(self.project, self.allowed, self.source)
 
     def init_payload(
         self,
@@ -91,7 +91,7 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
             "STATUS.md": (
                 "# 项目状态\n\n"
                 "user_facing_language_resolution:\n"
-                "  contract: dual-ai.user-facing-language-resolution.v1\n"
+                "  contract: cotend.user-facing-language-resolution.v1\n"
                 "  status: resolved\n"
                 f"  normalized_tag: {declared_language}\n"
                 "  source: project_local_explicit\n"
@@ -151,10 +151,10 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
         with self.assertRaises(g06.RealProjectAcceptanceError):
             g06.prepare_project(self.project, self.allowed)
 
-    def test_project_delivery_updates_r11_to_exact_r12(self) -> None:
+    def test_project_delivery_updates_r11_to_exact_r13(self) -> None:
         self.prepare_and_deliver()
-        state = g06.DeliveryManager(self.project).inspect(g06.r12_artifact())
-        self.assertEqual(state["artifact_id"], g06.R12_ID)
+        state = g06.DeliveryManager(self.project).inspect(g06.r13_artifact())
+        self.assertEqual(state["artifact_id"], g06.R13_ID)
         self.assertEqual(state["installation"], "complete")
         self.assertEqual(g06.git_status(self.project), "")
 
@@ -1271,7 +1271,7 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
             if output.exists():
                 output.unlink()
 
-    def test_delivery_rollback_restores_r11_then_current_r12(self) -> None:
+    def test_delivery_rollback_restores_r11_then_current_r13(self) -> None:
         self.prepare_and_deliver()
         result = g06.rollback_restore(
             self.project,
@@ -1280,7 +1280,7 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
             require_product=False,
         )
         self.assertEqual(result["rollback_target"], g06.R11_ID)
-        self.assertEqual(result["restored_target"], g06.R12_ID)
+        self.assertEqual(result["restored_target"], g06.R13_ID)
         self.assertTrue(result["non_delivery_files_unchanged"])
 
 

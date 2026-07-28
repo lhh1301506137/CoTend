@@ -1405,3 +1405,79 @@ rollback_triggers:
   - smaller model repeatedly fails a contract that passes under a stronger model with identical Skill bytes and environment
 review_after: next_authorized_single_G06_r12_real_Init
 ```
+
+## 2026-07-28 Dual 2026.07.28.2 / CoTend v1.67 r13 采用
+
+```yaml
+current_framework_version: cotend-collaboration-v1.67
+change_type: workflow_behavior
+change_summary: 采用 Dual v1.67 可靠性后继 release，把 Project Init 拆为受限渐进加载核心与直接参考文件，并把 CoTend Codex target 推进到 r13
+intent: 让治理语言预交接检查基于实际字节、稳定重读与 SHA-256 证据失败关闭，同时控制 Project Init 常规上下文负担
+expected_benefit:
+  - Project Init 核心保持 212 行，按场景只加载 10 个一层直接参考文件
+  - 治理语言检查读取实际正文并记录实际字节数与 SHA-256，不再接受调用方自报
+  - 检查前后稳定重读；文件漂移、读取失败、校验失败或证据不一致都在交接前停止
+  - 失败后的自动修复最多允许两次总调用，避免无限检查循环
+  - r12 到 r13 更新必须精确命中已锁定 predecessor 身份和 52 文件 target manifest
+possible_harm:
+  - Project Init 从单文件变为 14 文件拓扑，直接参考缺失或意外嵌套会使初始化失败关闭
+  - 更严格的稳定重读可能把并发修改识别为阻断，需要用户先消除写入竞争
+  - upstream source inventory 为 49，而 CoTend target 因 3 个原生协作参考为 52；混淆两种计数会导致交付误拒绝
+affected_workflows:
+  - fresh_and_resume_project_init
+  - governance_language_pre_handback
+  - project_scoped_delivery_update_and_rollback
+  - G06_no_model_and_real_project_acceptance
+deviations:
+  - 上游私有 checker 文件名映射为 CoTend 命名空间的 check_cotend_governance_language.py
+  - 保留 3 个 CoTend 原生 collaboration pass 参考，因此 target inventory 比 upstream source 多 3
+mechanism_budget:
+  added_context_surface: no_new_skill_10_direct_refs_loaded_only_when_relevant
+  ordinary_load_impact: bounded_212_line_Project_Init_core
+  ceremony_added: one_pre_handback_language_check_with_at_most_two_total_calls
+  duplication_check: shared_validator_algorithm_reused_by_checker_and_tests
+  cheaper_alternative_considered: 继续把全部 Project Init 规则放在 SKILL.md；因会让所有初始化无条件承担可靠性细节上下文而拒绝
+  retirement_or_thinning_trigger: Codex 提供等价的原生稳定字节读取与可审计语言正文检查
+  expected_failure_prevented: self_reported_language_false_pass_TOCTOU_governance_drift_unbounded_repair_loop_and_source_target_inventory_conflation
+validation_scenarios:
+  - scenario: immutable upstream candidate and adopted Skill parity
+    validation_result_type: executed
+    result: passed_release_2026_07_28_2_v167_source_49_target_52
+  - scenario: Project Init topology and governance language reliability
+    validation_result_type: executed
+    result: passed_15_tests_14_files_10_direct_refs_2_scripts_core_212_lines
+  - scenario: native workflow route recovery and zero-runtime focused regression
+    validation_result_type: executed
+    result: passed_80_no_model_tests
+  - scenario: delivery lifecycle and G06 retained-project no-model harness
+    validation_result_type: executed
+    result: passed_153_combined_tests
+  - scenario: exact r12 predecessor and r13 target inventory
+    validation_result_type: executed
+    result: passed_r12_source_37_target_40_to_r13_source_49_target_52
+  - scenario: deterministic local r13 carrier
+    validation_result_type: executed
+    result: passed_two_independent_54_entry_builds_52_Skill_plus_2_locks_manifest_39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd_same_ZIP_SHA256_78b50fa75e41cbbe4c10decda9195274ffbcdfcd74c984df5d87101b9a958981
+  - scenario: full repository regression and static gates
+    validation_result_type: executed
+    result: passed_411_tests_Ruff_compileall_and_repository_check_285_19_19
+real_project_validation:
+  - scenario: exactly one authorized r13 real CoTend Init
+    expected: r12 installs, r13 updates, resolved governance language persists, actual governance prose passes stable byte and SHA evidence before handback
+    validation_result_type: deferred
+    result: explicit_one_time_real_model_authorization_required
+  - scenario: frozen rc2 package identity
+    expected: historical 48-file package manifest and archive digest remain unchanged
+    validation_result_type: executed
+    result: passed_48_files_package_manifest_a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2_archive_sha256_b28e63c83ad80e5885594574a46b19fb901af92cc38fe2110448d1b8ee122547
+decision: watch
+rollback_triggers:
+  - Project Init loads nested references or exceeds the bounded core contract
+  - language checker trusts caller-reported byte count or digest
+  - unstable reread or third failed retry can still hand back
+  - r13 accepts a predecessor other than the exact locked r12 identity
+  - frozen rc2 bytes change or any real-model/public action occurs without separate authorization
+review_after: final_local_gate_then_first_authorized_single_G06_r13_real_Init
+```
+
+本次采用不新增 Skill，也不恢复 Trellis 运行依赖。无模型验证与真实模型验收严格分开：上列确定性检查均未调用模型；G06 真实模型 Init 仍为 deferred。未执行全局安装、rc.3、commit、push、tag、Release、submission 或 publish。

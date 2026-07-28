@@ -86,15 +86,28 @@ Trigger this gate whenever the current operation creates or changes user-visible
 
 Derive the changed-governance file set from the real VCS diff plus operation write receipts, including untracked files; do not trust only a hand-authored `changed_files` list. Read the current bytes for every in-scope file. The CoTend adapter owns localized titles/templates and its body-language checker, including any script/character/token thresholds. The shared contract owns only the evidence and result rules and must not freeze one language heuristic as universal behavior.
 
+During Project Init, this is an executable pre-handback gate, not a later
+external-oracle suggestion. Use Project Init's bundled
+`scripts/validate_governance_language.py` with
+`scripts/check_cotend_governance_language.py` and operation write receipts.
+The generic validator is read-only: it consumes the already-resolved tag and
+canonical carrier, unions VCS evidence with receipts, reads actual bytes, calls
+the checker, and emits `cotend.governance-language-pre-handback.v1` JSON plus
+deterministic exit status. It must not resolve language, materialize state,
+translate prose, or trust final structured self-report.
+
 ```yaml
 governance_language_evidence:
   status: checked | blocked | not_applicable
+  validator_contract: cotend.governance-language-pre-handback.v1
+  validator_execution: executed | unavailable | not_triggered
   canonical_resolution_pointer: <STATUS.md or mapped equivalent>#user_facing_language_resolution
   declared_normalized_tag: <normalized BCP 47 tag> | missing
-  changed_file_set_source: vcs_diff_plus_write_receipts | write_receipts_no_vcs
-  adapter_checker: <adapter-owned checker/version> | missing
+  changed_file_set_source: vcs_diff_plus_write_receipts | vcs_diff | write_receipts_no_vcs | established_empty
+  adapter_checker: cotend-governance-language.v1 | missing
   files:
     - path:
+      sha256:
       actual_bytes_checked: yes | no
       user_visible_prose: present | absent
       body_result: match | mismatch | technical_only | unchecked
@@ -109,9 +122,22 @@ Derive `result` deterministically:
 1. `not_applicable` only when the real changed set contains no user-facing governance file;
 2. `blocked` when Project Init's resolution is missing/`human_needed`, the changed file set cannot be established, actual bytes cannot be read, or the required adapter checker is unavailable;
 3. `fail` when the declaration differs from the canonical normalized tag, an in-scope changed file is omitted, any user-visible prose is `mismatch | unchecked`, or the only support is structured self-report;
-4. `pass` only when every changed governance file's actual bytes were inspected and every user-visible prose segment matches the canonical tag. A technical-only file may use `technical_only` with concrete exclusions and does not fail merely because identifiers remain untranslated.
+4. `pass` only when every changed governance file's actual bytes were inspected, the CoTend checker reports the same SHA-256 that shared core read and the file stays byte-stable through checker execution, and every user-visible prose segment matches the canonical tag. A technical-only file may use `technical_only` with concrete exclusions and does not fail merely because identifiers remain untranslated.
 
 Technical identifiers, schema keys, enum/status values, code, paths, hashes, commands, model names, URLs, and machine-readable fields are not user-facing prose and must not be counted as translation failures. Natural-language headings, explanations, recommendations, decision menus, summaries, and acceptance meaning remain prose even when adjacent to machine fields. Full and Adaptive execute this identical gate and must return the same result for the same resolution and bytes.
+
+For Project Init, only `pass` or a genuine `not_applicable` may feed the normal
+readiness calculation. Across one Init turn, the validator runs at most twice:
+one initial check and one bounded recheck. The first `fail` may consume that
+recheck after one safe repair limited to reported governance files. A first
+`blocked` result already prevents readiness; only a safely establishable
+missing checker or changed-set input may consume the same sole recheck, and it
+does not preserve another content-repair attempt. Any `fail` or `blocked` that
+remains after the recheck, an unavailable checker, unreadable bytes, or an
+unestablished changed set prevents `continue_ready`. Do not repair a
+language-source conflict through this gate and do not create a retry loop.
+Full and Adaptive use the same one-repair/one-recheck budget and final stop
+result.
 
 ## Done / Review Gate
 

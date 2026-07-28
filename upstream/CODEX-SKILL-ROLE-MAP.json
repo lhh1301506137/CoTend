@@ -2,7 +2,7 @@
   "schema": "cotend.codex-skill-role-map",
   "schema_version": 1,
   "status": "adopted_verified",
-  "candidate_release": "2026.07.28.1",
+  "candidate_release": "2026.07.28.2",
   "platform": "Codex",
   "launch_adapter": true,
   "public_interface_authority": "codex_skill_source_set_adopted_live_delivery_pending",
@@ -21,7 +21,7 @@
   "skills": [
     {
       "source_skill_id": "dual-ai-init",
-      "source_tree": "689f5088f950dcb18c56846e03f3e8ea549c6b0b",
+      "source_tree": "d365118ef0337f8d911a6854871c608d78ec6b4e",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "unified_visible_entry",
@@ -47,7 +47,7 @@
     },
     {
       "source_skill_id": "dual-ai-project-init",
-      "source_tree": "d28d2858e540996f787e1ba9c77e9953e44fb7fd",
+      "source_tree": "990f3be754243846ac8c951a22466e7a83105b19",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "internal_auto_mode_engine",
@@ -73,12 +73,13 @@
         "Auto Mode",
         "fresh/update/repair/resume/blocked classification",
         "high-level confirmation gates",
-        "project-owned recovery truth"
+        "project-owned recovery truth",
+        "deterministic governance-language pre-handback validation over actual changed bytes"
       ]
     },
     {
       "source_skill_id": "dual-ai-collaboration",
-      "source_tree": "3eb2c5db3b07b1f4963e2eb96cd1465825de510a",
+      "source_tree": "b0604ba3147ccaca37da2d3f88c043d73ced56bc",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "shared_governance_core",
@@ -131,7 +132,7 @@
     },
     {
       "source_skill_id": "dual-ai-semantic-alignment",
-      "source_tree": "e7f019bfd5ee99f1d0f518bcba177de6ae90f5fb",
+      "source_tree": "c7653b16fc102beb27853622895c66d0d6fedaae",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "direct_writable_semantic_alignment",
@@ -160,7 +161,7 @@
     },
     {
       "source_skill_id": "dual-model-upgrade",
-      "source_tree": "7f4e6fba55bded5f8a18917be9fa6e1f09fd01cc",
+      "source_tree": "25d867f5dd797589efbc556afc8c37a7c156a3a2",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "advanced_model_role_lifecycle",
@@ -240,7 +241,7 @@
         "dual-model-upgrade"
       ],
       "adoption_status": "deferred",
-      "reason": "Codex is the confirmed launch adapter; the packaged Claude carrier remains v1.65 and does not claim v1.66 governance-language parity"
+      "reason": "Codex is the confirmed launch adapter; the packaged Claude carrier remains v1.65 and claims neither v1.66 governance-language parity nor v1.67 Init pre-handback reliability parity"
     }
   ],
   "adoption": {
@@ -258,7 +259,7 @@
     "repository_source_carrier": "skills/",
     "repository_source_implemented": true,
     "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-1-v1-66-adoption",
+    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-2-v1-67-adoption",
     "live_install_authorized": false,
     "live_install_performed": false,
     "plugin_or_marketplace_carrier": "github_root_candidate_local_verified",

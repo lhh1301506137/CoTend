@@ -7,6 +7,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Literal
 
+import verify_cotend_project_init as project_init_contract
+
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNTIME_PROFILES_PATH = (
@@ -41,8 +43,8 @@ REQUIRED_RUNTIME_MARKERS = (
     "2. one valid native project record;",
     "3. one unambiguous project-local legacy selection",
     "4. the CoTend product default `full`.",
-    "`full` | `v1.66-full` | `delegated_pair`",
-    "`adaptive` | `v1.66-A` | `inline`",
+    "`full` | `v1.67-full` | `delegated_pair`",
+    "`adaptive` | `v1.67-A` | `inline`",
     "Migrate only when all of these are true:",
     "Do not modify, delete, or normalize the source file.",
 )
@@ -513,9 +515,12 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         / "references"
         / "runtime-profiles.md"
     ).read_text(encoding="utf-8")
-    init_text = (
-        root / "skills" / "cotend-project-init" / "SKILL.md"
-    ).read_text(encoding="utf-8")
+    try:
+        init_text = project_init_contract.load_project_init_contract(root)[
+            "combined"
+        ]
+    except project_init_contract.ProjectInitContractError as exc:
+        raise NativeWorkflowStateError(str(exc)) from exc
     collaboration_text = (
         root / "skills" / "cotend-collaboration" / "SKILL.md"
     ).read_text(encoding="utf-8")

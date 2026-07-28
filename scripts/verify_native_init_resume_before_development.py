@@ -8,6 +8,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Literal
 
+import verify_cotend_project_init as project_init_contract
+
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT_INIT_PATH = ROOT / "skills" / "cotend-project-init" / "SKILL.md"
@@ -64,8 +66,9 @@ REQUIRED_PROJECT_INIT_MARKERS = (
     "## Native Initialization And Resume Boundary",
     "classify exactly one Auto Mode;",
     "report readiness and return control exactly once.",
-    "a second run with unchanged inputs must produce no diff.",
-    "An explicit Init invocation never starts product implementation in the same response.",
+    "a second run with unchanged inputs",
+    "must produce no diff.",
+    "Do not start product implementation in the same response",
     "The native pre-development readiness gate",
     "current CoTend truth -> active leaf and route -> requirements/acceptance/risk -> code-context provider and impact set -> direct file verification",
 )
@@ -529,9 +532,12 @@ def trellis_inventory(root: Path = ROOT) -> dict[str, int]:
 
 
 def verify_repository(root: Path = ROOT) -> dict[str, object]:
-    project_init = (
-        root / "skills" / "cotend-project-init" / "SKILL.md"
-    ).read_text(encoding="utf-8")
+    try:
+        project_init = project_init_contract.load_project_init_contract(root)[
+            "combined"
+        ]
+    except project_init_contract.ProjectInitContractError as exc:
+        raise NativeProjectEntryError(str(exc)) from exc
     init = (root / "skills" / "cotend-init" / "SKILL.md").read_text(
         encoding="utf-8"
     )

@@ -7,6 +7,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Literal
 
+import verify_cotend_project_init as project_init_contract
+
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN_TREE_PATH = (
@@ -460,7 +462,15 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
 
     for path, markers in REQUIRED_INTEGRATION_MARKERS.items():
         relative = path.relative_to(ROOT)
-        text = (root / relative).read_text(encoding="utf-8")
+        if path == INIT_SKILL_PATH:
+            try:
+                text = project_init_contract.load_project_init_contract(root)[
+                    "combined"
+                ]
+            except project_init_contract.ProjectInitContractError as exc:
+                raise NativeRouteRebaseError(str(exc)) from exc
+        else:
+            text = (root / relative).read_text(encoding="utf-8")
         _require_markers(text, markers, relative.as_posix())
 
     findings = scan_forbidden_active_spec_routes(root)

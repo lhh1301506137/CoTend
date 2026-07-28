@@ -4,23 +4,32 @@
   "status": "verified",
   "source": {
     "framework_lock": "upstream/framework.lock.json",
-    "release_id": "2026.07.28.1",
+    "release_id": "2026.07.28.2",
     "carrier": "skills/",
-    "framework_protocol": "cotend-collaboration-v1.66"
+    "framework_protocol": "cotend-collaboration-v1.67"
   },
   "target": {
     "platform": "Codex",
     "lineage": "cotend-codex",
-    "artifact_id": "cotend-codex-r000012",
-    "revision": 12,
-    "manifest_sha256": "44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276"
+    "artifact_id": "cotend-codex-r000013",
+    "revision": 13,
+    "manifest_sha256": "39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd"
   },
   "product": {
     "version": null
   },
   "skill_count": 8,
-  "skill_file_count": 40,
+  "skill_file_count": 52,
   "predecessor_targets": [
+    {
+      "platform": "Codex",
+      "lineage": "cotend-codex",
+      "artifact_id": "cotend-codex-r000012",
+      "revision": 12,
+      "source_release_id": "2026.07.28.1",
+      "framework_protocol": "cotend-collaboration-v1.66",
+      "manifest_sha256": "44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276"
+    },
     {
       "platform": "Codex",
       "lineage": "cotend-codex",

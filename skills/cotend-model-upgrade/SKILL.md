@@ -10,7 +10,7 @@ metadata:
 
 Version: 1.11
 
-Compatibility baseline: `cotend-collaboration-v1.66`.
+Compatibility baseline: `cotend-collaboration-v1.67`.
 
 Use this skill to coordinate a cost-efficient current model and a stronger premium model on the same project, including one-shot advice, user-approved takeover, milestone re-entry advisor rounds, non-authorizing runtime-profile recommendations, and cold-path framework thinning review after the user confirms a new primary development model.
 
