@@ -2,8 +2,9 @@
   "schema": "cotend.capability-implementation-map",
   "schema_version": 1,
   "status": "adopted_verified",
-  "source_release": "2026.07.28.2",
-  "source_anchor": "dual-ai-share-2026.07.28.2",
+  "source_release": "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
+  "source_anchor": "9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
+  "source_publication_state": "not_public_release",
   "target_platform": "Codex",
   "skill_set_path": "skills/",
   "capability_count": 19,
@@ -144,6 +145,7 @@
       "implementation_mode": "platform_adaptation",
       "coverage_status": "mapped",
       "owners": [
+        "skills/cotend-session-handoff/SKILL.md",
         "skills/cotend-model-upgrade/references/packet-templates.md",
         "skills/cotend-collaboration/references/templates.md"
       ]

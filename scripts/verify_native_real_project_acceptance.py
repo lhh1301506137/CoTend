@@ -39,9 +39,11 @@ R11_ID = "cotend-codex-r000011"
 R11_REVISION = 11
 R11_MANIFEST = "eac48844295f9ba12d64df469aa25fab9e76a8c9ceb9817857350b5029767627"
 R11_SOURCE = ROOT / ".private-provenance" / "G06-real-project" / "r11-repository"
+R13_COMMIT = "df7f2a400b6be76fd1c2f7e0de865401791945d3"
 R13_ID = "cotend-codex-r000013"
 R13_REVISION = 13
 R13_MANIFEST = "39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd"
+R13_SOURCE = ROOT / ".private-provenance" / "G06-real-project" / "r13-repository"
 LEGACY_RELEASE_ID = "2026.07.23.2"
 LEGACY_PROTOCOL = "cotend-collaboration-v1.65"
 RELEASE_ID = "2026.07.28.2"
@@ -1208,8 +1210,8 @@ def r11_artifact() -> Artifact:
     return extract_r11_source()
 
 
-def r13_artifact() -> Artifact:
-    artifact = Artifact.from_repository(ROOT)
+def validated_r13_artifact(source: Path) -> Artifact:
+    artifact = Artifact.from_repository(source)
     if (
         artifact.source_release_id != RELEASE_ID
         or artifact.protocol != PROTOCOL
@@ -1218,9 +1220,72 @@ def r13_artifact() -> Artifact:
         or artifact.manifest_sha256 != R13_MANIFEST
     ):
         raise RealProjectAcceptanceError(
-            "current repository does not match the frozen r13 target"
+            "materialized repository does not match frozen r13"
         )
     return artifact
+
+
+def extract_r13_source(destination: Path = R13_SOURCE) -> Artifact:
+    destination = guarded_private_source(destination)
+    if destination.exists():
+        return validated_r13_artifact(destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    staging = destination.with_name(destination.name + f".staging-{os.getpid()}")
+    if staging.exists():
+        raise RealProjectAcceptanceError("r13 staging path already exists")
+    staging.mkdir()
+    required_files = {
+        "delivery/codex-artifact.lock.json",
+        "upstream/framework.lock.json",
+    }
+    try:
+        listing = git(
+            ROOT,
+            "ls-tree",
+            "-r",
+            "--name-only",
+            R13_COMMIT,
+            "--",
+            "skills",
+            *sorted(required_files),
+        ).stdout
+        paths = [path for path in listing.splitlines() if path]
+        inventory = set(paths)
+        if (
+            not any(path.startswith("skills/") for path in paths)
+            or required_files - inventory
+            or any(
+                PurePosixPath(path).is_absolute()
+                or ".." in PurePosixPath(path).parts
+                or (
+                    not path.startswith("skills/")
+                    and path not in required_files
+                )
+                for path in paths
+            )
+        ):
+            raise RealProjectAcceptanceError("trusted r13 repository inventory is invalid")
+        for repository_path in paths:
+            target = staging.joinpath(*PurePosixPath(repository_path).parts)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            payload = git(
+                ROOT,
+                "show",
+                f"{R13_COMMIT}:{repository_path}",
+                binary=True,
+            ).stdout
+            target.write_bytes(payload)
+        validated_r13_artifact(staging)
+        staging.replace(destination)
+        return validated_r13_artifact(destination)
+    except Exception:
+        if staging.exists():
+            shutil.rmtree(staging)
+        raise
+
+
+def r13_artifact() -> Artifact:
+    return extract_r13_source()
 
 
 def extract_r10_source(destination: Path) -> Artifact:

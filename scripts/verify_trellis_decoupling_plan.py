@@ -258,7 +258,7 @@ def validate_contract(
         raise TrellisDecouplingPlanError("current candidate identity drifted")
     if contract.get("target_candidate") != "cotend@0.1.0-rc.3_after_parity":
         raise TrellisDecouplingPlanError("target candidate identity drifted")
-    if contract.get("development_target_artifact") != "cotend-codex-r000013":
+    if contract.get("development_target_artifact") != "cotend-codex-r000014":
         raise TrellisDecouplingPlanError("development target artifact drifted")
 
     source = contract.get("source_boundary")
@@ -578,16 +578,17 @@ def validate_contract(
             )
 
     if contract.get("this_slice") != {
-        "skill_behavior_changed": False,
+        "skill_behavior_changed": True,
         "trellis_route_removed": False,
         "removed_capability_ids": [],
-        "target_artifact_changed": False,
+        "target_artifact_changed": True,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
-        "validation_gate_completed": "G06-real-project-and-rollback",
+        "validation_gate_completed": "G01-G05-regression-for-r14",
+        "g06_current_target_status": "not_rerun_frozen_r13_evidence",
     }:
         raise TrellisDecouplingPlanError(
-            "L73 G06 real-project acceptance slice boundary drifted"
+            "r14 adaptation and frozen-r13 G06 boundary drifted"
         )
 
     for marker in EXPECTED_DOCUMENT_MARKERS:

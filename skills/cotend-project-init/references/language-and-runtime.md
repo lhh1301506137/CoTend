@@ -71,7 +71,7 @@ Never read, import, translate, or infer a CoTend selection from a private Dual o
 
 Resolve without reading model, carrier, provider, role, reasoning configuration, Model Upgrade eligibility, self-assessment, historical performance, delegation maturity, or safety evidence. Those facts may be reported or used for a separate advisory recommendation, but they cannot activate, reject, invalidate, restore, or migrate the profile.
 
-Preserve a valid existing project `runtime_profile` across framework updates. Derive the new display name from the current protocol version and the stable machine value: an earlier `adaptive` selection becomes `v1.67-A`, and an earlier `full` selection becomes `v1.67-full`. Do not ask again merely because the framework or model changed.
+Preserve a valid existing project `runtime_profile` across framework updates. Derive the new display name from the current protocol version and the stable machine value: an earlier `adaptive` selection becomes `v1.71-A`, and an earlier `full` selection becomes `v1.71-full`. Do not ask again merely because the framework or model changed. Preserve the separately user-selected continuous-risk tier; runtime-profile selection may produce only the advisory recommendation defined by Collaboration and never selects `low`, `medium`, or `dev_high`.
 
 Write a project profile only after explicit project-persistence intent or when materializing a first-use product default. A session-only choice changes the current execution route without rewriting the project. Bare `继续`, silence, an AI recommendation, or a model-role decision is not a profile change.
 

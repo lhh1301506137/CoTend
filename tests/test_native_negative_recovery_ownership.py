@@ -24,11 +24,11 @@ class NativeNegativeRecoveryOwnershipTests(unittest.TestCase):
         self.assertEqual(result["incident_scenario_count"], 13)
         self.assertEqual(result["native_capabilities_composed"], 8)
         self.assertEqual(result["dual_capability_baseline"], 19)
-        self.assertEqual(result["mapped_skill_roles"], 8)
+        self.assertEqual(result["mapped_skill_roles"], 9)
         self.assertFalse(result["real_project_claimed"])
         self.assertFalse(result["real_user_acceptance_claimed"])
         self.assertFalse(result["skill_behavior_changed"])
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000013")
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000014")
 
     def test_foreign_conflicts_fail_closed_without_delegating_owner(self) -> None:
         for semantic_level in ("L0_L2", "L3_L4"):

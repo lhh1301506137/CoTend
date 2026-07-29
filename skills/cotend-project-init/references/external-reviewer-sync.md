@@ -5,7 +5,7 @@ paste-ready handoff seed.
 
 ## External Reviewer Sync Policy
 
-Treat the adopted Codex Skill set as the active CoTend product source until another platform adapter is separately implemented and verified. Do not automatically edit Claude/Gemini runtime files or generate distributable cross-platform packages. Only enter adapter sync when the user explicitly requests it and the exact target files, platform limitations, rollback, and semantic review are known.
+Treat the adopted Codex Skill set as the active CoTend product source until another platform adapter is separately implemented and verified. Do not automatically edit Claude/Gemini runtime files, consumer handoffs, or distributable cross-platform packages. Only enter adapter sync when the user explicitly names the target and the exact source commit, target files, platform limitations, rollback, and semantic review are known.
 
 If the user requests external review before a permanent adapter exists, provide a paste-ready handoff seed and state that it is temporary context, not proof of an installed or behaviorally equivalent CoTend adapter. Record carrier, provider, actual model, configuration, and role separately; a reviewer-only change preserves the primary, runtime profile, framework-thinning state, and delegation maturity.
 

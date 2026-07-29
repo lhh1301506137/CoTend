@@ -1,20 +1,40 @@
 ---
 name: cotend-model-upgrade
 description: >-
-  Use when a project may benefit from a stronger model or a carrier runs a different actual model. Separate carrier/provider/model/configuration/role identity; classify reviewer-only, advisor, primary-trial, confirmed-primary, and rollback changes; prepare evidence-backed advisor or takeover packets; produce non-authorizing Full/Adaptive recommendations without changing the user's persistent profile; distinguish published capability from current-product behavior and real-project evidence; and run cold-path framework thinning or restoration review.
+  Use when a project may benefit from a stronger model or changes carrier, provider, actual model, material configuration, or role. Separate identity and role; classify reviewer-only, advisor, primary-trial, confirmed-primary, and rollback changes; prepare evidence-backed advisor or takeover packets; produce non-authorizing Full/Adaptive recommendations without changing the user's persistent profile; distinguish published capability from current-product behavior and real-project evidence; and run cold-path framework thinning or restoration review. Exclude same-Primary new-session transfer, but never auto-load cotend-session-handoff; the user must explicitly invoke $cotend-session-handoff.
 metadata:
   short-description: "Premium model project handoff"
 ---
 
 # CoTend Model Upgrade
 
-Version: 1.11
+Version: 1.13
 
-Compatibility baseline: `cotend-collaboration-v1.67`.
+Compatibility baseline: `cotend-collaboration-v1.71`.
 
 Use this skill to coordinate a cost-efficient current model and a stronger premium model on the same project, including one-shot advice, user-approved takeover, milestone re-entry advisor rounds, non-authorizing runtime-profile recommendations, and cold-path framework thinning review after the user confirms a new primary development model.
 
 It is not the CoTend governance framework itself. It may reuse existing project records such as `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, `PROJECT-DECISION-LOG.md`, `COLLAB-*`, `PLAN-CHANGELOG.md`, PRDs/specs, native workflow/profile state, classified external-framework evidence, CodeGraph summaries, UAT notes, and source files, but it can also run in projects that do not use those files.
+
+## Same-Primary Session Exclusion
+
+This Skill owns model and role lifecycle, not conversation lifecycle. When the verified Primary identity, role, runtime profile, and delegation state remain unchanged and the user only wants a fresh conversation or task, redirect only to a short instruction that the user must explicitly invoke `$cotend-session-handoff`. Do not load that Skill, inspect a session packet, run preflight, or generate either packet file on the user's behalf.
+
+```yaml
+redirect:
+  target: user_must_explicitly_invoke $cotend-session-handoff
+  reason: same_primary_new_session_only
+  session_handoff_loaded: no
+  same_primary_packet_generated: no
+  model_role_decision_created: no
+  framework_thinning_review_triggered: false
+  runtime_profile_changed: false
+  delegation_maturity_changed: false
+```
+
+Do not create a `model_role_decision`, takeover packet, runtime-profile assessment, framework-thinning review, or delegation restoration merely because the conversation changes. Do not add a `same_primary_new_session_only` value to Model Upgrade packets.
+
+If the request mixes a new session with a real carrier, provider, model, material configuration, or role change, remain in Model Upgrade for the identity change and report `same_primary_packet_generated: no`. Never emit one packet containing both replacement and same-primary invariants.
 
 ## Default Roles
 
@@ -293,15 +313,19 @@ When `new_primary_confirmed`, add or update an entry in `UPSTREAM-SOURCES.md` fo
 
 ## Workflow Decision
 
-1. Classify `model_role_decision` when the user mentions model upgrade, primary-model replacement, trial use, runtime-profile recommendation, or framework overhead after a model change. Ask the role question unless current user-confirmed evidence already answers it.
-2. Preserve the selected runtime profile for advisor/trial/unknown/replacement/rollback cases. Produce a recommendation only when the user asks or current evidence makes it useful.
-3. If the current model is invoked before opening the premium model, choose `review_depth`, refresh **Baseline Context Pack** when needed, then run **Packet Preparation**.
-4. If the premium model is invoked with a prepared packet, run **Premium Advisor**, **Premium Takeover**, Runtime Profile Eligibility Assessment, and/or **Framework Thinning Review** based on the user-selected mode and model-role decision.
-5. If the current model is invoked after premium outputs exist, run **Consolidation And Execution**.
-6. If a prior advisor round exists and the user is returning at a milestone or recall trigger, run **Milestone Re-Entry Preparation** instead of a fresh full packet when the previous packet is still trustworthy.
-7. If the user is still deciding between advisor and takeover, recommend `advisor_guided` as the cost-efficient default and explain when takeover is worth it.
+1. First separate an explicit A/Full choice from material identity or configuration change. A/Full remains user-owned by the canonical runtime-profile selector. Resolve it before handoff only when the same current input also explicitly invokes `$cotend-session-handoff`.
+2. Exclude a same-Primary new-session-only request from Model Upgrade. Without a literal `$cotend-session-handoff` invocation, return only the explicit-invocation instruction and load or generate nothing. If the literal is present, leave Model Upgrade and let the independently invoked Session Handoff proceed. If a real identity or role change is present, stay in Model Upgrade and record that no same-primary packet was generated.
+3. Classify `model_role_decision` when the user mentions model upgrade, primary-model replacement, trial use, runtime-profile recommendation, or framework overhead after a model change. Ask the role question unless current user-confirmed evidence already answers it.
+4. Preserve the selected runtime profile and continuous-risk tier for advisor, trial, unknown, replacement, and rollback cases. Produce a recommendation only when the user asks or current evidence makes it useful.
+5. If the current model is invoked before opening the premium model, choose `review_depth`, refresh **Baseline Context Pack** when needed, then run **Packet Preparation**.
+6. If the premium model is invoked with a prepared packet, run **Premium Advisor**, **Premium Takeover**, Runtime Profile Eligibility Assessment, and/or **Framework Thinning Review** based on the user-selected mode and model-role decision.
+7. If the current model is invoked after premium outputs exist, run **Consolidation And Execution**.
+8. If a prior advisor round exists and the user is returning at a milestone or recall trigger, run **Milestone Re-Entry Preparation** instead of a fresh full packet when the previous packet is still trustworthy.
+9. If the user is still deciding between advisor and takeover, recommend `advisor_guided` as the cost-efficient default and explain when takeover is worth it.
 
 Use `references/packet-templates.md` when writing packet files, advisor outputs, takeover plans, return handoffs, or consolidation summaries.
+
+For a standalone explicit Model Upgrade operation, report the result and return control once. If the same instruction already makes every required model-role or advisor decision and explicitly authorizes a bounded follow-on on the confirmed route, report the control result first and run that follow-on without a duplicate generic prompt. Any unresolved role or takeover choice, high-impact disagreement, framework-thinning decision, runtime-profile choice, or other specialized boundary still stops for the user.
 
 ## Milestone Advisory Loop
 
@@ -409,7 +433,7 @@ For `primary_takeover`, also write `TAKEOVER-PACKET.md` with current work state,
 Rules:
 
 - Keep summaries compact. Prefer pointers to files over copying large content.
-- Stamp packets with `packet_version: cotend-model-upgrade-v1.11` and `generated_at_commit` when git is available so the advisor can check freshness.
+- Stamp packets with `packet_version: cotend-model-upgrade-v1.13` and `generated_at_commit` when git is available so the advisor can check freshness.
 - Include `model_role_decision` in `ADVISOR-PACKET.md` when the user is evaluating a model replacement, running a trial model, confirming a new primary development model, reverting/downgrading the primary model, or asking whether the framework can become thinner after a model change.
 - Include `runtime_profile_assessment_request` whenever the user asks which profile is recommended for the current setup, reports overlapping native/framework orchestration, or reverts/downgrades a model.
 - Separate `user_confirmed`, `current_model_inference`, `direct_code_evidence`, `advisor_request`, and `unknown`.
@@ -484,7 +508,7 @@ At `review_depth: takeover_ready`, write the full set:
 
 If `framework_thinning_review` is triggered, also write `FRAMEWORK-THINNING-REVIEW.md` and include only a concise pointer summary in `EXECUTION-HANDOFF.md`. This extra output does not replace any takeover-ready required file.
 
-If runtime-profile assessment is triggered, also write `RUNTIME-PROFILE-ASSESSMENT.md`. Preserve the historical filename for packet compatibility, but use the v1.11 advisory schema: `selection_authority: user_only`, one recommendation result, separate evidence layers, and `profile_changed_by_assessment: no`. Reviewer, advisor, trial, replacement, and rollback states all preserve the selected profile.
+If runtime-profile assessment is triggered, also write `RUNTIME-PROFILE-ASSESSMENT.md`. Preserve the historical filename and v1.11 advisory fields for packet compatibility, while stamping the current v1.13 packet: `selection_authority: user_only`, one recommendation result, separate evidence layers, and `profile_changed_by_assessment: no`. Reviewer, advisor, trial, replacement, and rollback states all preserve the selected profile.
 
 `ADVISOR-REVIEW.md` is optional at takeover depth. If written, keep it to 15 lines or fewer as a user-readable pointer summary only. It must not duplicate the independent thesis, strongest challenge, detailed strengths/risks, or must/should/could guidance; those belong in `EXECUTION-HANDOFF.md`.
 

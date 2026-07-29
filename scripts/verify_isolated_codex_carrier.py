@@ -30,6 +30,7 @@ EXPECTED_SKILLS = {
     "cotend-model-upgrade",
     "cotend-project-init",
     "cotend-semantic-alignment",
+    "cotend-session-handoff",
     "grill-me",
     "karpathy-guidelines",
 }
@@ -57,6 +58,10 @@ EXPECTED_INTERFACES = {
     "cotend-semantic-alignment": (
         "CoTend Semantic Alignment",
         "Align product intent and repair semantic drift",
+    ),
+    "cotend-session-handoff": (
+        "CoTend Session Handoff",
+        "Explicit same-primary session handoff",
     ),
 }
 LIVE_SCENARIO_IDS = {"init-delegation", "pending-decision", "diagnose-only"}
@@ -303,8 +308,8 @@ def verify_static(
     }
     if source_manifest != managed_manifest:
         raise CarrierError("installed Skill files differ from repository source")
-    if len(managed_manifest) != 52:
-        raise CarrierError(f"expected 52 managed Skill files, found {len(managed_manifest)}")
+    if len(managed_manifest) != 54:
+        raise CarrierError(f"expected 54 managed Skill files, found {len(managed_manifest)}")
 
     for skill in sorted(EXPECTED_SKILLS):
         skill_file = target_root / skill / "SKILL.md"

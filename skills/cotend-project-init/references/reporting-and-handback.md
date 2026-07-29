@@ -27,6 +27,7 @@ Never omit these from the user-facing report when present:
 - pending root/MVP/stage/feature understanding confirmations;
 - existing high-level understanding, its authority, and any observed unconfirmed material without Init-authored product inference;
 - Plan Tree active path, next leaf, reconciliation needs, or route changes;
+- explicitly invoked and supplied same-Primary session-handoff integrity/freshness result, dirty-worktree ownership conflicts, reliable boundary, required takeover teachback, and whether takeover is ready;
 - active material Route Rebase status, authority gate, reliable resume boundary, resulting-path state, blockers, and whether `继续` is valid for the affected route;
 - decision log status when user/grill/advisor decisions affect active direction, next leaf, model role, risk, release, or acceptance;
 - unresolved user interruption/new idea reconciliation when it affects active direction, route, risk, acceptance, or continuation authority;
@@ -46,7 +47,7 @@ Never omit these from the user-facing report when present:
 
 Every report must include a one-line Never-Omit coverage statement, such as:
 
-`Never-Omit Coverage: blockers=<not_present|not_relevant|present_unchanged|present>; user_facing_language_resolution=<resolved|human_needed>; semantic_baseline=<...>; semantic_contract_binding=<not_triggered|verified_active_scope|legacy_migration_at_trigger|affected_stale_or_unknown>; semantic_onboarding_handoff=<...>; appended_request=<...>; pending_confirmations=<...>; existing_or_observed_high_level_understanding=<...>; active_path_or_route=<...>; route_rebase=<...>; semantic_implementation_closure=<...>; decision_log=<...>; delegation_maturity=<...>; user_interruption=<...>; post_init_consistency=<...>; semantic_reconciliation=<...>; native_workflow_and_profiles=<...>; external_frameworks=<...>; risk_and_critical_boundaries=<...>; review_debt_or_sentinel=<...>; done_or_release_gate=<...>; intent_drift=<...>; acceptance_harness=<...>; code_context=<...>; durable_files=<...>; explicit_skill_handback=<...>; readiness_and_next_step=<...>.`
+`Never-Omit Coverage: blockers=<not_present|not_relevant|present_unchanged|present>; user_facing_language_resolution=<resolved|human_needed>; same_primary_session_handoff=<not_supplied|current|stale|conflict>; semantic_baseline=<...>; semantic_contract_binding=<not_triggered|verified_active_scope|legacy_migration_at_trigger|affected_stale_or_unknown>; semantic_onboarding_handoff=<...>; appended_request=<...>; pending_confirmations=<...>; existing_or_observed_high_level_understanding=<...>; active_path_or_route=<...>; route_rebase=<...>; semantic_implementation_closure=<...>; decision_log=<...>; delegation_maturity=<...>; user_interruption=<...>; post_init_consistency=<...>; semantic_reconciliation=<...>; native_workflow_and_profiles=<...>; external_frameworks=<...>; risk_and_critical_boundaries=<...>; review_debt_or_sentinel=<...>; done_or_release_gate=<...>; intent_drift=<...>; acceptance_harness=<...>; code_context=<...>; durable_files=<...>; explicit_skill_handback=<...>; readiness_and_next_step=<...>.`
 
 Default compact summary:
 
@@ -61,6 +62,7 @@ Default compact summary:
   status: present | created | updated | not_needed
   note:
 - active_path_or_next_leaf:
+- same_primary_session_handoff: not_supplied | <only when current input explicitly contains `$cotend-session-handoff`, reference the supplied frozen canonical packet plus the separate canonical takeover result with current | stale | conflict preflight, reliable boundary, and teachback status>
 - route_rebase: not_applicable | <reference the canonical triggered-only packet from its existing carrier; do not restate fields>
 - semantic_implementation_closure: not_applicable | <existing compact state/pointer from the canonical module>
 - semantic_baseline: <use the canonical schema from cotend-collaboration/references/templates.md>
@@ -83,7 +85,7 @@ Default compact summary:
   external_framework_owner: false
 - runtime_profile:
   effective: full | adaptive
-  display_name: v1.67-full | v1.67-A
+  display_name: v1.71-full | v1.71-A
   source: session_explicit | project_persistent | cotend_product_default | migrated_legacy_project_selection | invalid
   persistence: session | project | product_default
   user_selected: true | false
@@ -143,7 +145,7 @@ Detailed audit template:
 ## Detailed Initialization Audit
 
 Project initialization report:
-- protocol: cotend-collaboration-v1.67
+- protocol: cotend-collaboration-v1.71
 - report_mode: summary_only | summary_plus_detail | full_audit | blocked_decision
 - detail_policy: full_required | changed_or_relevant_only
 - omitted_unchanged_sections:
@@ -179,13 +181,20 @@ Project initialization report:
   must_fix_before_release:
 - continuous_risk_authorization:
   max_continuous_risk:
-  authorization_basis: default_personal_local_dev_high | temporary_medium_until_classified | user_explicit_dev_high | user_restricted_low
-  # Accept default_v1.61_dev_high_local / temporary_v1.61_medium_until_classified and earlier versioned values only as historical migration aliases.
+  authorization_basis: default_medium | user_explicit_low | user_explicit_medium | user_explicit_dev_high
+  selection_source: current_window | project_persistent | default
+  recommendation: none | recommend_medium | recommend_dev_high
+  recommendation_authorizes_selection: no
+  posture_notice:
+    status: not_needed | shown
+    trigger_fingerprint:
+  # Accept default_personal_local_dev_high / temporary_medium_until_classified and earlier versioned values only as historical AI-default migration aliases, never as user confirmation. Preserve user_restricted_low as explicit user authority by normalizing it to user_explicit_low.
   local_only_confirmed:
   data_scope:
   public_release_or_remote_upload:
   critical_stop_boundaries:
   scope:
+  expires: current_window | current_project | named_milestone
 - local_closeout_authorization:
   status: active | disabled
   mode: manual_closeout | auto_local_commit_and_native_closeout
@@ -213,6 +222,7 @@ Project initialization report:
   superseded:
   temporary:
 - plan_tree_alignment: <use the canonical schema from cotend-collaboration/references/templates.md>
+- same_primary_session_handoff: <when explicitly invoked and supplied, reference the immutable canonical point-in-time packet and the separate same_primary_session_takeover_result; report current | stale | conflict, reconciliation, reliable boundary, pending gates, and resolved-language takeover teachback without writing back into the packet; otherwise omit>
 - route_rebase: <use the canonical triggered-only schema from cotend-collaboration/references/templates.md by reference to its existing carrier; otherwise omit>
 - semantic_baseline: <use the canonical schema from cotend-collaboration/references/templates.md>
 - semantic_contract_binding: not_triggered | verified_active_scope | legacy_migration_at_trigger | affected_stale_or_unknown
@@ -246,6 +256,7 @@ Project initialization report:
     - internal_links
     - active_truth_navigation_pointer_closure
     - material_route_rebase_continuity
+    - same_primary_session_handoff_freshness
     - metadata_format
     - commit_anchor_reliability
     - semantic_trigger_routing
@@ -327,7 +338,9 @@ Project initialization report:
 
 `user_interruption_reconciliation` may preserve the full historical classification/action vocabulary when reporting an existing project record. During Init, do not assign those values to a newly appended product or semantic request; leave that request unclassified and report its independent post-init route.
 
-If no specialized user question is needed, set `user_question: none`, report whether the project is safe to continue, and still return control once for an explicit invocation. With no active material rebase, use a concise prompt such as `Initialization is complete. Reply continue to resume the same confirmed route.` For `evaluating`, the prompt must say that `continue` resumes only materiality/semantic-impact/authority classification and does not reactivate the previous path. For `applying` / `revalidating` with no human gate, it must say that `continue` resumes only authorized propagation/repair from the reliable boundary. For `blocked`, do not offer affected-route continuation; a generic handback may name only a separately confirmed, dependency-isolated route. Do not start product development in the same response. If a specialized decision is pending, including an existing high-level Route Rebase confirmation, it satisfies the handback and the generic prompt must be omitted. For a composite invocation, the independent direct next action is the outer handback: omit the generic `continue` prompt and do not execute that next action in the same response. A recommended fresh-intake `semantic_onboarding_handoff` is likewise the sole outer handback, with `explicit_skill_handback.satisfied_by: semantic_alignment_entry_choice`; ask `1` to start independent alignment or `2` to stop after Init, and never treat `1` as product-semantic confirmation.
+If no specialized user question is needed, set `user_question: none`, report whether the project is safe to continue, and still return control once for a standalone explicit invocation. With no active material rebase, use a concise prompt such as `Initialization is complete. Reply continue to resume the same confirmed route.` For `evaluating`, the prompt must say that `continue` resumes only materiality/semantic-impact/authority classification and does not reactivate the previous path. For `applying` / `revalidating` with no human gate, it must say that `continue` resumes only authorized propagation/repair from the reliable boundary. For `blocked`, do not offer affected-route continuation; a generic handback may name only a separately confirmed, dependency-isolated route. Do not start unrequested product development in the same response. If the same instruction explicitly authorized a bounded ordinary follow-on and no specialized decision is pending, report Init first, set `explicit_skill_handback.pending: no` and `satisfied_by: same_instruction_authorized_follow_on`, then run only that follow-on without a duplicate prompt. If a specialized decision is pending, including an existing high-level Route Rebase confirmation, it satisfies the handback and the generic prompt must be omitted. For a composite semantic invocation, the independent direct next action remains the outer handback: omit the generic `continue` prompt and do not execute that separate control action inside Init. A recommended fresh-intake `semantic_onboarding_handoff` is likewise the sole outer handback, with `explicit_skill_handback.satisfied_by: semantic_alignment_entry_choice`; ask `1` to start independent alignment or `2` to stop after Init, and never treat `1` as product-semantic confirmation.
+
+For an explicitly invoked and supplied same-Primary packet, do not use the generic prompt until preflight is `current` and the resolved-language takeover teachback is complete. `stale` reports reconciliation as the next action; `conflict` uses the specialized `human_needed` or recovery handback. Bare `continue` never answers a preserved pending gate.
 
 For `current_resume`, prefer:
 

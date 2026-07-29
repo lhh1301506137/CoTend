@@ -2,7 +2,8 @@
   "schema": "cotend.codex-skill-role-map",
   "schema_version": 1,
   "status": "adopted_verified",
-  "candidate_release": "2026.07.28.2",
+  "candidate_release": "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
+  "candidate_publication_state": "not_public_release",
   "platform": "Codex",
   "launch_adapter": true,
   "public_interface_authority": "codex_skill_source_set_adopted_live_delivery_pending",
@@ -17,11 +18,11 @@
     "FRAMEWORK-INTRO.md",
     "THIRD-PARTY-SOURCES.json"
   ],
-  "skill_count": 8,
+  "skill_count": 9,
   "skills": [
     {
       "source_skill_id": "dual-ai-init",
-      "source_tree": "d365118ef0337f8d911a6854871c608d78ec6b4e",
+      "source_tree": "c4692686a98043b9e8196e2041497ba7113069a2",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "unified_visible_entry",
@@ -47,7 +48,7 @@
     },
     {
       "source_skill_id": "dual-ai-project-init",
-      "source_tree": "990f3be754243846ac8c951a22466e7a83105b19",
+      "source_tree": "e8f22e5731a03f4a5f1d993bf57e3c575a48a91f",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "internal_auto_mode_engine",
@@ -79,7 +80,7 @@
     },
     {
       "source_skill_id": "dual-ai-collaboration",
-      "source_tree": "b0604ba3147ccaca37da2d3f88c043d73ced56bc",
+      "source_tree": "23cbd059d203957c5a435592865614bb4171e48e",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "shared_governance_core",
@@ -109,7 +110,7 @@
     },
     {
       "source_skill_id": "diagnose-only",
-      "source_tree": "06e8b6bd4c2f916d80e57544edd7bd4ec1db60f5",
+      "source_tree": "dd5ba26517f032c3dfcdd5c69fabc27825c6bf25",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "contextual_read_only_diagnosis",
@@ -132,7 +133,7 @@
     },
     {
       "source_skill_id": "dual-ai-semantic-alignment",
-      "source_tree": "c7653b16fc102beb27853622895c66d0d6fedaae",
+      "source_tree": "679c45d557cc3e625415d333e1ed4f68e730cd46",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "direct_writable_semantic_alignment",
@@ -161,7 +162,7 @@
     },
     {
       "source_skill_id": "dual-model-upgrade",
-      "source_tree": "25d867f5dd797589efbc556afc8c37a7c156a3a2",
+      "source_tree": "6f3dd1f0062e40034fd0662093cc5a17307dc6b4",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "advanced_model_role_lifecycle",
@@ -185,6 +186,35 @@
         "premium model packet and handoff",
         "rollback and milestone re-entry",
         "framework thinning only after user-confirmed primary change"
+      ]
+    },
+    {
+      "source_skill_id": "dual-ai-session-handoff",
+      "source_tree": "67580d890c217630bbe7a61e44dfedc86377e6b1",
+      "source_relationship": "user_owned_original",
+      "license": "Apache-2.0",
+      "current_role": "same_primary_session_transition",
+      "current_visibility": "explicit_only_cold_path",
+      "delegates_to": [],
+      "uses": [
+        "dual-ai-collaboration",
+        "dual-model-upgrade"
+      ],
+      "role_evidence": [
+        "the exact literal Skill invocation is required before any packet discovery or preflight",
+        "the Skill freezes a same-Primary route into one two-file point-in-time packet",
+        "identity or role changes are redirected to model upgrade rather than treated as session continuity"
+      ],
+      "adoption_status": "adapted",
+      "implementation_mode": "platform_adaptation",
+      "target_skill_id": "cotend-session-handoff",
+      "naming_status": "user_confirmed",
+      "preserve": [
+        "explicit-only invocation",
+        "same-Primary identity invariant",
+        "dirty ownership and pending-gate preservation",
+        "current stale conflict takeover preflight",
+        "frozen old-session boundary"
       ]
     },
     {
@@ -241,7 +271,7 @@
         "dual-model-upgrade"
       ],
       "adoption_status": "deferred",
-      "reason": "Codex is the confirmed launch adapter; the packaged Claude carrier remains v1.65 and claims neither v1.66 governance-language parity nor v1.67 Init pre-handback reliability parity"
+      "reason": "Codex is the confirmed launch adapter; the packaged Claude carrier remains v1.65 and claims neither v1.66-v1.67 governance-language reliability parity nor v1.71 session-handoff, continuous-authorization, or risk-selection parity"
     }
   ],
   "adoption": {
@@ -249,17 +279,17 @@
     "role_layers_confirmed": true,
     "user_owned_skill_names_confirmed": true,
     "final_names_confirmed": true,
-    "final_names_scope": "six_user_owned_ids_plus_preserved_third_party_identity",
+    "final_names_scope": "seven_user_owned_ids_plus_preserved_third_party_identity",
     "physical_skill_count_confirmed": true,
     "physical_skill_count_scope": "repository_codex_skill_source_set",
-    "confirmed_codex_skill_count": 8,
+    "confirmed_codex_skill_count": 9,
     "third_party_bundling_confirmed": true,
     "codex_skill_set_decisions_complete": true,
     "actual_adoption_authorized": true,
     "repository_source_carrier": "skills/",
     "repository_source_implemented": true,
     "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-2-v1-67-adoption",
+    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-29-1-v1-71-adoption",
     "live_install_authorized": false,
     "live_install_performed": false,
     "plugin_or_marketplace_carrier": "github_root_candidate_local_verified",

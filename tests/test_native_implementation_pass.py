@@ -21,8 +21,8 @@ class NativeImplementationPassTests(unittest.TestCase):
         self.assertEqual(result["runtime_files"], 0)
         self.assertEqual(result["td04_commands"], 0)
         self.assertEqual(result["remaining_commands"], 0)
-        self.assertEqual(result["skill_files"], 52)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000013")
+        self.assertEqual(result["skill_files"], 54)
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000014")
 
     def test_full_and_adaptive_use_the_same_result_contract(self) -> None:
         full = implementation.evaluate_implementation(profile="full")

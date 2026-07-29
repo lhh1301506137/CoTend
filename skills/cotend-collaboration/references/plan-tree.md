@@ -14,6 +14,7 @@ Plan Tree is an auditable navigation system, not a new product truth source.
 - Full project understanding is established during init/rebuild or major replanning, then reused through summaries and links.
 - Current-MVP L0-L2 product semantics form a protected baseline confirmed by the user; L3+ descendants are the AI's delegated inference/implementation space while that baseline remains true.
 - `mainline` means the currently selected `active_path`. It is a relative route state, not a permanent node/branch type; a candidate route may later become active, merge back, defer, or be superseded.
+- A same-Primary session handoff is a point-in-time consumer of `active_path`, active truth, and the reliable resume boundary. It never owns or duplicates them and never creates a second Plan Tree.
 - Normal development reads only the index plus the active path summaries, not every node document or expanded understanding file.
 - Do not create a separate "understanding tree". Use Plan Tree as the only tree, and link expanded understanding docs from the relevant nodes.
 
@@ -326,11 +327,12 @@ Do not open a packet for an ordinary next-leaf choice, small L3/L4 reorder, loca
 
 1. Capture the previous and candidate paths and enter `evaluating` in an existing durable carrier.
 2. If every required current-MVP L0-L2 ancestor remains exactly true and no existing risk, acceptance, or release boundary is crossed, the Primary may autonomously merge, promote, replace, reorder, defer, reject, or supersede L3/L4 route work inside authorized scope/risk. Move through `applying` and `revalidating`; do not ask the user to approve implementation decomposition.
+   Under Adaptive `active_route_continuous`, update the Plan Tree and evidence and resume the resulting confirmed route without a user question. Under Full `authorized_task_closure`, do the same while it remains inside the authorized task or slice; neither posture promotes the next uncovered material slice.
 3. If the candidate materially changes an L0, L1, or L2 goal, responsibility, user result, main-chain position, input/output, core behavior, acceptance, or current-MVP boundary, set the canonical high-level-confirmation classification and `pending_user_confirmation`, with the Primary recorded as proposal-only until the user decides. Explain the original meaning, new evidence, recommended change, product impact, and the consequences of accept/reject, then route directly to `$cotend-semantic-alignment semantic_change`. Pause only affected work. A separate confirmed route may continue only with explicit dependency-isolation evidence.
 4. After exact confirmation, Semantic Alignment remains the sole owner of the protected write and its dependency-directed impact propagation. Plan Tree consumes the resulting path, dispositions, and recovery boundary; it does not create a second semantic write path.
 5. Deferring or rejecting a candidate never activates it by itself. A defer keeps the previous path active unless another authorized resulting path was selected. A rejection keeps candidate meaning non-authoritative: classify and isolate candidate-only implementation and pointers, supersede what cannot remain active, restore the previous path as the result, and preserve mixed user/main-route edits. Never use a blind `git revert` to erase mixed changes.
 
-A bare `继续`, successful tests, unattended authority, Adaptive, delegation maturity, or agent confidence cannot move a high-level candidate out of `pending_user_confirmation`. Full and Adaptive use this identical lifecycle and authority model; they differ only in orchestration.
+A bare `继续`, successful tests, unattended authority, Adaptive, delegation maturity, or agent confidence cannot move a high-level candidate out of `pending_user_confirmation`. Full and Adaptive use this identical lifecycle and authority model; their differences are limited to the bounded or continuous execution posture, orchestration shape, and checkpoint/report cadence.
 
 A nonsemantic L3/L4 route change that crosses an existing risk, acceptance, release, deployment, or publication boundary still follows that boundary's canonical owner and approval rule. Route Rebase neither grants broader authority nor creates a replacement confirmation gate.
 
@@ -349,6 +351,8 @@ Set `reliable_resume_boundary` to the earliest boundary whose protected meaning,
 - `applying` or `revalidating`: when no human gate is pending, ordinary continuation may propagate, repair, and revalidate only inside the already authorized affected scope.
 - `blocked`: keep the affected route at its reliable boundary and report the unresolved blocker; unaffected isolated routes may continue.
 - `closed`: bind navigation to the resulting path and retain the decision plus superseded relationship in existing history.
+
+When the current user input explicitly contains `$cotend-session-handoff` and supplies a canonical `same_primary_session_handoff`, compare its point-in-time active task, truth, path, dirty-worktree ownership, pending gates, verification state, and reliable boundary with current owners before product writes. `current` may resume at the first invalid or unverified point after the boundary. `stale` first reconciles successor differences and recomputes that boundary. `conflict` stops at `human_needed` or the existing recovery owner. The packet cannot answer a pending gate, activate a candidate, or make an old route current merely because the Primary model is unchanged. Do not discover or auto-consume a packet on app restart/reconnect or ordinary task resume.
 
 Persist an active packet in an existing CoTend-owned Plan Tree node, `STATUS.md`, `PROJECT-DECISION-LOG.md`, `PROJECT-KNOWLEDGE-CHANGELOG.md`, or one explicitly mapped existing route owner. Link classified external task/PRD evidence without making it the packet owner. Do not create `ROUTE-REBASE.md`, a branch ledger, or another task tree. Once closed, detailed impact rows may leave the current cockpit, but the resulting path, decision, reliable-boundary outcome, and superseded history must remain recoverable.
 
@@ -442,6 +446,7 @@ Use this default loading:
 |---|---|
 | Init, first Plan Tree creation, rebuild, or major replanning | Active truth + current-MVP L0-L2 docs/coverage + relevant expanded understanding docs + recent `PROJECT-DECISION-LOG.md` and `PROJECT-KNOWLEDGE-CHANGELOG.md` entries + proposed active leaf doc. |
 | Ordinary `继续` under current plan | `PROJECT-PLAN-TREE.md` + compact derived semantic-baseline status/non-default gaps + current leaf doc summary/acceptance + parent chain summaries + any active `route_rebase_ref` + only unresolved/recent decision/changelog entries if they affect the active path. Do not expand a route-rebase packet or standing six-dimension completion table unless its cold-path trigger fires. |
+| Explicit new-session takeover from a same-Primary handoff | Current input contains `$cotend-session-handoff`, plus the supplied canonical packet and its current owners: `PROJECT-PLAN-TREE.md`, active task/truth, dirty-worktree state, pending gates, current leaf/parent summaries, and mode-triggered evidence. Classify `current | stale | conflict` before writes; routine mode does not load semantic-renovation detail. A discovered packet or app restart alone does not load the cold path. |
 | Leaf implementation detail | Current leaf full doc only if summary/acceptance is insufficient. |
 | User asks to inspect/check Codex understanding | Relevant expanded understanding doc(s) + relevant changelog entries, not all project docs by default. |
 | Plan-external work or unclear priority | Relevant parent full doc + relevant expanded understanding if the meaning may change + current leaf full doc + changelog, then Reconciliation Gate. |
@@ -508,7 +513,7 @@ Use the canonical `plan_tree_alignment` schema from `templates.md`. This section
 
 If `status: needs_reconciliation`, do not implement plan-external work yet.
 
-Before trusting an existing `current_next_leaf`, resolve any active `route_rebase_ref` by the lifecycle above. Pending high-level confirmation preserves the candidate and blocks only its affected path; applying/revalidating state resumes at the reliable boundary; blocked state cannot be bypassed by selecting a later leaf.
+Before trusting an existing `current_next_leaf`, freshness-check a supplied canonical same-Primary session handoff only when the current input explicitly contains `$cotend-session-handoff`, and resolve any active `route_rebase_ref` by the lifecycle above. Never discover or auto-consume a packet merely because the app restarted or a task resumed. A stale packet must reconcile its successor differences; a conflicting packet stops. Pending high-level confirmation preserves the candidate and blocks only its affected path; applying/revalidating state resumes at the reliable boundary; blocked state cannot be bypassed by selecting a later leaf.
 
 Before selecting a new important `current_next_leaf`, inspect the current material node's `semantic_implementation_closure` from its CoTend-owned node/STATUS/review carrier or explicitly mapped route owner. External-framework records may supply classified evidence but cannot own closure. If the closure module triggers and `next_step_allowed` is not `yes`, keep that node active and select only in-scope repair leaves. A future downstream implementation is not required merely to close the current boundary, but the current output contract must be verified as defined by the closure owner.
 
@@ -528,6 +533,7 @@ Check:
 - **Internal links**: verify linked `PROJECT-PLAN-NODES/*.md`, `PROJECT-UNDERSTANDING/*.md`, `PROJECT-DECISION-LOG.md`, `PROJECT-KNOWLEDGE-CHANGELOG.md`, and linked active/archived external-framework tasks exist or are explicitly marked historical/missing. Older provider-specific source values remain evidence-only migration inputs; normalize new active records to `external_framework` without granting the provider route authority.
 - **Active truth/navigation pointer closure**: within the active/affected route, verify `active_truth_sources`, `current`, `active`, and `next` pointers do not resolve to superseded meaning or routes. Repair safe control-plane pointers, mark retained history explicitly historical, or report a blocker. Do not create missing semantic assets or scan unrelated L3/L4 branches.
 - **Material route-rebase continuity**: when an active canonical packet is referenced, verify its status, authority gate, previous/candidate/resulting path, reliable resume boundary, and unresolved blockers from the existing carrier. Do not let resume revive a superseded path or jump past the first invalid/unverified node.
+- **Same-Primary session-handoff freshness**: when a canonical point-in-time packet is explicitly supplied, compare its hash/containing-commit method, including committed-packet single-parent, parent-equals-source-snapshot, exact two-output delta, and current-HEAD reachability checks, plus HEAD/branch/worktree ownership, active task/truth/path, pending gates, verification, and reliable boundary with the current owners. `HEAD == containing_commit` may be current, a later determinable descendant is stale, and contradictory or unreachable history is conflict. Report `current | stale | conflict`; never let a packet, model sameness, or bare `continue` answer a pending gate.
 - **Metadata format**: scan Plan Tree, node docs, and expanded understanding docs for obvious metadata drift such as unindented `status:` or `authority:` fields immediately after `metadata:`, missing `node_id`, missing `authority`, or authority/status labels that are neither canonical labels nor accepted aliases from `authority-and-triggers.md`. Formatting-only fixes are safe; accepted aliases produce migration suggestions rather than failures; meaning changes still follow the Understanding Update Policy.
 - **Commit anchor reliability**: if git is available, record whether the worktree is clean enough to trust `last_reconciled_commit` / `generated_at_commit`. A large dirty worktree, many untracked files, or missing git state should be reported as `dirty_anchor_unknown`; do not pretend the tree is exactly reconciled to HEAD.
 - **Semantic trigger routing**: run Depth 1 ordinary lineage checks. If any Depth 2 trigger or anomaly is present, run the required triggered/deep reconciliation and include its four-state result before declaring `continue_ready`.
@@ -547,6 +553,7 @@ post_init_consistency:
     - internal_links
     - active_truth_navigation_pointer_closure
     - material_route_rebase_continuity
+    - same_primary_session_handoff_freshness
     - metadata_format
     - commit_anchor_reliability
     - semantic_trigger_routing
@@ -672,6 +679,7 @@ At checkpoint, Native Closeout Pass, handoff, or review:
 - when wording would express decision-relevant delivery-state intent for a capability, attach or reference the conditional Acceptance Harness completion-claim result; otherwise omit the six-dimension block;
 - when the current checkpoint closes or advances an important L2/main-chain node, attach or reference the compact `semantic_implementation_closure` record from its canonical module and require `next_step_allowed: yes`; otherwise omit it;
 - when a material route rebase is active, attach only the canonical packet/reference from its existing carrier and keep navigation at the reliable boundary; omit it entirely for ordinary route work;
+- when `$cotend-session-handoff` is explicitly invoked, reference the canonical point-in-time packet, freeze old-session product work after generation, and leave all mutable route state with its existing owners; natural-language intent without the literal may only receive an invocation suggestion;
 - update active node status;
 - update affected node summaries only when understanding, acceptance, dependencies, or route changed;
 - update expanded understanding only when user-confirmed understanding, Codex inference, route meaning, or major boundaries changed;

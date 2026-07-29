@@ -8,7 +8,7 @@ preserve the established CoTend-native order without starting product work.
 Do not start large product development until this workflow is complete.
 
 1. Run Auto Mode classification.
-   - Inspect durable files, the native workflow record, classified external-framework evidence, old collaboration records, current protocol markers, CodeGraph status, `USER-DEVELOPMENT-PROFILE.md` when present, project runtime-profile/model-role records, any legacy machine preference as non-authorizing evidence, active truth, available L0-L2 confirmation evidence, any active canonical Route Rebase reference/state/reliable boundary in existing carriers, and shallow intake candidates without interpreting their product meaning.
+   - Inspect durable files, the native workflow record, classified external-framework evidence, old collaboration records, current protocol markers, CodeGraph status, `USER-DEVELOPMENT-PROFILE.md` when present, project runtime-profile/model-role records, any legacy machine preference as non-authorizing evidence, active truth, available L0-L2 confirmation evidence, any canonical `same_primary_session_handoff` explicitly supplied with the literal `$cotend-session-handoff` in the current input, any active canonical Route Rebase reference/state/reliable boundary in existing carriers, and shallow intake candidates without interpreting their product meaning. Never discover a handoff merely because the app restarted or a task resumed.
    - Set `auto_mode: fresh_init | legacy_update | partial_repair | current_resume | blocked_human_decision`.
    - If the mode is `blocked_human_decision`, stop with Human Rejoin format.
    - Otherwise complete safe setup/update/repair before continuing.
@@ -29,7 +29,7 @@ Do not start large product development until this workflow is complete.
 
 4. Select the runtime profile, then load collaboration rules.
    - Load `cotend-collaboration/references/runtime-profiles.md`, preserve a session/project selection across framework and model changes, use the applicable product default only when no choice exists, ignore model/Model Upgrade facts as selector inputs, and map the effective profile to `delegated_pair | inline` idempotently in the native record.
-   - Use `cotend-collaboration` v1.67 semantics.
+   - Use `cotend-collaboration` v1.71 semantics.
    - Treat `cotend-collaboration` as modular: load core first, then required `references/*.md` modules by trigger.
    - Load `cotend-collaboration/references/authority-and-triggers.md` whenever exact authority labels, stop boundaries, Chrome/release/decision triggers, or checkpoint measurement rules are needed.
    - Always include `loaded_protocol_modules` in initialization, handoff, review, unattended wake-up, approval, acceptance, Done Gate, and release-hardening outputs.
@@ -43,6 +43,7 @@ Do not start large product development until this workflow is complete.
    - Conditional for standard/full multi-stage projects or projects with repeated user/grill/advisor decisions: `PROJECT-PLAN-TREE.md`, targeted `PROJECT-PLAN-NODES/` docs, linked `PROJECT-UNDERSTANDING/` docs, `PROJECT-DECISION-LOG.md`, and `PROJECT-KNOWLEDGE-CHANGELOG.md`. During Init, create only structural/index surfaces or copy already user-confirmed facts; do not draft proposed protected meaning, create a pending semantic state, or create a separate semantic tree/file.
    - Optional for larger projects: `COLLAB-HANDOFF.md`, `COLLAB-CONTEXT.md`, `COLLAB-TASK-INDEX.md`, legacy/project-specific `PLAN-CHANGELOG.md`.
    - If equivalent project-local names already exist, use them instead of duplicating files.
+   - An explicitly invoked and supplied same-Primary session packet is an input inside an existing handoff or task carrier, never a required standing file. Do not create or discover a session ledger during Init.
 
 6. Identify active truth.
    - List current CoTend PRD/spec/STATUS/route records, then classify applicable external-framework docs as `reference_only`, `historical`, or `conflict`.
@@ -55,11 +56,14 @@ Do not start large product development until this workflow is complete.
    - If ambiguous and it changes risk boundaries, ask one concise question with option `1` as the recommended default.
 
 8. Set continuous-development authority.
-   - Default `max_continuous_risk: dev_high` for confirmed `personal_dev` / early `prototype`, local-only projects with no other people's private data, no public deployment, no real payment, and only user-owned or disposable data.
-   - Use `max_continuous_risk: medium` only as a temporary fallback while project stage, local-only status, data scope, payment/cost exposure, or public/release posture is not yet known.
-   - Once inspection confirms the local personal conditions, upgrade the recorded authorization to `dev_high` without asking again.
-   - If the user says "只允许低风险" or equivalent, record `max_continuous_risk: low` for the named scope.
-   - If the user explicitly enables uninterrupted local closeout, or the project is a confirmed personal/local project where local commits reduce checkpoint risk, record `local_closeout_authorization`. This may allow verified in-scope native record synchronization and local commits through `cotend-collaboration/references/closeout-pass.md`, but never push/deploy/release/publish, force-push/history rewrite, secrets/private data exposure, destructive operations, scope expansion, final user acceptance, or any `critical` item.
+   - Apply the single user-owned resolver in `cotend-collaboration/references/risk-and-approval.md`. Keep runtime profile, project adoption profile, continuous-risk authorization, and delegation maturity as separate fields.
+   - Resolve a current-window user choice before a valid project-persistent user choice. Keep the current-window choice in session state; it must not overwrite the underlying project-persistent choice unless the user also asks to persist it. A persisted choice is valid only when its tier has the matching `user_explicit_*` basis and current scope/expiry. Without either, record `max_continuous_risk: medium` with `authorization_basis: default_medium`.
+   - Both Full and Adaptive allow the user to select `low`, `medium`, or `dev_high`. Runtime profile, model capability, project classification, and repeated `continue` never activate or rewrite a tier.
+   - While no valid user choice exists, Adaptive may use confirmed personal/local/prototype evidence to set `recommendation: recommend_dev_high` once. This suggestion is non-authorizing and must not block otherwise safe medium work. Full uses `recommendation: recommend_medium`.
+   - Normalize historical AI-derived default-risk aliases to `default_medium`; preserve actual user-explicit choices whose scope and expiry remain current. Normalize historical `user_restricted_low` to `user_explicit_low` without raising the tier.
+   - If active `dev_high` later appears inconsistent with the current local/data/cost/public posture, emit one concise non-blocking notice in the resolved language and record a compact non-empty fingerprint so it is not repeated every step. Preserve the user choice. If the next action itself is Critical, stop instead of merely warning.
+   - If the user selects low, medium, or dev_high, record the matching explicit basis and scope or expiry.
+   - Only when the user explicitly enables uninterrupted local closeout, record `local_closeout_authorization`. This may allow verified in-scope native record synchronization and local commits through `cotend-collaboration/references/closeout-pass.md`, but never push/deploy/release/publish, force-push/history rewrite, secrets/private data exposure, destructive operations, scope expansion, final user acceptance, or any `critical` item.
    - Do not preserve momentum by choosing only low-value low-risk work; if the most valuable next step needs medium/dev-high authority, continue when authorized and record rationale. If it needs critical authority or scope expansion, stop and ask.
    - Critical work must stop for the user according to the canonical Critical / Never-Unattended Stop List in `cotend-collaboration/references/authority-and-triggers.md`.
    - Make these stop boundaries visible in the report whenever relevant:

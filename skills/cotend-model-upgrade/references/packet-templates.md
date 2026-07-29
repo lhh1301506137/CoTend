@@ -1,6 +1,6 @@
 # CoTend Model Upgrade Packet Templates
 
-Version: 1.11
+Version: 1.13
 
 Use these compact templates when running `cotend-model-upgrade`. Keep project packets evidence-linked and concise. For first-time project reassessment or possible premium-model takeover, create `MODEL-UPGRADE/BASELINE/` before the per-run packet. For milestone re-entry, reuse the active packet directory and add `MILESTONE-REPORT.md` rather than rebuilding the entire packet unless the old packet is stale. For confirmed primary-model replacement, include `model_role_decision`; use `RUNTIME-PROFILE-ASSESSMENT.md` only for a non-authorizing A/Full recommendation; and trigger `FRAMEWORK-THINNING-REVIEW.md` only when the new primary model is user-confirmed and `takeover_ready`.
 
@@ -228,7 +228,7 @@ This file contains compact high-signal excerpts or summaries. Treat it as naviga
 ```markdown
 # Advisor Packet
 
-packet_version: cotend-model-upgrade-v1.11
+packet_version: cotend-model-upgrade-v1.13
 runtime_identity_contract: 1
 generated_at_commit:
 mode: advisor_guided | primary_takeover
@@ -1142,6 +1142,20 @@ Use the shared evidence vocabulary for decision-relevant milestone, verification
 ```
 
 ## Changelog
+
+### 1.13 (2026-07-29)
+
+- Kept same-Primary new-session-only requests outside Model Upgrade without automatically loading Session Handoff.
+- Required the user-input literal `$cotend-session-handoff` before handoff loading, packet discovery, preflight, or generation.
+- Changed a Model Upgrade misuse into a short explicit-invocation instruction while preserving mixed identity or role requests inside Model Upgrade.
+- Updated current packet and template stamps to `cotend-model-upgrade-v1.13`.
+
+### 1.12 (2026-07-28)
+
+- Excluded same-Primary new-session-only requests before Model Upgrade packet generation and routed them to `$cotend-session-handoff`.
+- Kept mixed requests with a real identity, material configuration, or role change in Model Upgrade while forbidding a same-primary packet.
+- Kept explicit A/Full selection under the separate user-owned runtime-profile selector; when combined with same-Primary transfer, resolve it before freezing the handoff.
+- Updated current packet and template stamps to `cotend-model-upgrade-v1.12`.
 
 ### 1.11 (2026-07-23)
 

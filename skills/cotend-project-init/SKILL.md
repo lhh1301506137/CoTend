@@ -1,12 +1,12 @@
 ---
 name: cotend-project-init
 description: >-
-  Initialize, update, repair, migrate, or resume a CoTend-governed coding project. Auto-classifies native workflow and external-framework state; exclusively resolves and persists user-facing governance language; preserves protected L0-L2 semantics, authority, risk, review, runtime-profile, and explicit-handback boundaries; progressively loads ten direct references; and deterministically validates actual changed governance bytes before declaring Init ready.
+  Initialize, update, repair, migrate, or resume a CoTend-governed coding project. Auto-classifies native workflow and external-framework state; consumes only explicitly invoked and supplied same-Primary point-in-time session handoffs through freshness preflight; exclusively resolves and persists user-facing governance language; preserves protected L0-L2 semantics, authority, risk, review, runtime-profile, and explicit-handback boundaries; progressively loads ten direct references; and deterministically validates actual changed governance bytes before declaring Init ready.
 ---
 
 # CoTend Project Init
 
-Protocol target: `cotend-collaboration-v1.67`
+Protocol target: `cotend-collaboration-v1.71`
 
 Initialize or resume CoTend without requiring the user to paste a long prompt.
 This Skill is an orchestrator, not a product-development, diagnosis, or
@@ -27,8 +27,9 @@ semantic-alignment flow.
 - Do not create protected L0-L2 meaning, confirmation, a parallel semantic
   tree, a second language resolver, a language ledger, or an automatic
   canonical writer.
-- Do not start product implementation in the same response as an explicit
-  Init.
+- Do not treat a supplied `same_primary_session_handoff` as current truth, infer identity from its carrier name, or create a session ledger. It is a point-in-time resume input whose current owners must be compared before product work.
+- Do not discover or auto-consume a handoff after app restart/reconnect or ordinary resume. Session-handoff preflight is eligible only when the current user input contains the literal `$cotend-session-handoff` and supplies the packet.
+- Do not start product development in the same response for a standalone explicit Init. When the same instruction explicitly authorizes a bounded follow-on and no specialized decision blocks it, report Init first and execute that follow-on through the normal workflow without a duplicate prompt.
 - Critical, destructive, public/release, credential/private-data, scope,
   unresolved P0/P1, and final-acceptance boundaries still stop for the user.
 - Full and Adaptive use the same resolver, validator, repair budget, stop
@@ -76,9 +77,18 @@ Project Init reference as a prerequisite.
 1. **Inspect and classify without writing.**
    Read current CoTend truth, applicable project instructions, active route,
    native state, runtime-profile evidence, classified external-framework
-   artifacts, and only the minimum standing semantic evidence required by Auto
-   Mode. Load `references/auto-mode-and-onboarding.md` and select exactly one
-   recorded mode.
+   artifacts, any explicitly invoked and supplied canonical
+   `same_primary_session_handoff`, and only the minimum standing semantic
+   evidence required by Auto Mode. For a supplied packet, compare its hash and
+   containing-commit method. A committed packet additionally requires a single
+   parent equal to `source_snapshot_commit`, the exact two-output delta, and
+   reachability from current `HEAD`; `HEAD == containing_commit` may be
+   current, a determinable descendant is stale, and contradictory history is
+   conflict. Also compare branch/worktree ownership, active task/truth/path,
+   pending gates, verification, and reliable resume boundary; classify
+   `current | stale | conflict` before readiness. Load
+   `references/auto-mode-and-onboarding.md` and select exactly one recorded
+   mode.
 
 2. **Resolve governance language before affected writes.**
    Load `references/language-and-runtime.md`. Apply conflict guards before
@@ -86,12 +96,14 @@ Project Init reference as a prerequisite.
    mapped equivalent. A `human_needed` resolution is the sole outer handback
    and prohibits every affected governance write.
 
-3. **Resolve native state and persistent runtime profile independently.**
+3. **Resolve native state, persistent runtime profile, and risk independently.**
    Preserve a valid user/project Full or Adaptive choice across framework,
    model, provider, carrier, role, reasoning, and Model Upgrade changes.
    CoTend defaults first-use projects to `full`, maps the result to
    `delegated_pair | inline`, and defaults delegation maturity separately to
-   `ask_each_time`. Never read, import, translate, or infer CoTend selection
+   `ask_each_time`. Resolve continuous risk from current-window user choice,
+   project-persistent user choice, then `medium`; a profile recommendation
+   never activates a tier. Never read, import, translate, or infer CoTend selection
    from a private Dual owner default, private Dual machine state, or any
    machine-wide legacy preference.
 
@@ -132,7 +144,9 @@ Project Init reference as a prerequisite.
 9. **Reconcile and report once.**
    Run triggered post-init consistency checks, load
    `references/reporting-and-handback.md`, report actual files/evidence and
-   readiness in the resolved language, then return control exactly once.
+   readiness in the resolved language, then return control exactly once for a
+   standalone invocation or record the same-instruction follow-on as satisfying
+   that generic handback.
 
 ## Native Initialization And Resume Boundary
 
@@ -141,7 +155,7 @@ phases in order:
 
 1. classify exactly one Auto Mode;
 2. resolve and persist user-facing governance language or stop affected writes;
-3. resolve the native workflow state and runtime profile;
+3. resolve the native workflow state, runtime profile, and continuous-risk tier;
 4. preserve or safely repair durable CoTend truth and control-plane files;
 5. run the deterministic pre-handback validator when triggered;
 6. run post-init consistency checks;
@@ -154,12 +168,14 @@ record, route-affecting external conflict, invalid profile, ambiguous migration,
 or missing specialized human decision fails closed before affected
 development.
 
-An explicit Init invocation never starts product implementation in the same
-response. When no specialized decision is pending, its handback may offer only
-the same already-confirmed route; bare `continue` satisfies that generic
-handback on the next turn. A specialized semantic, Route Rebase, acceptance,
-release, risk, or other human-only decision remains the sole handback and is
-never answered by bare `continue`.
+A standalone explicit Init invocation never starts product implementation in
+the same response. When no specialized decision is pending, its handback may
+offer only the same already-confirmed route; bare `continue` satisfies that
+generic handback on the next turn. A same-instruction bounded follow-on may
+run after the Init report without a duplicate prompt when it was explicitly
+authorized and no specialized gate blocks it. A specialized semantic, Route
+Rebase, acceptance, release, risk, or other human-only decision remains the
+sole handback and is never answered by bare `continue`.
 
 The native pre-development readiness gate in
 `cotend-collaboration/references/code-context-harness.md` runs only after this
@@ -189,8 +205,15 @@ record uses `cotend.user-facing-language-resolution.v1`.
 
 ## Readiness And Handback
 
-- `continue_ready` describes the next authorized route; it is never permission
-  to start product work inside the Init response.
+- `continue_ready` describes the next authorized route; by itself it is never
+  permission to start product work inside the Init response. Separate explicit
+  follow-on authority in the same user instruction may satisfy the generic
+  handback after the Init result is reported.
+- An explicitly invoked and supplied same-Primary session packet may support
+  `continue_ready` only after a `current` preflight and required
+  resolved-language takeover teachback. `stale` first reconciles known
+  successor differences and recomputes the reliable boundary; `conflict` is
+  `human_needed` or routes to the existing recovery owner.
 - `review_pending` means evidence, framework change, or the pre-handback gate
   must close first.
 - `human_needed` uses the one Human Rejoin decision and cannot be answered by
@@ -200,6 +223,9 @@ record uses `cotend.user-facing-language-resolution.v1`.
 - A specialized pending decision, appended independent control action, or
   fresh-intake semantic entry choice satisfies the one handback. Do not add a
   duplicate generic prompt.
+- An explicitly authorized ordinary follow-on in the same instruction also
+  satisfies the generic handback when no specialized decision is pending;
+  report Init first, then execute only that bounded follow-on.
 - Without a stronger decision, ask once whether to resume the same confirmed
   route. Do not let a session/model change revive a superseded or unreliable
   route.

@@ -1,4 +1,4 @@
 interface:
   display_name: "CoTend Diagnose Only"
   short_description: "Root cause, drift, or completion evidence"
-  default_prompt: "Use $cotend-diagnose-only to investigate technical failure, semantic drift, or a read-only capability-completion question without modifying files. Report exact-scope evidence, likely cause, and the correct fix or alignment handoff; use the canonical conditional completion guard only when triggered."
+  default_prompt: "Use $cotend-diagnose-only to investigate technical failure, semantic drift, or a read-only capability-completion question without modifying files. Report exact-scope evidence, likely cause, and the correct fix or alignment handoff. If the same instruction explicitly says diagnose, then fix and verify, report diagnosis first and hand off to that authorized repair closure without another prompt; explicit edit-withholding always forbids repair."

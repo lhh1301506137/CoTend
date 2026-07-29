@@ -192,9 +192,9 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
                 )
             )
 
-    def test_g06_slice_must_not_claim_runtime_or_release_change(self) -> None:
+    def test_r14_slice_must_claim_behavior_change_but_not_release_change(self) -> None:
         changed = copy.deepcopy(self.contract)
-        changed["this_slice"]["skill_behavior_changed"] = True
+        changed["this_slice"]["skill_behavior_changed"] = False
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 

@@ -68,7 +68,7 @@ REQUIRED_PROJECT_INIT_MARKERS = (
     "report readiness and return control exactly once.",
     "a second run with unchanged inputs",
     "must produce no diff.",
-    "Do not start product implementation in the same response",
+    "A standalone explicit Init invocation never starts product implementation in",
     "The native pre-development readiness gate",
     "current CoTend truth -> active leaf and route -> requirements/acceptance/risk -> code-context provider and impact set -> direct file verification",
 )

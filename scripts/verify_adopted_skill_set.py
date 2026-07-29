@@ -14,41 +14,51 @@ import verify_cotend_project_init as project_init_contract
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_ROOT = "dual-ai-collaboration-skill-share"
 TAG = "dual-ai-share-2026.07.28.2"
+SOURCE_COMMIT = "9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
+SOURCE_ROOT = "skills-backup/codex"
+SOURCE_TREE = "8218cbfb8906bc3cc0f3bf76f4480d866ecb392e"
+SOURCE_IDENTITY = f"exact-source:{SOURCE_COMMIT}"
 
 SKILLS = {
     "dual-ai-init": {
         "target": "cotend-init",
-        "tree": "d365118ef0337f8d911a6854871c608d78ec6b4e",
+        "tree": "c4692686a98043b9e8196e2041497ba7113069a2",
         "mode": "adapted",
         "files": 2,
     },
     "dual-ai-project-init": {
         "target": "cotend-project-init",
-        "tree": "990f3be754243846ac8c951a22466e7a83105b19",
+        "tree": "e8f22e5731a03f4a5f1d993bf57e3c575a48a91f",
         "mode": "adapted",
         "files": 14,
     },
     "dual-ai-collaboration": {
         "target": "cotend-collaboration",
-        "tree": "b0604ba3147ccaca37da2d3f88c043d73ced56bc",
+        "tree": "23cbd059d203957c5a435592865614bb4171e48e",
         "mode": "adapted",
         "files": 23,
     },
     "diagnose-only": {
         "target": "cotend-diagnose-only",
-        "tree": "06e8b6bd4c2f916d80e57544edd7bd4ec1db60f5",
+        "tree": "dd5ba26517f032c3dfcdd5c69fabc27825c6bf25",
         "mode": "adapted",
         "files": 2,
     },
     "dual-ai-semantic-alignment": {
         "target": "cotend-semantic-alignment",
-        "tree": "c7653b16fc102beb27853622895c66d0d6fedaae",
+        "tree": "679c45d557cc3e625415d333e1ed4f68e730cd46",
         "mode": "adapted",
         "files": 3,
     },
+    "dual-ai-session-handoff": {
+        "target": "cotend-session-handoff",
+        "tree": "67580d890c217630bbe7a61e44dfedc86377e6b1",
+        "mode": "adapted",
+        "files": 2,
+    },
     "dual-model-upgrade": {
         "target": "cotend-model-upgrade",
-        "tree": "25d867f5dd797589efbc556afc8c37a7c156a3a2",
+        "tree": "6f3dd1f0062e40034fd0662093cc5a17307dc6b4",
         "mode": "adapted",
         "files": 3,
     },
@@ -89,6 +99,7 @@ DISPLAY_NAMES = {
     "cotend-diagnose-only": "CoTend Diagnose Only",
     "cotend-model-upgrade": "CoTend Model Upgrade",
     "cotend-semantic-alignment": "CoTend Semantic Alignment",
+    "cotend-session-handoff": "CoTend Session Handoff",
 }
 
 REQUIRED_MARKERS = {
@@ -99,7 +110,7 @@ REQUIRED_MARKERS = {
         ".codex/skills/cotend-project-init/SKILL.md",
     ),
     "cotend-project-init": (
-        "Protocol target: `cotend-collaboration-v1.67`",
+        "Protocol target: `cotend-collaboration-v1.71`",
         "Project Init is the sole owner of `user_facing_language_resolution`",
         "**cotend-collaboration** owns collaboration governance",
         "`$cotend-diagnose-only`",
@@ -110,7 +121,7 @@ REQUIRED_MARKERS = {
         "at most twice total",
     ),
     "cotend-collaboration": (
-        "Protocol version: `cotend-collaboration-v1.67`",
+        "Protocol version: `cotend-collaboration-v1.71`",
         "inspect their actual prose against the persisted resolved language",
         "CoTend Core never grants project-truth authority",
         "through `cotend-project-init` Auto Mode",
@@ -121,16 +132,23 @@ REQUIRED_MARKERS = {
         "Do not change files",
     ),
     "cotend-model-upgrade": (
-        "packet_version: cotend-model-upgrade-v1.11",
+        "packet_version: cotend-model-upgrade-v1.13",
         "cotend-collaboration/references/authority-and-triggers.md",
         "primary_model_reverted_or_downgraded",
         "milestone re-entry",
     ),
     "cotend-semantic-alignment": (
-        "Companion version: `cotend-collaboration-v1.67`",
+        "Companion version: `cotend-collaboration-v1.71`",
         "`cotend.semantic-contract.v1`",
         "scripts/semantic-contract.mjs",
         "Independent Entry And Minimum Truth",
+    ),
+    "cotend-session-handoff": (
+        "Protocol version: `cotend-session-handoff-v1.1`",
+        "Compatibility baseline: `cotend-collaboration-v1.71`",
+        "literal `$cotend-session-handoff`",
+        "current/stale/conflict",
+        "same_primary_session_takeover_result",
     ),
     "grill-me": (
         "Ask the questions one at a time",
@@ -178,14 +196,14 @@ def load_json(path: Path) -> dict[str, object]:
     return data
 
 
-def tagged_inventory(repo: Path, source_id: str) -> list[str]:
-    prefix = f"{PACKAGE_ROOT}/codex-skills/{source_id}"
+def source_inventory(repo: Path, source_id: str) -> list[str]:
+    prefix = f"{SOURCE_ROOT}/{source_id}"
     paths = git_text(
         repo,
         "ls-tree",
         "-r",
         "--name-only",
-        TAG,
+        SOURCE_COMMIT,
         "--",
         prefix,
     ).splitlines()
@@ -226,14 +244,14 @@ def verify_source_topology(upstream_repo: Path, errors: list[str]) -> None:
             source_tree = git_text(
                 upstream_repo,
                 "rev-parse",
-                f"{TAG}:{PACKAGE_ROOT}/codex-skills/{source_id}",
+                f"{SOURCE_COMMIT}:{SOURCE_ROOT}/{source_id}",
             )
-            source_files = tagged_inventory(upstream_repo, source_id)
+            source_files = source_inventory(upstream_repo, source_id)
         except subprocess.CalledProcessError as exc:
-            errors.append(f"cannot resolve tagged source Skill {source_id}: {exc}")
+            errors.append(f"cannot resolve exact source Skill {source_id}: {exc}")
             continue
         if source_tree != record["tree"]:
-            errors.append(f"tagged source tree drift: {source_id}")
+            errors.append(f"exact source tree drift: {source_id}")
         target_files = target_inventory(target_dir)
         native_additions = NATIVE_TARGET_ADDITIONS.get(target_id, set())
         path_mappings = SOURCE_TARGET_PATH_MAPPINGS.get(target_id, {})
@@ -246,7 +264,7 @@ def verify_source_topology(upstream_repo: Path, errors: list[str]) -> None:
                 f"source/target file topology drift: {source_id} -> {target_id}"
             )
         if len(source_files) != record["files"]:
-            errors.append(f"tagged source file count drift: {source_id}")
+            errors.append(f"exact source file count drift: {source_id}")
         if len(target_files) != record["files"] + len(native_additions):
             errors.append(f"target file count drift: {target_id}")
 
@@ -537,35 +555,46 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         return
     expected_lock = {
         "schema": "cotend.framework-lock",
-        "release_id": "2026.07.28.2",
-        "framework_protocol": "cotend-collaboration-v1.67",
-        "model_upgrade_packet_family": "cotend-model-upgrade-v1.11",
-        "skill_count": 8,
+        "release_id": SOURCE_IDENTITY,
+        "framework_protocol": "cotend-collaboration-v1.71",
+        "model_upgrade_packet_family": "cotend-model-upgrade-v1.13",
+        "skill_count": 9,
         "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
         "adoption_record": (
-            "upstream/FRAMEWORK-ADOPTION-LOG.md#release-2026-07-28-2-v1-67-adoption"
+            "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-29-1-v1-71-adoption"
         ),
     }
     for key, expected in expected_lock.items():
         if lock.get(key) != expected:
             errors.append(f"framework lock mismatch: {key}")
-    expected_source_release = {
-        "tag": TAG,
-        "tag_object": "d26994355921b9c43956f7300069c892884496e0",
-        "release_commit": "4540f9e0543e85c6a7cceb1d7501467feee8b440",
-        "source_framework_commit": "e40f8dec01b140e697197c038f45fd962e7fb868",
-        "package_tree": "686a507d904b08c6a43ef6c5d40c1d43083d8f1b",
-        "manifest_sha256": (
-            "f96b86ba00fd1bc75bd70287c12d0af58f14f225d7dd34e43cfe4a9a99e51d00"
-        ),
+    expected_source_anchor = {
+        "type": "exact_source_commit",
+        "publication_state": "not_public_release",
+        "commit": SOURCE_COMMIT,
+        "canonical_source_tree": SOURCE_TREE,
+        "canonical_source_tree_path": SOURCE_ROOT,
+        "consumer_handoff": {
+            "id": "2026.07.29.1",
+            "schema": "dual-ai.consumer-range-handoff",
+            "schema_version": 1,
+            "handoff_json_sha256": (
+                "f3142ab14c42e982332cda383ca20e016f44f42c86cb0b0ae760ccc864c76804"
+            ),
+            "handoff_markdown_sha256": (
+                "fc960fbac7c11ebbb64eb0b94e0e117e647b6d38fe7c8455287d532fc9ed7f50"
+            ),
+            "checksums_sha256": (
+                "2e1e385db448c3bc622e68f851efd5e41012f9b4f94899caaca6e09297d9fb92"
+            ),
+        },
     }
     if lock.get("status") != "adopted_verified":
         errors.append("framework lock status is not adopted_verified")
-    if lock.get("source_release") != expected_source_release:
-        errors.append("framework lock source release drift")
+    if lock.get("source_anchor") != expected_source_anchor:
+        errors.append("framework lock exact source anchor drift")
     if (
         lock.get("source_carrier") != "skills/"
-        or lock.get("skill_file_count") != 49
+        or lock.get("skill_file_count") != 51
     ):
         errors.append("framework lock source carrier or file count drift")
     expected_trees = {source_id: record["tree"] for source_id, record in SKILLS.items()}
@@ -599,14 +628,25 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         "target": {
             "platform": "Codex",
             "lineage": "cotend-codex",
-            "artifact_id": "cotend-codex-r000013",
-            "revision": 13,
+            "artifact_id": "cotend-codex-r000014",
+            "revision": 14,
             "manifest_sha256": carrier_manifest,
         },
         "product": {"version": None},
-        "skill_count": 8,
-        "skill_file_count": 52,
+        "skill_count": 9,
+        "skill_file_count": 54,
         "predecessor_targets": [
+            {
+                "platform": "Codex",
+                "lineage": "cotend-codex",
+                "artifact_id": "cotend-codex-r000013",
+                "revision": 13,
+                "source_release_id": "2026.07.28.2",
+                "framework_protocol": "cotend-collaboration-v1.67",
+                "manifest_sha256": (
+                    "39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd"
+                ),
+            },
             {
                 "platform": "Codex",
                 "lineage": "cotend-codex",
@@ -761,8 +801,8 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
         by_source = {
             item.get("source"): item for item in mappings if isinstance(item, dict)
         }
-        if len(mappings) != 8 or len(by_source) != 8 or set(by_source) != set(SKILLS):
-            errors.append("framework lock must map exactly eight source Skills")
+        if len(mappings) != 9 or len(by_source) != 9 or set(by_source) != set(SKILLS):
+            errors.append("framework lock must map exactly nine source Skills")
         for source_id, record in SKILLS.items():
             item = by_source.get(source_id)
             if item is None:
@@ -830,10 +870,10 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
                 or len(adapted) != len(set(adapted))
                 or set(imported) & set(adapted)
                 or recorded != actual
-                or len(actual) != 52
+                or len(actual) != 54
             ):
                 errors.append(
-                    "framework candidate inventory does not equal the 52 current Skill files"
+                    "framework candidate inventory does not equal the 54 current Skill files"
                 )
         if candidate_adoption.get("final_framework_lock_exists") is not True:
             errors.append("framework candidate does not record the final lock")
@@ -864,8 +904,8 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
             for item in entries
             if isinstance(item, dict)
         }
-        if len(entries) != 8 or len(by_source) != 8 or set(by_source) != set(SKILLS):
-            errors.append("Codex role map must contain exactly eight source Skills")
+        if len(entries) != 9 or len(by_source) != 9 or set(by_source) != set(SKILLS):
+            errors.append("Codex role map must contain exactly nine source Skills")
         for source_id, record in SKILLS.items():
             item = by_source.get(source_id)
             if item is None:
@@ -891,7 +931,7 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
     else:
         log_text = adoption_log.read_text(encoding="utf-8")
         for marker in (
-            "## release-2026-07-28-2-v1-67-adoption",
+            "## exact-source-2026-07-29-1-v1-71-adoption",
             "status: adopted_verified_local",
             "resulting_CoTend_commit: containing_commit",
         ):
@@ -955,10 +995,17 @@ def verify(
 ) -> list[str]:
     errors: list[str] = []
     try:
+        if git_text(upstream_repo, "cat-file", "-t", SOURCE_COMMIT) != "commit":
+            errors.append("exact source anchor is not a commit")
+        if (
+            git_text(upstream_repo, "rev-parse", f"{SOURCE_COMMIT}:{SOURCE_ROOT}")
+            != SOURCE_TREE
+        ):
+            errors.append("exact source canonical tree drift")
         if git_text(upstream_repo, "cat-file", "-t", TAG) != "tag":
-            errors.append("source release anchor is not an annotated tag")
+            errors.append("latest public release history is not an annotated tag")
     except subprocess.CalledProcessError as exc:
-        return [f"cannot resolve source release tag: {exc}"]
+        return [f"cannot resolve exact source or release-history anchor: {exc}"]
     verify_source_topology(upstream_repo, errors)
     verify_skill_metadata(errors)
     verify_references(errors)
@@ -997,7 +1044,7 @@ def main() -> int:
     print(
         "ADOPTED_SKILL_SET_VERIFICATION_OK "
         f"mode={'pre_lock' if args.pre_lock else 'final'} "
-        "skills=8 files=52 capabilities=19"
+        "skills=9 files=54 capabilities=19"
     )
     return 0
 

@@ -184,4 +184,4 @@ Implementation discovery may improve the route without changing product meaning:
 - Goal Completion treats any required material closure that is not `closed` as a blocker to the corresponding MVP/full-goal claim.
 - Formal self-review and external review inspect the active runtime path, legacy-path disposition, exact canonical completion claim, and all three boundaries; they do not approve from the Primary's summary alone.
 - Unattended/resume authorization can continue repair work inside the confirmed scope but cannot cross a material-node closure with `next_step_allowed: no`.
-- Full and Adaptive execute the same semantic, Route Rebase, evidence, recovery, and navigation gate. They differ only in orchestration.
+- Full and Adaptive execute the same semantic, Route Rebase, evidence, recovery, and navigation gate. Their bounded/continuous execution posture, orchestration shape, and checkpoint/report cadence cannot change that gate or its result.

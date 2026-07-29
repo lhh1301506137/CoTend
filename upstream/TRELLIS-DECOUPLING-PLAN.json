@@ -6,13 +6,13 @@
   "decision": "preserve_governance_capabilities_replace_trellis_identity_authority_and_runtime_dependency",
   "current_candidate": "cotend@0.1.0-rc.2_local_unpublished",
   "target_candidate": "cotend@0.1.0-rc.3_after_parity",
-  "development_target_artifact": "cotend-codex-r000013",
+  "development_target_artifact": "cotend-codex-r000014",
   "source_boundary": {
     "trellis_relationship": "restricted_design_inspiration_and_legacy_runtime_integration",
     "trellis_source_adoption": "none",
     "trellis_package_dependency": false,
     "trellis_runtime_tracked_paths": [],
-    "cotend_core_source": "user_owned_dual_ai_release_plus_cotend_original_adaptation",
+    "cotend_core_source": "user_owned_private_dual_exact_source_plus_cotend_original_adaptation",
     "allowed_bundled_non_framework_skills": [
       "grill-me",
       "karpathy-guidelines"
@@ -376,12 +376,13 @@
     }
   ],
   "this_slice": {
-    "skill_behavior_changed": false,
+    "skill_behavior_changed": true,
     "trellis_route_removed": false,
     "removed_capability_ids": [],
-    "target_artifact_changed": false,
+    "target_artifact_changed": true,
     "package_identity_changed": false,
     "push_release_submission_or_publish": false,
-    "validation_gate_completed": "G06-real-project-and-rollback"
+    "validation_gate_completed": "G01-G05-regression-for-r14",
+    "g06_current_target_status": "not_rerun_frozen_r13_evidence"
   }
 }

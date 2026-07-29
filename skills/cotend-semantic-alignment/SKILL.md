@@ -5,7 +5,7 @@ description: Use as the direct, independent writable entry when the user wants t
 
 # CoTend Semantic Alignment
 
-Companion version: `cotend-collaboration-v1.67`
+Companion version: `cotend-collaboration-v1.71`
 
 Align product meaning before implementation details. Preserve one Plan Tree and its linked truth files; do not create a second semantic tree.
 
@@ -396,7 +396,7 @@ Use the resolved governance language and keep user decisions free of code jargon
   next_action:
 ```
 
-When confirmation is needed, show exactly what `1` would confirm. When the flow ends, perform one explicit control-Skill handback; a pending semantic decision itself satisfies the handback, so do not append a second generic question.
+When confirmation is needed, show exactly what `1` would confirm. When the flow ends, perform one explicit control-Skill handback; a pending semantic decision itself satisfies the handback, so do not append a second generic question. If no specialized decision remains and the same user instruction explicitly authorized a follow-on implementation or repair route, report the Alignment result first and continue only that authorized route under the normal closure contract without asking a duplicate “continue?” question.
 
 ## Hard Boundaries
 

@@ -89,6 +89,27 @@ Any proposal to thin these items is a `boundary_probe` calibration signal. Recor
 
 Applied to Route Rebase, the unchanged `继续` boundary means a bare resume token never chooses a material L0-L2 Route Rebase candidate; that candidate remains a pending human-only question until exact Semantic Alignment confirmation.
 
+## Execution Authorization Contract
+
+This section is the single canonical owner of execution authorization. Runtime profiles, continuous missions, review, Plan Tree, native workflow roles, and control Skills consume it; they must not create another permission system, authority label, ledger, or state tree.
+
+Before asking the user, classify the proposed decision in this order:
+
+1. Is it semantically L3/L4 work already owned by the Primary inside individually `user_confirmed` current-MVP L0-L2 ancestors?
+2. Does it remain inside the current confirmed active route or already-authorized task/slice, scope, risk ceiling, acceptance contract, and stop boundaries?
+3. Does it avoid every user-only boundary below?
+
+When all three answers are yes, continue under `primary_ai_auto_within_scope`; do not turn the decision into a user recommendation, consult Delegation Maturity, or ask for approval. Primary-owned execution includes implementation details, test/tooling choices, reversible route-local refactors, in-scope review repairs, verification retries, Plan Tree/status/evidence maintenance, and ordinary subagent orchestration that already satisfies the native-agent contract.
+
+A user-authorized task, plan, slice, or mission covers one closure loop: implementation -> checking -> in-scope repair -> rechecking -> evidence/status updates -> already-authorized local closeout. The selected runtime profile supplies exactly one execution posture:
+
+- Adaptive uses `active_route_continuous`: continue across successive L3/L4 leaves on the same confirmed active route, including reversible candidate promotion/rejection and route-local refactoring, and report decisions/evidence at material checkpoints.
+- Full uses `authorized_task_closure`: preserve the fixed native Implementer/Checker pair and complete its implement-check-fix-recheck loop without intermediate approval, but stop before the next material task/slice unless the existing mission or user instruction already covers it.
+
+Neither posture creates product scope or risk authority. Stop for a user-only decision, a canonical stop boundary, unresolved verification/integrity failure, semantic-implementation-closure blocker, or completion. The permanent user-only set includes any L0/L1/L2 goal, responsibility, input/output, current-MVP boundary, or user-visible result change; scope expansion; destructive or irreversible action; secrets or private data; real payment, legal/regulatory commitment, or global system change; push/deploy/publish/release/history rewrite; persistent runtime-profile/model-role/framework-thinning change; final acceptance; and genuine high-impact product-direction or reviewer disagreement. These are explicit instances of the unchanged Critical / Never-Unattended boundary, not a replacement list.
+
+If a material checkpoint needs to expose the posture, embed it in the existing runtime-profile, native task, `STATUS.md`, delegated-mission, decision-log, or local-closeout carrier. Do not create `EXECUTION-AUTHORIZATION.md` or a standing execution ledger.
+
 ## Explicit Control-Skill Handback
 
 Treat an operation as explicit when the user directly invokes or clearly requests one of these bounded control flows:
@@ -97,15 +118,28 @@ Treat an operation as explicit when the user directly invokes or clearly request
 - a formal `cotend-collaboration` review rather than its implicit always-on governance;
 - Diagnose Only read-only investigation;
 - Semantic Alignment writable baseline, rebaseline, realignment, or explicit semantic-change flow;
+- Same-Primary Session Handoff generation or new-session takeover preflight;
 - Model Upgrade advisor/takeover evaluation.
 
-After the explicit control flow completes its currently authorized result, report that result and return control to the user before starting unrelated product development. Nested delegation such as `cotend-init -> cotend-project-init` produces one outer handback, not one prompt per internal Skill.
+After the explicit control flow completes its currently authorized result, report that result once. For a standalone invocation, return control before starting unrelated product development. Nested delegation such as `cotend-init -> cotend-project-init` produces one outer handback, not one prompt per internal Skill.
 
 Use the strongest already-pending decision as the handback. Diagnose repair authorization, model-role/advisor/takeover choice, a material review disposition that requires the user, conflict resolution, high-level truth or Route Rebase confirmation, Done Gate, release/risk approval, or another human-only decision satisfies the handback; do not append a second generic question.
 
 When no stronger decision is pending, use one generic handback that asks only whether to resume the same already-confirmed route. In that narrow case a bare `继续` is explicit approval to resume that route, even when no unattended window was pre-seeded. It does not select option `1`, change scope or risk, approve a review, accept the product, accept an advisor recommendation, release, push, deploy, publish, or answer any specialized pending question.
 
+When the same user instruction explicitly authorizes follow-on work after the control result, that authority satisfies the generic handback. Report the control result first, record `same_instruction_authorized_follow_on`, then execute only that already-authorized follow-on through the normal workflow without asking a duplicate “continue?” question. A specialized pending decision still stops; Diagnose Only wording that withholds edits still forbids repair even if nearby wording is ambiguous.
+
 Do not trigger this handback for implicit/default `cotend-collaboration` loading, internal Skill delegation, ordinary checkpointing, or ordinary Plan Tree selection of the next L3/L4 leaf inside a confirmed current-MVP L0-L2 baseline. The handback is an explicit-operation event boundary, not a per-step approval gate.
+
+## Same-Primary Session Handoff Routing
+
+The only load authorization is the literal `$cotend-session-handoff` in the user's current input, including a Skill-picker/link invocation or a generated `NEW-SESSION-PROMPT.md` that repeats the literal. After that gate, route a long-conversation/new-task transfer to the Skill only when the verified Primary identity, role, runtime profile, and delegation state remain unchanged. The Skill generates a point-in-time packet, freezes old-session product work, and requires a `current | stale | conflict` preflight before new-session writes.
+
+An app restart/reconnect, ordinary task resume, bare `continue`, or natural-language mention of a long conversation, new session, or new task does not authorize loading, packet discovery, preflight, or generation. A clear natural-language handoff request without the literal may receive only a short suggestion to invoke the Skill. The suggestion does not grant authority.
+
+Any requested model, carrier, provider, material configuration, Primary role, or advisor-role change routes to `$cotend-model-upgrade`; an explicit mixed request generates no same-primary packet. Framework initialization or repair stays with Init, and review-only transfer stays with the existing review handoff. The detailed packet schema lives only in `templates.md`.
+
+An explicit A/Full selection is not a model/configuration change. When it is combined with a literal `$cotend-session-handoff` invocation, resolve that profile choice first through the canonical runtime-profile owner, then freeze the handoff from the resolved execution state. The handoff still records `runtime_profile_changed: false`: it consumes the selection and never becomes a second selector.
 
 ## Semantic Alignment Triggers
 

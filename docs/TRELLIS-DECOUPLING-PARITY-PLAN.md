@@ -6,7 +6,7 @@ authority: product_owner_confirmed_through_2026-07-29
 scope: packaged_CoTend_runtime_and_first_party_Skills
 current_candidate: cotend@0.1.0-rc.2_local_unpublished
 target_candidate: cotend@0.1.0-rc.3_after_parity
-development_target_artifact: cotend-codex-r000013
+development_target_artifact: cotend-codex-r000014
 machine_contract: ../upstream/TRELLIS-DECOUPLING-PLAN.json
 analysis_language: zh-CN
 ```
@@ -23,7 +23,7 @@ Trellis 可以继续出现在竞品研究、固定来源和历史采用说明中
 
 - L61 冻结基线是根 `skills/` 中 241 处不区分大小写的 `Trellis`，分布在 22 个第一方 Skill 文件；它作为不可变历史量尺保留。
 - L62 完成 TD08 权限替换后的检查点库存是 174 处、21 个文件；L63 完成 TD03 主动澄清路由替换后为 163 处、21 个文件；L64 完成 TD06 规格变化权限替换后为 158 处、21 个文件；L65 完成 TD01 原生状态与档位替换后为 43 处、16 个文件；L66 完成 TD02 初始化/续接/开发前门后为 38 处、16 个文件；L67 完成 TD04 原生实现阶段后为 28 处、15 个文件；L68 完成 TD05 原生检查阶段后为 20 处、10 个文件；L69 完成 TD07 原生收尾后为 7 处、6 个文件；L72 最终把当前第一方运行库存降为 0 处、0 文件。每次减少均限定在已审计表面。
-- 当前根 Skill 字节属于内部 target r13；r12、r11、r10、r9、r8、r7、r6、r5、r4、r3 和 r2 依次保留为精确 predecessor。rc.2 不再从当前工作树取 Skill，而从其已验证历史 r2 提交复现，因此不会把后续开发字节静默塞进同一候选身份。
+- 当前根 Skill 字节属于内部 target r14；r13、r12、r11、r10、r9、r8、r7、r6、r5、r4、r3 和 r2 依次保留为精确 predecessor。r14 只完成本地 G01-G05 回归；G06 的真实项目、用户验收和 fresh-session 证据仍冻结在 r13，未被重写成 r14 证据。rc.2 不再从当前工作树取 Skill，而从其已验证历史 r2 提交复现，因此不会把后续开发字节静默塞进同一候选身份。
 - 仓库没有跟踪 `.trellis/`，也没有位于 Skill、源码、交付、打包或插件运行时路径下的 Trellis 命名文件、Trellis 源码、模板、hooks、二进制或依赖包。本计划、研究、来源说明和验证器可以保留 Trellis 名称，以准确描述替换对象和来源边界。
 - `requirements-ci.txt` 只固定 PyYAML；Plugin/package manifest 没有 Trellis 组件或许可证载体。
 - 因此当前问题是**运行时框架集成与权限依赖**，不是已经复制 Trellis 源码。

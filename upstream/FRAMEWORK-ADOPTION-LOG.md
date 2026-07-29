@@ -470,3 +470,63 @@ CoTend 原生 `current/dormant/conflict` 状态、`delegated_pair/inline` 执行
 - CoTend checker 与共享 validator 的语言、SHA、稳定重读、Full/Adaptive 等价及 fail-closed 单元矩阵通过。
 - 两个 MIT Skill 的 source tree 未变化，目标字节与上游 release 保持一致。
 - 本记录只授权仓库内 Codex source adoption、r13 锁与本地非公开 artifact。它不授权全局 Skill/Plugin 更新、真实模型调用、G06 用户验收、rc.3、Claude v1.67 适配、push、tag、Release、submission 或 publish。
+
+## exact-source-2026-07-29-1-v1-71-adoption
+
+```yaml
+status: adopted_verified_local
+source_identity: exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826
+source_anchor_type: exact_source_commit
+source_commit: 9e6bbeeb4b91f98406e60dcbced923b3e1dd6826
+source_tree: 8218cbfb8906bc3cc0f3bf76f4480d866ecb392e
+source_tree_path: skills-backup/codex
+target_publication_state: not_public_release
+consumer_handoff: 2026.07.29.1
+handoff_json_sha256: f3142ab14c42e982332cda383ca20e016f44f42c86cb0b0ae760ccc864c76804
+handoff_markdown_sha256: fc960fbac7c11ebbb64eb0b94e0e117e647b6d38fe7c8455287d532fc9ed7f50
+handoff_checksums_sha256: 2e1e385db448c3bc622e68f851efd5e41012f9b4f94899caaca6e09297d9fb92
+latest_public_release: 2026.07.28.2
+latest_public_tag_object: d26994355921b9c43956f7300069c892884496e0
+latest_public_release_commit: 4540f9e0543e85c6a7cceb1d7501467feee8b440
+latest_public_source_tree: 2eae0ca4447cace17bdf93df3b04b665293deecb
+reviewed_commit_range: 20_commits_from_latest_public_release_exclusive_to_exact_source_inclusive
+contract_change_commits: 5
+evidence_only_commits: 15
+unclassified_commits: 0
+framework_protocol: cotend-collaboration-v1.71
+model_upgrade_packet_family: cotend-model-upgrade-v1.13
+skill_count: 9
+upstream_skill_file_count: 51
+target_skill_file_count: 54
+target_artifact_id: cotend-codex-r000014
+target_revision: 14
+target_manifest_sha256: 07ac592c82ed87f1759b38f04ed1f453c44e21d454fd12b4ce9eca459e4f3ed4
+local_artifact_file: cotend-codex-r000014-local-07ac592c82ed.zip
+local_artifact_entry_count: 56
+local_artifact_sha256: d32741471f6f23024dbecc929ec90c73d5e6d1eb870fe0ecabf267aa704f05b8
+predecessor_target_artifact_id: cotend-codex-r000013
+predecessor_manifest_sha256: 39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd
+G06_status: frozen_completed_user_accepted_r13_not_rerun_for_r14
+rc2_status: frozen_unchanged
+resulting_CoTend_commit: containing_commit
+live_install_performed: false
+model_call_performed: false
+external_UAT_modified: false
+push_release_or_publish: not_performed
+```
+
+### 区间分类
+
+上游 consumer handoff 把 `.28.2` release commit 到 exact source commit 的 20 个提交完整分为 5 个合同变化和 15 个 evidence-only 提交，没有未分类项。CoTend 逐项消费这份范围证明，但不让上游治理日志、证据归档或未发布身份直接取得产品运行时权限。
+
+### 产品化适配结论
+
+CoTend 将协议推进到 v1.71、DMU packet 推进到 1.13，并新增显式 `cotend-session-handoff`。该入口复用既有 C13，只在用户字面调用时冻结旧会话并生成两份确定性移交文件；它不自动恢复旧会话，也不建立平行状态树。Full 首次使用默认保持不变；Full/Adaptive 与 `low/medium/dev_high` 风险授权继续分离，缺失风险声明时使用 `medium`。
+
+当前 target 是 9 Skills / 54 files 的 r14；r13 是精确第一 predecessor。CoTend 原生 truth authority、三 pass、治理语言解析与 `current/dormant/conflict` 保持唯一 owner，Trellis 不重新进入运行时。两个 MIT Skill 继续按最新公开 `.28.2` 祖先核对字节与许可。
+
+### 历史与授权边界
+
+G01-G05 随 r14 做当前仓库回归。G06 保留为已完成并由用户接受的 r13 历史真实项目验收；其 verifier 从可信 r13 commit 重建旧 source，本轮不重写外部 UAT 或假称完成 r14 真实项目验收。冻结 rc.2 仍由原 source commit 重建，package identity、manifest 和 ZIP 摘要不变。
+
+本记录只覆盖仓库内 exact-source review、CoTend 产品适配、r14 锁、本地 artifact 与必要本地提交。它不授权全局安装、真实模型调用、Claude v1.71 适配、push、tag、Release、submission 或 publish。

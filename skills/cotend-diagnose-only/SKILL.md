@@ -24,7 +24,7 @@ Use this skill when:
 - the user says a feature is not what they intended, development keeps moving but the product remains half-finished, or asks whether the AI misunderstood the feature while withholding edit authorization.
 - a subagent, background agent, or model/tool call produces no trustworthy first response and it is unclear whether it is still reasoning, queued, disconnected, completed without a receipt, or stuck in a tool process.
 
-If the user clearly asks to fix now, diagnose first only long enough to avoid guessing, then proceed under the active project workflow.
+If the same user instruction clearly asks to diagnose, then fix and verify, that explicit follow-on authorization satisfies the generic control-Skill handback. Report the diagnosis first, then proceed under the active project workflow without asking “continue?” again.
 
 ## Rules
 
@@ -35,6 +35,7 @@ If the user clearly asks to fix now, diagnose first only long enough to avoid gu
 - If you cannot reproduce or inspect enough evidence, say so and list exactly what artifact is needed.
 - Do not change files. If a temporary command creates artifacts, place them in OS temp or clean them up before finishing.
 - Do not treat "先看看/先判断/先查一下" plus an edit-withholding phrase as permission to patch. Wait for explicit fix authorization such as "可以改了", "开始修", or "按方案改".
+- Explicit edit-withholding wording such as "diagnose only", "只诊断", or "不要改" overrides nearby ambiguous repair language. It forbids the follow-on fix; report the diagnosis and return control.
 - Apply natural-language precedence before acting: explicit withholding always remains read-only; without withholding, explicit mutation such as "重新对齐", "更新并修复", "对齐并修复", "确认后更新", or "修正这个理解" routes directly to `$cotend-semantic-alignment`; otherwise evaluative wording outranks generic "理解对齐" / "语义对齐" and stays here.
 - Do not leak secrets in the report; redact paths or values when needed.
 - Classify the likely cause as `technical`, `semantic_drift`, `mixed`, or `insufficient_evidence`. Do not force a semantic explanation onto an ordinary reproducible bug.
@@ -133,6 +134,7 @@ semantic_drift: # include only for semantic_drift or mixed
 
 When the user authorizes fixing, hand off into the active workflow:
 
+- same-instruction `diagnose, then fix and verify`: report the diagnosis, mark the generic handback satisfied by `same_instruction_authorized_follow_on`, then execute the authorized repair/check closure without a duplicate prompt;
 - low-risk clear fix: direct fix -> verify/check -> review or self-review;
 - behavior bug or regression: TDD/behavior-first fix -> verify -> review;
 - unclear architecture or cross-layer issue: replan -> plan review gate -> vertical slice fix;

@@ -19,13 +19,22 @@ EXPECTED_SKILLS = (
     "cotend-model-upgrade",
     "cotend-project-init",
     "cotend-semantic-alignment",
+    "cotend-session-handoff",
     "grill-me",
     "karpathy-guidelines",
 )
-FIRST_PARTY_SKILLS = EXPECTED_SKILLS[:6]
-SHAREABLE_COMPANION_SKILLS = EXPECTED_SKILLS[6:]
-EXPECTED_FILE_COUNT = 52
-CURRENT_SOURCE_FRAMEWORK_FILE_COUNT = 49
+FIRST_PARTY_SKILLS = EXPECTED_SKILLS[:7]
+SHAREABLE_COMPANION_SKILLS = EXPECTED_SKILLS[7:]
+R2_TO_R13_SKILLS = tuple(
+    skill for skill in EXPECTED_SKILLS if skill != "cotend-session-handoff"
+)
+R1_SKILLS = tuple(
+    skill for skill in R2_TO_R13_SKILLS if skill != "cotend-semantic-alignment"
+)
+EXPECTED_FILE_COUNT = 54
+CURRENT_SOURCE_FRAMEWORK_FILE_COUNT = 51
+R13_FILE_COUNT = 52
+R13_SOURCE_FRAMEWORK_FILE_COUNT = 49
 R10_TO_R12_FILE_COUNT = 40
 R9_FILE_COUNT = 39
 R8_FILE_COUNT = 38
@@ -144,8 +153,10 @@ def _target_artifact_id(lineage: str, revision: int) -> str:
 
 
 def _expected_file_count(revision: int) -> int:
-    if revision >= 13:
+    if revision >= 14:
         return EXPECTED_FILE_COUNT
+    if revision == 13:
+        return R13_FILE_COUNT
     if revision >= 10:
         return R10_TO_R12_FILE_COUNT
     if revision == 9:
@@ -157,9 +168,19 @@ def _expected_file_count(revision: int) -> int:
     return 30
 
 
+def _expected_skills(revision: int) -> tuple[str, ...]:
+    if revision >= 14:
+        return EXPECTED_SKILLS
+    if revision >= 2:
+        return R2_TO_R13_SKILLS
+    return R1_SKILLS
+
+
 def _expected_source_file_count(revision: int) -> int:
-    if revision >= 13:
+    if revision >= 14:
         return CURRENT_SOURCE_FRAMEWORK_FILE_COUNT
+    if revision == 13:
+        return R13_SOURCE_FRAMEWORK_FILE_COUNT
     if revision >= 2:
         return SOURCE_FRAMEWORK_FILE_COUNT
     return 30
@@ -605,7 +626,8 @@ class Artifact:
         _assert_no_symlinks(source, label="Artifact")
 
         entries = {path.name for path in source.iterdir()}
-        expected = set(EXPECTED_SKILLS)
+        expected_skills = _expected_skills(revision)
+        expected = set(expected_skills)
         if entries != expected:
             raise DeliveryError(
                 "artifact_skill_inventory",
@@ -615,14 +637,14 @@ class Artifact:
                     "unexpected": sorted(entries - expected),
                 },
             )
-        for skill in EXPECTED_SKILLS:
+        for skill in expected_skills:
             if not (source / skill / "SKILL.md").is_file():
                 raise DeliveryError(
                     "artifact_skill_invalid",
                     f"Artifact Skill is missing SKILL.md: {skill}",
                 )
 
-        files = _directory_manifest(source, EXPECTED_SKILLS)
+        files = _directory_manifest(source, expected_skills)
         expected_file_count = _expected_file_count(revision)
         if len(files) != expected_file_count:
             raise DeliveryError(
@@ -708,7 +730,7 @@ class Artifact:
             revision=revision,
             protocol=protocol,
             root=source,
-            skills=EXPECTED_SKILLS,
+            skills=expected_skills,
             files=files,
             manifest_sha256=manifest_sha256,
             legacy_receipt_mappings=legacy_receipt_mappings,

@@ -345,8 +345,8 @@ def verify_static(fixture: Path) -> dict[str, Any]:
     installed = project / ".agents" / "skills"
     if carrier.file_manifest(installed) != carrier.file_manifest(carrier.SOURCE_ROOT):
         raise LifecycleError("fixture Skill files differ from repository source")
-    if len(carrier.file_manifest(installed)) != 52:
-        raise LifecycleError("fixture must contain exactly 52 Skill files")
+    if len(carrier.file_manifest(installed)) != 54:
+        raise LifecycleError("fixture must contain exactly 54 Skill files")
     discovered_skills = {path.name for path in installed.iterdir() if path.is_dir()}
     if discovered_skills != carrier.EXPECTED_SKILLS:
         raise LifecycleError("fixture Skill directory inventory drift")

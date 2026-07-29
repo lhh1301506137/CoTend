@@ -70,7 +70,7 @@ class PublicReadmeTests(unittest.TestCase):
             "<!-- skill-catalog-end -->", 1
         )[0]
         ids = re.findall(r"^\| [^|]+ \| `([^`]+)` \|", section, re.MULTILINE)
-        self.assertEqual(len(ids), 8)
+        self.assertEqual(len(ids), 9)
         self.assertEqual(set(ids), set(package.EXPECTED_SKILLS))
         self.assertIn("`CoTend Init` is the normal start or resume entry", self.text)
 

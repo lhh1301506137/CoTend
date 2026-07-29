@@ -72,8 +72,8 @@ Until the user explicitly promotes the relationship, use this sequence for share
 1. CoTend records a proposal and evidence without implementing a parallel shared rule.
 2. The dual-ai maintainer source audits the proposal against current dual-ai owners, mechanism budget, user profile, and original evidence.
 3. The user confirms any accepted authority/workflow change in the dual-ai maintenance context.
-4. dual-ai implements, validates, reviews, versions, and releases the change.
-5. CoTend verifies that release and records `adopted`, `adapted`, `deferred`, `rejected`, or `needs_user_decision` before changing its adopted lock.
+4. dual-ai implements, validates, reviews, versions, and commits the change in its private canonical source.
+5. CoTend verifies the exact-source handoff and records `adopted`, `adapted`, `deferred`, `rejected`, or `needs_user_decision` before changing its adopted lock or publishing its own product artifact.
 
 CoTend still owns its brand, target-user surface, product architecture, and product-specific adaptations. It may not use that ownership to implement shared framework behavior first and then ask dual-ai to synchronize. CoTend becoming feature-complete or stable does not automatically change this hierarchy; only an explicit user decision does.
 
@@ -85,26 +85,26 @@ Use `consumer_range_handoff` only when the user explicitly names one consumer an
 
 Before generation, obtain the named consumer's own active adoption lock:
 
-- CoTend must provide an `adopted` or `adapted` immutable Dual release anchor. The upstream maintainer must not infer CoTend adoption from the newest handoff or current Dual release.
+- CoTend must provide its last `adopted` or `adapted` immutable anchor. Historical locks may use an annotated Dual release; future locks may use the exact canonical source commit/tree that CoTend actually adopted. The upstream maintainer must not infer adoption from the newest handoff or current source.
 - Claude must provide its last `approved_installed` carrier anchor. A later public release that still bundles an older Claude carrier is valid adoption evidence, but it is not automatically the range start: derive the latest earlier annotated release where canonical protocol/DMU match that carrier and the packaged carrier tree is identical. If no such lineage release can be verified, require the exact approved Claude source commit/tree.
 - A display version, current Codex version, or package filename alone is not a baseline.
 
-The lock root is `schema: dual-ai.consumer-adoption-lock`, `schema_version: 1`, plus `consumer`, `carrier`, `carrier_protocol`, `dual_model_upgrade_version`, `adoption_state`, and `anchor`. An `annotated_release_tag` anchor contains `tag`, `release_id`, `tag_object`, `release_commit`, `package_tree`, and `sha256_manifest_sha256`; an `exact_source_commit` anchor contains `commit`, `carrier_tree_path`, and `carrier_tree`. The latter is currently accepted only for Claude's approved installed source. Every field is checked against immutable Git objects or anchored Skill version lines.
+The lock root is `schema: dual-ai.consumer-adoption-lock`, `schema_version: 1`, plus `consumer`, `carrier`, `carrier_protocol`, `dual_model_upgrade_version`, `adoption_state`, and `anchor`. An historical `annotated_release_tag` anchor contains `tag`, `release_id`, `tag_object`, `release_commit`, `package_tree`, and `sha256_manifest_sha256`; an `exact_source_commit` anchor contains `commit`, `carrier_tree_path`, and `carrier_tree`. Both consumers may use exact-source anchors after their own adoption gate. Every field is checked against immutable Git objects or anchored Skill version lines.
 
-Build a sidecar only against an immutable annotated target release:
+Build a sidecar against one full exact canonical source commit:
 
 ```powershell
 python -X utf8 scripts/packaging/build_consumer_range_handoff.py `
   --consumer <cotend|claude> `
   --baseline-lock <consumer-lock.json> `
-  --target-tag <dual-ai-share-release-tag> `
+  --target-source-commit <full-40-hex-commit> `
   --dispositions <reviewed-dispositions.json> `
   --output <new-empty-output-directory>
 ```
 
-The common output is `HANDOFF.json`, `HANDOFF.md`, and `SHA256SUMS`; no ZIP is generated. The range is lineage-base-exclusive to target-inclusive. Every commit receives exactly one of `included_change | evidence_only | superseded_or_reverted | consumer_not_applicable`. Automatic classification is conservative: it may identify pure external-framework evidence, but exclusion or supersession requires an exact-range disposition override with a non-empty reason. A non-empty range cannot become `complete_range` until a review attests that every exact-range commit was checked for supersession and consumer applicability against Git commits, each immutable release changelog, FCE, and net package diff.
+The common output is `HANDOFF.json`, `HANDOFF.md`, and `SHA256SUMS`; no ZIP is generated. The range is lineage-base-exclusive to target-inclusive. Every commit receives exactly one of `included_change | evidence_only | superseded_or_reverted | consumer_not_applicable`. Automatic classification is conservative: it may identify pure external-framework evidence, but exclusion or supersession requires an exact-range disposition override with a non-empty reason. A non-empty range cannot become `complete_range` until a review attests that every exact-range commit was checked for supersession and consumer applicability against Git commits, release changelog evidence when present, FCE, net package diff, and net source diff.
 
-Use `schema: dual-ai.consumer-range-dispositions`, `schema_version: 1`, the same `consumer`, exact lineage `base_ref` and `target_ref`, a `review` object, and a `commits` object keyed by full 40-hex commit IDs. `review` must declare `status: complete`, `review_scope: supersession_and_consumer_applicability`, the exact `reviewed_commit_count`, a non-empty reviewer, and evidence sources `git_commits`, `release_changelog`, `framework_change_eval`, and `net_package_diff`. Commit entries contain a valid `disposition` and non-empty `reason`; `superseded_or_reverted` additionally requires a `resolution_commit` that resolves to a later commit in the exact range. Missing review, count drift, unknown/out-of-range commits, and same-or-earlier resolutions fail closed.
+Use `schema: dual-ai.consumer-range-dispositions`, `schema_version: 1`, the same `consumer`, exact lineage `base_ref` and `target_ref`, a `review` object, and a `commits` object keyed by full 40-hex commit IDs. `review` must declare `status: complete`, `review_scope: supersession_and_consumer_applicability`, the exact `reviewed_commit_count`, a non-empty reviewer, and evidence sources `git_commits`, `release_changelog`, `framework_change_eval`, `net_package_diff`, and `net_source_diff`. Commit entries contain a valid `disposition` and non-empty `reason`; `superseded_or_reverted` additionally requires a `resolution_commit` that resolves to a later commit in the exact range. Missing review, count drift, unknown/out-of-range commits, and same-or-earlier resolutions fail closed.
 
 Fail closed as `baseline_unknown | baseline_conflict | history_gap` when the lock is missing, conflicts with immutable Git objects, cannot derive a stale carrier's matching lineage, is newer than/not an ancestor of the target, lacks disposition review, or cannot be covered by release/changelog/history evidence. Each release-history section must come from its own immutable tag and match the target changelog's retained copy. Do not emit `complete_range` or create the output directory after such a failure.
 
@@ -113,17 +113,17 @@ Consumer responsibilities remain separate:
 - CoTend classifies contract deltas as `adopted | adapted | deferred | rejected | needs_user_decision`, then updates its own lock only after blockers close. Dual remains the shared-framework authority; CoTend retains its product-specific authority.
 - Claude owns Claude-carrier adaptation and platform-difference reporting. Codex reviews semantic fidelity; only the user authorizes installation. Codex must not edit Claude source/runtime as part of handoff generation.
 
-`complete_range` proves range accounting only. It does not prove consumer adoption/installation, synchronize the other consumer, authenticate the publisher, create a public release, or authorize push. If current source is newer than the last immutable target, create a new release only inside the user's explicit named-consumer sync request; do not release merely to keep consumers current.
+`complete_range` proves range accounting only. It does not prove consumer adoption or installation, synchronize another consumer, authenticate the publisher, create a public release, or authorize push. The upstream framework is private; CoTend owns the public/general-user product line. A named consumer sync must not create a public upstream release, package, tag, or ZIP unless the user explicitly reverses that boundary.
 
 ## External Reviewer And Claude Adaptation Boundary
 
-Codex source remains the active draft source while the shared protocol is changing. Do not automatically update Claude commands, Claude Skill mirrors, Gemini prompts, public packages, or consumer handoffs after each source revision. A stable source or release is eligible for review; it is not permission to synchronize a consumer.
+Codex source remains the active private source while the shared protocol is changing. Do not automatically update Claude commands, Claude Skill mirrors, Gemini prompts, historical public packages, or consumer handoffs after each source revision. A stable source commit is eligible for review; it is not permission to synchronize a consumer.
 
 When the user explicitly names an external reviewer before permanent sync, provide a self-contained review seed and disclose that the reviewer may not have the newest installed carrier. Reviewer feedback remains `advisor_recommended` until the user accepts it through the normal authority path.
 
 Claude adaptation prioritizes semantic fidelity, truthful carrier tool binding, and unchanged safety boundaries over byte-for-byte identity. A missing Claude-side tool, including a Codex-only browser capability, must be reported as unavailable rather than replaced with a fake equivalent. Installation and migration must follow the target carrier's documented Skill locations and preserve a reversible backup when replacing legacy commands.
 
-Codex may generate the named Claude range handoff and review a Claude-produced adaptation for semantic fidelity, but it must not silently edit Claude source/runtime files. Claude owns its platform adaptation; only the user authorizes installation. Record an approved installation in the project's carrier-adaptation baseline without exposing private machine paths. These rules do not apply a Claude update merely because the public package contains a newer Codex carrier.
+Codex may generate the named Claude range handoff and review a Claude-produced adaptation for semantic fidelity, but it must not silently edit Claude source/runtime files. Claude owns its platform adaptation; only the user authorizes installation. Record an approved installation in the project's carrier-adaptation baseline without exposing private machine paths. Historical public packages are lineage evidence only and do not trigger a Claude update.
 
 ## Review Procedure
 
@@ -179,8 +179,8 @@ Use one of:
 
 - Update `UPSTREAM-SOURCES.md` for source/version/boundary/update-policy changes.
 - Update `FRAMEWORK-CHANGE-EVAL.md` for workflow or high-impact framework behavior changes.
-- Keep Claude/Gemini/share package sync deferred unless the user explicitly asks.
-- For a named CoTend/Claude sync, use `scripts/packaging/build_consumer_range_handoff.py`; do not manually reconstruct skipped releases or generate the other consumer's package.
+- Keep Claude/Gemini/CoTend consumer sync deferred unless the user explicitly asks.
+- For a named CoTend/Claude sync, use `scripts/packaging/build_consumer_range_handoff.py` with one exact canonical source commit; do not manually reconstruct skipped releases, generate the other consumer's package, or extend a retired upstream public-release line.
 
 For passive/non-adopted upstream observations with no local behavior change, update only `UPSTREAM-SOURCES.md` when the source record itself changed. Do not create a framework-change entry unless local framework behavior changes.
 

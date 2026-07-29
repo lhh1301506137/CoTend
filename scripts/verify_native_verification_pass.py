@@ -86,9 +86,9 @@ REMOVED_TD05_COMMAND = "trellis-check"
 REQUIRED_REMAINING_COMMANDS: tuple[str, ...] = ()
 EXPECTED_TRELLIS_MENTIONS = 0
 EXPECTED_TRELLIS_FILES = 0
-EXPECTED_SKILL_FILES = 52
-EXPECTED_R12_MANIFEST = (
-    "44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276"
+EXPECTED_SKILL_FILES = 54
+EXPECTED_R13_MANIFEST = (
+    "39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd"
 )
 EXPECTED_R9_MANIFEST = (
     "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"
@@ -734,7 +734,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         raise NativeVerificationPassError("exact TD05 runtime Trellis inventory drifted")
 
     source_lock = json.loads((root / SOURCE_LOCK_PATH.relative_to(ROOT)).read_text(encoding="utf-8"))
-    if source_lock.get("skill_file_count") != 49:
+    if source_lock.get("skill_file_count") != 51:
         raise NativeVerificationPassError("current upstream source inventory drifted")
 
     lock = json.loads((root / TARGET_LOCK_PATH.relative_to(ROOT)).read_text(encoding="utf-8"))
@@ -742,24 +742,24 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000013"
-        or target.get("revision") != 13
+        target.get("artifact_id") != "cotend-codex-r000014"
+        or target.get("revision") != 14
         or target.get("manifest_sha256") != digest
-        or lock.get("skill_count") != 8
+        or lock.get("skill_count") != 9
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
         or len(files) != EXPECTED_SKILL_FILES
     ):
-        raise NativeVerificationPassError("r13 target identity or manifest drifted")
+        raise NativeVerificationPassError("r14 target identity or manifest drifted")
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000012",
-        "revision": 12,
-        "source_release_id": "2026.07.28.1",
-        "framework_protocol": "cotend-collaboration-v1.66",
-        "manifest_sha256": EXPECTED_R12_MANIFEST,
+        "artifact_id": "cotend-codex-r000013",
+        "revision": 13,
+        "source_release_id": "2026.07.28.2",
+        "framework_protocol": "cotend-collaboration-v1.67",
+        "manifest_sha256": EXPECTED_R13_MANIFEST,
     }:
-        raise NativeVerificationPassError("r12 predecessor identity drifted")
+        raise NativeVerificationPassError("r13 predecessor identity drifted")
 
     _require_markers(
         texts["evidence"],

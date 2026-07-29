@@ -1,0 +1,4 @@
+interface:
+  display_name: "CoTend Session Handoff"
+  short_description: "Explicit same-primary session handoff"
+  default_prompt: "Use $cotend-session-handoff v1.1 only because I explicitly invoked it. Freeze the current same-primary development state, create a point-in-time handoff whose new-session prompt repeats the literal $cotend-session-handoff marker, preserve dirty ownership and pending gates, and require current/stale/conflict freshness preflight before resuming. Never infer invocation from app restart, reconnect, ordinary continue, or natural-language session mentions; identity or role changes belong to $cotend-model-upgrade."

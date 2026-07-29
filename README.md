@@ -71,9 +71,9 @@ These starter prompts describe the main workflows:
 
 For an independent stronger-model review or possible takeover, ask CoTend to prepare a model handoff. CoTend keeps prior conclusions separate from verified facts so the receiving model can reason independently, then returns the advisor-or-takeover choice to you.
 
-## How the eight Skills fit together
+## How the nine Skills fit together
 
-You are not expected to manage eight commands in ordinary use. `CoTend Init` is the normal start or resume entry; the other Skills are delegated, contextual, advanced, or supporting capabilities.
+You are not expected to manage nine commands in ordinary use. `CoTend Init` is the normal start or resume entry; the other Skills are delegated, contextual, advanced, or supporting capabilities.
 
 <!-- skill-catalog-start -->
 | Display name | Skill ID | Role |
@@ -84,11 +84,12 @@ You are not expected to manage eight commands in ordinary use. `CoTend Init` is 
 | CoTend Diagnose Only | `cotend-diagnose-only` | Contextual read-only root-cause analysis when edits are not authorized. |
 | CoTend Semantic Alignment | `cotend-semantic-alignment` | Direct writable entry for confirming or repairing product meaning before affected implementation continues. |
 | CoTend Model Upgrade | `cotend-model-upgrade` | Advanced advisor, trial, takeover, rollback, and milestone handoff workflow. |
+| CoTend Session Handoff | `cotend-session-handoff` | Explicit-only same-Primary session transfer with frozen state and freshness preflight. |
 | Grill Me | `grill-me` | MIT-licensed clarification companion for resolving a plan one decision at a time. |
 | Karpathy Guidelines | `karpathy-guidelines` | MIT-licensed implementation-discipline companion for simpler, verifiable code changes. |
 <!-- skill-catalog-end -->
 
-The six CoTend-owned Skills use the `cotend-` prefix. The two bundled companions retain their upstream identities and license notices.
+The seven CoTend-owned Skills use the `cotend-` prefix. The two bundled companions retain their upstream identities and license notices.
 
 ## Current availability
 
@@ -98,10 +99,10 @@ The initial submission identity and version are confirmed for repository prepara
 
 | Area | Current state |
 |---|---|
-| Source carrier | Eight Codex Skills are adopted in [`skills/`](skills/), which is also the repository-root Plugin contract path. |
-| Package candidate | `cotend@0.1.0-rc.2`, 48 deterministic files including the Semantic Alignment helper and four locked brand assets; the repository Logo is locked, and this candidate remains unpublished. |
+| Source carrier | Nine Codex Skills are adopted in [`skills/`](skills/) as internal target r14 from an exact private-upstream source commit that is explicitly not a public Dual release. |
+| Package candidate | `cotend@0.1.0-rc.2` remains frozen at its historical eight-Skill, 48-file source and is unpublished; r14 does not silently change that package identity. |
 | Isolated lifecycle | Package add, install, discovery, coexistence, remove, recovery, and cleanup are verified in redirected disposable roots. |
-| GitHub Marketplace carrier | Real `lhh1301506137/CoTend` fetch, Git-backed refresh, clean isolated install, eight-Skill discovery, remove, recovery, and cleanup must be revalidated against the public commit after rc.2 is pushed. |
+| GitHub Marketplace carrier | The local repository-root carrier verifies nine-Skill discovery; remote fetch, refresh, install, remove, recovery, and cleanup must be revalidated against a future authorized public commit. |
 | Submission materials | English listing, three starter prompts, five positive cases, three negative cases, and release-note structure exist as a repository draft. |
 | Public installation | GitHub Open Beta is available through the personal Marketplace commands above. The Plugin has not been submitted to or published in the Public Plugin Directory. |
 | External readiness | Repository Logo assets are ready, but Portal format is not yet verified. Publisher identity, public support and legal URLs, availability, and policy attestations remain unresolved. |

@@ -23,7 +23,7 @@ CoTend 是用户自有 dual-ai 框架的产品化产品，不是必须脱离母�
 ## 当前仓库边界
 
 - 本仓库是独立的 CoTend 产品仓库，不是 upstream 维护工作区的镜像。
-- 当前公开候选已从固定 dual-ai `2026.07.28.2` release 采用 8 个 Codex Skill：上游 Skill 源为 49 个文件，CoTend r13 target 为 52 个文件；六个用户原创 Skill 经 CoTend 适配，两个 MIT Skill 保持发布标签字节一致，另有 3 个 CoTend 原生 pass。完整累计范围为 v1.53-v1.67，`.28.1` 保留为上一可采用历史，`.27.1` 保留为不可采用历史。
+- 当前仓库载体从精确私有上游提交采用 9 个 Codex Skill：上游 Skill 源为 51 个文件，CoTend r14 target 为 54 个文件；七个用户原创 Skill 经 CoTend 适配，两个 MIT Skill 保持最近公开 release 的字节与许可证一致，另有 3 个 CoTend 原生 pass。精确提交明确不是公开 release；`2026.07.28.2` 仅保留为最近公开祖先和 r13 历史来源。
 - 采用范围由 `upstream/framework.lock.json`、adoption log、逐文件 candidate record 和来源/许可证记录共同限定；未列入记录的 upstream 文件仍不是实现输入。
 - Git 非忽略文件构成公开候选集；本地状态、计划树、审查过程和受限来源证据不自动成为公开产品规范。
 - 公开产品结论必须写入公开 PRD、能力基线、路线或行为规范，不能只依赖本地会话和治理日志。

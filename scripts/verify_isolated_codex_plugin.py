@@ -35,10 +35,11 @@ EXPECTED_SKILLS = (
     "cotend-model-upgrade",
     "cotend-project-init",
     "cotend-semantic-alignment",
+    "cotend-session-handoff",
     "grill-me",
     "karpathy-guidelines",
 )
-EXPECTED_FILE_COUNT = 52
+EXPECTED_FILE_COUNT = 54
 PACKAGE_SUPPORT_FILES = {
     "LICENSE": ROOT / "LICENSE",
     "NOTICE": ROOT / "NOTICE",

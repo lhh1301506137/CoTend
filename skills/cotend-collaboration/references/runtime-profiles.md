@@ -2,16 +2,17 @@
 
 This is the single canonical contract for CoTend workflow state, runtime-profile selection, and execution-mode mapping. Project Init detects and persists the state through this contract. Other Skills may route here and report the result, but they must not define a second state owner, selector, or Full/Adaptive Skill tree.
 
-## Two Orthogonal Profile Axes
+## Runtime And Separate Governance Axes
 
-`runtime_profile` controls how the active Primary AI is orchestrated. The project adoption profile controls how much durable project governance is present. They are independent:
+`runtime_profile` controls how the active Primary AI is orchestrated. The project adoption profile controls how much durable project governance is present. Persisted continuous-risk authorization controls the maximum autonomous risk. They remain separate fields:
 
 | Axis | Machine values | Meaning |
 |---|---|---|
-| Runtime profile | `full`, `adaptive` | `delegated_pair` or `inline` execution while retaining the same Constitution. |
+| Runtime profile | `full`, `adaptive` | `delegated_pair` or `inline` execution, reversible execution continuity, and checkpoint/report cadence while retaining the same Constitution. |
 | Project adoption profile | `lite`, `standard`, `full` | Durable project files, review shape, and collaboration records. |
+| Continuous-risk authorization | `low`, `medium`, `dev_high` | Maximum autonomous risk inside the already-authorized scope; `critical` always stops. |
 
-Always report both fields by their full names. Never shorten either one to an ambiguous `profile`, and never infer one from the other.
+Always report all three fields by their full names. Never shorten either profile to an ambiguous `profile`. Risk defaults to `medium` when the user has not selected a tier. Runtime profile may influence only the advisory recommendation defined by `risk-and-approval.md`; it never selects or rewrites risk.
 
 ## Native State Owner
 
@@ -34,7 +35,7 @@ cotend_workflow:
   schema_version: 1
   state: current | dormant | conflict
   state_reason:
-  protocol: cotend-collaboration-v1.67
+  protocol: cotend-collaboration-v1.71
   runtime_profile: full | adaptive
   runtime_profile_source: user_explicit_project | product_default_materialized | migrated_existing_selection
   runtime_profile_confirmed_by_user: true | false
@@ -67,12 +68,12 @@ An external conflict with `affects_current_route: true` produces native `state: 
 
 | Machine value | User-visible name | Execution mode |
 |---|---|---|
-| `full` | `v1.67-full` | `delegated_pair` |
-| `adaptive` | `v1.67-A` | `inline` |
+| `full` | `v1.71-full` | `delegated_pair` |
+| `adaptive` | `v1.71-A` | `inline` |
 
 The CoTend product default is `full` when no prior selection exists. It is product-scoped, not model-, carrier-, or external-framework-scoped.
 
-The default is only an initial value. Once a project records `full` or `adaptive`, framework updates preserve that stable machine value. Upgrading an earlier A selection to v1.67 produces `v1.67-A`; it must not silently become `v1.67-full`. The same rule preserves Full.
+The default is only an initial value. Once a project records `full` or `adaptive`, framework updates preserve that stable machine value. Upgrading an earlier A selection to v1.71 produces `v1.71-A`; it must not silently become `v1.71-full`. The same rule preserves Full.
 
 Carrier, provider, actual model, reasoning configuration, role, Model Upgrade evidence, self-assessment, historical performance, and delegation maturity are not selector inputs. They may support truthful identity, tool compatibility, review independence, or a non-authorizing recommendation, but they never activate, reject, invalidate, restore, or migrate a runtime profile.
 
@@ -90,6 +91,10 @@ A session selection does not rewrite the project record unless the user also ask
 `product_default_materialized` records which initial default was applied; it is not stronger authority than a later user choice. A session-only override is reported but not persisted.
 
 Private owner-default files and old machine-wide preferences are outside CoTend authority. CoTend must not read, import, translate, or infer a selection from them.
+
+After resolving the effective profile, route to `risk-and-approval.md`. A valid user risk selection remains separate and survives profile changes within its scope or expiry. A missing risk selection defaults to `medium` under either profile. While no user risk choice exists, Adaptive may recommend `dev_high` once for eligible local work and Full recommends `medium`. Once the user chooses, do not repeat a profile-derived recommendation unless asked or materially new evidence changes it. Neither recommendation selects risk.
+
+When one request combines an explicit A/Full selection with a literal `$cotend-session-handoff` invocation for a same-Primary session handoff, resolve and apply the user-owned profile selection here first, including its requested persistence scope. Only then generate and freeze the handoff from that resolved execution state. Without the literal invocation, do not load the handoff cold path. The handoff records `runtime_profile_changed: false` because it did not select or change the profile itself; it must not duplicate this selector.
 
 ## Legacy Migration
 
@@ -127,24 +132,33 @@ Project Init owns these transitions. It must never store them in an external fra
 `full` uses `execution_mode: delegated_pair` and preserves all current governance:
 
 - For implementation work, run one fixed Implementer -> Checker pair.
+- Once the user or existing mission authorizes the current task/slice, establish `authorized_task_closure`. Complete implementation, checking, in-scope finding repair, rechecking, and evidence/status updates without intermediate approval prompts.
 - The Implementer executes `implementation-pass.md` through a bounded role packet, then an independently scoped Checker executes `verification-pass.md` against the current workspace and direct evidence.
 - Both roles follow the CoTend-owned route and classified evidence. Neither role replaces the actual Primary model's formal self-review unless that role is explicitly recorded.
 - This fixed pair is a profile-authorized quality baseline and the sole exception to the optional-agent positive-net-benefit gate. Additional agents or packets still require positive expected net benefit.
 - Both roles use the native-agent contract for explicit context, dependencies, non-overlapping ownership, root integration, local plus integrated verification, fresh review when triggered, and side-effect-safe retry.
 - All required verification, evidence, acceptance, release, risk, and stop boundaries remain active.
+- When no valid user risk selection exists, Full uses `max_continuous_risk: medium` with `authorization_basis: default_medium` and `recommendation: recommend_medium`. The user may still explicitly select any non-Critical tier.
+- `authorized_task_closure` ends at completion, a canonical stop, an unresolved verification/integrity or semantic-closure blocker, or the boundary of the authorized material task/slice. It does not automatically authorize the next material slice unless the existing mission or user instruction already covers it.
+- Local commit and Native Closeout remain opt-in unless an existing project record already has active local-closeout authorization.
 
 Both profiles finish verified checkpoints through `closeout-pass.md`; neither delegates closeout to an external framework.
 
 ## Adaptive Execution Contract
 
-`adaptive` uses `execution_mode: inline` and changes only reversible orchestration scaffolding:
+`adaptive` uses `execution_mode: inline` and changes only reversible execution scaffolding and checkpoint/report cadence; it does not change user-only authority:
 
 - The Primary executes the native `implementation-pass.md` contract for the authorized CoTend leaf inline.
+- When the effective profile is Adaptive and the current active route, individually confirmed L0-L2 ancestors, risk tier, and canonical stop boundaries are known, establish `active_route_continuous` without requiring a second per-leaf approval or a separate unattended-mode request.
+- When no valid user risk selection exists, Adaptive uses `max_continuous_risk: medium` with `authorization_basis: default_medium`. Eligible confirmed local/prototype evidence may set `recommendation: recommend_dev_high`, but only the user activates it.
 - Before editing, it loads the applicable CoTend-owned requirements, acceptance, route, and pre-development guidance.
 - After implementation, it enters a distinct inline checking phase and executes `verification-pass.md`: derive scope independently, inspect current differences and contracts, run relevant tests/checks, fix only in-scope findings, bind post-fix identity, rerun affected checks, and report evidence. `inline` never means `unchecked` or self-certifying.
+- Continue across successive L3/L4 leaves on that route, including reversible candidate promotion/rejection, route-local refactoring, in-scope review repair, rechecking, and Plan Tree/status/evidence maintenance. Report the choices and evidence at material checkpoints instead of asking before each action.
 - Optional agents require positive expected net benefit: independent parallel work, context isolation, specialist capability, independent challenge, or repeated failure.
 - Dispatched agents follow `native-agent-orchestration.md`; Adaptive changes dispatch shape, not authority or safety.
 - Do not stack another unconditional framework chain on platform-native orchestration.
+- Stop `active_route_continuous` only for a user-only decision, canonical stop boundary, unresolved verification/integrity failure, semantic-implementation-closure blocker, or completion.
+- Neither Adaptive nor CoTend's public default activates local-closeout authorization; use the existing explicit project record.
 
 Adaptive may save fixed child-agent round trips. It does not skip specification reading, implementation, checks, tests, evidence, formal review, user confirmation, or release hardening.
 
@@ -159,7 +173,7 @@ constitution_inheritance:
   adaptive: inherit_all_exactly_no_overrides
 ```
 
-The selector may change only orchestration scaffolding. It must never change authority/status labels, `user_confirmed` priority, protected current-MVP L0-L2 confirmation, Critical stops, pending-question or `continue` semantics, Done Gate, AI UAT status, final user acceptance, Release Hardening, evidence/deviation vocabulary, decision-log obligations, or explicit control-Skill handback.
+The selector may change only reversible execution continuity, orchestration scaffolding, checkpoint/report cadence, and a non-authorizing risk recommendation. It must never select or overwrite a risk tier or change authority/status labels, `user_confirmed` priority, protected current-MVP L0-L2 confirmation, Critical stops, pending-question or `continue` semantics, Done Gate, AI UAT status, final user acceptance, Release Hardening, evidence/deviation vocabulary, decision-log obligations, or explicit control-Skill handback.
 
 Both profiles execute the same semantic-contract verification, implementation closure, dynamic active-path, Route Rebase, acceptance, and review contracts. Neither may use blanket context inheritance, conflicting write ownership, skipped packet verification, or blind side-effect retries.
 
@@ -184,11 +198,17 @@ runtime_profile_selection:
   previous_display_name: <versioned display | none>
   legacy_machine_preference: absent | ignored_non_authorizing
   effective: full | adaptive
-  display_name: v1.67-full | v1.67-A
+  display_name: v1.71-full | v1.71-A
   execution_mode: delegated_pair | inline
   recommendation: none | advisory_recommended
   recommendation_pointer: none | <non-authorizing evidence or guide>
   unresolved_reason: none | invalid_runtime_value | duplicate_native_record | ambiguous_legacy_selection | external_route_conflict
+continuous_risk_authorization:
+  max_continuous_risk: low | medium | dev_high
+  authorization_basis: default_medium | user_explicit_low | user_explicit_medium | user_explicit_dev_high
+  selection_source: current_window | project_persistent | default
+  recommendation: none | recommend_medium | recommend_dev_high
+  recommendation_authorizes_selection: no
 project_adoption_profile: lite | standard | full
 external_frameworks:
   - identity:
@@ -207,9 +227,10 @@ Adaptive remains an FCE `watch` choice. Observe duplicate-agent reduction, misse
 
 A safety stop, failed check, model change, role rollback, or external framework upgrade must not erase the native record or delete project truth, decisions, evidence, or governance files. Rollback restores the last verified native record and leaves external framework files untouched.
 
-## Public And Release Boundary
+## Public Product Boundary
 
-- Public documentation and the share package explain both profiles and declare Full as the default.
+- Public documentation and the CoTend artifact explain both profiles and declare Full as the first-use default.
+- Risk remains a separate user choice and defaults to `medium` when absent.
 - The package must not contain or read private owner defaults, machine preferences, current private project selections, private model-role records, or private absolute paths.
 - CoTend exposes both profiles without a model gate.
-- Carrier adapters may differ only when release metadata and migration guidance disclose the difference explicitly.
+- Carrier adapters may differ only when an exact reviewed handoff and migration guidance disclose the difference explicitly. CoTend publishes its own versioned artifacts only after adaptation and verification.

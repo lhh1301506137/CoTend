@@ -6,6 +6,8 @@ Use this cold-path module when repeated user-facing recommendations may justify 
 
 Delegation maturity reduces repeated interaction cost. It does not infer consent, create a new authority label, widen product scope, change risk authorization, or weaken any Constitution Never Thin item.
 
+First apply the canonical `Execution Authorization Contract` in `authority-and-triggers.md`. Work already owned by the Primary at L3/L4 is executed directly and is neither an `ask_each_time` decision nor a maturity sample. Delegation Maturity applies only when the framework genuinely had a reason to present a user-facing recommendation.
+
 It is orthogonal to:
 
 - runtime profile: `full | adaptive`;
@@ -23,7 +25,7 @@ Both runtime profiles use the same maturity rules. `act_then_report` changes whe
 
 There is no `silent_autonomy` level. A delegated decision remains visible and uses the existing `primary_ai_auto_within_scope` authority label.
 
-## Initial Eligible Categories
+## Initial Eligible Recommendation Categories
 
 - `implementation_detail`
 - `test_or_tooling_choice`
@@ -32,7 +34,7 @@ There is no `silent_autonomy` level. A delegated decision remains visible and us
 
 Every eligible decision must stay inside individually user-confirmed current-MVP L0-L2 ancestors, be semantically L3/L4, be reversible, avoid changing an external contract or product meaning, and remain within the existing risk authorization. Delegation maturity never confirms, changes, or bypasses an L0-L2 semantic decision.
 
-Do not create new questions to collect samples. Count only recommendations that the AI already had a valid reason to present to the user.
+These category names do not convert ordinary implementation details, test/tooling selection, route-local refactoring, review repair/recheck, evidence maintenance, or subagent orchestration into user decisions. Count only recommendations that the AI already had a valid reason to present to the user after the execution-authorization classification. Do not create new questions to collect samples.
 
 ## Resolved Sample Contract
 
@@ -74,6 +76,7 @@ Do not count:
 - a forced or only feasible option;
 - a factual acknowledgement with no decision;
 - work the AI executed without presenting a recommendation;
+- Primary-owned execution that should have proceeded under `primary_ai_auto_within_scope`, even if an earlier model unnecessarily asked about it;
 - any permanently non-delegable topic;
 - samples from another project, category, primary model/configuration, or protected L0-L2 scope.
 

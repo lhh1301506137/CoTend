@@ -1551,3 +1551,86 @@ watch_closure:
 ```
 
 本次只关闭当前 r13 的真实项目稳定性 `watch`。它没有修改 52 个 r13 Skill、交付锁、r13 artifact、冻结 rc.2 或任何 UAT 产品字节；也没有调用模型、生成 rc.3、全局安装、push、tag、Release、submission 或 publish。
+
+## 2026-07-29 Dual exact source / CoTend v1.71 r14 采用
+
+```yaml
+current_framework_version: cotend-collaboration-v1.71
+model_upgrade_packet_family: cotend-model-upgrade-v1.13
+source_identity: exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826
+source_anchor_type: exact_source_commit
+target_publication_state: not_public_release
+consumer_handoff: 2026.07.29.1
+change_summary: 独立审查 Dual 未发布 exact source，把可迁移合同适配为 CoTend 自有 v1.71/r14，并新增显式会话移交入口
+user_facing_effect:
+  - CoTend Codex 载体从 8 Skills / 52 files 推进到 9 Skills / 54 files
+  - 新增仅由字面 $cotend-session-handoff 触发的同一主任务会话移交
+  - Full 首次使用默认保持不变
+  - Full/Adaptive 与 low/medium/dev_high 风险授权继续分离，缺失风险使用 medium
+behavior_change:
+  - Full 连续边界固定为 authorized_task_closure，Adaptive 固定为 active_route_continuous
+  - 同一指令已授权且没有专门闸门的连续动作不重复 control handback
+  - 会话移交使用 cotend.same-primary-session-handoff.v1 与 cotend.same-primary-session-takeover-result.v1
+  - 模型身份或角色合同变化继续转交 cotend-model-upgrade
+risk_changes:
+  - exact source 尚非公开 release，必须同时固定 commit、canonical tree 与 handoff 摘要
+  - 新增会话移交若误触发可能造成并行 writer 或陈旧包接管
+  - 当前 r14 若直接复用 G06 r13 路径可能篡改已接受历史证据
+affected_contracts:
+  - upstream/framework.lock.json
+  - delivery/codex-artifact.lock.json
+  - upstream/FRAMEWORK-CANDIDATE.json
+  - upstream/CODEX-SKILL-ROLE-MAP.json
+  - upstream/CAPABILITY-IMPLEMENTATION-MAP.json
+  - skills/cotend-session-handoff
+  - current G01-G05 verification carriers
+  - frozen G06 r13 reconstruction boundary
+compatibility:
+  - r13 retained as exact first predecessor
+  - r12 and earlier predecessor identities retained
+  - frozen rc2 package source and identity unchanged
+  - G06 retained as completed user-accepted r13 history and not rerun for r14
+mechanism_budget:
+  new_long_lived_skills: 1
+  new_capability_ids: 0
+  new_parallel_state_trees: 0
+  new_automatic_writers: 0
+  rationale: 会话移交是用户显式入口并复用既有 C13；其两文件包与 Project Init 接管合同不能由一般协作 Skill 隐式触发
+validation:
+  - scenario: exact source and handoff integrity
+    expected: exact commit/tree, three handoff hashes, 20 commits classified as 5 contract changes plus 15 evidence-only
+    validation_result_type: executable_repository_check
+    result: passed_exact_commit_tree_three_handoff_hashes_and_20_of_20_classified
+  - scenario: CoTend independent adaptation
+    expected: 9 Skills, 51 source files, 54 target files, 19 capabilities, zero Trellis runtime ownership
+    validation_result_type: executable_repository_check
+    result: passed_9_skills_51_source_files_54_target_files_19_capabilities_zero_trellis_runtime
+  - scenario: current target identity
+    expected: cotend-codex-r000014 revision 14 with manifest 07ac592c82ed87f1759b38f04ed1f453c44e21d454fd12b4ce9eca459e4f3ed4 and exact r13 first predecessor
+    validation_result_type: executable_repository_check
+    result: passed_r14_manifest_and_exact_r13_first_predecessor
+  - scenario: deterministic local r14 carrier
+    expected: two clean local builds produce identical bytes while r13 ZIP and frozen rc2 remain unchanged
+    validation_result_type: executable_local_reproducibility
+    result: passed_two_byte_identical_builds_56_entries_zip_sha256_d32741471f6f23024dbecc929ec90c73d5e6d1eb870fe0ecabf267aa704f05b8
+  - scenario: complete local regression
+    expected: official validation for every changed first-party Skill, current native gates, repository check, and full unit suite
+    validation_result_type: executed
+    result: passed_official_skill_creator_7_of_7_changed_first_party_skills_native_G01_G05_and_413_of_413_unit_tests
+decision: keep
+rollback_triggers:
+  - handoff, commit, canonical tree or source Skill tree cannot be reproduced
+  - any of 20 commits is unclassified
+  - current carrier differs from 9 Skills / 54 files or its locked manifest
+  - session handoff can trigger implicitly, create parallel writer authority or rewrite model identity
+  - Full silently grants dev_high or missing risk does not resolve to medium
+  - G06 r13 evidence, r13 local artifact or frozen rc2 bytes change
+review_after: next_Dual_exact_source_or_public_release_adoption_or_first_r14_real_project_authorization
+authorization_boundary:
+  - no global install
+  - no real model call
+  - no external UAT mutation
+  - no push tag release submission or publish
+```
+
+本次采用明确区分“参考上游”和“公开产品”：Dual exact source 提供可审查输入，CoTend 决定公开命名、触发方式、权限和交付历史。5 个合同变化进入产品代码，15 个 evidence-only 提交只作为来源证明。G06 仍是 r13 历史事实，不因 r14 仓库回归被改写。

@@ -40,8 +40,12 @@ EXPECTED_SKILLS = (
     "cotend-model-upgrade",
     "cotend-project-init",
     "cotend-semantic-alignment",
+    "cotend-session-handoff",
     "grill-me",
     "karpathy-guidelines",
+)
+FROZEN_RC2_SKILLS = tuple(
+    skill for skill in EXPECTED_SKILLS if skill != "cotend-session-handoff"
 )
 EXPECTED_DISPLAY_NAMES = {
     "cotend-collaboration": "CoTend Collaboration",
@@ -340,9 +344,9 @@ def source_skill_manifest() -> dict[str, str]:
     if actual_directories != EXPECTED_SKILLS:
         raise PluginPackageError("repository Skill directory inventory drifted")
     manifest = path_hash_manifest(SOURCE_SKILLS_ROOT)
-    if len(manifest) != 52:
+    if len(manifest) != 54:
         raise PluginPackageError(
-            f"expected 52 repository Skill files, found {len(manifest)}"
+            f"expected 54 repository Skill files, found {len(manifest)}"
         )
     for skill in EXPECTED_SKILLS:
         if f"{skill}/SKILL.md" not in manifest:
@@ -448,14 +452,14 @@ def _historical_source_skill_entries(
     actual_directories = tuple(
         sorted({PurePosixPath(relative).parts[0] for relative, _ in entries})
     )
-    if actual_directories != EXPECTED_SKILLS:
+    if actual_directories != FROZEN_RC2_SKILLS:
         raise PluginPackageError("historical Skill directory inventory drifted")
     if len(entries) != expected_file_count:
         raise PluginPackageError(
             f"expected {expected_file_count} historical Skill files, found {len(entries)}"
         )
     relative_paths = {relative for relative, _ in entries}
-    for skill in EXPECTED_SKILLS:
+    for skill in FROZEN_RC2_SKILLS:
         if f"{skill}/SKILL.md" not in relative_paths:
             raise PluginPackageError(
                 f"historical Skill is missing SKILL.md: {skill}"
@@ -540,8 +544,8 @@ def validate_contract() -> dict[str, Any]:
     if (
         target.get("platform") != "Codex"
         or target.get("lineage") != "cotend-codex"
-        or target.get("artifact_id") != "cotend-codex-r000013"
-        or target.get("revision") != 13
+        or target.get("artifact_id") != "cotend-codex-r000014"
+        or target.get("revision") != 14
         or not isinstance(target.get("manifest_sha256"), str)
         or len(target["manifest_sha256"]) != 64
     ):
@@ -582,7 +586,7 @@ def validate_contract() -> dict[str, Any]:
         "artifact_id": package_predecessor["artifact_id"],
         "revision": package_predecessor["revision"],
         "target_manifest_sha256": package_predecessor["manifest_sha256"],
-        "skill_count": len(EXPECTED_SKILLS),
+        "skill_count": len(FROZEN_RC2_SKILLS),
         "skill_file_count": 37,
         "path_hash_manifest_sha256": path_hash_manifest_sha256(
             locked_source_manifest
@@ -714,7 +718,7 @@ def verify_package(package_root: Path) -> dict[str, Any]:
         "plugin_name": PLUGIN_NAME,
         "plugin_version": PLUGIN_VERSION,
         "package_files": len(actual_manifest),
-        "skills": len(EXPECTED_SKILLS),
+        "skills": len(FROZEN_RC2_SKILLS),
         "skill_files": len(contract["source_manifest"]),
         "friendly_display_names": len(EXPECTED_DISPLAY_NAMES),
         "relative_notice_links": len(relative_notice_links),

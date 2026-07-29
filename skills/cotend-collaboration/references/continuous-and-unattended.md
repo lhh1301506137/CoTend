@@ -2,6 +2,12 @@
 
 Use when the user asks Codex to keep going, sends repeated or pre-seeded `继续`, authorizes a batch/mission, is away/asleep, or when work accumulates into batches.
 
+## Runtime Posture Versus Unattended Mission
+
+Adaptive's `active_route_continuous` posture is ordinary execution authorization, not an unattended mission. When the active route, individually confirmed current-MVP L0-L2 ancestors, risk tier, and stop boundaries are known, the Primary continues successive in-scope L3/L4 leaves and reports at material checkpoints without asking between them. It does not require a separate away/asleep request, delegated-mission packet, or pre-seeded `继续`.
+
+The activation requirements below apply when the user actually authorizes an unattended window or delegated batch. Full's `authorized_task_closure` likewise completes only the already-authorized task or slice through implement-check-fix-recheck; it does not create an unattended window or cover the next material slice.
+
 ## Activation Requirements
 
 Record before starting:
@@ -87,13 +93,13 @@ When `preflight_baseline` is degraded or not run, record why before starting. Th
 
 ## Local Closeout Authorization
 
-Use this only when the project status explicitly records `local_closeout_authorization.status: active`.
+Use this only when the project status explicitly records `local_closeout_authorization.status: active`. CoTend never activates local closeout from Adaptive or Full alone.
 
 `继续` may include local closeout work only when all conditions hold:
 
 - the user explicitly enabled local closeout authorization for this project, milestone, or unattended window;
 - the completed work stays inside the current agreed scope/task and authorized risk tier;
-- the working tree contains no unrelated or user-owned changes;
+- unrelated or user-owned changes are classified and excluded with explicit staging paths; unresolved ownership, staged overlap, overwrite, or inclusion blocks closeout;
 - no secrets, private data, large generated files, public artifacts, or ignored local-only config are staged;
 - required tests/checks/smoke verification and the actual primary model's formal self-review passed or are recorded as intentionally not applicable;
 - no unresolved user-only decision, Done Gate acceptance, release boundary, scope expansion, P0/P1, or `critical` risk appeared.
@@ -103,6 +109,8 @@ Allowed local closeout actions:
 - create a local git commit for the verified in-scope checkpoint;
 - synchronize applicable existing project records through `closeout-pass.md`, including `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, decision/knowledge records, Plan Tree, or milestone reports;
 - update a handoff only when the active route or user actually requires one.
+
+If an optional archive helper requires a fully clean worktree, defer only that archive or journal step and report the reason; a verified task-local commit may still proceed when unrelated changes are classified and excluded.
 
 Still requires the user:
 

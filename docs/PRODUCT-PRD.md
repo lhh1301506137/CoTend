@@ -60,7 +60,7 @@ CoTend Core 本身是唯一拥有项目开发治理权的框架。计划、规�
 
 19 类能力已按照 [`docs/BEHAVIOR-SPECIFICATION-STANDARD.md`](BEHAVIOR-SPECIFICATION-STANDARD.md) 整理为平台中立、架构中立的可观察行为契约，并全部达到 `active_user_confirmed`；[`docs/BEHAVIOR-SPEC-INDEX.md`](BEHAVIOR-SPEC-INDEX.md) 负责唯一覆盖和依赖顺序。
 
-这些契约现在是产品化覆盖和验收护栏：直接改名或适配不得静默丢失任何已确认能力，但契约本身不要求把 dual-ai 重写成一套新流程。当前 CoTend adoption 已完整覆盖 dual-ai v1.53-v1.67，C01-C19 映射到 8 个仓库内 Codex Skill；上游 Skill 源为 49 个文件，r13 target 为 52 个文件。Project Init 的实际字节 pre-handback 验证、隔离 Plugin、项目载体、已交付运行时、卸载/回滚和精确 predecessor 更新已经验证；G06 又用一个保留型 r13 真实项目完成实现、检查、用户验收、r13→r12→r13 和验收前后跨会话恢复。真实用户全局更新和 rc.2 远端重验仍需独立执行。
+这些契约现在是产品化覆盖和验收护栏：直接改名或适配不得静默丢失任何已确认能力，但契约本身不要求把 dual-ai 重写成一套新流程。当前 CoTend adoption 已完整覆盖 dual-ai v1.53-v1.71，C01-C19 映射到 9 个仓库内 Codex Skill；上游 exact source 为 51 个文件，r14 target 为 54 个文件。Project Init 的实际字节 pre-handback 验证、显式 Session Handoff、隔离 Plugin、项目载体、已交付运行时、卸载/回滚和精确 predecessor 更新已经验证；G06 保留一个已经由用户接受的 r13 真实项目历史，包含实现、检查、用户验收、r13→r12→r13 和验收前后跨会话恢复，但不冒充 r14 真实模型验收。真实用户全局更新和 rc.2 远端重验仍需独立执行。
 
 ## 产品与测试载体边界（已确认）
 

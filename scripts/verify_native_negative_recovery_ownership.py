@@ -50,6 +50,7 @@ EXPECTED_TARGET_SKILLS = {
     "cotend-diagnose-only",
     "cotend-semantic-alignment",
     "cotend-model-upgrade",
+    "cotend-session-handoff",
     "grill-me",
     "karpathy-guidelines",
 }
@@ -978,26 +979,30 @@ def _validate_no_regression_baseline(root: Path) -> dict[str, Any]:
         for item in skills
         if isinstance(item, dict)
     } if isinstance(skills, list) else set()
-    source_release = framework_lock.get("source_release")
+    source_release = framework_lock.get("source_anchor")
     target = target_lock.get("target")
     skill_files, skill_digest = native_closeout.skill_manifest(root)
     if (
-        framework_lock.get("release_id") != "2026.07.28.2"
+        framework_lock.get("release_id")
+        != "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
         or framework_lock.get("framework_protocol")
-        != "cotend-collaboration-v1.67"
+        != "cotend-collaboration-v1.71"
         or not isinstance(source_release, dict)
-        or source_release.get("tag") != "dual-ai-share-2026.07.28.2"
-        or framework_lock.get("skill_count") != 8
-        or framework_lock.get("skill_file_count") != 49
+        or source_release.get("type") != "exact_source_commit"
+        or source_release.get("commit")
+        != "9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
+        or source_release.get("publication_state") != "not_public_release"
+        or framework_lock.get("skill_count") != 9
+        or framework_lock.get("skill_file_count") != 51
         or capability_map.get("capability_count") != 19
         or capability_ids != EXPECTED_CAPABILITY_IDS
-        or role_map.get("skill_count") != 8
+        or role_map.get("skill_count") != 9
         or target_skills != EXPECTED_TARGET_SKILLS
         or not isinstance(target, dict)
-        or target.get("artifact_id") != "cotend-codex-r000013"
-        or target.get("revision") != 13
+        or target.get("artifact_id") != "cotend-codex-r000014"
+        or target.get("revision") != 14
         or target.get("manifest_sha256") != skill_digest
-        or target_lock.get("skill_count") != 8
+        or target_lock.get("skill_count") != 9
         or target_lock.get("skill_file_count") != len(skill_files)
     ):
         raise NativeNegativeRecoveryError(

@@ -120,7 +120,7 @@ When the implementation differs from agreed wording, external-review recommendat
 - Ordinary `继续`: normal development does not load cold-path framework evaluation.
 - Local closeout: verified in-scope local commit/archive is allowed only inside recorded authorization.
 - Risk boundary: `critical` still stops; dev_high still requires confirmed personal/local/prototype posture.
-- External sync: Claude/share package sync remains deferred until user/stability decision.
+- External sync: another carrier or consumer remains deferred until the user names that target; the handoff must bind an exact reviewed source and must not imply that the consumer has adopted it.
 
 ## Success Signals
 
@@ -156,7 +156,7 @@ Do not call a behavior-changing protocol stable merely because the files validat
 - rollback triggers are named;
 - the decision is `keep`, or the user accepts `watch`.
 
-For Claude/Gemini/CoTend consumer packages, keep Codex-side changes as the active draft until the user explicitly names a consumer and asks to sync it. A stable version may serve as an immutable target, but stability alone does not authorize a consumer handoff. Use the consumer range handoff cold path rather than requiring one package per intermediate Dual version.
+For another carrier or downstream consumer, keep the current CoTend source as the active product until the user explicitly names the consumer and asks to sync it. A stable exact source commit may serve as the immutable handoff target, but stability alone does not authorize a consumer handoff or adoption. Use one exact range handoff rather than requiring one package per intermediate protocol version.
 
 ## Watch Closure
 
