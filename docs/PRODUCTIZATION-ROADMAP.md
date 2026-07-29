@@ -65,7 +65,7 @@ Gate：仓库源树的精确角色、名称和 7 Skill 物理集合已由用户�
 
 Gate：确定性 fixtures 和至少一个真实本地项目都完成端到端验证。
 
-当前进度：仓库源树导入、CoTend 改名、来源与许可证记录、C01-C19 映射、确定性项目级 fixture、Codex 实际发现、三条只读显式调用场景、项目级交付核心的 11 步常规生命周期、5 步 legacy identity migration、6 项进程级并发/强制终止、8 项 snapshot-bound recovery，以及“由交付核心安装后再被 Codex 发现并只读调用”的桥接均已完成；source release 与 `cotend-codex-r000001` / revision `1` 也已分离。真实可写本地项目和完整可写模型旅程仍未完成，因此 P4 Gate 仍未关闭。
+当前进度：仓库源树导入、CoTend 改名、来源与许可证记录、C01-C19 映射、确定性项目级 fixture、Codex 实际发现、三条只读显式调用场景、项目级交付核心的 11 步常规生命周期、5 步 legacy identity migration、6 项进程级并发/强制终止、8 项 snapshot-bound recovery，以及“由交付核心安装后再被 Codex 发现并只读调用”的桥接均已完成；source release 与内部 artifact identity 也已分离。G06 现已用一个保留型 r13 项目完成真实 Init、可写产品旅程、独立检查、用户验收、r13→r12→r13 与验收前后跨会话恢复，因此 P4 Gate 在当前 r13 范围内关闭。
 
 ### P4A - 冻结并替换外部开发框架运行时
 
@@ -74,7 +74,7 @@ Gate：确定性 fixtures 和至少一个真实本地项目都完成端到端验
 - 每个原生替代项通过 success、blocked、failure、stop、恢复和无关文件保护后，才删除对应 Trellis 路径。
 - 最终第一方运行时 Skills 中不保留 Trellis 命令、状态路径或任务/规格权限；竞品研究和来源归属继续保留真实名称。
 
-Gate：[`TRELLIS-DECOUPLING-PARITY-PLAN.md`](TRELLIS-DECOUPLING-PARITY-PLAN.md) 的 G01-G05 已全部通过：八项能力分别取得原生等价，G03 证明 Full、Adaptive、中断恢复与 HANDOFF 的累计连续性，G04 证明外部冲突、状态漂移、检查失败恢复和非拥有文件保护，G05 又把第一方运行 Skills 的特定外部开发框架名称、命令、状态路径和 task/PRD/spec 权限降为零；当前 v1.67/r13 已重验这些基线并精确支持 r12 predecessor。以上仍以合成夹具和 disposable 运行副本为主，不是用户真实验收。rc.3 技术前置门虽已满足，但构建仍需独立授权；G06 真实项目和用户验收通过前继续保持 `watch`，内部 target r13 也不是 rc.3 包。
+Gate：[`TRELLIS-DECOUPLING-PARITY-PLAN.md`](TRELLIS-DECOUPLING-PARITY-PLAN.md) 的 G01-G06 已全部通过：八项能力分别取得原生等价，G03 证明 Full、Adaptive、中断恢复与 HANDOFF 的累计连续性，G04 证明外部冲突、状态漂移、检查失败恢复和非拥有文件保护，G05 又把第一方运行 Skills 的特定外部开发框架名称、命令、状态路径和 task/PRD/spec 权限降为零；当前 v1.67/r13 已重验这些基线并精确支持 r12 predecessor。G06 使用保留型真实项目完成真实模型旅程、独立检查、用户验收、精确回滚/恢复和验收前后 fresh-session。rc.3 的技术与稳定性前置已满足，但构建仍需独立授权；内部 target r13 不是 rc.3 包。
 
 ### P5 - 完成保留能力与差异改进
 
@@ -136,8 +136,8 @@ Gate：产品变化由用户证据驱动，而不是为了与竞品不同而变�
 ## 当前待验证或未确认
 
 - Desktop 技能选择器对 rc.1 的 `/cotend` 七条列表标题、可见说明截断、新任务刷新和 `CoTend Init` 非发送 chip 已验证；当前任务热更新未通过。rc.2 新增的 Semantic Alignment 第八入口、详情、其他查询/排序、canonical placement 和自然语言触发仍待验证。当前 8 Skill 项目级与 Plugin CLI 发现已验证。
-- v1.66 已建立 Project Init 唯一语言解析 owner、显式选择与冲突停止、规范化持久化和实际治理正文验收；v1.67 又加入 VCS+write-receipt changed set、checker SHA 绑定、稳定重读、一次有界修复/复检和 fail-closed handback。CoTend adapter 默认仍为英文。仓库层语言/validator 正反例通过，但新的 r13 真实 Init 尚未执行，不能用静态合同代替模型实际遵循证据。
-- GitHub Open Beta 已公开 `cotend@0.1.0-rc.1`、preserve namespace 和真实 `owner/repo` CLI 安装路径；当前 `cotend@0.1.0-rc.2` 48 文件候选只完成本地验证，尚未获准推送或做远端升级重验。最终稳定版 identity/version、Public Directory listing、详情/canonical placement、token 插入与模型介导委派证据仍待验证，v1.67/r13 真实项目及可写 live 旅程尚未完成。
+- v1.66 已建立 Project Init 唯一语言解析 owner、显式选择与冲突停止、规范化持久化和实际治理正文验收；v1.67 又加入 VCS+write-receipt changed set、checker SHA 绑定、稳定重读、一次有界修复/复检和 fail-closed handback。CoTend adapter 默认仍为英文。仓库层语言/validator 正反例与新的 r13 真实 Init 均已通过，后者由实际治理字节和稳定摘要证明，不再只依赖静态合同。
+- GitHub Open Beta 已公开 `cotend@0.1.0-rc.1`、preserve namespace 和真实 `owner/repo` CLI 安装路径；当前 `cotend@0.1.0-rc.2` 48 文件候选只完成本地验证，尚未获准推送或做远端升级重验。v1.67/r13 真实项目及可写模型旅程已由 G06 完成；最终稳定版 identity/version、Public Directory listing、详情/canonical placement、token 插入、真实用户全局升级和公开发布仍待验证。
 - 项目状态的最小物理布局。
 - GitHub Open Beta 之后的跨版本升级、真实用户/Desktop 生命周期、审核和 Public Directory 发布执行顺序。
 

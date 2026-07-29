@@ -454,6 +454,11 @@ EXPECTED_NATIVE_ZERO_RUNTIME_FILES = {
     "scripts/verify_native_zero_runtime_dependency.py",
     "tests/test_native_zero_runtime_dependency.py",
 }
+EXPECTED_NATIVE_REAL_PROJECT_ACCEPTANCE_FILES = {
+    "docs/evidence/NATIVE-REAL-PROJECT-ACCEPTANCE-G06.md",
+    "scripts/verify_native_real_project_acceptance.py",
+    "tests/test_native_real_project_acceptance.py",
+}
 EXPECTED_DELIVERY_OPERATIONS = {
     "inspect",
     "install",
@@ -4328,6 +4333,7 @@ def main() -> int:
     framework_lock_path = "upstream/framework.lock.json"
     trellis_decoupling_contract_path = "upstream/TRELLIS-DECOUPLING-PLAN.json"
     trellis_decoupling_document_path = "docs/TRELLIS-DECOUPLING-PARITY-PLAN.md"
+    g06_public_evidence_path = "docs/evidence/NATIVE-REAL-PROJECT-ACCEPTANCE-G06.md"
     missing_native_authority = EXPECTED_NATIVE_AUTHORITY_FILES - candidates
     if missing_native_authority:
         errors.append(
@@ -4411,6 +4417,14 @@ def main() -> int:
         errors.append(
             "native zero-runtime artifacts are missing or ignored: "
             f"{sorted(missing_native_zero_runtime)}"
+        )
+    missing_native_real_project_acceptance = (
+        EXPECTED_NATIVE_REAL_PROJECT_ACCEPTANCE_FILES - candidates
+    )
+    if missing_native_real_project_acceptance:
+        errors.append(
+            "native real-project acceptance artifacts are missing or ignored: "
+            f"{sorted(missing_native_real_project_acceptance)}"
         )
     if reference_study_path not in candidates:
         errors.append("reference framework implementation study is missing or ignored")
@@ -4565,6 +4579,7 @@ def main() -> int:
     if {
         trellis_decoupling_contract_path,
         trellis_decoupling_document_path,
+        g06_public_evidence_path,
     } <= candidates:
         try:
             trellis_decoupling.validate_contract(
@@ -4572,6 +4587,7 @@ def main() -> int:
                     ROOT / trellis_decoupling_contract_path
                 ),
                 read(trellis_decoupling_document_path),
+                read(g06_public_evidence_path),
                 trellis_decoupling.runtime_inventory(ROOT),
                 sorted(candidates),
             )

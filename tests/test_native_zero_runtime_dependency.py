@@ -44,6 +44,26 @@ class NativeZeroRuntimeDependencyTests(unittest.TestCase):
         self.assertFalse(result["rc3_built"])
         self.assertFalse(result["public_action"])
 
+        current = json.loads(zero_runtime.CONTRACT_PATH.read_text(encoding="utf-8"))
+        historical = copy.deepcopy(current)
+        historical["status"] = "native_runtime_decoupled_waiting_real_project"
+        historical["gates"][5]["status"] = "not_started"
+        historical["this_slice"] = {
+            "skill_behavior_changed": True,
+            "trellis_route_removed": True,
+            "removed_capability_ids": [],
+            "target_artifact_changed": True,
+            "package_identity_changed": False,
+            "push_release_submission_or_publish": False,
+            "validation_gate_completed": "G05-zero-runtime-dependency",
+        }
+        zero_runtime.validate_decoupling_contract(historical)
+
+        mismatched = copy.deepcopy(historical)
+        mismatched["this_slice"] = current["this_slice"]
+        with self.assertRaises(zero_runtime.NativeZeroRuntimeDependencyError):
+            zero_runtime.validate_decoupling_contract(mismatched)
+
     def test_source_runtime_and_disposable_copy_are_identical_and_clean(self) -> None:
         scan = zero_runtime.scan_runtime(ROOT / "skills")
         zero_runtime.assert_runtime_scan_clean(scan, "source")

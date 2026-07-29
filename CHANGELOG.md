@@ -22,6 +22,7 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - Deterministic Project Init governance-language pre-handback validation over VCS changes plus write receipts, with checker SHA binding, stable reread, one bounded repair/recheck, and fail-closed Full/Adaptive-equivalent outcomes.
 - Progressive Project Init packaging with one concise core, ten direct one-level references, a CoTend language checker, and the shared read-only validator.
 - Exact predecessor-consumption tests that reject undeclared or partially matching delivery receipts instead of merely recording predecessor metadata.
+- De-identified G06 real-project evidence covering retained-project Init, implementation, independent checking, formal repair review, local product closeout, AI UAT, exact r13-to-r12-to-r13 rollback/restore, pre/post-acceptance fresh-session recovery, and explicit maintainer acceptance.
 
 ### Changed
 
@@ -46,14 +47,15 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - Advanced the repository carrier to `cotend-codex-r000012`, with r11 as an exact cross-protocol predecessor and the unpublished rc.2 package unchanged.
 - Adopted Dual AI `2026.07.28.2` / v1.67 from immutable annotated-tag objects, adapting 49 upstream Skill files into 52 CoTend target files without restoring Trellis runtime ownership.
 - Advanced the repository carrier to `cotend-codex-r000013`, with r12 as the exact first predecessor and the unpublished rc.2 package identity, 48-file manifest, and ZIP digest unchanged.
+- Completed G06 on a retained r13 project without changing runtime Skill bytes, the r13 artifact, the frozen rc.2 package, or any release surface.
 
 ### Boundaries
 
 - TD08 project-truth authority, TD03 requirements clarification, TD06 specification change/Route Rebase, TD01 workflow state/runtime profiles, TD02 init/pre-development, TD04 implementation, TD05 verification, and TD07 closeout have per-capability native parity.
-- G03 cumulative journeys, G04 integrated negative-recovery/ownership, and G05 zero-runtime-dependency evidence are complete with disposable fixtures; G06 real-project/user acceptance remains a separate incomplete gate.
-- The v1.67/r13 repository adoption and no-model G06 harness are verified, but no new retained r13 project, real model call, product journey, rollback, or user acceptance has run.
+- G03 cumulative journeys, G04 integrated negative-recovery/ownership, G05 zero-runtime-dependency, and G06 retained real-project/user-acceptance evidence are complete.
+- The v1.67/r13 retained-project journey includes real model-mediated Init and implementation, independent checking, a reviewed repair, AI UAT, exact predecessor rollback/restore, explicit maintainer acceptance, and fresh-session recovery before and after acceptance.
 - Plugin package identity, release tag, remote repository, real-user installation, and submission state did not change.
-- G01-G05 completion satisfies the technical prerequisite for a future rc.3 build, but does not authorize that build or any release action.
+- G01-G05 completion satisfies the technical prerequisite for a future rc.3 build, and G06 closes the current real-project stability gate; neither result authorizes that build or any release action.
 
 ## [0.1.0-rc.2] - Unreleased
 

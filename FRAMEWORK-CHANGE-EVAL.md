@@ -1481,3 +1481,73 @@ review_after: final_local_gate_then_first_authorized_single_G06_r13_real_Init
 ```
 
 本次采用不新增 Skill，也不恢复 Trellis 运行依赖。无模型验证与真实模型验收严格分开：上列确定性检查均未调用模型；G06 真实模型 Init 仍为 deferred。未执行全局安装、rc.3、commit、push、tag、Release、submission 或 publish。
+
+## 2026-07-29 CoTend v1.67 r13 G06 真实项目验收收口
+
+```yaml
+current_framework_version: cotend-collaboration-v1.67
+change_type: workflow_behavior
+change_summary: 不改变运行时 Skill 行为，把已经完成的 r13 真实项目、用户验收、精确回滚/恢复和验收前后跨会话恢复同步为 G06 公开完成态，并用去本地路径证据与确定性变异检查关闭 v1.67 的 real-project watch
+intent: 消除本地治理已支持 G06、公开 machine contract 仍写未开始的双重真相，同时严格保留 rc.3、安装、push 和发布的独立人类边界
+expected_benefit:
+  - 公开 JSON 合同、解耦计划、产品路线、当前真相和变更评估对 G06 使用同一完成状态
+  - 维护者和后续审查者可从公开证据区分真实产品通过、控制面注记、用户验收与发布授权
+  - machine contract、公开证据标记或 G06 完成状态回退会被确定性测试和 repository checker 拒绝
+possible_harm:
+  - 去本地路径证据只能用摘要绑定私有原始封套，公开读者无法独立重放真实模型会话
+  - G06 完成可能被误读为 rc.3 或公开发布已经获准
+  - 历史 G03/G05 证据中的当时未开始状态若被误当当前指针，会造成表面矛盾
+affected_workflows:
+  - native_decoupling_machine_contract
+  - real_project_acceptance_evidence
+  - repository_verification_and_negative_mutation
+  - framework_watch_closure
+  - future_rc3_or_release_decision
+deviations:
+  - 原始执行封套继续留在 Git 忽略的维护者证据区；公开文件只保留去本地路径摘要、稳定身份和 SHA-256
+  - 历史 G03/G05 快照保持原样，不把后来的 G06 结果倒写成当时已完成
+mechanism_budget:
+  added_context_surface: one_public_evidence_document_plus_existing_contract_and_checker_extensions
+  ordinary_load_impact: none
+  ceremony_added: none
+  duplication_check: extends_existing_G06_acceptance_harness_and_trellis_decoupling_contract
+  cheaper_alternative_considered: 只把 JSON 的 G06 改为 complete；因会留下公开文档、FCE 和校验器互相矛盾而拒绝
+  retirement_or_thinning_trigger: 当公开仓库拥有可安全重放且不泄露本地运行元数据的原生真实项目证据载体时，可用该载体替代静态 marker 列表
+  expected_failure_prevented: public_private_completion_split_false_release_inference_and_silent_G06_evidence_regression
+validation_scenarios:
+  - scenario: G06 machine contract and direct regression mutations
+    expected: all six gates are complete; missing G06 evidence, status regression, runtime-change claim or release-action claim fails closed
+    validation_result_type: executed
+    result: passed_41_focused_tests_across_decoupling_zero_runtime_and_workflow_state
+  - scenario: complete repository regression
+    expected: existing capability, delivery, Plugin, recovery and G06 no-model contracts do not regress
+    validation_result_type: executed
+    result: passed_411_tests
+  - scenario: public repository contract and leak boundary
+    expected: the new evidence is publishable, contains no private path or local decision identifier, and remains linked from the machine contract
+    validation_result_type: executed
+    result: passed_repository_check_286_public_candidates_19_capabilities_19_behavior_specs
+  - scenario: runtime and artifact immutability
+    expected: 52 r13 Skill files, delivery locks, r13 artifact and frozen rc2 remain unchanged
+    validation_result_type: inspection
+    result: no_runtime_Skill_delivery_lock_artifact_or_frozen_rc2_file_in_authorized_diff
+real_project_validation:
+  - scenario: retained r13 Init through post-acceptance fresh-session recovery
+    expected: real writable product, independent check, formal repair review, AI UAT, local product commit, exact r13_to_r12_to_r13, explicit maintainer acceptance and no development reopen
+    validation_result_type: executed
+    result: passed_with_control_plane_notes_see_docs/evidence/NATIVE-REAL-PROJECT-ACCEPTANCE-G06.md
+decision: keep
+rollback_triggers:
+  - any stable identity in the public evidence no longer matches the preserved local bytes
+  - accepted product or user-acceptance evidence is reclassified as failed
+  - G06 completion requires a runtime Skill, delivery lock, artifact or frozen rc2 mutation not disclosed here
+  - public evidence exposes a private path, credential material or local-only decision identifier
+  - repository or focused mutation checks stop failing closed
+review_after: next_Dual_or_CoTend_framework_adoption_or_first_rc3_release_decision
+watch_closure:
+  - close_keep
+  - v1_67_real_project_watch_closed_by_G06_retained_project_evidence
+  - rc3_build_install_push_and_release_authority_remain_separate
+```
+
+本次只关闭当前 r13 的真实项目稳定性 `watch`。它没有修改 52 个 r13 Skill、交付锁、r13 artifact、冻结 rc.2 或任何 UAT 产品字节；也没有调用模型、生成 rc.3、全局安装、push、tag、Release、submission 或 publish。

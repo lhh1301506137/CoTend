@@ -68,7 +68,7 @@ REQUIRED_DOCUMENT_MARKERS = (
     "current / dormant / conflict",
     "delegated_pair / inline",
     "TD07 已由原生 Native Closeout Pass 承接",
-    "G03、G04、G06",
+    "G03、G04、G05、G06",
 )
 REQUIRED_COMPATIBILITY_COMMANDS: tuple[str, ...] = ()
 FORBIDDEN_STATE_PATTERNS = {

@@ -91,4 +91,4 @@ CodeGraph 已安装且根目录明确时，可以安全初始化或刷新项目�
 
 TD04 的实现过程后来已由 r8 Native Implementation Pass 原生化，TD05 的检查过程又由 r9 Native Verification Pass 原生化；TD07 已由 Native Closeout Pass 承接。当前 target 是 r11，r10 是精确 predecessor。未发布 rc.2 仍由固定历史 r2 source commit 构建，不吸收当前开发态字节。
 
-TD02 单项原生等价本身不代表整个解耦完成；后续 G03 累计主旅程、G04 负向恢复/所有权和 G05 零运行依赖现已通过。G06 真实项目/用户验收仍未执行。
+TD02 单项原生等价本身不代表整个解耦完成；后续 G03 累计主旅程、G04 负向恢复/所有权、G05 零运行依赖和 G06 真实项目/用户验收现已分别通过。

@@ -72,4 +72,4 @@ CoTend 现在由内部 Native Verification Pass 承接 Checker：读取 TD04 的
 
 当前开发根目标是 `cotend-codex-r000011`，r10 是精确 predecessor。未发布 `cotend@0.1.0-rc.2` 继续从历史 r2 source commit 构建，其 37 个 Skill 来源文件、48 文件包体和 ZIP 摘要不因 r11 开发字节改变。
 
-TD07 已完成单项原生等价，但本叶自身不代表 G03 累计主旅程、G04 负向恢复集成、G05 运行时零依赖或 G06 真实项目/用户验收已经完成；当前 G03-G05 已由后续独立 Gate 证明，G06 仍未执行，也不授权真实安装、全局更新、push、tag、Release、Portal、submission 或 publish。
+TD07 已完成单项原生等价，但本叶自身不代表 G03 累计主旅程、G04 负向恢复集成、G05 运行时零依赖或 G06 真实项目/用户验收已经完成；当前 G03-G06 均已由后续独立 Gate 证明，其中 G06 另有真实项目、用户验收和回滚证据，也不授权真实安装、全局更新、push、tag、Release、Portal、submission 或 publish。

@@ -108,4 +108,4 @@ Full 与 Adaptive 使用完全相同的输入、阶段、状态、记录所有�
 
 当前开发根目标是 `cotend-codex-r000011`，r10 是精确 predecessor。未发布 `cotend@0.1.0-rc.2` 继续从历史 r2 source commit 构建，固定的 37 个 Skill 来源文件、48 文件包体、包摘要和 ZIP 摘要均不随 r11 开发字节改变。
 
-本叶当时只关闭 G02 的第八项能力等价门，不代表 G03-G06 已完成；当前 G03-G05 已由后续独立 Gate 证明，G06 仍未执行。任何这些结果都不授权真实安装、全局更新、push、tag、Release、Portal、submission 或 publish。
+本叶当时只关闭 G02 的第八项能力等价门，不单独代表 G03-G06 已完成；当前 G03-G06 均已由后续独立 Gate 证明，其中 G06 的真实项目、用户验收和回滚证据另见公开 G06 记录。任何这些结果都不授权真实安装、全局更新、push、tag、Release、Portal、submission 或 publish。

@@ -19,6 +19,9 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.contract = json.loads(decoupling.CONTRACT_PATH.read_text(encoding="utf-8"))
         cls.document_text = decoupling.DOCUMENT_PATH.read_text(encoding="utf-8")
+        cls.g06_evidence_text = decoupling.G06_EVIDENCE_PATH.read_text(
+            encoding="utf-8"
+        )
         cls.inventory = decoupling.runtime_inventory()
         cls.tracked_paths = decoupling.tracked_paths()
 
@@ -26,10 +29,16 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
         self,
         contract: dict | None = None,
         inventory: dict[str, int] | None = None,
+        g06_evidence_text: str | None = None,
     ) -> dict:
         return decoupling.validate_contract(
             self.contract if contract is None else contract,
             self.document_text,
+            (
+                self.g06_evidence_text
+                if g06_evidence_text is None
+                else g06_evidence_text
+            ),
             self.inventory if inventory is None else inventory,
             self.tracked_paths,
         )
@@ -44,7 +53,7 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
         self.assertEqual(result["runtime_files"], 0)
         self.assertTrue(result["skill_behavior_changed"])
         self.assertEqual(result["native_capabilities_verified"], 8)
-        self.assertEqual(result["cumulative_gates_verified"], 3)
+        self.assertEqual(result["cumulative_gates_verified"], 4)
 
     def test_immutable_baseline_change_is_rejected(self) -> None:
         changed = copy.deepcopy(self.contract)
@@ -163,15 +172,34 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 
-    def test_g06_cannot_advance_during_g05(self) -> None:
+    def test_g06_completion_and_evidence_cannot_regress(self) -> None:
         changed = copy.deepcopy(self.contract)
-        changed["gates"][5]["status"] = "complete"
+        changed["gates"][5]["status"] = "not_started"
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 
-    def test_g05_slice_must_record_runtime_and_target_change(self) -> None:
         changed = copy.deepcopy(self.contract)
-        changed["this_slice"]["skill_behavior_changed"] = False
+        changed["gates"][5]["evidence"].pop()
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(changed)
+
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(
+                g06_evidence_text=self.g06_evidence_text.replace(
+                    "post_acceptance_fresh_session: passed",
+                    "post_acceptance_fresh_session: missing",
+                    1,
+                )
+            )
+
+    def test_g06_slice_must_not_claim_runtime_or_release_change(self) -> None:
+        changed = copy.deepcopy(self.contract)
+        changed["this_slice"]["skill_behavior_changed"] = True
+        with self.assertRaises(decoupling.TrellisDecouplingPlanError):
+            self.validate(changed)
+
+        changed = copy.deepcopy(self.contract)
+        changed["this_slice"]["push_release_submission_or_publish"] = True
         with self.assertRaises(decoupling.TrellisDecouplingPlanError):
             self.validate(changed)
 
@@ -186,6 +214,7 @@ class TrellisDecouplingPlanTests(unittest.TestCase):
             decoupling.validate_contract(
                 self.contract,
                 self.document_text,
+                self.g06_evidence_text,
                 self.inventory,
                 self.tracked_paths + [".trellis/config.yaml"],
             )

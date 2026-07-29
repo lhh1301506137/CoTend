@@ -1,8 +1,8 @@
 {
   "schema": "cotend.trellis-decoupling-plan",
   "schema_version": 2,
-  "status": "native_runtime_decoupled_waiting_real_project",
-  "authority": "product_owner_confirmed_2026-07-24",
+  "status": "native_runtime_decoupled_real_project_verified",
+  "authority": "product_owner_confirmed_through_2026-07-29",
   "decision": "preserve_governance_capabilities_replace_trellis_identity_authority_and_runtime_dependency",
   "current_candidate": "cotend@0.1.0-rc.2_local_unpublished",
   "target_candidate": "cotend@0.1.0-rc.3_after_parity",
@@ -368,18 +368,20 @@
       "evidence": [
         "real_writable_project_journey",
         "user_acceptance",
-        "rollback_to_last_verified_candidate"
+        "rollback_to_last_verified_candidate",
+        "pre_and_post_acceptance_fresh_session_recovery",
+        "docs/evidence/NATIVE-REAL-PROJECT-ACCEPTANCE-G06.md"
       ],
-      "status": "not_started"
+      "status": "complete"
     }
   ],
   "this_slice": {
-    "skill_behavior_changed": true,
-    "trellis_route_removed": true,
+    "skill_behavior_changed": false,
+    "trellis_route_removed": false,
     "removed_capability_ids": [],
-    "target_artifact_changed": true,
+    "target_artifact_changed": false,
     "package_identity_changed": false,
     "push_release_submission_or_publish": false,
-    "validation_gate_completed": "G05-zero-runtime-dependency"
+    "validation_gate_completed": "G06-real-project-and-rollback"
   }
 }

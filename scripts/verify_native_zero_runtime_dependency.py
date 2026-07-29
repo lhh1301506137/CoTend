@@ -399,12 +399,8 @@ def validate_decoupling_contract(contract: dict[str, Any]) -> None:
         )
     ):
         raise NativeZeroRuntimeDependencyError("G01-G05 are not complete")
-    if statuses.get("G06-real-project-and-rollback") != "not_started":
-        raise NativeZeroRuntimeDependencyError("G06 advanced during G05")
     if (
-        contract.get("status")
-        != "native_runtime_decoupled_waiting_real_project"
-        or contract.get("development_target_artifact") != EXPECTED_TARGET_ID
+        contract.get("development_target_artifact") != EXPECTED_TARGET_ID
         or contract.get("current_runtime")
         != {
             "scope": "skills/",
@@ -413,18 +409,47 @@ def validate_decoupling_contract(contract: dict[str, Any]) -> None:
             "file_count": 0,
             "file_mentions": {},
         }
-        or contract.get("this_slice")
-        != {
-            "skill_behavior_changed": True,
-            "trellis_route_removed": True,
-            "removed_capability_ids": [],
-            "target_artifact_changed": True,
-            "package_identity_changed": False,
-            "push_release_submission_or_publish": False,
-            "validation_gate_completed": "G05-zero-runtime-dependency",
-        }
     ):
-        raise NativeZeroRuntimeDependencyError("G05 machine contract drifted")
+        raise NativeZeroRuntimeDependencyError("G05 runtime contract drifted")
+
+    historical_g05_slice = {
+        "skill_behavior_changed": True,
+        "trellis_route_removed": True,
+        "removed_capability_ids": [],
+        "target_artifact_changed": True,
+        "package_identity_changed": False,
+        "push_release_submission_or_publish": False,
+        "validation_gate_completed": "G05-zero-runtime-dependency",
+    }
+    current_g06_slice = {
+        "skill_behavior_changed": False,
+        "trellis_route_removed": False,
+        "removed_capability_ids": [],
+        "target_artifact_changed": False,
+        "package_identity_changed": False,
+        "push_release_submission_or_publish": False,
+        "validation_gate_completed": "G06-real-project-and-rollback",
+    }
+    lifecycle = (
+        statuses.get("G06-real-project-and-rollback"),
+        contract.get("status"),
+        contract.get("this_slice"),
+    )
+    if lifecycle not in (
+        (
+            "not_started",
+            "native_runtime_decoupled_waiting_real_project",
+            historical_g05_slice,
+        ),
+        (
+            "complete",
+            "native_runtime_decoupled_real_project_verified",
+            current_g06_slice,
+        ),
+    ):
+        raise NativeZeroRuntimeDependencyError(
+            "G05/G06 machine-contract lifecycle drifted"
+        )
 
 
 def verify_disposable_runtime(root: Path = ROOT) -> dict[str, Any]:

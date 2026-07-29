@@ -23,6 +23,9 @@ import verify_native_negative_recovery_ownership as native_negative_recovery
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "upstream" / "TRELLIS-DECOUPLING-PLAN.json"
 DOCUMENT_PATH = ROOT / "docs" / "TRELLIS-DECOUPLING-PARITY-PLAN.md"
+G06_EVIDENCE_PATH = (
+    ROOT / "docs" / "evidence" / "NATIVE-REAL-PROJECT-ACCEPTANCE-G06.md"
+)
 EXPECTED_CAPABILITY_IDS = [
     "TD01-workflow-state-and-mode",
     "TD02-init-resume-and-before-development",
@@ -68,8 +71,33 @@ EXPECTED_DOCUMENT_MARKERS = [
     "### L70 / G03 已完成",
     "### L71 / G04 已完成",
     "### L72 / G05 已完成",
+    "### L73 / G06 已完成",
     "G04 不修改 Skill 字节",
     "G05 不构建 rc.3",
+    "G06 不构建 rc.3",
+]
+EXPECTED_G06_EVIDENCE_MARKERS = [
+    "# CoTend G06 Real-Project Acceptance Evidence",
+    "gate: G06-real-project-and-rollback",
+    "status: complete",
+    "framework_protocol: cotend-collaboration-v1.67",
+    "development_target_artifact: cotend-codex-r000013",
+    "development_target_manifest: 39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd",
+    "predecessor_target_artifact: cotend-codex-r000012",
+    "predecessor_target_manifest: 44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276",
+    "retained_project_journey: passed",
+    "real_writable_product: passed",
+    "independent_checker: passed",
+    "formal_product_review: passed",
+    "ai_uat: pass_with_control_plane_notes",
+    "rollback_restore: passed_r13_to_r12_to_r13",
+    "pre_acceptance_fresh_session: passed_with_control_plane_note",
+    "user_acceptance: maintainer_explicitly_accepted",
+    "post_acceptance_fresh_session: passed",
+    "development_reopened_after_acceptance: false",
+    "runtime_skill_change_in_g06: false",
+    "rc3_built: false",
+    "public_action: false",
 ]
 EXPECTED_BASELINE_INVENTORY_SHA256 = (
     "a1c9893a7462d7abd925b1ae468a3dd97366fae850e2881a23546e5471e93aeb"
@@ -207,6 +235,7 @@ def _require_non_empty_strings(value: Any, label: str) -> list[str]:
 def validate_contract(
     contract: dict[str, Any],
     document_text: str,
+    g06_evidence_text: str,
     actual_inventory: dict[str, int],
     actual_tracked_paths: list[str],
 ) -> dict[str, Any]:
@@ -214,10 +243,12 @@ def validate_contract(
         raise TrellisDecouplingPlanError("Trellis decoupling schema drifted")
     if contract.get("schema_version") != 2:
         raise TrellisDecouplingPlanError("Trellis decoupling schema version drifted")
-    if contract.get("status") != "native_runtime_decoupled_waiting_real_project":
+    if contract.get("status") != "native_runtime_decoupled_real_project_verified":
         raise TrellisDecouplingPlanError(
             "native replacement state drifted"
         )
+    if contract.get("authority") != "product_owner_confirmed_through_2026-07-29":
+        raise TrellisDecouplingPlanError("product-owner authority drifted")
     if (
         contract.get("decision")
         != "preserve_governance_capabilities_replace_trellis_identity_authority_and_runtime_dependency"
@@ -503,7 +534,7 @@ def validate_contract(
         item.get("id") for item in gates if isinstance(item, dict)
     ] != EXPECTED_GATE_IDS:
         raise TrellisDecouplingPlanError("parity gate inventory drifted")
-    for index, gate in enumerate(gates):
+    for gate in gates:
         if not isinstance(gate, dict):
             raise TrellisDecouplingPlanError("parity gate must be an object")
         _require_non_empty_strings(gate.get("evidence"), f"{gate['id']}.evidence")
@@ -528,29 +559,46 @@ def validate_contract(
             ]
         ):
             raise TrellisDecouplingPlanError("G04 evidence contract drifted")
-        expected_status = "complete" if index in {0, 1, 2, 3, 4} else "not_started"
+        if (
+            gate.get("id") == "G06-real-project-and-rollback"
+            and gate.get("evidence")
+            != [
+                "real_writable_project_journey",
+                "user_acceptance",
+                "rollback_to_last_verified_candidate",
+                "pre_and_post_acceptance_fresh_session_recovery",
+                "docs/evidence/NATIVE-REAL-PROJECT-ACCEPTANCE-G06.md",
+            ]
+        ):
+            raise TrellisDecouplingPlanError("G06 evidence contract drifted")
+        expected_status = "complete"
         if gate.get("status") != expected_status:
             raise TrellisDecouplingPlanError(
-                f"{gate['id']} status advanced without executed evidence"
+                f"{gate['id']} completion status regressed"
             )
 
     if contract.get("this_slice") != {
-        "skill_behavior_changed": True,
-        "trellis_route_removed": True,
+        "skill_behavior_changed": False,
+        "trellis_route_removed": False,
         "removed_capability_ids": [],
-        "target_artifact_changed": True,
+        "target_artifact_changed": False,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
-        "validation_gate_completed": "G05-zero-runtime-dependency",
+        "validation_gate_completed": "G06-real-project-and-rollback",
     }:
         raise TrellisDecouplingPlanError(
-            "L72 G05 zero-runtime slice boundary drifted"
+            "L73 G06 real-project acceptance slice boundary drifted"
         )
 
     for marker in EXPECTED_DOCUMENT_MARKERS:
         if marker not in document_text:
             raise TrellisDecouplingPlanError(
                 f"decoupling document is missing marker: {marker}"
+            )
+    for marker in EXPECTED_G06_EVIDENCE_MARKERS:
+        if marker not in g06_evidence_text:
+            raise TrellisDecouplingPlanError(
+                f"G06 public evidence is missing marker: {marker}"
             )
     native_result = native_authority.verify_repository(ROOT)
     if native_result.get("status") != "native_parity_verified":
@@ -616,7 +664,7 @@ def validate_contract(
         "trellis_runtime_paths": 0,
         "skill_behavior_changed": True,
         "native_capabilities_verified": 8,
-        "cumulative_gates_verified": 3,
+        "cumulative_gates_verified": 4,
     }
 
 
@@ -625,9 +673,13 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
     document_text = (
         root / "docs" / "TRELLIS-DECOUPLING-PARITY-PLAN.md"
     ).read_text(encoding="utf-8")
+    g06_evidence_text = (
+        root / "docs" / "evidence" / "NATIVE-REAL-PROJECT-ACCEPTANCE-G06.md"
+    ).read_text(encoding="utf-8")
     return validate_contract(
         contract,
         document_text,
+        g06_evidence_text,
         runtime_inventory(root),
         tracked_paths(root),
     )
