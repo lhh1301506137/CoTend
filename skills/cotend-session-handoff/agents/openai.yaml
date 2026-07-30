@@ -1,4 +1,4 @@
 interface:
   display_name: "CoTend Session Handoff"
-  short_description: "Explicit same-primary session handoff"
-  default_prompt: "Use $cotend-session-handoff v1.1 only because I explicitly invoked it. Freeze the current same-primary development state, create a point-in-time handoff whose new-session prompt repeats the literal $cotend-session-handoff marker, preserve dirty ownership and pending gates, and require current/stale/conflict freshness preflight before resuming. Never infer invocation from app restart, reconnect, ordinary continue, or natural-language session mentions; identity or role changes belong to $cotend-model-upgrade."
+  short_description: "Literal-gated same-Primary handoff"
+  default_prompt: "Use $cotend-session-handoff v1.3 only when that literal appears in the current input. Otherwise return the exact short invocation hint without reads or tools. After the gate, load only the direct workflow, preserve the frozen point-in-time packet, require current/stale/conflict preflight, full_current_mvp Project Understanding Reconstruction, and an in-own-words teachback before takeover_ready. Route identity or role changes to $cotend-model-upgrade."

@@ -10,22 +10,24 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_COMMIT = "9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
+SOURCE_COMMIT = "774aab64e778d2e3a57b66cfd65d808ac8235e14"
 SOURCE_ROOT = "skills-backup/codex"
-SOURCE_TREE = "8218cbfb8906bc3cc0f3bf76f4480d866ecb392e"
+SOURCE_TREE = "ebcc0b2930146aca1ce299215f9a2f936b12d4c8"
 SOURCE_IDENTITY = f"exact-source:{SOURCE_COMMIT}"
-DUAL_PROTOCOL = "dual-ai-" + "collaboration-v1.71"
+DUAL_PROTOCOL = "dual-ai-" + "collaboration-v1.76"
+ADOPTION_BASE_COMMIT = "9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
+ADOPTION_BASE_TREE = "8218cbfb8906bc3cc0f3bf76f4480d866ecb392e"
 BASELINE_COMMIT = "4540f9e0543e85c6a7cceb1d7501467feee8b440"
 BASELINE_TAG = "dual-ai-share-2026.07.28.2"
 BASELINE_TAG_OBJECT = "d26994355921b9c43956f7300069c892884496e0"
 BASELINE_SOURCE_TREE = "2eae0ca4447cace17bdf93df3b04b665293deecb"
 PACKAGE_ROOT = "dual-ai-collaboration-skill-share"
 PACKAGE_TREE = "686a507d904b08c6a43ef6c5d40c1d43083d8f1b"
-HANDOFF_ROOT = Path("consumer-handoffs/cotend/2026.07.29.1")
+HANDOFF_ROOT = Path("consumer-handoffs/cotend/2026.07.30.1")
 HANDOFF_HASHES = {
-    "HANDOFF.json": "f3142ab14c42e982332cda383ca20e016f44f42c86cb0b0ae760ccc864c76804",
-    "HANDOFF.md": "fc960fbac7c11ebbb64eb0b94e0e117e647b6d38fe7c8455287d532fc9ed7f50",
-    "SHA256SUMS": "2e1e385db448c3bc622e68f851efd5e41012f9b4f94899caaca6e09297d9fb92",
+    "HANDOFF.json": "a2e23ab5a58fadc3dd4e454f9fd42ef7681c91ccb0f70fe6c85e330d6688298e",
+    "HANDOFF.md": "0fbde80f3e491442c21281c09f1abbe6e9dcb2cc32fd1d08fdd11a75695f5675",
+    "SHA256SUMS": "ae76f6101e9562740ffbf15ba6cd9841d21bfd85721bdc1994b2be123a64d3cb",
 }
 
 
@@ -85,7 +87,7 @@ def verify_handoff(upstream_repo: Path, errors: list[str]) -> dict[str, Any] | N
         "anchor_ref": SOURCE_COMMIT,
         "anchor_type": "exact_source_commit",
         "commit": SOURCE_COMMIT,
-        "dual_model_upgrade_version": "1.13",
+        "dual_model_upgrade_version": "1.14",
         "framework_protocol": DUAL_PROTOCOL,
         "latest_public_release": target.get("latest_public_release"),
         "publication_state": "not_public_release",
@@ -107,22 +109,25 @@ def verify_handoff(upstream_repo: Path, errors: list[str]) -> dict[str, Any] | N
     ):
         errors.append("consumer handoff latest-public-release history drift")
     if (
-        baseline.get("commit") != BASELINE_COMMIT
-        or baseline.get("tag_object") != BASELINE_TAG_OBJECT
-        or baseline.get("carrier_tree") != BASELINE_SOURCE_TREE
+        baseline.get("commit") != ADOPTION_BASE_COMMIT
+        or baseline.get("carrier_tree") != ADOPTION_BASE_TREE
+        or baseline.get("anchor_type") != "exact_source_commit"
+        or baseline.get("carrier_protocol")
+        != "dual-ai-" + "collaboration-v1.71"
     ):
         errors.append("consumer handoff baseline drift")
     commits = coverage.get("commits")
-    if not isinstance(commits, list) or coverage.get("accounted_count") != 20:
+    if not isinstance(commits, list) or coverage.get("accounted_count") != 27:
         errors.append("consumer handoff commit coverage count drift")
     else:
         dispositions = [
             item.get("disposition") for item in commits if isinstance(item, dict)
         ]
         if (
-            len(dispositions) != 20
-            or dispositions.count("included_change") != 5
-            or dispositions.count("evidence_only") != 15
+            len(dispositions) != 27
+            or dispositions.count("included_change") != 9
+            or dispositions.count("evidence_only") != 17
+            or dispositions.count("consumer_not_applicable") != 1
         ):
             errors.append("consumer handoff commit disposition coverage drift")
     if handoff.get("target_publication_state") != "not_public_release":
@@ -157,17 +162,23 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
             != BASELINE_SOURCE_TREE
         ):
             errors.append("latest public release canonical source tree mismatch")
-        git_text(upstream_repo, "merge-base", "--is-ancestor", BASELINE_COMMIT, SOURCE_COMMIT)
+        git_text(
+            upstream_repo,
+            "merge-base",
+            "--is-ancestor",
+            ADOPTION_BASE_COMMIT,
+            SOURCE_COMMIT,
+        )
         if (
             git_text(
                 upstream_repo,
                 "rev-list",
                 "--count",
-                f"{BASELINE_COMMIT}..{SOURCE_COMMIT}",
+                f"{ADOPTION_BASE_COMMIT}..{SOURCE_COMMIT}",
             )
-            != "20"
+            != "27"
         ):
-            errors.append("exact-source handoff range is not the recorded 20 commits")
+            errors.append("exact-source handoff range is not the recorded 27 commits")
     except subprocess.CalledProcessError as exc:
         return errors + [f"cannot resolve exact source or release-history anchor: {exc}"]
 
@@ -179,8 +190,8 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
         or candidate.get("candidate_only") is not False
         or candidate.get("release_id") != SOURCE_IDENTITY
         or candidate.get("target_publication_state") != "not_public_release"
-        or candidate.get("framework_protocol_version") != "1.71"
-        or candidate.get("dual_model_upgrade_version") != "1.13"
+        or candidate.get("framework_protocol_version") != "1.76"
+        or candidate.get("dual_model_upgrade_version") != "1.14"
     ):
         errors.append("candidate exact-source identity or finalized state drift")
     if (
@@ -224,7 +235,7 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
     claude_trees = claude.get("skill_trees")
     if not isinstance(codex_trees, dict) or not isinstance(claude_trees, dict):
         return errors + ["candidate Skill tree maps are invalid"]
-    if codex.get("skill_count") != 9 or codex.get("skill_file_count") != 51:
+    if codex.get("skill_count") != 9 or codex.get("skill_file_count") != 59:
         errors.append("candidate exact-source Codex inventory drift")
     for skill_id, expected_tree in codex_trees.items():
         try:
@@ -295,12 +306,12 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
             f"Companion version: `{DUAL_PROTOCOL}`",
         ),
         "dual-ai-session-handoff": (
-            "The user's current input must contain the literal",
+            "Evaluate only whether the current user input contains the exact literal",
             "$dual-ai-session-handoff",
             "same_primary_session_takeover_result",
-            "current/stale/conflict",
+            "not_started | current | stale | conflict",
         ),
-        "dual-model-upgrade": ("packet_version: dual-model-upgrade-v1.13",),
+        "dual-model-upgrade": ("packet_version: dual-model-upgrade-v1.14",),
     }
     for skill_id, entry in by_source.items():
         if entry.get("source_tree") != codex_trees.get(skill_id):
@@ -314,6 +325,20 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
         except (subprocess.CalledProcessError, UnicodeDecodeError) as exc:
             errors.append(f"cannot read exact-source Skill {skill_id}: {exc}")
             continue
+        if skill_id == "dual-ai-session-handoff":
+            try:
+                skill_text += "\n" + object_file(
+                    upstream_repo,
+                    SOURCE_COMMIT,
+                    (
+                        f"{SOURCE_ROOT}/{skill_id}/references/"
+                        "session-handoff-workflow.md"
+                    ),
+                ).decode("utf-8")
+            except (subprocess.CalledProcessError, UnicodeDecodeError) as exc:
+                errors.append(
+                    f"cannot read exact-source session-handoff workflow: {exc}"
+                )
         parts = skill_text.split("---", 2)
         if len(parts) != 3 or f"name: {skill_id}" not in parts[1]:
             errors.append(f"exact-source Skill frontmatter mismatch: {skill_id}")
@@ -321,11 +346,17 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
             if marker not in skill_text:
                 errors.append(f"exact-source Skill marker missing: {skill_id}: {marker}")
         source = source_by_skill.get(str(skill_id))
-        if source is not None and (
-            entry.get("source_relationship") != source.get("relationship")
-            or entry.get("license") != source.get("license")
-        ):
-            errors.append(f"role-map third-party provenance mismatch: {skill_id}")
+        if source is not None:
+            expected_relationship = (
+                "adapted_third_party"
+                if skill_id == "karpathy-guidelines"
+                else source.get("relationship")
+            )
+            if (
+                entry.get("source_relationship") != expected_relationship
+                or entry.get("license") != source.get("license")
+            ):
+                errors.append(f"role-map third-party provenance mismatch: {skill_id}")
 
     lock_path = ROOT / "upstream" / "framework.lock.json"
     try:

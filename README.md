@@ -99,8 +99,8 @@ The initial submission identity and version are confirmed for repository prepara
 
 | Area | Current state |
 |---|---|
-| Source carrier | Nine Codex Skills are adopted in [`skills/`](skills/) as internal target r14 from an exact private-upstream source commit that is explicitly not a public Dual release. |
-| Package candidate | `cotend@0.1.0-rc.2` remains frozen at its historical eight-Skill, 48-file source and is unpublished; r14 does not silently change that package identity. |
+| Source carrier | Nine Codex Skills are adopted in [`skills/`](skills/) as internal target r15 from an exact private-upstream source commit that is explicitly not a public Dual release. |
+| Package candidate | `cotend@0.1.0-rc.2` remains frozen at its historical eight-Skill, 48-file source and is unpublished; r15 does not silently change that package identity. |
 | Isolated lifecycle | Package add, install, discovery, coexistence, remove, recovery, and cleanup are verified in redirected disposable roots. |
 | GitHub Marketplace carrier | The local repository-root carrier verifies nine-Skill discovery; remote fetch, refresh, install, remove, recovery, and cleanup must be revalidated against a future authorized public commit. |
 | Submission materials | English listing, three starter prompts, five positive cases, three negative cases, and release-note structure exist as a repository draft. |

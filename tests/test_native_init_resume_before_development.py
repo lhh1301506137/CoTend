@@ -20,7 +20,7 @@ class NativeInitResumeBeforeDevelopmentTests(unittest.TestCase):
         self.assertEqual(result["runtime_files"], 0)
         self.assertEqual(result["td02_commands"], 0)
         self.assertEqual(result["remaining_commands"], 0)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000014")
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000015")
 
     def test_all_entry_modes_and_stops_are_covered(self) -> None:
         result = native_entry.verify_repository()

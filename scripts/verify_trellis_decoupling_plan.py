@@ -247,7 +247,7 @@ def validate_contract(
         raise TrellisDecouplingPlanError(
             "native replacement state drifted"
         )
-    if contract.get("authority") != "product_owner_confirmed_through_2026-07-29":
+    if contract.get("authority") != "product_owner_confirmed_through_2026-07-30":
         raise TrellisDecouplingPlanError("product-owner authority drifted")
     if (
         contract.get("decision")
@@ -258,7 +258,7 @@ def validate_contract(
         raise TrellisDecouplingPlanError("current candidate identity drifted")
     if contract.get("target_candidate") != "cotend@0.1.0-rc.3_after_parity":
         raise TrellisDecouplingPlanError("target candidate identity drifted")
-    if contract.get("development_target_artifact") != "cotend-codex-r000014":
+    if contract.get("development_target_artifact") != "cotend-codex-r000015":
         raise TrellisDecouplingPlanError("development target artifact drifted")
 
     source = contract.get("source_boundary")
@@ -584,11 +584,11 @@ def validate_contract(
         "target_artifact_changed": True,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
-        "validation_gate_completed": "G01-G05-regression-for-r14",
+        "validation_gate_completed": "G01-G05-regression-for-r15",
         "g06_current_target_status": "not_rerun_frozen_r13_evidence",
     }:
         raise TrellisDecouplingPlanError(
-            "r14 adaptation and frozen-r13 G06 boundary drifted"
+            "r15 adaptation and frozen-r13 G06 boundary drifted"
         )
 
     for marker in EXPECTED_DOCUMENT_MARKERS:

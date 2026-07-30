@@ -66,7 +66,38 @@ Stop for the user before any of these actions. No `继续` token, `dev_high` set
 - Global system, credential store, firewall, registry, scheduled task, PATH, shell profile, startup-service, or machine-wide configuration changes.
 - Real payment, real charge, uncapped API/model/tool cost, or new paid service activation.
 - Handling or exposing other people's private data.
-- Validation failure, unexplained data corruption, integrity mismatch, active security incident, P0/P1 issue, high-impact AI disagreement, or bypassing a recorded stop boundary.
+- A P0 issue, unexplained data corruption, integrity mismatch, active security
+  incident, high-impact AI disagreement, bypassing a recorded stop boundary,
+  or a P1/validation failure that the bounded repair contract below classifies
+  as unresolved.
+
+## Bounded Failure Repair Before Handback
+
+This is the single owner of the distinction between a repairable task failure
+and a user stop. Severity labels do not create new scope, but an ordinary,
+reversible, in-scope P1 or validation failure also does not become a user
+decision merely because it has a label.
+
+The Primary may perform one bounded repair and recheck without asking the user
+when all of these are true:
+
+- the task or slice is already authorized;
+- the cause and affected integrity boundary are understood;
+- the repair stays inside confirmed L0-L2 meaning, scope, risk, acceptance, and
+  external-effect boundaries;
+- the repair is reversible and does not touch another Critical item;
+- this failure has not already consumed its bounded recheck.
+
+If the same check then passes, update the evidence and continue under the
+selected execution posture. Full and Adaptive produce the same repair, recheck,
+and stop result; only their orchestration differs.
+
+A P0 stops immediately after any side-effect-safe containment needed to prevent
+further harm. Also stop when a P1/validation failure remains unresolved after
+that recheck, repeats, has unknown integrity, cannot be interpreted, is not
+safely reversible, or crosses L0-L2, scope, risk, data, security, cost,
+external-effect, release, public, or acceptance boundaries. A lower-severity
+generic retry allowance elsewhere cannot enlarge this P1 repair budget.
 
 ## Constitution Never Thin
 
@@ -99,7 +130,18 @@ Before asking the user, classify the proposed decision in this order:
 2. Does it remain inside the current confirmed active route or already-authorized task/slice, scope, risk ceiling, acceptance contract, and stop boundaries?
 3. Does it avoid every user-only boundary below?
 
-When all three answers are yes, continue under `primary_ai_auto_within_scope`; do not turn the decision into a user recommendation, consult Delegation Maturity, or ask for approval. Primary-owned execution includes implementation details, test/tooling choices, reversible route-local refactors, in-scope review repairs, verification retries, Plan Tree/status/evidence maintenance, and ordinary subagent orchestration that already satisfies the native-agent contract.
+When all three answers are yes, continue under `primary_ai_auto_within_scope`; do not turn the decision into a user recommendation, consult Delegation Maturity, or ask for approval. Primary-owned execution includes implementation details, test/tooling choices, reversible route-local refactors, in-scope review repairs, the one bounded failure repair/recheck above, ordinary verification retries below that severity boundary, Plan Tree/status/evidence maintenance, and ordinary subagent orchestration that already satisfies the native-agent contract.
+
+Architecture authority is classified by impact, not by code volume, file count,
+or labels such as `large` and `major`. The Primary may choose, replace, or
+substantially reshape architecture when the work is L3/L4, reversible or has a
+reliable rollback, and preserves confirmed L0-L2 meaning, user-visible results,
+scope, data semantics, security/privacy, real cost, public API, external
+contracts, release posture, and every other canonical stop boundary. Ask the
+user when any of those impacts changes, an irreversible migration is required,
+or the impact cannot yet be classified safely. Multiple technical
+implementations inside the unchanged boundary are not a user decision. Full
+and Adaptive use the same impact classification; only orchestration differs.
 
 A user-authorized task, plan, slice, or mission covers one closure loop: implementation -> checking -> in-scope repair -> rechecking -> evidence/status updates -> already-authorized local closeout. The selected runtime profile supplies exactly one execution posture:
 

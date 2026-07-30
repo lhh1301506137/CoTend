@@ -42,6 +42,27 @@ Choose the smallest owner-aligned prevention:
 
 Do not turn every mistake into a global instruction. Tighten the harness only for recurrence, high impact, or cheap evidence-backed prevention; reuse an existing owner instead of creating a parallel mechanism.
 
+## Cross-Project Failure Memory
+
+When a signal is an evidence-backed AI/process recurrence, one confirmed
+high-impact AI-caused incident, or the user explicitly asks to remember,
+compare, or postmortem it, route to `failure-memory.md`.
+
+- Keep the concrete event in the project's existing review/quality evidence.
+- Promote only a reusable cross-project pattern through CoTend framework
+  maintenance.
+- Do not edit an installed global Skill from a downstream project.
+- During ordinary work, use the deterministic selector and load at most three
+  compact guard cards. Do not read the whole catalog or pattern library.
+- A returned card is a prevention hint, not new product truth, user authority,
+  or completion evidence.
+- Repeated failure after a guard reopens and raises the pattern; a proven
+  deterministic guard lets the narrative leave ordinary retrieval.
+
+Quality Sentinel continues to own signal thresholds and escalation. Failure
+Memory owns pattern lifecycle, bounded retrieval, and cross-project reuse; it
+does not create another project signal ledger.
+
 ## State
 
 Statuses: `open`, `watching`, `resolved`, `dismissed_by_user`, `deferred_until`, `escalated`.

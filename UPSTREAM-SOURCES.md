@@ -4,14 +4,14 @@
 status: active_productization_and_research_registry
 checked_at: 2026-07-29
 relationship: primary_user_owned_productization_source_plus_secondary_public_references
-implementation_dependency: pinned_private_dual_exact_source_9e6bbeeb
-source_copying: scoped_7_adapted_plus_2_byte_identical_skills
+implementation_dependency: pinned_private_dual_exact_source_774aab64
+source_copying: scoped_8_adapted_plus_1_byte_identical_skill
 update_policy: manual_pinned_review_before_architecture_adoption_or_release
 ```
 
 本台账同时区分 CoTend 的用户原创产品化母体和外部设计参考。只有 `UP01` 是首要产品化来源；RF01-RF06 仍只是二级比较证据，不能按竞品多数做法改变 CoTend。
 
-当前仓库已从精确私有上游提交采用 9 个 Codex Skill：上游 51 个文件适配为 CoTend r14 的 54 个文件；七个用户原创 Skill 做 CoTend 适配，两个 MIT Skill 继续按最近公开 release 的字节和许可证边界复用，另有 3 个 CoTend 原生 pass。该精确提交明确不是公开 Dual release；采用范围、来源、许可证与更新边界由 consumer handoff、adoption log、framework lock 和自动验证共同约束。
+当前仓库已从精确私有上游提交采用 9 个 Codex Skill：上游 59 个文件适配为 CoTend r15 的 61 个文件；七个用户原创 Skill 做 CoTend 适配，`grill-me` 保持已审查字节，`karpathy-guidelines` 作为保留 MIT 归属的 CoTend 适配型第三方 Skill，另有 3 个 CoTend 原生 pass；上游 Project Init 的 1 个内部单元测试由仓库级 CoTend 测试等价承接，不作为产品 Skill 文件复制。该精确提交明确不是公开 Dual release；采用范围、来源、许可证与更新边界由 consumer handoff、adoption log、framework lock 和自动验证共同约束。
 
 ## UP01 dual-ai 分享包
 
@@ -19,15 +19,15 @@ update_policy: manual_pinned_review_before_architecture_adoption_or_release
 role: primary_productization_source
 product_relationship: user_owned_upstream_framework
 source: private_upstream_exact_commit_via_consumer_handoff
-reviewed_release: exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826
+reviewed_release: exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14
 release_anchor: exact_source_commit
 target_publication_state: not_public_release
 latest_public_release: 2026.07.28.2
 latest_public_release_anchor: dual-ai-share-2026.07.28.2
 previous_adoptable_release: 2026.07.28.2
 superseded_non_adoptable_release: 2026.07.27.1
-latest_reviewed_candidate: exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826
-latest_candidate_anchor: 9e6bbeeb4b91f98406e60dcbced923b3e1dd6826
+latest_reviewed_candidate: exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14
+latest_candidate_anchor: 774aab64e778d2e3a57b66cfd65d808ac8235e14
 latest_candidate_status: adopted_verified_local
 successor_candidate: none_current
 declared_license_scope: Apache-2.0_for_user_owned_content_with_separate_MIT_components
@@ -38,14 +38,14 @@ codex_role_map: upstream/CODEX-SKILL-ROLE-MAP.json
 adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md
 adoption_plan: upstream/FRAMEWORK-ADOPTION-PLAN.md
 capability_map: upstream/CAPABILITY-IMPLEMENTATION-MAP.json
-adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-29-1-v1-71-adoption
+adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-30-1-v1-76-adoption
 adopted_skill_verifier: scripts/verify_adopted_skill_set.py
 mapping_status: codex_skill_source_set_adopted_live_delivery_pending
 final_framework_lock: upstream/framework.lock.json
 automatic_update: forbidden
 ```
 
-`2026.07.28.2` 仍是最近公开 Dual release 和 r13 的来源历史。当前 target 则由 consumer handoff 固定到精确提交 `9e6bbeeb4b91f98406e60dcbced923b3e1dd6826` 及 canonical source tree `8218cbfb8906bc3cc0f3bf76f4480d866ecb392e`；20 个范围提交全部分类为 5 个合同变化和 15 个证据变化。CoTend 独立适配 v1.71、DMU v1.13、显式 Session Handoff、连续授权与用户持有风险选择，不把这个私有上游提交冒充新的公开 release。r13 作为 r14 首个 predecessor；`.23.2` 继续作为冻结 rc.2 的来源锚点。
+`2026.07.28.2` 仍是最近公开 Dual release 和 r13 的来源历史。当前 target 则由 consumer handoff 固定到精确提交 `774aab64e778d2e3a57b66cfd65d808ac8235e14` 及 canonical source tree `ebcc0b2930146aca1ce299215f9a2f936b12d4c8`；27 个范围提交全部分类为 9 个合同变化、17 个证据变化和 1 个 CoTend 不适用变化。CoTend 独立适配 v1.76、DMU v1.14、显式 Session Handoff、Failure Memory、CodeGraph/授权收敛与 Skill 检索加固，不把这个私有上游提交冒充新的公开 release。r14 作为 r15 首个 predecessor；`.23.2` 继续作为冻结 rc.2 的来源锚点。
 
 审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容直接改名或适配，对两个内置 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。仓库源树、逐文件 adoption、final lock、本地隔离根载体与真实 GitHub `owner/repo` Open Beta 生命周期已完成。远端 refresh 只验证同 revision，不冒充跨版本升级；真实用户/Desktop 生命周期、Claude 载体和发布者身份认证仍未完成。
 

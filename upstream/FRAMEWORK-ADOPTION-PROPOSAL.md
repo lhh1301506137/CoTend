@@ -1,12 +1,12 @@
-# Dual exact source 2026.07.29.1 产品化采用记录
+# Dual exact source 2026.07.30.1 产品化采用记录
 
 ```yaml
 status: adopted_verified
-candidate_release: exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826
-source_identity: exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826
+candidate_release: exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14
+source_identity: exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14
 source_anchor_type: exact_source_commit
 target_publication_state: not_public_release
-consumer_handoff: 2026.07.29.1
+consumer_handoff: 2026.07.30.1
 role_layer_status: user_confirmed
 role_layer_decision: product_owner_confirmed
 user_owned_skill_name_status: user_confirmed
@@ -15,43 +15,43 @@ codex_skill_set_decisions_status: complete
 adoption_state: adopted
 final_framework_lock_exists: true
 analysis_language: zh-CN
-current_framework_protocol: cotend-collaboration-v1.71
-current_model_upgrade_packet: cotend-model-upgrade-v1.13
+current_framework_protocol: cotend-collaboration-v1.76
+current_model_upgrade_packet: cotend-model-upgrade-v1.14
 skill_count: 9
-source_skill_file_count: 51
-target_skill_file_count: 54
-target_artifact_id: cotend-codex-r000014
-target_revision: 14
-target_manifest_sha256: 07ac592c82ed87f1759b38f04ed1f453c44e21d454fd12b4ce9eca459e4f3ed4
-local_artifact_sha256: d32741471f6f23024dbecc929ec90c73d5e6d1eb870fe0ecabf267aa704f05b8
+source_skill_file_count: 59
+target_skill_file_count: 61
+target_artifact_id: cotend-codex-r000015
+target_revision: 15
+target_manifest_sha256: acc17586cf713acc85fef9e6be02013de6bc012b7864ade22bed495ee68a9e7b
+local_artifact_sha256: 8b8f80da07503964620a135208159a313d3b00252c2ddde943904e4c10c685c1
 latest_public_release: 2026.07.28.2
 ```
 
 ## 结论摘要
 
-CoTend 已独立审查上游提供的 `2026.07.29.1` consumer handoff，并把其中固定的 Dual exact source 适配为 CoTend v1.71 / Codex r14。目标不是把私有 Dual 原样公开，也不是把未发布提交伪装成新 release；目标是保留 Dual 的可迁移合同，同时由 CoTend 自己拥有公开命名、触发条件、风险语义、状态权限与交付边界。
+CoTend 已独立审查上游提供的 `2026.07.30.1` consumer handoff，并把其中固定的 Dual exact source 适配为 CoTend v1.76 / Codex r15。目标不是把私有 Dual 原样公开，也不是把未发布提交伪装成新 release；目标是保留 Dual 的可迁移合同，同时由 CoTend 自己拥有公开命名、触发条件、风险语义、状态权限与交付边界。
 
-本轮新增一个显式入口 `cotend-session-handoff`，用于同一主任务在新旧会话之间移交。它只在用户字面调用 `$cotend-session-handoff` 时触发，不自动扫描或恢复旧会话，也不建立第二棵状态树。CoTend 的 Full 首次使用默认、原生三 pass、`current/dormant/conflict` 状态、治理语言解析 owner 与零 Trellis 运行依赖保持不变。
+本轮在既有显式 `cotend-session-handoff` 之上，加入 Failure Memory、授权与 CodeGraph 收敛、Skill 检索加固以及项目级 AGENTS 路由维护。会话移交仍只在用户字面调用 `$cotend-session-handoff` 时触发，不自动扫描或恢复旧会话，也不建立第二棵状态树。CoTend 的 Full 首次使用默认、原生三 pass、`current/dormant/conflict` 状态、治理语言解析 owner 与零 Trellis 运行依赖保持不变。
 
-当前仓库载体共有 9 个 Skill：7 个 CoTend 第一方适配 Skill；两个 MIT 伴随 Skill 保留原身份。Dual canonical source 是 51 个文件；CoTend 因保留 3 个原生 pass 参考文件，目标载体是 54 个文件。
+当前仓库载体共有 9 个 Skill：7 个 CoTend 第一方适配 Skill；两个 MIT 伴随 Skill 保留原身份，其中 `grill-me` 直接采用已审查字节，`karpathy-guidelines` 适配 CoTend 执行权限语义。Dual canonical source 是 59 个文件；CoTend 保留 3 个原生 pass 参考文件，并把 1 个上游内部单元测试交由仓库级 CoTend 测试承接，因此目标载体是 61 个文件。
 
 ## 输入与可复现锚点
 
 | 项目 | 固定值 |
 | --- | --- |
-| exact source commit | `9e6bbeeb4b91f98406e60dcbced923b3e1dd6826` |
-| canonical source tree | `8218cbfb8906bc3cc0f3bf76f4480d866ecb392e` |
+| exact source commit | `774aab64e778d2e3a57b66cfd65d808ac8235e14` |
+| canonical source tree | `ebcc0b2930146aca1ce299215f9a2f936b12d4c8` |
 | canonical path | `skills-backup/codex` |
-| handoff JSON SHA-256 | `f3142ab14c42e982332cda383ca20e016f44f42c86cb0b0ae760ccc864c76804` |
-| handoff Markdown SHA-256 | `fc960fbac7c11ebbb64eb0b94e0e117e647b6d38fe7c8455287d532fc9ed7f50` |
-| handoff checksums SHA-256 | `2e1e385db448c3bc622e68f851efd5e41012f9b4f94899caaca6e09297d9fb92` |
+| handoff JSON SHA-256 | `a2e23ab5a58fadc3dd4e454f9fd42ef7681c91ccb0f70fe6c85e330d6688298e` |
+| handoff Markdown SHA-256 | `0fbde80f3e491442c21281c09f1abbe6e9dcb2cc32fd1d08fdd11a75695f5675` |
+| handoff checksums SHA-256 | `ae76f6101e9562740ffbf15ba6cd9841d21bfd85721bdc1994b2be123a64d3cb` |
 | latest public release | `2026.07.28.2` |
 | public release commit | `4540f9e0543e85c6a7cceb1d7501467feee8b440` |
 | public canonical tree | `2eae0ca4447cace17bdf93df3b04b665293deecb` |
 
 `.28.2` 仅作为已发布祖先和第三方字节/许可基线。当前采用锚点是 exact source commit，publication state 明确为 `not_public_release`。
 
-交接覆盖从 `.28.2` release commit 到目标 commit 的 20 个提交：5 个合同变化提交进入产品适配审查，15 个只改变证据或治理记录的提交不取得 CoTend 运行时权限。
+交接以已采用的 v1.71 exact-source commit 为排他基线，到目标 commit 共覆盖 27 个提交：9 个合同变化进入产品适配审查，17 个只改变证据或治理记录，1 个变化判定为 CoTend 不适用。`.28.2` 仍是更早的最近公开祖先。
 
 ## Codex Skill 角色映射
 
@@ -65,7 +65,7 @@ CoTend 已独立审查上游提供的 `2026.07.29.1` consumer handoff，并把�
 | `dual-model-upgrade` | `cotend-model-upgrade` | 包协议与命名适配 |
 | `dual-ai-session-handoff` | `cotend-session-handoff` | 显式会话移交适配 |
 | `grill-me` | `grill-me` | MIT 原身份直接采用 |
-| `karpathy-guidelines` | `karpathy-guidelines` | MIT 原身份直接采用 |
+| `karpathy-guidelines` | `karpathy-guidelines` | MIT 原身份、CoTend 权限语义适配 |
 
 ## CoTend 独立适配决定
 
@@ -77,9 +77,9 @@ CoTend 已独立审查上游提供的 `2026.07.29.1` consumer handoff，并把�
 
 ## 交付与历史边界
 
-- 当前开发目标是 `cotend-codex-r000014`，9 Skills / 54 files。
-- r13 是精确第一 predecessor；r12 及更早目标继续按原锁保留。
-- G01-G05 随当前 r14 做仓库内回归。G06 是已经完成并由用户接受的 r13 历史真实项目验收，本轮不重写、不冒充 r14 复验。
+- 当前开发目标是 `cotend-codex-r000015`，9 Skills / 61 files。
+- r14 是精确第一 predecessor；r13 及更早目标继续按原锁保留。
+- G01-G05 随当前 r15 做仓库内回归。G06 是已经完成并由用户接受的 r13 历史真实项目验收，本轮不重写、不冒充 r15 复验。
 - rc.2 是历史冻结载体，仍从原 source commit 重建；本轮不改变其 package identity、manifest 或 ZIP。
 - Claude adapter、全局安装、真实模型调用、外部 UAT、push、tag、Release、submission 与 publish 均不在本采用授权内。
 

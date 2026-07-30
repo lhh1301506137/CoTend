@@ -189,7 +189,7 @@ class IsolatedCodexPluginTests(unittest.TestCase):
         plugin_fixture.materialize_fixture_payload(self.fixture)
         result = plugin_fixture.verify_static(self.fixture, run_official=False)
         self.assertEqual(result["skills"], 9)
-        self.assertEqual(result["skill_files"], 54)
+        self.assertEqual(result["skill_files"], 61)
         self.assertEqual(result["undeclared_capabilities"], 0)
         negative = plugin_fixture.run_negative_mutations(self.fixture)
         self.assertEqual(negative["passed"], 12)

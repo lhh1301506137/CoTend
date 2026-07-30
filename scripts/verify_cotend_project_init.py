@@ -21,6 +21,7 @@ EXPECTED_REFERENCES = (
 )
 EXPECTED_SCRIPTS = (
     "check_cotend_governance_language.py",
+    "maintain_project_agents_router.py",
     "validate_governance_language.py",
 )
 EXPECTED_FILES = {
@@ -82,12 +83,15 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
     checker = _read(
         skill_root / "scripts" / "check_cotend_governance_language.py"
     )
+    router = _read(skill_root / "scripts" / "maintain_project_agents_router.py")
     validator = _read(skill_root / "scripts" / "validate_governance_language.py")
     required_checker_markers = (
-        'CHECKER_ID = "cotend-governance-language.v1"',
+        'CHECKER_ID = "cotend-governance-language.v2"',
         'SUPPORTED_TAGS = {"en", "zh-CN", "zh-TW"}',
         '"actual_bytes_checked": True',
         'payload["sha256"] = hashlib.sha256(data).hexdigest()',
+        'payload["whole_file_sha256_checked"] = True',
+        '"evaluation_scope": "git_added_lines"',
     )
     if any(marker not in checker for marker in required_checker_markers):
         raise ProjectInitContractError("CoTend governance checker contract drifted")
@@ -99,6 +103,21 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
         raise ProjectInitContractError(
             "CoTend governance checker contains private-Dual identity or reason codes"
         )
+    required_router_markers = (
+        'CONTRACT = "cotend.project-router.v1"',
+        'START_MARKER = "<!-- COTEND:PROJECT-ROUTER:START -->"',
+        'END_MARKER = "<!-- COTEND:PROJECT-ROUTER:END -->"',
+        "$cotend-collaboration",
+        "$cotend-session-handoff",
+        'path = root / "AGENTS.md"',
+        'mode.add_argument("--apply", action="store_true")',
+        'mode.add_argument("--check", action="store_true")',
+        'raise RouterError("managed_marker_pair_incomplete")',
+        'raise RouterError("managed_marker_pair_duplicate")',
+        "os.replace(temporary, path)",
+    )
+    if any(marker not in router for marker in required_router_markers):
+        raise ProjectInitContractError("CoTend project router contract drifted")
     required_validator_markers = (
         'CONTRACT = "cotend.governance-language-pre-handback.v1"',
         'RESOLUTION_CONTRACT = "cotend.user-facing-language-resolution.v1"',
@@ -111,11 +130,22 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
         raise ProjectInitContractError("CoTend governance validator contract drifted")
 
     combined = "\n".join([core, *(references[name] for name in EXPECTED_REFERENCES)])
+    required_router_documentation = (
+        "maintain_project_agents_router.py --apply",
+        "--check",
+        "COTEND:PROJECT-ROUTER",
+        "AGENTS.md",
+    )
+    if any(marker not in combined for marker in required_router_documentation):
+        raise ProjectInitContractError(
+            "Project Init does not document the native project router lifecycle"
+        )
     if FORBIDDEN_RUNTIME_RE.search(
         "\n".join(
             [
                 combined,
                 checker,
+                router,
                 validator,
                 _read(skill_root / "agents" / "openai.yaml"),
             ]
@@ -129,6 +159,7 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
         "status": "cotend_project_init_topology_verified",
         "core": core,
         "references": references,
+        "router": router,
         "combined": combined,
         "file_count": len(actual_files),
         "reference_count": len(references),

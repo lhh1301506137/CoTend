@@ -45,6 +45,12 @@ inside the canonical project root and read from its current bytes. A path
 escape, missing receipt, unreadable file, unavailable VCS with no receipts, or
 otherwise unestablished set is `blocked`.
 
+An adapter may evaluate only the operation-owned added lines of a tracked Git
+file so legacy prose does not dominate the current operation. It must still
+hash and report the complete current file bytes. Untracked, non-Git, unborn,
+out-of-root, or clean tracked receipt files fall back to whole-file language
+evaluation. A Git diff failure is `unchecked`, not `technical_only`.
+
 If VCS is available and the union contains no governance file, return the
 genuine `not_applicable`. Do not use `not_applicable` merely because receipts
 were forgotten.
@@ -151,9 +157,14 @@ actual_bytes_checked: true
 user_visible_prose: present | absent
 body_result: match | mismatch | technical_only | unchecked
 excluded_technical_segments:
-  - none | schema_key | enum | identifier | path | hash | command | code | url | model_name | machine_field
+  - none | schema_key | enum | identifier | path | hash | command | code | url | model_name | machine_field | markdown_table_structure | machine_table_cell
 metrics: {}
 reason:
+evaluation_scope: git_added_lines | git_untracked_whole_file | git_unborn_whole_file | whole_file_no_git | whole_file_outside_git_root | whole_file_no_git_delta | git_added_lines_unavailable
+git_added_line_count: <integer> | null
+whole_file_sha256_checked: true
+whole_file_byte_count: <integer>
+evaluated_text_byte_count: <integer>
 ```
 
 Exit `0` means the result was evaluated, including a deterministic mismatch.
@@ -164,8 +175,11 @@ also rereads the target after checker execution and blocks if the bytes changed
 during validation. It does not know adapter-specific thresholds.
 
 `scripts/check_cotend_governance_language.py` is the bundled CoTend adapter.
-CoTend owns its checker identity, localized templates, supported tags, and
-thresholds without changing shared result semantics.
+Its operation-scoped Git evaluation never excludes natural-language headings,
+short bullets, or table cells merely because they are short or tabular; only
+concrete machine-only table cells are technical. CoTend owns its checker
+identity, localized templates, supported tags, and thresholds without changing
+shared result semantics.
 
 ## Evidence Packet
 
@@ -195,6 +209,11 @@ files:
     user_visible_prose:
     body_result:
     checker:
+    evaluation_scope:
+    git_added_line_count:
+    whole_file_sha256_checked:
+    whole_file_byte_count:
+    evaluated_text_byte_count:
 reasons:
   -
 repair:

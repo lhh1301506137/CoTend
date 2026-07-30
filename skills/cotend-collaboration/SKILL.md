@@ -1,12 +1,12 @@
 ---
 name: cotend-collaboration
 description: >-
-  Use for CoTend-governed development across supported carriers and switchable actual models: carrier/provider/model/role identity; native workflow state; Full/Adaptive and native-subagent orchestration; protected user-confirmed L0-L2 semantics and AI-owned L3+ execution; semantic drift, active-route rebase, implementation closure, midstream corrections, and explicitly invoked same-Primary cross-session handoff freshness; continuous development, review, verification, Done/acceptance/release gates, risk and `continue` authority; Plan Tree/project-init coordination; external-framework classification; external reviewer, upstream, Skill-authoring, share-package, and adapter handoffs. Reviewer-only changes preserve the primary, runtime profile, thinning, and delegation state.
+  Canonical router for CoTend project entry, resume, or `continue`; L0-L2 or main-chain semantics; acceptance, completion, release, or risk; route rebase, review, unattended, and multi-model work. Load only triggered one-level modules. Ordinary isolated L3/L4 work inside a confirmed route may stay lightweight.
 ---
 
 # CoTend Collaboration
 
-Protocol version: `cotend-collaboration-v1.71`
+Protocol version: `cotend-collaboration-v1.76`
 
 ## Progressive Disclosure Contract
 
@@ -16,6 +16,29 @@ This body is the always-needed governance and routing core. Detailed contracts l
 - A matching `Must Read` route is mandatory, not advisory. Read the named file before acting or claiming the control flow complete.
 - Do not reconstruct a missing contract from memory. If a required file cannot be read, report it under `missing_required_modules` and stop the affected route.
 - Keep one owner per detailed rule. The core may summarize an owner but must not silently override it.
+
+## Mandatory Module Routing
+
+Choose the route before reading the longer constitutional summary. Load only
+the named direct reference layer; a reference may trigger a deeper canonical
+owner only when its own contract explicitly requires it.
+
+| High-value trigger | Direct owner to load |
+|---|---|
+| Authority, Critical stops, bounded P1/validation repair, impact-based architecture, or handback | `references/authority-and-triggers.md` |
+| First root project entry, same/new Primary takeover, L0/L1 rebase, new L1/L2 domain, cross-domain/architecture/cumulative work, or drift/rework | `references/plan-tree.md` Project Understanding Reconstruction |
+| Explicit `$cotend-session-handoff` literal | Direct `$cotend-session-handoff`; without the literal, perform zero secondary reads or tools |
+| Implementation or checking of a non-trivial authorized slice | `references/implementation-pass.md` or `references/verification-pass.md`, plus `references/acceptance-test-harness.md` |
+| Completion, acceptance, changed governance prose, or user-visible evidence | `references/acceptance-test-harness.md` |
+| Repeated/high-impact AI failure or explicit remember/compare/postmortem | `references/quality-sentinel.md`, then cold-path `references/failure-memory.md` |
+| Code discovery, impact scope, or CodeGraph | `references/code-context-harness.md` |
+| Review, reviewer independence, or model identity | `references/review-and-self-review.md` |
+| Release, deploy, publish, or public sharing | `references/release-hardening.md` |
+| Upstream adoption/sync or framework behavior change | `references/upstream-dependency-review.md` and, when behavior changes, `references/framework-change-evaluation.md` |
+| Skill creation or trigger/description change | Official Skill creator plus `references/skill-authoring-quality-gate.md` |
+
+The extended trigger matrix below refines this index. It does not create a
+second owner.
 
 ## Constitution And Defaults
 
@@ -28,9 +51,9 @@ This body is the always-needed governance and routing core. Detailed contracts l
 - A directly invoked Init/Project Init, formal Collaboration review, Diagnose Only, Semantic Alignment, Session Handoff, or Model Upgrade reports its authorized result once. A standalone invocation returns control; follow-on work explicitly authorized in the same user instruction satisfies the generic handback and runs after the report without a duplicate prompt. A stronger pending decision still stops, and edit-withholding Diagnose Only wording still forbids repair. Implicit governance and ordinary confirmed Plan Tree continuation do not create this handback.
 - Recorded local closeout may cover verified in-scope durable-record synchronization and a local commit through the Native Closeout Pass. It never covers push/publication, shared-history rewrite, secrets, scope expansion, final acceptance, or `critical` work.
 - Use the lightest route that preserves intent, risk, evidence, verification, and reviewability.
-- Native workflow state, runtime profile, project adoption profile, and persisted continuous-risk authorization are separate. Resolve `current | dormant | conflict`, `full | adaptive`, and `delegated_pair | inline` only through `references/runtime-profiles.md`: session choice overrides project choice, project choice persists across framework updates, and a missing choice uses the CoTend product default `v1.71-full`. A missing risk choice defaults to `medium`; either profile permits an explicit `low | medium | dev_high` choice but never selects one. Model, carrier, provider, role, reasoning configuration, external-framework flags, and model-upgrade evidence may support an advisory recommendation but never select or invalidate a profile or risk tier.
+- Native workflow state, runtime profile, project adoption profile, and persisted continuous-risk authorization are separate. Resolve `current | dormant | conflict`, `full | adaptive`, and `delegated_pair | inline` only through `references/runtime-profiles.md`: session choice overrides project choice, project choice persists across framework updates, and a missing choice uses the CoTend product default `v1.76-full`. A missing risk choice defaults to `medium`; either profile permits an explicit `low | medium | dev_high` choice but never selects one. Model, carrier, provider, role, reasoning configuration, external-framework flags, and model-upgrade evidence may support an advisory recommendation but never select or invalidate a profile or risk tier.
 - Delegation maturity is also separate. Ten resolved samples with at least nine `accepted_clean` may offer one narrow `act_then_report` choice; it never activates automatically. L0-L2, risk, release, acceptance, model role, framework, and specialized pending decisions remain non-delegable.
-- Before asking about an execution choice, apply the single `Execution Authorization Contract` in `references/authority-and-triggers.md`. Implementation details, tests/tooling, reversible route-local refactors, in-scope review repair/recheck, evidence/status maintenance, and ordinary subagent orchestration are already Primary-owned L3/L4 work when the confirmed route, ancestors, scope, risk, and stop boundaries remain unchanged; do not send those choices through Delegation Maturity.
+- Before asking about an execution choice, apply the single `Execution Authorization Contract` in `references/authority-and-triggers.md`. Implementation details, tests/tooling, reversible route-local refactors, the one bounded in-scope P1/validation repair and recheck, ordinary lower-severity repair, evidence/status maintenance, and ordinary subagent orchestration are Primary-owned L3/L4 work when the confirmed route, ancestors, scope, risk, and stop boundaries remain unchanged. Architecture authority is classified by impact rather than code volume, file count, or words such as “large”; reversible or reliably recoverable L3/L4 architecture remains Primary-owned only while every user-owned boundary is unchanged.
 - One authorized task, plan, or slice covers implementation, checking, in-scope repair, rechecking, evidence updates, and already-authorized local closeout as one closure loop. Adaptive uses `active_route_continuous` across successive leaves of the confirmed active route; Full uses `authorized_task_closure` for the fixed implement/check loop and stops before the next uncovered material slice.
 - Before broad autonomous implementation, require a protected current-MVP baseline: user-confirmed L0 complete goal, L1 MVP/main capabilities/main chain, and each important L2 needed by the active route. Confirmation is per node and never inherited; every new/materially changed node is content-addressed to its exact decision-log payload, while legacy nodes migrate only at relevant high-value triggers. The AI owns L3/L4 only inside confirmed ancestors.
 - For a new/reconstructed/stale/conflicting/materially changed L2, confirm its complete charter before rules. Old rules remain candidates until then; charter confirmation does not confirm rules.
@@ -44,9 +67,9 @@ This body is the always-needed governance and routing core. Detailed contracts l
 - After a non-trivial Implementation Pass returns `checker_handoff: required`, read `references/verification-pass.md`. Full dispatches an independent Checker role and Adaptive enters the same Checker contract inline; both independently inspect current differences, requirements, tests, failure paths, authorized fixes, reruns, evidence, and later formal-review boundaries.
 - When native subagents, parallel packets, a fresh final review context, or an agent first-response stall is material, read `references/native-agent-orchestration.md`. The root Primary retains product context, authority, dependency/integration ownership, and completion claims. The selected Full fixed Implementer/Checker chain is a profile-authorized quality baseline; positive net benefit is required for every extra/optional agent and for further packet decomposition inside that chain.
 - After meaningful implementation, select evidence proportionate to the slice. When user-facing governance files changed, Acceptance/Test Harness must inspect their actual prose against the persisted resolved language; a structured declaration alone is not evidence. AI UAT is not user acceptance; Done Gate and Release Hardening remain mandatory when triggered.
-- Plan Tree ordinary work reads only the active path and traces the leaf through confirmed current-MVP L0-L2. Replan/correction/advisor/milestone/long-batch/Done/acceptance/release/quality signals may require deeper semantic reconciliation.
+- Plan Tree ordinary work reads only the active path and traces the leaf through confirmed current-MVP L0-L2. Its triggered Project Understanding Reconstruction cold path is required at root-Primary first entry, explicit same-Primary takeover, confirmed new-Primary takeover, material L0/L1 rebase, new L1/L2 domain scope, cross-domain/architecture/cumulative-main-chain work, or drift/rework/route-break/stale-assumption signals. The result must connect the active leaf to the complete current-MVP main chain before non-trivial implementation; ordinary same-route L3/L4 continuation omits the block and keeps progressive loading.
 - Project Init is the sole `user_facing_language_resolution` owner. Before any affected governance write, consume its persisted normalized tag from `STATUS.md` or the mapped equivalent; never infer from conversation, repository content, host locale, or account preference, and never re-resolve in Collaboration. Missing, invalid, or `human_needed` resolution stops the affected write and routes only the language-resolution subsection to Project Init. `STATUS.md` is the concise user cockpit in that resolved language, while schema keys, enums, identifiers, paths, hashes, and commands remain technical. Full and Adaptive use the same language result and gate.
-- A same verified Primary moving to a fresh conversation is a session-lifecycle event, not a model upgrade. Load direct `$cotend-session-handoff` only when the user's current input contains that literal explicit invocation. Without it, an app restart/reconnect or ordinary resume stays on the current route; a clear natural-language handoff request receives only a short invocation suggestion. Once explicitly invoked, preserve identity, role, runtime profile, delegation maturity, and thinning state, freeze the old session after a point-in-time packet, and require `current | stale | conflict` preflight before new-session product writes. A model/carrier/provider/material-configuration/role change remains `$cotend-model-upgrade`; bare `continue` remains ordinary continuation.
+- A same verified Primary moving to a fresh conversation is a session-lifecycle event, not a model upgrade. Load direct `$cotend-session-handoff` only when the user's current input contains that literal explicit invocation. Without it, return only the short literal-invocation suggestion and perform zero repository reads, tools, preflight, or output generation. Once explicitly invoked, preserve identity, role, runtime profile, delegation maturity, and thinning state, freeze the old session after a point-in-time packet, require `current | stale | conflict` preflight, then require Plan Tree's ready `full_current_mvp` reconstruction and complete user-language teachback before new-session product writes. A model/carrier/provider/material-configuration/role change remains `$cotend-model-upgrade`; bare `continue` remains ordinary continuation.
 - Upstream tools/Skills/frameworks are reviewed through `UPSTREAM-SOURCES.md` plus `references/upstream-dependency-review.md`. Framework behavior changes require `references/framework-change-evaluation.md` before stability or external sync claims.
 - When the current goal may be done, stop adding low-value work and run Goal Completion / Done Gate.
 
@@ -62,7 +85,7 @@ This body is the always-needed governance and routing core. Detailed contracts l
 - `full` maps to native `delegated_pair`; `adaptive` maps to native `inline`. Both use the native Implementation Pass, native Verification Pass, formal review, and Native Closeout Pass while preserving the same requirements, checks, tests, evidence, and Constitution.
 - On instruction conflict preserve user intent and safety first, apply the CoTend Project Truth Authority contract, then enforce project-local coding style inside that boundary; record a material resolution.
 
-## Mandatory Module Routing
+## Extended Trigger Matrix
 
 At initialization, handoff/review, unattended entry, Human Rejoin, Done Gate, or release-posture change, record what was actually loaded:
 
@@ -88,10 +111,11 @@ missing_required_modules:
 | Check a non-trivial Implementation Pass; inspect current differences/specs/tests/failure paths; fix and rerun inside scope; derive Checker status | `references/verification-pass.md` plus `references/acceptance-test-harness.md` |
 | Meaningful implementation verification, changed user-facing governance prose, UI/browser, Chrome state, acceptance evidence, completion claims or other delivery-state intent | `references/acceptance-test-harness.md` |
 | Important current-MVP L2/main-chain implementation, post-alignment repair, material-node completion, or advancing to the next important node | `references/semantic-implementation-closure.md` plus `references/acceptance-test-harness.md` |
-| Repeated bugs/process failures, weak verification, deferred findings, quality decay, rubber-stamp review | `references/quality-sentinel.md` |
+| Repeated bugs/process failures, weak verification, deferred findings, quality decay, rubber-stamp review | `references/quality-sentinel.md`; add `references/failure-memory.md` only for an evidence-backed recurrence/high-impact incident, explicit remember/compare/postmortem request, or relevant pre-action lookup. Its selector returns at most three cards; do not preload full records. |
 | Feature appears built but needs product-style interaction/acceptance | `references/ai-uat.md` |
 | Current standard/full init or resume; native pre-development readiness; large/unfamiliar/cross-module/architecture/review scope | `references/code-context-harness.md` |
 | Standard/full multi-stage work, Plan Tree route, drift, reconciliation, protected L0-L2, understanding depth | `references/plan-tree.md` |
+| Root-Primary first project entry, explicit same-Primary new-session takeover, confirmed new-Primary takeover/`takeover_ready`, L0/L1 rebase, new L1/L2 domain scope, cross-domain/architecture/cumulative-main-chain work, or drift/rework/route-break/stale-assumption signal | `references/plan-tree.md` Project Understanding Reconstruction; use its triggered-only `plan_tree_alignment` block and stop implementation on a non-ready result |
 | Writable baseline/rebaseline/feature meaning change or semantic-contract migration | Direct `$cotend-semantic-alignment` plus `references/plan-tree.md`, `references/authority-and-triggers.md`, `references/templates.md`, and its zero-dependency contract helper |
 | Read-only semantic correctness/drift check or edits withheld | Direct `$cotend-diagnose-only` plus minimum relevant intent/product evidence |
 | Fuzzy idea/intake artifact before protected confirmation | `references/idea-to-consensus.md`, then direct `$cotend-semantic-alignment new_baseline` |

@@ -89,7 +89,10 @@ ResumePhase = Literal[
 
 EXPECTED_TRELLIS_MENTIONS = 0
 EXPECTED_TRELLIS_FILES = 0
-EXPECTED_SKILL_FILES = 54
+EXPECTED_SKILL_FILES = 61
+EXPECTED_R14_MANIFEST = (
+    "07ac592c82ed87f1759b38f04ed1f453c44e21d454fd12b4ce9eca459e4f3ed4"
+)
 EXPECTED_R13_MANIFEST = (
     "39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd"
 )
@@ -825,7 +828,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     source_lock = json.loads(
         (root / SOURCE_LOCK_PATH.relative_to(ROOT)).read_text(encoding="utf-8")
     )
-    if source_lock.get("skill_file_count") != 51:
+    if source_lock.get("skill_file_count") != 59:
         raise NativeCloseoutPassError("current upstream source inventory drifted")
 
     lock = json.loads(
@@ -835,24 +838,24 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000014"
-        or target.get("revision") != 14
+        target.get("artifact_id") != "cotend-codex-r000015"
+        or target.get("revision") != 15
         or target.get("manifest_sha256") != digest
         or lock.get("skill_count") != 9
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
         or len(files) != EXPECTED_SKILL_FILES
     ):
-        raise NativeCloseoutPassError("r14 target identity or manifest drifted")
+        raise NativeCloseoutPassError("r15 target identity or manifest drifted")
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000013",
-        "revision": 13,
-        "source_release_id": "2026.07.28.2",
-        "framework_protocol": "cotend-collaboration-v1.67",
-        "manifest_sha256": EXPECTED_R13_MANIFEST,
+        "artifact_id": "cotend-codex-r000014",
+        "revision": 14,
+        "source_release_id": "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
+        "framework_protocol": "cotend-collaboration-v1.71",
+        "manifest_sha256": EXPECTED_R14_MANIFEST,
     }:
-        raise NativeCloseoutPassError("r13 predecessor identity drifted")
+        raise NativeCloseoutPassError("r14 predecessor identity drifted")
 
     _require_markers(
         texts["evidence"],

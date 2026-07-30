@@ -2,7 +2,7 @@
   "schema": "cotend.codex-skill-role-map",
   "schema_version": 1,
   "status": "adopted_verified",
-  "candidate_release": "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
+  "candidate_release": "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14",
   "candidate_publication_state": "not_public_release",
   "platform": "Codex",
   "launch_adapter": true,
@@ -22,7 +22,7 @@
   "skills": [
     {
       "source_skill_id": "dual-ai-init",
-      "source_tree": "c4692686a98043b9e8196e2041497ba7113069a2",
+      "source_tree": "8dfda33031d0aad19f035a7d9de74bfcd52d29c6",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "unified_visible_entry",
@@ -48,7 +48,7 @@
     },
     {
       "source_skill_id": "dual-ai-project-init",
-      "source_tree": "e8f22e5731a03f4a5f1d993bf57e3c575a48a91f",
+      "source_tree": "a2945ffe225c3ab502eaa43bcf14fc9c231aa220",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "internal_auto_mode_engine",
@@ -80,7 +80,7 @@
     },
     {
       "source_skill_id": "dual-ai-collaboration",
-      "source_tree": "23cbd059d203957c5a435592865614bb4171e48e",
+      "source_tree": "fde20c6c554cfae1c17b4239aac2b725727493e2",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "shared_governance_core",
@@ -133,7 +133,7 @@
     },
     {
       "source_skill_id": "dual-ai-semantic-alignment",
-      "source_tree": "679c45d557cc3e625415d333e1ed4f68e730cd46",
+      "source_tree": "e6e145dc1fb66032ee01aaa0abae4afa77c12ff8",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "direct_writable_semantic_alignment",
@@ -162,7 +162,7 @@
     },
     {
       "source_skill_id": "dual-model-upgrade",
-      "source_tree": "6f3dd1f0062e40034fd0662093cc5a17307dc6b4",
+      "source_tree": "96babb80a3ed68776c2a1d11df4093a93469f99b",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "advanced_model_role_lifecycle",
@@ -190,7 +190,7 @@
     },
     {
       "source_skill_id": "dual-ai-session-handoff",
-      "source_tree": "67580d890c217630bbe7a61e44dfedc86377e6b1",
+      "source_tree": "9f97fbafdb510e47aff83f3e111c01e946b69d92",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "same_primary_session_transition",
@@ -239,8 +239,8 @@
     },
     {
       "source_skill_id": "karpathy-guidelines",
-      "source_tree": "e119339197d600aa39a24fd7a95c946800c9c949",
-      "source_relationship": "bundled_third_party",
+      "source_tree": "32d7f4abb8c9dd8ab17a793b5e0b1a3a1fa35aeb",
+      "source_relationship": "adapted_third_party",
       "license": "MIT",
       "current_role": "internal_ai_implementation_discipline",
       "current_visibility": "implicit_internal_companion",
@@ -250,8 +250,8 @@
         "the Skill defines simplicity, surgical edits, assumptions and verifiable goals",
         "it does not own project lifecycle, user authority or product state"
       ],
-      "adoption_status": "adopted",
-      "implementation_mode": "direct_adoption",
+      "adoption_status": "adapted",
+      "implementation_mode": "platform_adaptation",
       "bundling_status": "user_confirmed",
       "target_skill_id": "karpathy-guidelines",
       "naming_status": "preserve_third_party_identity_if_bundled",
@@ -271,7 +271,7 @@
         "dual-model-upgrade"
       ],
       "adoption_status": "deferred",
-      "reason": "Codex is the confirmed launch adapter; the packaged Claude carrier remains v1.65 and claims neither v1.66-v1.67 governance-language reliability parity nor v1.71 session-handoff, continuous-authorization, or risk-selection parity"
+      "reason": "Codex is the confirmed launch adapter; the packaged Claude carrier remains v1.65 and claims neither v1.66-v1.67 governance-language reliability parity nor v1.71-v1.76 session-handoff, failure-memory, retrieval, continuous-authorization, or risk-selection parity"
     }
   ],
   "adoption": {
@@ -289,7 +289,7 @@
     "repository_source_carrier": "skills/",
     "repository_source_implemented": true,
     "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-29-1-v1-71-adoption",
+    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-30-1-v1-76-adoption",
     "live_install_authorized": false,
     "live_install_performed": false,
     "plugin_or_marketplace_carrier": "github_root_candidate_local_verified",

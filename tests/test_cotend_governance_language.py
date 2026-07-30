@@ -104,10 +104,13 @@ class CoTendGovernanceLanguageTests(unittest.TestCase):
             "en", "# Project Status\n\nInitialization is complete and safe to resume."
         )
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(payload["checker"], "cotend-governance-language.v1")
+        self.assertEqual(payload["checker"], "cotend-governance-language.v2")
         self.assertEqual(payload["body_result"], "match")
         self.assertTrue(payload["actual_bytes_checked"])
         self.assertEqual(payload["sha256"], hashlib.sha256(data).hexdigest())
+        self.assertEqual(payload["evaluation_scope"], "whole_file_no_git")
+        self.assertTrue(payload["whole_file_sha256_checked"])
+        self.assertEqual(payload["whole_file_byte_count"], len(data))
         self.assertNotIn("private", payload["reason"])
 
     def test_checker_accepts_explicit_simplified_and_traditional_chinese(self) -> None:
@@ -179,6 +182,95 @@ class CoTendGovernanceLanguageTests(unittest.TestCase):
         )
         self.assertEqual(chinese["body_result"], "match")
 
+    def test_checker_keeps_user_table_cells_and_short_bullets_as_prose(self) -> None:
+        _, table, _ = self.run_checker(
+            "zh-CN",
+            (
+                "| 状态 | 含义 |\n"
+                "|---|---|\n"
+                "| ready | 可以安全继续当前路线 |\n"
+                "- 等待用户确认\n"
+            ),
+        )
+        self.assertEqual(table["body_result"], "match")
+        self.assertIn(
+            "markdown_table_structure", table["excluded_technical_segments"]
+        )
+        self.assertIn(
+            "machine_table_cell", table["excluded_technical_segments"]
+        )
+
+    def test_checker_scopes_tracked_file_to_git_added_lines(self) -> None:
+        project = Path(tempfile.mkdtemp(prefix="cotend-language-added-lines-"))
+        try:
+            subprocess.run(
+                ["git", "init", "--quiet", "--initial-branch=main", str(project)],
+                check=True,
+                capture_output=True,
+            )
+            status = project / "STATUS.md"
+            status.write_text(
+                "# Legacy Status\n\nThis old English explanation remains historical.\n",
+                encoding="utf-8",
+            )
+            subprocess.run(
+                ["git", "-C", str(project), "add", "STATUS.md"],
+                check=True,
+                capture_output=True,
+            )
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(project),
+                    "-c",
+                    "user.name=CoTend Test",
+                    "-c",
+                    "user.email=cotend-test@example.invalid",
+                    "commit",
+                    "--quiet",
+                    "-m",
+                    "baseline",
+                ],
+                check=True,
+                capture_output=True,
+            )
+            status.write_text(
+                status.read_text(encoding="utf-8")
+                + "\n## 本轮更新\n\n初始化已完成，可以安全继续当前路线。\n",
+                encoding="utf-8",
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(CHECKER),
+                    "--normalized-tag",
+                    "zh-CN",
+                    "--path",
+                    str(status),
+                ],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                check=False,
+            )
+            payload = json.loads(result.stdout)
+            self.assertEqual(result.returncode, 0)
+            self.assertEqual(payload["evaluation_scope"], "git_added_lines")
+            self.assertGreater(payload["git_added_line_count"], 0)
+            self.assertEqual(payload["body_result"], "match")
+            self.assertEqual(
+                payload["whole_file_sha256_checked"],
+                True,
+            )
+            self.assertEqual(
+                payload["whole_file_byte_count"],
+                len(status.read_bytes()),
+            )
+        finally:
+            shutil.rmtree(project, ignore_errors=True)
+
     def test_validator_passes_actual_bytes_and_is_profile_equivalent(self) -> None:
         project = self.prepare_project(
             "en", "# Project Status\n\nInitialization is complete and safe to resume."
@@ -203,6 +295,10 @@ class CoTendGovernanceLanguageTests(unittest.TestCase):
             status_bytes = (project / "STATUS.md").read_bytes()
             self.assertEqual(
                 full["files"][0]["sha256"], hashlib.sha256(status_bytes).hexdigest()
+            )
+            self.assertEqual(
+                full["files"][0]["evaluation_scope"],
+                "git_untracked_whole_file",
             )
         finally:
             shutil.rmtree(project, ignore_errors=True)

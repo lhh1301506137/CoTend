@@ -36,6 +36,62 @@ plan_tree_alignment:
     -
   pending_understanding_confirmations:
     -
+  project_understanding_reconstruction: # omit unless the Plan Tree trigger fires
+    contract_owner: cotend-collaboration/references/plan-tree.md
+    trigger_reasons:
+      - <one or more canonical trigger reason IDs from plan-tree.md>
+    scope: full_current_mvp | affected_l1_domain | active_path_delta
+    reliable_boundary_ref:
+    source_pointers:
+      current_l0:
+      current_mvp_l1:
+        -
+      important_l2_summaries:
+        -
+      active_l2_full:
+      recent_semantic_decision_knowledge_changes:
+        -
+      implementation_or_evidence_checks:
+        -
+    synthesis:
+      product_goal:
+      target_user_and_usage:
+      complete_current_mvp_main_chain:
+        -
+      l1_capability_map:
+        - capability:
+          responsibility:
+          main_chain_position:
+      active_l2_global_role:
+        node:
+        parent_l1:
+        responsibility:
+        inputs:
+          -
+        outputs:
+          -
+        direct_dependencies:
+          -
+      non_goals_and_mvp_boundaries:
+        -
+      recent_semantic_changes:
+        -
+      invalidated_assumptions:
+        -
+      unresolved_uncertainties:
+        -
+      active_leaf_to_main_chain_connection:
+    understanding_checks:
+      required_synthesis_complete: yes | no
+      active_leaf_connected_to_complete_main_chain: yes | no
+      current_truth_conflict: yes | no
+      required_domain_missing: yes | no
+      invalidated_assumption_still_drives_route: yes | no
+      file_or_hash_receipts_only: yes | no
+    outcome: ready | reconciliation_required
+    failure_route: not_applicable | triggered_semantic_reconciliation | direct_cotend_semantic_alignment
+    implementation_allowed: yes | no
+    user_confirmation_required: no | existing_semantic_gate_only
   load_policy_used: init_full_rebuild | active_path_summary | active_leaf_full | not_required
   high_level_understanding:
     root_goal_summary:
@@ -53,6 +109,16 @@ plan_tree_alignment:
 ```
 
 `full_rebuild` is an accepted legacy alias for `init_full_rebuild`; prefer `init_full_rebuild` in new packets.
+
+`project_understanding_reconstruction` is a triggered-only compact execution
+record. Omit it entirely for ordinary same-route L3/L4 continuation. Its
+source pointers and synthesis do not copy full semantic prose, do not become
+`user_confirmed`, and do not create a second product truth. The sole trigger,
+scope, synthesis, ready, and failure behavior lives in `plan-tree.md`.
+`direct_cotend_semantic_alignment` is valid only after the existing
+reconciliation route has identified protected L0-L2 meaning that needs
+confirmation or change; Project Init/Init must never select it merely because
+the reconstruction trigger exists.
 
 ### `semantic_baseline`
 
@@ -363,19 +429,35 @@ same_primary_session_takeover_result:
   reconciliation:
     -
   conflict_owner: none | human_needed | <existing recovery owner>
+  project_understanding_reconstruction_ref:
+    required_scope: full_current_mvp
+    plan_tree_alignment_ref:
+    outcome: ready | reconciliation_required | not_run_due_to_conflict
   takeover_teachback:
     language: <resolved user-facing governance language>
-    project_goal:
-    work_transition_mode:
-    current_main_chain_step:
-    reliable_resume_boundary:
-    explicit_unfinished_or_unverified:
-      -
-    next_verification:
+    canonical_synthesis_ref: <plan_tree_alignment.project_understanding_reconstruction.synthesis>
+    rendered_summary: <complete canonical synthesis in the AI's own words>
+    session_context:
+      work_transition_mode:
+      current_main_chain_step:
+      reliable_resume_boundary:
+      explicit_unfinished_or_unverified:
+        -
+      next_verification:
     status: pending | complete
   takeover_readiness: takeover_ready | teachback_required | reconcile_first | human_needed
   next_action:
 ```
+
+The new session may run `full_current_mvp` only after repository freshness is
+`current` or a stale packet has been reconciled to a current reliable
+boundary. `project_understanding_reconstruction_ref` points to the canonical
+triggered block under `plan_tree_alignment`; it must not copy that contract or
+use the frozen packet as product truth. `takeover_ready` requires the
+reconstruction outcome `ready` plus an in-own-words rendering in the resolved
+governance language of the complete canonical synthesis and the
+session-specific context above. An active-leaf-only summary, file-read receipt,
+hash check, or packet freshness by itself is insufficient.
 
 ### `semantic_reconciliation`
 

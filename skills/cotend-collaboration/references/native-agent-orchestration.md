@@ -13,6 +13,13 @@ The root Primary keeps the continuous product context and remains responsible fo
 
 A subagent may explore, implement, test, or review one bounded packet. It cannot confirm missing L0-L2 meaning, expand scope, accept risk, change the active route, declare the whole capability complete, or silently replace the root's integration responsibility.
 
+A bounded subagent's first repository view is not Plan Tree
+`first_project_entry`. The root provides a compact work packet plus canonical
+semantic pointers, and the subagent reads only what its packet needs. It runs
+Project Understanding Reconstruction only if it genuinely takes over
+route/integration responsibility or its assigned scope independently fires
+another canonical Plan Tree trigger.
+
 ## Net-Benefit Gate
 
 For every extra/optional agent and every proposal to split the selected workflow into more packets, delegate only when expected benefit is positive after counting additional model/tool tokens, repeated discovery, coordination, write conflicts, integration effort, machine resources, and verification cost.

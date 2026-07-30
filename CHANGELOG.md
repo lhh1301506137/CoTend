@@ -24,6 +24,8 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - Exact predecessor-consumption tests that reject undeclared or partially matching delivery receipts instead of merely recording predecessor metadata.
 - De-identified G06 real-project evidence covering retained-project Init, implementation, independent checking, formal repair review, local product closeout, AI UAT, exact r13-to-r12-to-r13 rollback/restore, pre/post-acceptance fresh-session recovery, and explicit maintainer acceptance.
 - Explicit-only `cotend-session-handoff` for same-Primary transfers, frozen two-file packets, dirty ownership, pending gates, and `current | stale | conflict` takeover preflight.
+- CoTend-native Failure Memory with a bounded three-card retrieval cap, evidence-backed lifecycle, fail-closed catalog validation, and no project-truth authority.
+- Impact-based architecture authority, fresh CodeGraph read-equivalence rules, project-root AGENTS routing, progressive Skill retrieval, and one-repair/one-recheck validation recovery.
 
 ### Changed
 
@@ -51,11 +53,15 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - Completed G06 on a retained r13 project without changing runtime Skill bytes, the r13 artifact, the frozen rc.2 package, or any release surface.
 - Adapted the exact private-upstream commit `9e6bbeeb4b91f98406e60dcbced923b3e1dd6826` to CoTend v1.71 without mislabeling it as a public Dual release.
 - Advanced the repository carrier to `cotend-codex-r000014`: nine Skills, 51 exact-source files, 54 CoTend target files, and r13 as the first exact predecessor.
+- Adapted the exact private-upstream commit `774aab64e778d2e3a57b66cfd65d808ac8235e14` to CoTend v1.76 / DMU v1.14 without restoring an external runtime or mislabeling the commit as a public release.
+- Advanced the repository carrier to `cotend-codex-r000015`: nine Skills, 59 exact-source files, 61 CoTend target files, and r14 as the first exact predecessor.
+- Bound frozen rc.2 support files and Skills to its historical source commit so current third-party notices cannot change the historical package manifest or ZIP digest.
 
 ### Boundaries
 
 - TD08 project-truth authority, TD03 requirements clarification, TD06 specification change/Route Rebase, TD01 workflow state/runtime profiles, TD02 init/pre-development, TD04 implementation, TD05 verification, and TD07 closeout have per-capability native parity.
 - G03 cumulative journeys, G04 integrated negative-recovery/ownership, and G05 zero-runtime-dependency are revalidated for r14; G06 retained real-project/user-acceptance evidence remains frozen at r13 and is not relabeled as r14 evidence.
+- G01-G05 are revalidated for v1.76/r15; the retained G06 real-project/user-acceptance evidence remains frozen at r13 and is not relabeled as r15 evidence.
 - The v1.67/r13 retained-project journey includes real model-mediated Init and implementation, independent checking, a reviewed repair, AI UAT, exact predecessor rollback/restore, explicit maintainer acceptance, and fresh-session recovery before and after acceptance.
 - Plugin package identity, release tag, remote repository, real-user installation, and submission state did not change.
 - G01-G05 completion satisfies the technical prerequisite for a future rc.3 build, and G06 closes the current real-project stability gate; neither result authorizes that build or any release action.

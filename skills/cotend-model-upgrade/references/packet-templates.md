@@ -1,6 +1,6 @@
 # CoTend Model Upgrade Packet Templates
 
-Version: 1.13
+Version: 1.14
 
 Use these compact templates when running `cotend-model-upgrade`. Keep project packets evidence-linked and concise. For first-time project reassessment or possible premium-model takeover, create `MODEL-UPGRADE/BASELINE/` before the per-run packet. For milestone re-entry, reuse the active packet directory and add `MILESTONE-REPORT.md` rather than rebuilding the entire packet unless the old packet is stale. For confirmed primary-model replacement, include `model_role_decision`; use `RUNTIME-PROFILE-ASSESSMENT.md` only for a non-authorizing A/Full recommendation; and trigger `FRAMEWORK-THINNING-REVIEW.md` only when the new primary model is user-confirmed and `takeover_ready`.
 
@@ -228,7 +228,7 @@ This file contains compact high-signal excerpts or summaries. Treat it as naviga
 ```markdown
 # Advisor Packet
 
-packet_version: cotend-model-upgrade-v1.13
+packet_version: cotend-model-upgrade-v1.14
 runtime_identity_contract: 1
 generated_at_commit:
 mode: advisor_guided | primary_takeover
@@ -259,6 +259,11 @@ runtime_profile_assessment_request:
   current_profile: full | adaptive | unknown
   current_product_orchestration_observed:
   public_or_unknown_environment: yes | no
+
+project_understanding_reconstruction_request:
+  contract_owner: cotend-collaboration/references/plan-tree.md
+  required_scope: full_current_mvp | not_required_for_slice_advisor
+  result_location: plan_tree_alignment.project_understanding_reconstruction
 
 ## User Request
 
@@ -487,6 +492,14 @@ yes / no / undecided
 ## Understanding Depth Verdict
 takeover_ready | slice_sufficient | insufficient_context
 
+## Canonical Project Understanding Reconstruction
+
+project_understanding_reconstruction_ref:
+  contract_owner: cotend-collaboration/references/plan-tree.md
+  required_scope: full_current_mvp | not_required_for_slice_advisor
+  plan_tree_alignment_ref:
+  outcome: ready | reconciliation_required | not_required_for_slice_advisor
+
 ## Freshness Check
 
 freshness_check:
@@ -530,6 +543,14 @@ advisory_log_appended: yes | no
 
 ## Questions Asked / Answers Confirmed
 ```
+
+At `takeover_ready`, the reference must resolve to the canonical triggered
+`plan_tree_alignment` block with `scope: full_current_mvp` and
+`outcome: ready`. The product-intent and end-to-end sections remain the
+advisor's compact teachback and independent code challenge; they do not
+redefine Plan Tree's trigger, scope, or readiness contract. A narrow
+`slice_advisor` may use `not_required_for_slice_advisor`, but cannot claim
+whole-project or takeover readiness.
 
 ## CONSENSUS-REVIEW.md
 
@@ -1142,6 +1163,16 @@ Use the shared evidence vocabulary for decision-relevant milestone, verification
 ```
 
 ## Changelog
+
+### 1.14 (2026-07-30)
+
+- Required Plan Tree's canonical `full_current_mvp` Project Understanding
+  Reconstruction before `takeover_ready` or confirmed-Primary product writes.
+- Kept `slice_advisor` narrow consultations on their bounded read path and
+  forbidden them from claiming takeover readiness.
+- Made Model Upgrade packets reference the triggered `plan_tree_alignment`
+  result instead of defining a parallel understanding contract.
+- Updated current packet and template stamps to `cotend-model-upgrade-v1.14`.
 
 ### 1.13 (2026-07-29)
 

@@ -95,7 +95,12 @@ Project-local CodeGraph indexes are allowed safe framework setup for current sta
 
 Use it after active truth is read, not before. The graph/map helps determine `must_read`, `should_check`, and impact scope; it must not silently expand the user's goal.
 
-If CodeGraph is missing or unindexed in a current standard/full project, do not silently downgrade. If `codegraph` is already installed and the canonical project root is clear, run `codegraph init .` from that root, ensure `.codegraph/` is ignored/untracked, then record `provider_status: available` and `freshness: fresh`.
+If CodeGraph is missing or unindexed in a current standard/full project, do not
+silently downgrade or initialize it. Name the canonical root, recommend
+initialization once, and wait for explicit user approval. Until then use a
+recorded `rg_fallback` for safe in-scope work. Only after approval may
+`codegraph init .` run in that root, with `.codegraph/` kept ignored/untracked
+and provider freshness recorded.
 
 Use `rg_fallback` only when CodeGraph is missing, unavailable, unsafe to initialize, declined by the user, or unnecessary for a tiny/local task. Record the fallback reason. If the user is away, continue only inside the current authorized scope and surface unresolved setup in the next checkpoint.
 

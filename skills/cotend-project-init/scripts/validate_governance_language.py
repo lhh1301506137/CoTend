@@ -58,6 +58,15 @@ GOVERNANCE_DIRS = {
 }
 ALLOWED_BODY_RESULTS = {"match", "mismatch", "technical_only", "unchecked"}
 ALLOWED_PROSE_RESULTS = {"present", "absent"}
+ALLOWED_EVALUATION_SCOPES = {
+    "whole_file_no_git",
+    "whole_file_outside_git_root",
+    "git_untracked_whole_file",
+    "git_unborn_whole_file",
+    "whole_file_no_git_delta",
+    "git_added_lines",
+    "git_added_lines_unavailable",
+}
 
 
 def normalize_tag(raw: str) -> str:
@@ -253,6 +262,7 @@ def invoke_checker(
     normalized_tag: str,
     path: Path,
     expected_sha256: str,
+    expected_byte_count: int,
 ) -> tuple[dict[str, Any] | None, str | None]:
     command = (
         [sys.executable, str(checker)]
@@ -311,6 +321,42 @@ def invoke_checker(
         and payload["user_visible_prose"] != "present"
     ):
         return None, "adapter_checker_body_prose_inconsistent"
+
+    scope_fields = {
+        "evaluation_scope",
+        "git_added_line_count",
+        "whole_file_sha256_checked",
+        "whole_file_byte_count",
+        "evaluated_text_byte_count",
+    }
+    if scope_fields.intersection(payload):
+        if not scope_fields.issubset(payload):
+            return None, "adapter_checker_scope_evidence_incomplete"
+        if payload["evaluation_scope"] not in ALLOWED_EVALUATION_SCOPES:
+            return None, "adapter_checker_evaluation_scope_invalid"
+        if payload["whole_file_sha256_checked"] is not True:
+            return None, "adapter_checker_whole_file_hash_unchecked"
+        whole_file_bytes = payload["whole_file_byte_count"]
+        if (
+            not isinstance(whole_file_bytes, int)
+            or isinstance(whole_file_bytes, bool)
+            or whole_file_bytes != expected_byte_count
+        ):
+            return None, "adapter_checker_whole_file_byte_count_mismatch"
+        evaluated_bytes = payload["evaluated_text_byte_count"]
+        if not isinstance(evaluated_bytes, int) or isinstance(evaluated_bytes, bool):
+            return None, "adapter_checker_evaluated_byte_count_invalid"
+        if evaluated_bytes < 0 or evaluated_bytes > expected_byte_count:
+            return None, "adapter_checker_evaluated_byte_count_invalid"
+        added_count = payload["git_added_line_count"]
+        if added_count is not None and (
+            not isinstance(added_count, int)
+            or isinstance(added_count, bool)
+            or added_count < 0
+        ):
+            return None, "adapter_checker_added_line_count_invalid"
+        if payload["evaluation_scope"] == "git_added_lines" and added_count is None:
+            return None, "adapter_checker_added_line_count_missing"
     return payload, None
 
 
@@ -543,6 +589,7 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
             normalized_tag=canonical_tag,
             path=path,
             expected_sha256=digest,
+            expected_byte_count=len(data),
         )
         if checker_error or checker_payload is None:
             packet["files"].append(
@@ -574,21 +621,29 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
             )
             return packet
         body_result = checker_payload["body_result"]
-        packet["files"].append(
-            {
-                "path": relative,
-                "sha256": digest,
-                "actual_bytes_checked": True,
-                "user_visible_prose": checker_payload["user_visible_prose"],
-                "body_result": body_result,
-                "checker": checker_payload.get("checker"),
-                "excluded_technical_segments": checker_payload.get(
-                    "excluded_technical_segments", []
-                ),
-                "metrics": checker_payload.get("metrics", {}),
-                "reason": checker_payload.get("reason"),
-            }
-        )
+        file_evidence = {
+            "path": relative,
+            "sha256": digest,
+            "actual_bytes_checked": True,
+            "user_visible_prose": checker_payload["user_visible_prose"],
+            "body_result": body_result,
+            "checker": checker_payload.get("checker"),
+            "excluded_technical_segments": checker_payload.get(
+                "excluded_technical_segments", []
+            ),
+            "metrics": checker_payload.get("metrics", {}),
+            "reason": checker_payload.get("reason"),
+        }
+        for field in (
+            "evaluation_scope",
+            "git_added_line_count",
+            "whole_file_sha256_checked",
+            "whole_file_byte_count",
+            "evaluated_text_byte_count",
+        ):
+            if field in checker_payload:
+                file_evidence[field] = checker_payload[field]
+        packet["files"].append(file_evidence)
         if body_result in {"mismatch", "unchecked"}:
             any_mismatch = True
             packet["reasons"].append(f"governance_body_{body_result}:{relative}")

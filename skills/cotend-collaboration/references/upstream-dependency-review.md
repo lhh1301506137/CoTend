@@ -190,7 +190,11 @@ Run only the checks relevant to the dependency:
 
 - Skill/prompt update: frontmatter and trigger consistency; no stale version strings; no conflict with module routing.
 - External framework update: identity/version evidence, local modifications, classified current/historical/conflict artifacts, and remaining procedure compatibility. Never copy its state/profile into the native CoTend record.
-- CodeGraph/MCP update: MCP connection, `codegraph init .`, ignored `.codegraph/`, sample query/scope result, no product-truth substitution.
+- CodeGraph/MCP update: verify the installed version, MCP connection, telemetry
+  boundary, index status, fresh-source/read-equivalence behavior, staleness
+  handling, sample scope result, and no product-truth substitution. Run
+  `codegraph init .` only in a disposable test root or a user-approved canonical
+  root; an existing real project index is not recreated merely for validation.
 - Plugin/runtime update: confirm whether it is platform-managed and whether local framework files need any change.
 - Code/assets/runtime adoption: complete the embedded dependency review; mutation case with an unknown bundled dependency must fail the safe-adoption gate, while design-inspiration-only may use evidence-backed `not_applicable_with_evidence`.
 

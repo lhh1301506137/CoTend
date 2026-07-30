@@ -1254,11 +1254,11 @@ def reference_study_errors(study_text: str, registry_text: str) -> list[str]:
             errors.append(f"reference study metadata mismatch: {key}")
 
     if metadata_values(registry_text, "implementation_dependency") != {
-        "pinned_private_dual_exact_source_9e6bbeeb"
+        "pinned_private_dual_exact_source_774aab64"
     }:
         errors.append("upstream registry must pin the adopted primary productization source")
     if metadata_values(registry_text, "source_copying") != {
-        "scoped_7_adapted_plus_2_byte_identical_skills"
+        "scoped_8_adapted_plus_1_byte_identical_skill"
     }:
         errors.append("upstream registry must record the scoped primary-source adoption")
 
@@ -1476,7 +1476,7 @@ def productization_truth_errors(
     for required_text in (
         "## UP01 dual-ai 分享包",
         "role: primary_productization_source",
-        "reviewed_release: exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
+        "reviewed_release: exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14",
         "target_publication_state: not_public_release",
         "latest_public_release: 2026.07.28.2",
         "adoption_status: repository_source_adopted_verified",
@@ -1485,7 +1485,7 @@ def productization_truth_errors(
         "adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md",
         "adoption_plan: upstream/FRAMEWORK-ADOPTION-PLAN.md",
         "capability_map: upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-        "adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-29-1-v1-71-adoption",
+        "adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-30-1-v1-76-adoption",
         "final_framework_lock: upstream/framework.lock.json",
     ):
         if required_text not in registry_text:
@@ -1609,34 +1609,34 @@ def upstream_adoption_errors(
         ("schema_version",): 1,
         ("status",): "adopted_verified",
         ("candidate_only",): False,
-        ("release_id",): "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
+        ("release_id",): "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14",
         ("target_publication_state",): "not_public_release",
-        ("framework_protocol_version",): "1.71",
-        ("dual_model_upgrade_version",): "1.13",
+        ("framework_protocol_version",): "1.76",
+        ("dual_model_upgrade_version",): "1.14",
         ("package_schema_version",): None,
-        ("source_framework_commit",): "9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
+        ("source_framework_commit",): "774aab64e778d2e3a57b66cfd65d808ac8235e14",
         ("release_anchor", "type"): "exact_source_commit",
         ("release_anchor", "publication_state"): "not_public_release",
-        ("release_anchor", "commit"): "9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
+        ("release_anchor", "commit"): "774aab64e778d2e3a57b66cfd65d808ac8235e14",
         ("release_anchor", "canonical_source_tree"): (
-            "8218cbfb8906bc3cc0f3bf76f4480d866ecb392e"
+            "ebcc0b2930146aca1ce299215f9a2f936b12d4c8"
         ),
         ("release_anchor", "canonical_source_tree_path"): "skills-backup/codex",
         ("release_anchor", "publisher_identity_authenticated"): False,
         ("integrity", "manifest_sha256"): (
-            "2e1e385db448c3bc622e68f851efd5e41012f9b4f94899caaca6e09297d9fb92"
+            "ae76f6101e9562740ffbf15ba6cd9841d21bfd85721bdc1994b2be123a64d3cb"
         ),
         ("integrity", "manifest_entries"): 2,
         ("integrity", "provenance_covered_files"): 2,
         ("integrity", "verification"): "passed",
         ("carriers", "codex", "skill_count"): 9,
-        ("carriers", "codex", "skill_file_count"): 51,
+        ("carriers", "codex", "skill_file_count"): 59,
         ("carriers", "claude", "skill_count"): 6,
         ("adoption", "state"): "adopted",
         ("adoption", "source_carrier"): "skills/",
         ("adoption", "capability_map"): "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
         ("adoption", "adoption_record"): (
-            "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-29-1-v1-71-adoption"
+            "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-30-1-v1-76-adoption"
         ),
         ("adoption", "final_framework_lock_exists"): True,
     }
@@ -1645,14 +1645,14 @@ def upstream_adoption_errors(
             errors.append(f"upstream candidate mismatch: {'.'.join(keys)}")
     expected_skill_trees = {
         "diagnose-only": "dd5ba26517f032c3dfcdd5c69fabc27825c6bf25",
-        "dual-ai-collaboration": "23cbd059d203957c5a435592865614bb4171e48e",
-        "dual-ai-init": "c4692686a98043b9e8196e2041497ba7113069a2",
-        "dual-ai-project-init": "e8f22e5731a03f4a5f1d993bf57e3c575a48a91f",
-        "dual-ai-semantic-alignment": "679c45d557cc3e625415d333e1ed4f68e730cd46",
-        "dual-ai-session-handoff": "67580d890c217630bbe7a61e44dfedc86377e6b1",
-        "dual-model-upgrade": "6f3dd1f0062e40034fd0662093cc5a17307dc6b4",
+        "dual-ai-collaboration": "fde20c6c554cfae1c17b4239aac2b725727493e2",
+        "dual-ai-init": "8dfda33031d0aad19f035a7d9de74bfcd52d29c6",
+        "dual-ai-project-init": "a2945ffe225c3ab502eaa43bcf14fc9c231aa220",
+        "dual-ai-semantic-alignment": "e6e145dc1fb66032ee01aaa0abae4afa77c12ff8",
+        "dual-ai-session-handoff": "9f97fbafdb510e47aff83f3e111c01e946b69d92",
+        "dual-model-upgrade": "96babb80a3ed68776c2a1d11df4093a93469f99b",
         "grill-me": "70df660726ef12349a40dc0353a681c82414fe95",
-        "karpathy-guidelines": "e119339197d600aa39a24fd7a95c946800c9c949",
+        "karpathy-guidelines": "32d7f4abb8c9dd8ab17a793b5e0b1a3a1fa35aeb",
     }
     if value(candidate, "carriers", "codex", "skill_trees") != expected_skill_trees:
         errors.append("upstream candidate Codex Skill tree inventory drift")
@@ -1676,8 +1676,8 @@ def upstream_adoption_errors(
     }
     if actual_skill_ids != expected_skill_ids:
         errors.append("adopted Codex Skill directory set must contain exactly nine Skills")
-    if len(skill_files) != 54:
-        errors.append(f"adopted Codex Skill source set must contain 54 files: {len(skill_files)}")
+    if len(skill_files) != 61:
+        errors.append(f"adopted Codex Skill source set must contain 61 files: {len(skill_files)}")
     adopted_files = value(candidate, "adoption", "imported_files")
     adapted_files = value(candidate, "adoption", "adapted_files")
     if not isinstance(adopted_files, list) or not isinstance(adapted_files, list):
@@ -1687,12 +1687,11 @@ def upstream_adoption_errors(
         adapted_set = set(adapted_files)
         expected_direct_adoption = {
             "skills/grill-me/SKILL.md",
-            "skills/karpathy-guidelines/SKILL.md",
         }
         if adopted_set != expected_direct_adoption:
             errors.append("directly adopted Skill file inventory drift")
         if adopted_set & adapted_set or adopted_set | adapted_set != skill_files:
-            errors.append("candidate adopted/adapted inventory does not equal the 54 current Skill files")
+            errors.append("candidate adopted/adapted inventory does not equal the 61 current Skill files")
     if value(candidate, "adoption", "required_before_lock") != []:
         errors.append("framework candidate retains unresolved pre-lock requirements")
 
@@ -1701,7 +1700,7 @@ def upstream_adoption_errors(
     if role_map.get("status") != "adopted_verified":
         errors.append("Codex role map is not finalized as adopted")
     if role_map.get("candidate_release") != (
-        "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
+        "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14"
     ):
         errors.append("Codex role map release mismatch")
     if role_map.get("candidate_publication_state") != "not_public_release":
@@ -1794,10 +1793,10 @@ def upstream_adoption_errors(
             "grill-me",
         ),
         "karpathy-guidelines": (
-            "bundled_third_party",
+            "adapted_third_party",
             "internal_ai_implementation_discipline",
-            "adopted",
-            "direct_adoption",
+            "adapted",
+            "platform_adaptation",
             "karpathy-guidelines",
         ),
     }
@@ -1861,7 +1860,7 @@ def upstream_adoption_errors(
             "repository_source_implemented": True,
             "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
             "adoption_record": (
-                "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-29-1-v1-71-adoption"
+                "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-30-1-v1-76-adoption"
             ),
             "live_install_authorized": False,
             "live_install_performed": False,
@@ -1876,7 +1875,7 @@ def upstream_adoption_errors(
         errors.append("framework adoption proposal is not finalized as adopted")
     exact_proposal_metadata = {
         "candidate_release": {
-            "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
+            "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14"
         },
         "source_anchor_type": {"exact_source_commit"},
         "target_publication_state": {"not_public_release"},
@@ -1898,7 +1897,7 @@ def upstream_adoption_errors(
         "`dual-ai-project-init` | `cotend-project-init`",
         "7 个 CoTend 第一方适配 Skill",
         "两个 MIT 伴随 Skill 保留原身份",
-        "目标载体是 54 个文件",
+        "目标载体是 61 个文件",
         "cotend.same-primary-session-handoff.v1",
         "adoption_state: adopted",
     ):
@@ -1909,7 +1908,7 @@ def upstream_adoption_errors(
         errors.append("framework adoption plan is not finalized as implemented")
     exact_plan_metadata = {
         "candidate_release": {
-            "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
+            "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14"
         },
         "source_anchor_type": {"exact_source_commit"},
         "target_publication_state": {"not_public_release"},
@@ -1926,7 +1925,7 @@ def upstream_adoption_errors(
         if metadata_values(adoption_plan_text, key) != expected:
             errors.append(f"framework adoption plan metadata mismatch: {key}")
     for required_text in (
-        "Source 合计 9 Skills / 51 files",
+        "Source 合计 9 Skills / 59 files",
         "`cotend-init`",
         "`cotend-project-init`",
         "`cotend-collaboration`",
@@ -1936,8 +1935,8 @@ def upstream_adoption_errors(
         "`cotend-session-handoff`",
         "`grill-me`",
         "`karpathy-guidelines`",
-        "cotend-collaboration-v1.71",
-        "cotend-model-upgrade-v1.13",
+        "cotend-collaboration-v1.76",
+        "cotend-model-upgrade-v1.14",
         "不新增能力编号或平行状态树",
         "锁文件只能在采用或升级提交中修改",
         "不全局安装或更新 Skills/Plugin",
@@ -1974,14 +1973,14 @@ def upstream_adoption_errors(
         ("schema",): "cotend.framework-lock",
         ("schema_version",): 1,
         ("status",): "adopted_verified",
-        ("release_id",): "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
-        ("framework_protocol",): "cotend-collaboration-v1.71",
-        ("model_upgrade_packet_family",): "cotend-model-upgrade-v1.13",
+        ("release_id",): "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14",
+        ("framework_protocol",): "cotend-collaboration-v1.76",
+        ("model_upgrade_packet_family",): "cotend-model-upgrade-v1.14",
         ("source_anchor", "type"): "exact_source_commit",
         ("source_anchor", "publication_state"): "not_public_release",
-        ("source_anchor", "commit"): "9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
+        ("source_anchor", "commit"): "774aab64e778d2e3a57b66cfd65d808ac8235e14",
         ("source_anchor", "canonical_source_tree"): (
-            "8218cbfb8906bc3cc0f3bf76f4480d866ecb392e"
+            "ebcc0b2930146aca1ce299215f9a2f936b12d4c8"
         ),
         ("source_anchor", "canonical_source_tree_path"): "skills-backup/codex",
         ("latest_public_release", "release_id"): "2026.07.28.2",
@@ -1994,10 +1993,10 @@ def upstream_adoption_errors(
         ("target_platform",): "Codex",
         ("source_carrier",): "skills/",
         ("skill_count",): 9,
-        ("skill_file_count",): 51,
+        ("skill_file_count",): 59,
         ("capability_map",): "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
         ("adoption_record",): (
-            "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-29-1-v1-71-adoption"
+            "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-30-1-v1-76-adoption"
         ),
         ("delivery_boundaries", "repository_source_adopted"): True,
         ("delivery_boundaries", "live_install_performed"): False,
@@ -2055,9 +2054,9 @@ def upstream_adoption_errors(
         "resulting_CoTend_commit: containing_commit",
         "live_install_performed: false",
         "8 个 Skill、37 个文件",
-        "## exact-source-2026-07-29-1-v1-71-adoption",
-        "target_artifact_id: cotend-codex-r000014",
-        "G06_status: frozen_completed_user_accepted_r13_not_rerun_for_r14",
+        "## exact-source-2026-07-30-1-v1-76-adoption",
+        "target_artifact_id: cotend-codex-r000015",
+        "G06_status: frozen_completed_user_accepted_r13_not_rerun_for_r15",
     ):
         if marker not in adoption_log_text:
             errors.append(f"framework adoption log is missing: {marker}")
@@ -2263,7 +2262,7 @@ def isolated_codex_plugin_fixture_errors(
     verifier_text = read("scripts/verify_isolated_codex_plugin.py")
     for marker in (
         'PLUGIN_VERSION = "0.0.0-dev.1+codex.fixture"',
-        "EXPECTED_FILE_COUNT = 54",
+        "EXPECTED_FILE_COUNT = 61",
         '"--phase-a"',
         '"--negative-mutations"',
         '"remote_plugin"',
@@ -2952,7 +2951,7 @@ def github_marketplace_root_carrier_errors(
             "tracked Marketplace inventory mismatch: " f"{tracked_marketplaces}"
         )
     source_files = sorted(path for path in candidates if path.startswith("skills/"))
-    if len(source_files) != 54:
+    if len(source_files) != 61:
         errors.append(f"root Marketplace Skill source count drifted: {len(source_files)}")
     if any(path.startswith("codex-skills/") for path in candidates):
         errors.append("legacy codex-skills source must not coexist with root skills")
@@ -3774,8 +3773,10 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         if actual_operations != EXPECTED_DELIVERY_OPERATIONS:
             errors.append(f"delivery operation inventory drift: {sorted(actual_operations)}")
         for marker in (
-            "EXPECTED_FILE_COUNT = 54",
-            "CURRENT_SOURCE_FRAMEWORK_FILE_COUNT = 51",
+            "EXPECTED_FILE_COUNT = 61",
+            "CURRENT_SOURCE_FRAMEWORK_FILE_COUNT = 59",
+            "R14_FILE_COUNT = 54",
+            "R14_SOURCE_FRAMEWORK_FILE_COUNT = 51",
             "R13_FILE_COUNT = 52",
             "R13_SOURCE_FRAMEWORK_FILE_COUNT = 49",
             "R10_TO_R12_FILE_COUNT = 40",
@@ -3849,8 +3850,8 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             "confirmation_gate_zero_write",
             "stale_plan_toctou_zero_write",
             "terminated_recovery_retains_dual_evidence",
-            'artifact_id="cotend-codex-r000015"',
-            "revision=15",
+            'artifact_id="cotend-codex-r000016"',
+            "revision=16",
         ):
             if marker not in harness_text:
                 errors.append(f"delivery lifecycle harness marker is missing: {marker}")
@@ -4082,14 +4083,14 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
         }
         or product != {"version": None}
         or target_lock.get("skill_count") != 9
-        or target_lock.get("skill_file_count") != 54
+        or target_lock.get("skill_file_count") != 61
     ):
         errors.append("delivery target lock source or envelope mismatch")
     expected_target = {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000014",
-        "revision": 14,
+        "artifact_id": "cotend-codex-r000015",
+        "revision": 15,
     }
     if not isinstance(target, dict) or any(
         target.get(key) != expected for key, expected in expected_target.items()
@@ -4113,6 +4114,19 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
     if not isinstance(target, dict) or target.get("manifest_sha256") != carrier_manifest:
         errors.append("delivery target lock manifest mismatch")
     expected_predecessors = [
+        {
+            "platform": "Codex",
+            "lineage": "cotend-codex",
+            "artifact_id": "cotend-codex-r000014",
+            "revision": 14,
+            "source_release_id": (
+                "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
+            ),
+            "framework_protocol": "cotend-collaboration-v1.71",
+            "manifest_sha256": (
+                "07ac592c82ed87f1759b38f04ed1f453c44e21d454fd12b4ce9eca459e4f3ed4"
+            ),
+        },
         {
             "platform": "Codex",
             "lineage": "cotend-codex",

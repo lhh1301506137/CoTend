@@ -102,7 +102,9 @@ Use this only when the project status explicitly records `local_closeout_authori
 - unrelated or user-owned changes are classified and excluded with explicit staging paths; unresolved ownership, staged overlap, overwrite, or inclusion blocks closeout;
 - no secrets, private data, large generated files, public artifacts, or ignored local-only config are staged;
 - required tests/checks/smoke verification and the actual primary model's formal self-review passed or are recorded as intentionally not applicable;
-- no unresolved user-only decision, Done Gate acceptance, release boundary, scope expansion, P0/P1, or `critical` risk appeared.
+- no unresolved user-only decision, Done Gate acceptance, release boundary,
+  scope expansion, P0, unresolved P1/validation failure after the canonical
+  bounded repair/recheck, or `critical` risk appeared.
 
 Allowed local closeout actions:
 
@@ -138,7 +140,9 @@ Do not use elapsed time alone as a checkpoint or stop reason.
 - Low-only personal/prototype: up to about 5 unattended checkpoints or about 4000 meaningful changed lines.
 - Default medium: up to about 3 unattended checkpoints or about 2500 meaningful changed lines.
 - Confirmed dev-high local fast mode: up to about 2 unattended checkpoints or about 1800 meaningful changed lines, then consolidate.
-- P0/P1 or critical: stop immediately.
+- P0 or Critical: stop immediately. An ordinary first in-scope P1 or validation
+  failure uses the canonical one-repair/one-recheck budget; if it remains
+  unresolved, repeats, or loses integrity confidence, stop immediately.
 
 These are approximate default anchors, not hard permission to keep going when evidence gets thin earlier. Use the same Checkpoint Measurement Method for all line estimates. If a project records numeric local limits, apply those local limits.
 

@@ -127,8 +127,8 @@ class IsolatedUserSkillDeliveryTests(unittest.TestCase):
         return Artifact.from_directory(
             source,
             source_release_id=self.artifact.source_release_id,
-            artifact_id="cotend-codex-r000015",
-            revision=15,
+            artifact_id="cotend-codex-r000016",
+            revision=16,
             protocol=self.artifact.protocol,
         )
 

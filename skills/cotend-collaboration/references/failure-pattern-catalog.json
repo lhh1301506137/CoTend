@@ -1,0 +1,78 @@
+{
+  "record_count": 2,
+  "records": [
+    {
+      "areas": [
+        "completion",
+        "evidence",
+        "main-chain",
+        "semantic-implementation"
+      ],
+      "cause_class": "framework_gap_or_ambiguity",
+      "confirmed_occurrences": 1,
+      "evidence_refs": [
+        "skills/cotend-collaboration/references/semantic-implementation-closure.md",
+        "tests/test_native_cumulative_main_journey.py"
+      ],
+      "first_seen": "2026-07-21",
+      "guard_owner": "semantic-implementation-closure.md",
+      "guard_summary": "完成重要 L2 或主链步骤前，同时验证局部职责、真实活动入口、上下游契约和累计主链；局部代码或测试通过不能单独支持推进。",
+      "id": "AFP-001",
+      "last_seen": "2026-07-21",
+      "lifecycle": "guarded",
+      "post_guard_recurrences": 0,
+      "record_path": "references/failure-patterns/AFP-001.md",
+      "record_sha256": "d8e69b5bf1e6568cf1c3e7eaa6b0d31913f85a33369e4d423a2d786f8c4c2b33",
+      "related_skills": [
+        "cotend-collaboration",
+        "cotend-semantic-alignment"
+      ],
+      "severity": "high",
+      "title": "局部实现完成被误报为功能或主链完成",
+      "trigger_tags": [
+        "feature-complete",
+        "main-chain-advance",
+        "post-alignment-renovation",
+        "step-complete"
+      ]
+    },
+    {
+      "areas": [
+        "evidence",
+        "governance",
+        "provenance",
+        "worktree"
+      ],
+      "cause_class": "framework_gap_or_ambiguity",
+      "confirmed_occurrences": 1,
+      "evidence_refs": [
+        "REVIEW-LOG.md#REVIEW-R300",
+        "PROJECT-KNOWLEDGE-CHANGELOG.md#KCH-20260728-245"
+      ],
+      "first_seen": "2026-07-28",
+      "guard_owner": "acceptance-test-harness.md",
+      "guard_summary": "申报文件变化时联合 Git 证据、操作写入回执和相关忽略治理文件的时间戳或哈希；Git 工作树干净只能证明其可见范围，不能证明没有文件被写入。",
+      "id": "AFP-002",
+      "last_seen": "2026-07-28",
+      "lifecycle": "guarded",
+      "post_guard_recurrences": 0,
+      "record_path": "references/failure-patterns/AFP-002.md",
+      "record_sha256": "921f8dfbf66864fb232f25d655653ce00350acd164f723f6a8043094e775ad5d",
+      "related_skills": [
+        "cotend-collaboration",
+        "cotend-project-init",
+        "cotend-session-handoff"
+      ],
+      "severity": "high",
+      "title": "Git 工作树干净被误报为没有文件变化",
+      "trigger_tags": [
+        "git-status",
+        "governance-write",
+        "ignored-file-change",
+        "session-handoff"
+      ]
+    }
+  ],
+  "schema": "cotend.failure-catalog.v1",
+  "source_of_truth": "failure-pattern Markdown metadata"
+}

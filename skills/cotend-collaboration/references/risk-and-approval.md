@@ -63,7 +63,14 @@ Record a compact `posture_notice` fingerprint in the existing risk or status car
 
 A material transition must produce a non-empty deterministic fingerprint before recording the notice. A missing or empty fingerprint is a validation defect; never treat two absent values as proof that the first notice was already shown.
 
-Critical includes push/deploy/release/public sharing, force-push/history rewrite, destructive or irreversible real-data/user-file actions, secrets/private data exposure, untrusted scripts, global system changes, real payment/uncapped cost, other people's private data, validation failure, P0/P1, high-impact disagreement, and bypassing recorded stop boundaries.
+Critical includes push/deploy/release/public sharing, force-push/history rewrite,
+destructive or irreversible real-data/user-file actions, secrets/private data
+exposure, untrusted scripts, global system changes, real payment/uncapped cost,
+other people's private data, P0, unresolved P1 or validation/integrity failure
+after the canonical bounded repair/recheck, high-impact disagreement, and
+bypassing recorded stop boundaries. An ordinary first in-scope P1 or validation
+failure follows that bounded repair contract rather than creating a new
+approval question.
 
 For the exact canonical list, use the Critical / Never-Unattended Stop List in `authority-and-triggers.md`.
 

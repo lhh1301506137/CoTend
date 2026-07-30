@@ -43,8 +43,8 @@ REQUIRED_RUNTIME_MARKERS = (
     "2. one valid native project record;",
     "3. one unambiguous project-local legacy selection",
     "4. the CoTend product default `full`.",
-    "`full` | `v1.71-full` | `delegated_pair`",
-    "`adaptive` | `v1.71-A` | `inline`",
+    "`full` | `v1.76-full` | `delegated_pair`",
+    "`adaptive` | `v1.76-A` | `inline`",
     "Migrate only when all of these are true:",
     "Do not modify, delete, or normalize the source file.",
 )

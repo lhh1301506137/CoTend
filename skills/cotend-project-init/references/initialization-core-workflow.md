@@ -29,7 +29,7 @@ Do not start large product development until this workflow is complete.
 
 4. Select the runtime profile, then load collaboration rules.
    - Load `cotend-collaboration/references/runtime-profiles.md`, preserve a session/project selection across framework and model changes, use the applicable product default only when no choice exists, ignore model/Model Upgrade facts as selector inputs, and map the effective profile to `delegated_pair | inline` idempotently in the native record.
-   - Use `cotend-collaboration` v1.71 semantics.
+   - Use `cotend-collaboration` v1.76 semantics.
    - Treat `cotend-collaboration` as modular: load core first, then required `references/*.md` modules by trigger.
    - Load `cotend-collaboration/references/authority-and-triggers.md` whenever exact authority labels, stop boundaries, Chrome/release/decision triggers, or checkpoint measurement rules are needed.
    - Always include `loaded_protocol_modules` in initialization, handoff, review, unattended wake-up, approval, acceptance, Done Gate, and release-hardening outputs.
@@ -38,6 +38,17 @@ Do not start large product development until this workflow is complete.
    - Use `full` only when the project needs long unattended windows, AI UAT, Gemini advisory review, or complex multi-AI state.
 
 5. Create or inspect durable files.
+   - After language resolution, run the installed Project Init
+     `scripts/maintain_project_agents_router.py --apply` for the canonical
+     project root and resolved tag. The stable `COTEND:PROJECT-ROUTER` markers
+     own only the short router block; preserve every byte outside them.
+   - The block routes high-value project entry and governance through
+     `$cotend-collaboration`, keeps ordinary confirmed-route L3/L4 work
+     lightweight, and only suggests literal invocation for explicit-only
+     Skills. It is not a second project truth, plan, or user-instruction owner.
+   - Include a changed `AGENTS.md` in operation write receipts. Run router
+     `--check` before readiness; malformed markers, drift, or blocked output
+     prevents `continue_ready`.
    - Required for `lite`: `STATUS.md`, `REVIEW-LOG.md`.
    - Required for `standard`: `STATUS.md`, `REVIEW-LOG.md`, and `QUALITY-SIGNALS.md` or a `STATUS.md` Quality Sentinel section.
    - Conditional for standard/full multi-stage projects or projects with repeated user/grill/advisor decisions: `PROJECT-PLAN-TREE.md`, targeted `PROJECT-PLAN-NODES/` docs, linked `PROJECT-UNDERSTANDING/` docs, `PROJECT-DECISION-LOG.md`, and `PROJECT-KNOWLEDGE-CHANGELOG.md`. During Init, create only structural/index surfaces or copy already user-confirmed facts; do not draft proposed protected meaning, create a pending semantic state, or create a separate semantic tree/file.
@@ -76,7 +87,9 @@ Do not start large product development until this workflow is complete.
      - global system, credential store, registry, PATH, service, firewall, or machine-wide config changes;
      - real payment, real charge, uncapped cost, or new paid service activation;
      - other people's private data;
-     - validation failure, unexplained corruption, P0/P1, high-impact AI disagreement, or bypassing a recorded stop boundary.
+     - P0, unexplained corruption/integrity mismatch, unresolved P1 or
+       validation failure after the canonical bounded repair/recheck,
+       high-impact AI disagreement, or bypassing a recorded stop boundary.
    - When stopping for user approval, acceptance, scope expansion, Done Gate, release hardening, or any operation outside skill authority, explain the current stage/step, what the project is doing, why human input is needed now, what the operation does, its impact scope, what happens if approved, and the safer fallback if not approved.
 
 9. Establish review cadence.

@@ -31,8 +31,10 @@ R2_TO_R13_SKILLS = tuple(
 R1_SKILLS = tuple(
     skill for skill in R2_TO_R13_SKILLS if skill != "cotend-semantic-alignment"
 )
-EXPECTED_FILE_COUNT = 54
-CURRENT_SOURCE_FRAMEWORK_FILE_COUNT = 51
+EXPECTED_FILE_COUNT = 61
+CURRENT_SOURCE_FRAMEWORK_FILE_COUNT = 59
+R14_FILE_COUNT = 54
+R14_SOURCE_FRAMEWORK_FILE_COUNT = 51
 R13_FILE_COUNT = 52
 R13_SOURCE_FRAMEWORK_FILE_COUNT = 49
 R10_TO_R12_FILE_COUNT = 40
@@ -153,8 +155,10 @@ def _target_artifact_id(lineage: str, revision: int) -> str:
 
 
 def _expected_file_count(revision: int) -> int:
-    if revision >= 14:
+    if revision >= 15:
         return EXPECTED_FILE_COUNT
+    if revision == 14:
+        return R14_FILE_COUNT
     if revision == 13:
         return R13_FILE_COUNT
     if revision >= 10:
@@ -177,8 +181,10 @@ def _expected_skills(revision: int) -> tuple[str, ...]:
 
 
 def _expected_source_file_count(revision: int) -> int:
-    if revision >= 14:
+    if revision >= 15:
         return CURRENT_SOURCE_FRAMEWORK_FILE_COUNT
+    if revision == 14:
+        return R14_SOURCE_FRAMEWORK_FILE_COUNT
     if revision == 13:
         return R13_SOURCE_FRAMEWORK_FILE_COUNT
     if revision >= 2:

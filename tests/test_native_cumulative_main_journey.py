@@ -25,7 +25,7 @@ class NativeCumulativeMainJourneyTests(unittest.TestCase):
         self.assertEqual(result["native_capabilities_composed"], 8)
         self.assertFalse(result["real_user_acceptance_claimed"])
         self.assertFalse(result["skill_behavior_changed"])
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000014")
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000015")
 
     def test_full_and_adaptive_have_equivalent_semantic_outcomes(self) -> None:
         full = journey.run_main_journey("full")

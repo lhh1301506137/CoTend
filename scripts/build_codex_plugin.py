@@ -344,9 +344,9 @@ def source_skill_manifest() -> dict[str, str]:
     if actual_directories != EXPECTED_SKILLS:
         raise PluginPackageError("repository Skill directory inventory drifted")
     manifest = path_hash_manifest(SOURCE_SKILLS_ROOT)
-    if len(manifest) != 54:
+    if len(manifest) != 61:
         raise PluginPackageError(
-            f"expected 54 repository Skill files, found {len(manifest)}"
+            f"expected 61 repository Skill files, found {len(manifest)}"
         )
     for skill in EXPECTED_SKILLS:
         if f"{skill}/SKILL.md" not in manifest:
@@ -474,6 +474,28 @@ def historical_source_skill_manifest(commit: str) -> dict[str, str]:
     }
 
 
+@functools.lru_cache(maxsize=4)
+def _historical_support_entries(commit: str) -> tuple[tuple[str, bytes], ...]:
+    commit = validate_historical_source_commit(commit)
+    entries: list[tuple[str, bytes]] = []
+    for relative, source in PACKAGE_SUPPORT_FILES.items():
+        repository_path = source.relative_to(ROOT).as_posix()
+        result = _run_git(["show", f"{commit}:{repository_path}"])
+        if result.returncode != 0:
+            raise PluginPackageError(
+                f"historical Plugin support file is unavailable: {repository_path}"
+            )
+        entries.append((relative, result.stdout))
+    return tuple(entries)
+
+
+def historical_support_manifest(commit: str) -> dict[str, str]:
+    return {
+        relative: sha256_bytes(payload)
+        for relative, payload in _historical_support_entries(commit)
+    }
+
+
 def _locked_source_commit() -> str:
     lock = load_json_object(PACKAGE_LOCK_PATH, "Plugin package lock")
     source = lock.get("source")
@@ -484,19 +506,20 @@ def _locked_source_commit() -> str:
 
 def expected_package_manifest(
     source_manifest: dict[str, str] | None = None,
+    support_manifest: dict[str, str] | None = None,
 ) -> dict[str, str]:
     validate_brand_assets()
     if source_manifest is None:
         source_manifest = historical_source_skill_manifest(_locked_source_commit())
+    if support_manifest is None:
+        support_manifest = historical_support_manifest(_locked_source_commit())
     manifest = {
         ".codex-plugin/plugin.json": sha256_file(MANIFEST_SOURCE),
     }
     manifest.update(
         {f"skills/{relative}": digest for relative, digest in source_manifest.items()}
     )
-    manifest.update(
-        {relative: sha256_file(source) for relative, source in PACKAGE_SUPPORT_FILES.items()}
-    )
+    manifest.update(support_manifest)
     manifest.update(
         {
             relative: sha256_file(asset["source"])
@@ -544,14 +567,15 @@ def validate_contract() -> dict[str, Any]:
     if (
         target.get("platform") != "Codex"
         or target.get("lineage") != "cotend-codex"
-        or target.get("artifact_id") != "cotend-codex-r000014"
-        or target.get("revision") != 14
+        or target.get("artifact_id") != "cotend-codex-r000015"
+        or target.get("revision") != 15
         or not isinstance(target.get("manifest_sha256"), str)
         or len(target["manifest_sha256"]) != 64
     ):
         raise PluginPackageError("current target artifact identity drifted")
     source_commit = validate_historical_source_commit(source.get("source_commit"))
     locked_source_manifest = historical_source_skill_manifest(source_commit)
+    locked_support_manifest = historical_support_manifest(source_commit)
     predecessor_targets = artifact_lock.get("predecessor_targets")
     if not isinstance(predecessor_targets, list):
         raise PluginPackageError("target artifact predecessor inventory is invalid")
@@ -595,7 +619,10 @@ def validate_contract() -> dict[str, Any]:
     if source != expected_source:
         raise PluginPackageError("Plugin package source lock drifted")
 
-    expected_files = expected_package_manifest(locked_source_manifest)
+    expected_files = expected_package_manifest(
+        locked_source_manifest,
+        locked_support_manifest,
+    )
     expected_package = {
         "output_directory_name": PLUGIN_NAME,
         "file_count": len(expected_files),
@@ -638,6 +665,7 @@ def validate_contract() -> dict[str, Any]:
         "lock": lock,
         "source_commit": source_commit,
         "source_manifest": locked_source_manifest,
+        "support_manifest": locked_support_manifest,
         "repository_source_manifest": source_skill_manifest(),
         "expected_package_manifest": expected_files,
     }
@@ -746,10 +774,10 @@ def _materialize_package(package_root: Path, contract: dict[str, Any]) -> None:
         target = package_root / "skills" / Path(PurePosixPath(relative))
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(payload)
-    for relative, source in PACKAGE_SUPPORT_FILES.items():
+    for relative, payload in _historical_support_entries(contract["source_commit"]):
         target = package_root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
+        target.write_bytes(payload)
     for relative, asset in PACKAGE_BRAND_ASSETS.items():
         source = asset["source"]
         assert isinstance(source, Path)

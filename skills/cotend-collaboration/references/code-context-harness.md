@@ -19,7 +19,7 @@ Use the best available provider. For current `standard` or `full`, long-running,
 
 | Provider | Use When | Notes |
 |---|---|---|
-| `codegraph` | CodeGraph-like CLI/MCP/symbol/call graph is installed/configured and the project has an index, or the index can be safely initialized in the canonical project root. | Preferred concrete provider for agent development because it can answer structure, dependency, and symbol questions. |
+| `codegraph` | CodeGraph-like CLI/MCP/symbol/call graph is installed/configured and the project already has an index, or the user has explicitly approved initialization in the canonical project root. | Preferred concrete provider for agent development because it can return verbatim source plus structure, dependency, and symbol evidence. |
 | `repo_map` | Aider-style repo map or other compressed code map exists. | Good for token-budgeted global understanding. |
 | `language_server` | LSP/ctags/indexer can find symbols/references. | Good fallback for typed projects. |
 | `rg_fallback` | CodeGraph/repo-map/index is missing, unavailable, declined, or inappropriate for a small task. | Use `rg`, file tree, imports, package scripts, CoTend-linked specs plus classified external references, and direct reads. Record why CodeGraph was not used for large/current standard-full projects. |
@@ -27,7 +27,32 @@ Use the best available provider. For current `standard` or `full`, long-running,
 
 Do not install global tools or add project-local dev dependencies automatically. Global tool installation, MCP setup, or package dependency changes require user approval.
 
-Project-local generated indexes are different: for current `standard` or `full`, large, unfamiliar, cross-module, architecture-heavy, or review-heavy projects, a CodeGraph index may be created automatically when `codegraph` is already installed and the canonical project root is clear. Generated indexes must be ignored/untracked unless the user explicitly wants them committed.
+Project-local indexes are also user-owned setup. When a useful project has no
+index, recommend initialization once and use `rg_fallback` until the user
+approves it. Never run `codegraph init .` without the user's approval, even
+when the CLI is installed and the root appears clear. Generated indexes must
+remain ignored/untracked unless the user explicitly wants them committed.
+
+## Provider Capability Contract
+
+The current provider/tool contract outranks generic framework advice about how
+to initialize, query, trust, or refresh that provider. Apply these CodeGraph
+rules when the active tool declares them:
+
+- fresh verbatim source is Read-equivalent. Treat the returned line-numbered
+  body as already read. Do not repeat `rg`, grep, or direct reads merely to
+  confirm the same source;
+- only the files named by a staleness banner require a direct fresh read. Other
+  returned files remain usable;
+- when auto-sync is disabled or the index is frozen, direct-read every detail
+  that may have changed until freshness is restored;
+- graph relationships and impact paths are scope evidence, not runtime
+  correctness, product truth, or proof that a dynamic path actually executed;
+- use direct tools for configs, documentation, unindexed details, generated or
+  binary assets, exact working-tree state, runtime output, diffs, and tests;
+- if the provider reports that the project is unindexed, stop provider calls
+  for that project, offer user-approved initialization when worthwhile, and
+  continue with the best safe fallback.
 
 ## CodeGraph MCP Configuration
 
@@ -35,7 +60,9 @@ Rules:
 
 - Use the provider's documented setup/status flow. User-level MCP configuration changes require approval.
 - A repair must affect only the CodeGraph MCP entry and must not alter model providers, relay/base URLs, auth tokens, other MCP servers, other carriers, or project files.
-- Each large project needs its own local `.codegraph/` index via `codegraph init .` from that project root.
+- Each large project benefits from its own local `.codegraph/` index, but
+  `codegraph init .` is run from that project root only after the user approves
+  initialization.
 - `.codegraph/` is project-local state and must be ignored/untracked unless the user explicitly wants otherwise.
 - Keep CodeGraph telemetry disabled for this local-first framework unless the user explicitly opts in. After install/upgrade, check `codegraph telemetry status`; if it is enabled, run `codegraph telemetry off` and record that privacy boundary in the init/update summary.
 - If the current Codex workspace root is a parent folder, use `codegraph` CLI `-p <canonical project path>` for checks/queries and record the canonical project root in the initialization report.
@@ -47,16 +74,28 @@ If a user initializes a current standard/full CoTend project, assume it is subst
 For these projects:
 
 - Prefer `provider: codegraph`.
-- If CodeGraph CLI/MCP is installed but the project index is missing, run `codegraph init .` from the canonical project root before broad development/review.
-- After initialization, run `codegraph status .` or an equivalent MCP status check and record `provider_status: available`, `freshness: fresh`, and the canonical project root.
-- Ensure `.codegraph/` is ignored/untracked. If `.gitignore` exists and lacks the entry, add `.codegraph/` when safe. If no `.gitignore` exists, create one only when the canonical project root is clear and the project appears to be a normal git/code project. If `.codegraph/` is already tracked, stop and ask the user.
+- If CodeGraph CLI/MCP is installed but the project index is missing, ask once
+  whether to initialize it in the named canonical project root. Until approval,
+  use `rg_fallback`; do not make initialization a prerequisite for safe
+  in-scope progress.
+- After user-approved initialization, run `codegraph status .` or an equivalent
+  MCP status check and record `provider_status: available`,
+  `freshness: fresh`, and the canonical project root.
+- Before approved initialization, check how `.codegraph/` will remain
+  ignored/untracked. Adding or creating `.gitignore` is a project write and
+  must stay inside the approved setup/task scope. If `.codegraph/` is already
+  tracked, stop and ask the user.
 - Check `codegraph telemetry status` after install/upgrade. Disable telemetry with `codegraph telemetry off` unless the user has explicitly chosen to keep it enabled.
 - If CodeGraph is installed but MCP is missing after a config switch, use or recommend the documented MCP setup flow. If CodeGraph is not installed/configured, recommend one-time global setup at the next human checkpoint.
 - If the root is ambiguous, points to a parent/multi-project folder, appears unexpectedly huge, or cannot be safely recorded, stop and ask the user to confirm the canonical project root.
-- If the user is away/unattended and indexing cannot be safely initialized, continue only within the current authorized scope using `rg_fallback`, record `fallback_reason`, and surface setup in the wake-up summary.
+- If the user is away/unattended and no index exists, continue only within the
+  current authorized scope using `rg_fallback`, record `fallback_reason`, and
+  surface the optional setup in the wake-up summary.
 - If the task is genuinely tiny and local, `rg_fallback` is allowed, but record `required: no`.
 
-Never treat CodeGraph setup as permission to widen scope, install global tools silently, add dependencies, commit generated indexes, or skip direct file/diff/test verification.
+Never treat CodeGraph setup as permission to widen scope, install global tools
+silently, add dependencies, commit generated indexes, or skip the direct
+runtime/diff/test evidence required for correctness.
 
 ## Native Pre-Development Readiness Gate
 
@@ -120,7 +159,14 @@ Run this pass for new/unfamiliar projects, large repos, cross-module work, archi
    - `must_read`: files needed before editing/reviewing;
    - `should_check`: related tests/config/callers;
    - `out_of_scope`: tempting but unrelated areas.
-5. Verify with actual files, diffs, and tests. Treat graph/map output as a hint, not as evidence by itself.
+5. Apply evidence by kind:
+   - fresh verbatim provider source already satisfies the source-read step;
+   - direct-read only staleness-banner files plus configs, documentation,
+     unindexed details, generated/binary assets, and exact working-tree state;
+   - use diffs, tests, logs, runtime inspection, and product evidence for
+     correctness;
+   - treat graph/map relationships as impact-scope hints rather than execution
+     or product-truth proof.
 
 ## Drift Guard
 
@@ -148,6 +194,9 @@ code_context_harness:
   preferred_provider: codegraph | repo_map | language_server | rg_fallback | none
   provider_status: available | missing | unindexed | stale | unavailable | user_declined | not_needed
   fallback_reason:
+  source_read_semantics: read_equivalent | map_only | direct_read_fallback | not_applicable
+  staleness_scope:
+    -
   target_level: full_goal | mvp | stage_goal | task
   freshness: fresh | stale | unknown | not_applicable
   used_for:

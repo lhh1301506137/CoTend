@@ -61,7 +61,7 @@
     - Detect available provider: `codegraph`, `repo_map`, `language_server`, `rg_fallback`, or `none`.
     - For current standard/full projects, treat CodeGraph as expected and record why it is unavailable if falling back.
     - If CodeGraph CLI is available but MCP is missing after a config switch, use or recommend the provider's documented MCP setup flow without changing unrelated configuration.
-    - For each current standard/full or large project, initialize or refresh an isolated project-local index with `codegraph init .` from the canonical project root when `codegraph` is installed and the root is clear. Do not reuse another project's `.codegraph/`.
-    - Ensure `.codegraph/` is ignored/untracked; add `.codegraph/` to the canonical root `.gitignore` when safe. If `.codegraph/` is already tracked, the root is ambiguous, or `.gitignore` cannot be safely updated, stop with Human Rejoin instead of silently falling back.
+    - For each current standard/full or large project, inspect an existing isolated project-local index. If none exists, ask the user before running `codegraph init .`; until approval, use a recorded safe fallback. Do not reuse another project's `.codegraph/`.
+    - Before approved initialization, verify how `.codegraph/` will remain ignored/untracked. Adding `.codegraph/` to `.gitignore` is a project write and must stay inside the approved setup/task scope. If `.codegraph/` is already tracked, the root is ambiguous, or the ignore boundary cannot be made safe, stop with Human Rejoin.
     - Record that code context is a scope hint, not product truth.
     - When external development-framework artifacts remain, run code-context discovery only after the CoTend goal/route owner is resolved and applicable external task/PRD/spec/closeout artifacts are classified. Historical foreign files are optional evidence only and are never executed as CoTend Core.

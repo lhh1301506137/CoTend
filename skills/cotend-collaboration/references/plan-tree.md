@@ -455,6 +455,113 @@ Use this default loading:
 
 Parent chain means the active path from root to current leaf. Prefer summaries first; load full node docs only when needed.
 
+## Project Understanding Reconstruction
+
+This is the sole owner of the triggered reconstruction contract. It is a cold
+path that rebuilds enough whole-project understanding for a Primary that must
+make route or integration decisions. It reads canonical Plan Tree and node
+summaries, `PROJECT-DECISION-LOG.md`, `PROJECT-KNOWLEDGE-CHANGELOG.md`, active
+task/spec truth, and current implementation/evidence only where needed to
+check the route. The compact result is an execution-readiness proxy, not new
+product truth, user confirmation, a semantic contract, or proof that a model
+mathematically “understands” the project.
+
+### Trigger Boundary
+
+Run reconstruction before non-trivial implementation when any trigger is
+present:
+
+- the root Primary is entering this project for the first time while assuming
+  end-to-end route and integration responsibility;
+- the same verified Primary is taking over in a newly and explicitly invoked
+  session;
+- a different Primary identity/role has been genuinely confirmed and is taking
+  over, including a Model Upgrade review claiming `takeover_ready`;
+- current-MVP L0 or L1 has been fully rebased or materially changed;
+- work enters a new L1 capability domain;
+- an L2 scope/responsibility change affects its L1 domain or dependencies;
+- work becomes cross-domain, architectural, or cumulative across material
+  main-chain steps;
+- drift, repeated rework, route rupture, disconnected lineage, or reliance on
+  superseded implementation/assumptions indicates that the prior mental model
+  is no longer reliable.
+
+Do **not** trigger reconstruction for ordinary `继续`, a next L3/L4 leaf on the
+same confirmed route, local implementation/test/refactor detail, a review-only
+narrow advisor question, or L3/L4 implementation change by itself. Those paths
+keep the existing active-path/parent-summary progressive load. A file was read,
+a summary exists, or a hash matches is evidence freshness, not an understanding
+trigger or a ready result.
+
+`first_project_entry` is a root-Primary lifecycle trigger, not a per-agent
+repository-view trigger. A bounded worker/reviewer/subagent consumes the root's
+compact work packet and canonical semantic pointers; its first view of the
+repository does not by itself trigger reconstruction. It runs this cold path
+only when it is actually taking over route/integration responsibility or its
+assigned work independently fires another canonical trigger.
+
+### Scope Selection
+
+Choose the widest minimum scope implied by all current triggers. A wider scope
+may be selected when evidence shows the narrower boundary is unsafe; never
+narrow a required scope for token savings or because Full/Adaptive differs.
+
+| Minimum scope | Canonical trigger reason IDs | Required read set |
+|---|---|---|
+| `full_current_mvp` | `first_project_entry`, `same_primary_new_session`, `confirmed_primary_takeover`, `l0_l1_full_rebase` | Read complete current L0; every current-MVP L1 summary and main-chain position; responsibility/relationship summaries for important current-MVP L2s; the active L2 in full; and recent relevant semantic, decision, and knowledge changes. |
+| `affected_l1_domain` | `new_l1_domain`, `l2_scope_change`, `cross_domain_architecture_or_cumulative_main_chain` | Read the affected L1 domain(s), important L2s inside them, direct upstream/downstream and cross-domain dependencies, the active L2 in full, and relevant changes. Widen when the domain or complete chain cannot be bounded reliably. |
+| `active_path_delta` | `drift_rework_route_break_or_stale_assumption` | Read the active path, its parent chain, and relevant changes since the last reliable boundary. Widen as soon as the anomaly crosses that boundary. |
+
+After a confirmed semantic change:
+
+- L0/L1 change -> `full_current_mvp`;
+- L2 scope/responsibility/relationship change -> `affected_l1_domain`,
+  including direct dependencies;
+- L3/L4 implementation change alone -> no semantic reconstruction;
+- multiple simultaneous reasons -> the widest required scope.
+
+### Required Synthesis
+
+Produce a compact synthesis in the AI's own words that covers:
+
+- product goal;
+- target user and usage mode;
+- the complete current-MVP main chain, not merely the active branch;
+- the L1 capability map and how each domain contributes to that chain;
+- the active L2's global responsibility, parent L1, inputs, outputs, and direct
+  upstream/downstream/cross-domain dependencies;
+- current non-goals and MVP boundaries;
+- recent semantic/decision/knowledge changes plus invalidated old assumptions;
+- unresolved uncertainties and the exact active-leaf-to-main-chain connection.
+
+Source pointers and compact summaries belong in the canonical optional block
+in `templates.md`; do not copy full L0-L2 prose into
+`plan_tree_alignment`. Omit the block when no trigger fires.
+
+### Ready And Failure Rule
+
+`ready` requires the complete synthesis above and affirmative evidence that
+the active leaf connects to the complete current-MVP main chain. It is
+forbidden when any of these holds:
+
+- the leaf cannot be connected to that chain;
+- current truth sources conflict;
+- a required capability domain is missing;
+- an invalidated or superseded assumption still drives the route;
+- the record contains only filenames, read receipts, hashes, or an existing
+  summary without the cross-domain synthesis.
+
+On failure, set implementation permission to `no` and enter the existing
+Triggered Semantic Reconciliation flow. Route to direct
+`$cotend-semantic-alignment` only when that existing flow finds protected
+L0-L2 meaning that needs confirmation or change. Reconstruction must not edit
+semantics or create a new user gate. When the synthesis is consistent with
+already confirmed truth, no new user confirmation is needed.
+
+Full and Adaptive use the same triggers, minimum scope, required synthesis,
+failure stop, and ready result. Their orchestration differences may change who
+performs the read, never what qualifies.
+
 ## Triggered Semantic Reconciliation
 
 Use one progressive mechanism to catch both explicit record conflicts and a current baseline that is internally consistent but semantically wrong when compared with original or later user-confirmed evidence. This composes Plan Tree, Active Truth, Decision Log, Knowledge Changelog, Intent Drift, User Interruption, and Quality Sentinel; it creates no new truth file. Writable new-baseline, full-rebaseline, scoped-realignment, and semantic-change workflows are owned only by the directly invoked `$cotend-semantic-alignment` and persist results back into these existing surfaces. Full/scoped read-only audits are owned by the directly invoked `$cotend-diagnose-only` and do not persist semantic or product changes.
@@ -512,6 +619,14 @@ Before implementing non-trivial work, bind the next step:
 Use the canonical `plan_tree_alignment` schema from `templates.md`. This section defines when binding is required; `templates.md` owns the packet fields.
 
 If `status: needs_reconciliation`, do not implement plan-external work yet.
+
+Resolve the Project Understanding Reconstruction trigger before trusting the
+binding. When no trigger fires, omit
+`plan_tree_alignment.project_understanding_reconstruction` and keep the
+ordinary active-path load. When a trigger fires, the canonical block must
+record the selected scope, source pointers, compact synthesis, checks, and
+result. Do not implement until its outcome is `ready` and
+`implementation_allowed: yes`.
 
 Before trusting an existing `current_next_leaf`, freshness-check a supplied canonical same-Primary session handoff only when the current input explicitly contains `$cotend-session-handoff`, and resolve any active `route_rebase_ref` by the lifecycle above. Never discover or auto-consume a packet merely because the app restarted or a task resumed. A stale packet must reconcile its successor differences; a conflicting packet stops. Pending high-level confirmation preserves the candidate and blocks only its affected path; applying/revalidating state resumes at the reliable boundary; blocked state cannot be bypassed by selecting a later leaf.
 

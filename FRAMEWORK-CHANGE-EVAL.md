@@ -1634,3 +1634,130 @@ authorization_boundary:
 ```
 
 本次采用明确区分“参考上游”和“公开产品”：Dual exact source 提供可审查输入，CoTend 决定公开命名、触发方式、权限和交付历史。5 个合同变化进入产品代码，15 个 evidence-only 提交只作为来源证明。G06 仍是 r13 历史事实，不因 r14 仓库回归被改写。
+
+## 2026-07-30 Dual exact source / CoTend v1.76 r15 本地采用
+
+```yaml
+current_framework_version: cotend-collaboration-v1.76
+previous_framework_version: cotend-collaboration-v1.71
+model_upgrade_packet: cotend-model-upgrade-v1.14
+source_identity:
+  base: exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826
+  target: exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14
+  target_tree: ebcc0b2930146aca1ce299215f9a2f936b12d4c8
+  publication_state: not_public_release
+consumer_handoff: consumer-handoff:2026.07.30.1
+change_classification: high_impact_workflow_behavior
+authority: product_owner_authorized_local_promotion
+change_summary: 在 CoTend 既有原生 owner 内适配 v1.72-v1.76 的理解重建、Failure Memory、有界修复、影响导向架构权威、CodeGraph provider 合同、渐进加载、Project Init 路由和瘦 Session Handoff，不复制 Trellis
+intent:
+  - 提升跨会话、跨域和架构工作前的项目理解可靠性，同时避免普通 L3/L4 工作全量重读
+  - 让第一次普通可恢复 P1/validation failure 能在严格边界内闭环，不把技术修复误升格为用户产品决定
+  - 让架构决策按真实用户影响而非规模标签划分权威
+  - 把失败经验变成最多三张可检索 guard，而非常驻全部事故历史
+  - 提升 Skill 入口发现和 project-root AGENTS 路由稳定性
+expected_benefit:
+  - 新会话/新 Primary/跨域架构工作必须把活动叶连接到完整 MVP 主链后才可实现
+  - 普通同路线工作保持渐进加载，降低核心 Skill 常驻上下文
+  - CodeGraph 新鲜逐字源码不再重复读取，缺索引也不会被静默初始化
+  - CoTend 原生六类开发过程治理和 Native Closeout 精确提交范围继续不退化
+possible_harm:
+  - 错误触发理解重建会增加上下文成本或制造伪停止
+  - Failure Memory 过宽匹配会把历史提示误当产品真相或权威
+  - 有界修复若边界不严会把未知完整性或重复 P1 隐藏在自动重试中
+  - AGENTS router 若不保护块外字节会覆盖用户项目规则
+  - Session Handoff 瘦身若漏迁合同会造成能力退化
+affected_workflows:
+  - cotend_collaboration_routing_and_authority
+  - plan_tree_and_project_truth
+  - quality_sentinel_and_failure_memory
+  - code_context_harness
+  - project_init_language_and_agents_router
+  - same_primary_session_handoff
+  - model_upgrade_takeover_readiness
+  - native_implementation_verification_review_closeout
+  - third_party_source_classification_and_notice
+deviations:
+  - 所有 `dual-ai-*` 名称、私有 owner 默认和 Trellis 载体改为 CoTend 原生命名与 owner
+  - 不复制上游私有事故原文；Failure Memory 使用 CoTend 自有、可公开化的模式与证据
+  - Full 使用 CoTend Native Implementer/Checker，而不是 Trellis implement/check
+  - Native Closeout 已承接精确 commit scope，因此不采用 `task_store.py`
+  - 已形成本地采用锁和确定性 r15 artifact；真实模型、外部 UAT、全局安装和公开动作仍须另行授权
+mechanism_budget:
+  new_long_lived_skills: 0
+  new_parallel_truth_or_state_trees: 0
+  new_reference_modules: 1_failure_memory
+  new_bounded_scripts: 2_failure_selector_and_project_agents_router
+  moved_detail: session_handoff_core_to_one_direct_reference
+  ordinary_context_policy: core_plus_triggered_one_level_modules
+  retrieval_cap: 3_guard_cards
+  repair_cap: one_repair_plus_one_recheck
+  cheaper_alternative_considered: 只改版本字符串或照搬 Dual 全部文件；前者缺失行为，后者会恢复外部载体并覆盖 CoTend 原生 owner，均拒绝
+  retirement_or_thinning_trigger: 当平台原生提供同等 project-router、failure-guard retrieval 或 session handoff 时，评估删除对应脚本/引用而不改变行为合同
+embedded_dependency_review:
+  status: completed
+  reason: 不嵌入 Trellis 或未知第三方 code/assets/runtime；CodeGraph 仅是可选外部 provider。v1.75 对现有 MIT karpathy-guidelines 的执行授权文字形成已知本地适配，因此已把其关系从 bundled_third_party 更正为 adapted_third_party，并同步 THIRD-PARTY-SOURCES.json 与 THIRD-PARTY-NOTICES.md；MIT 许可和上游归属保持不变。
+adopted_inventory:
+  skill_files: 61
+  source_skill_files: 59
+  previous_locked_skill_files: 54
+  excluded_preexisting_untracked_file: COTEND-SKILLS-GUIDE.html
+  framework_lock_changed: true
+  artifact_lock_changed: true
+  artifact_generated: true
+  artifact_entries: 63
+  artifact_sha256: 8b8f80da07503964620a135208159a313d3b00252c2ddde943904e4c10c685c1
+validation_scenarios:
+  - scenario: project_understanding_reconstruction_trigger_scope_ready_and_failure_matrix
+    validation_result_type: deterministic_contract_and_negative_test
+    result: passed_single_Plan_Tree_owner_exact_trigger_scope_ready_failure_and_no_second_Project_Init_owner
+  - scenario: failure_memory_catalog_selection_cap_hash_and_lifecycle_negative_matrix
+    validation_result_type: executable_unit_and_cli_validation
+    result: passed_5_tests_catalog_rebuild_hash_fail_closed_root_skill_no_admission_and_max3_plus_cli_validate_2_records
+  - scenario: bounded_P1_validation_repair_Full_Adaptive_parity
+    validation_result_type: deterministic_contract_and_native_verification_regression
+    result: passed_exact_one_repair_one_recheck_strict_stop_contract_and_existing_repair_rebind_retest_scenarios
+  - scenario: architecture_impact_classification_Full_Adaptive_parity
+    validation_result_type: deterministic_contract_test
+    result: passed_impact_not_size_classification_same_Full_Adaptive_authority_boundary
+  - scenario: codegraph_read_equivalence_staleness_and_user_approved_init_contract
+    validation_result_type: deterministic_contract_test
+    result: passed_fresh_verbatim_read_equivalence_banner_scoped_fallback_and_no_automatic_init
+  - scenario: project_agents_router_byte_preservation_marker_and_path_safety
+    validation_result_type: executable_unit_test
+    result: passed_4_tests_create_check_idempotence_BOM_newline_block_outside_bytes_malformed_duplicate_invalid_UTF8_and_tag_fail_closed
+  - scenario: session_handoff_literal_zero_read_gate_and_thin_reference_integrity
+    validation_result_type: deterministic_entry_contract_test
+    result: passed_38_line_literal_gate_one_direct_reference_and_reconstruction_takeover_contract
+  - scenario: governance_language_git_added_lines_and_whole_file_hash_binding
+    validation_result_type: executable_unit_test
+    result: passed_11_tests_git_added_lines_whole_file_SHA_byte_count_table_bullets_drift_and_profile_equivalence
+  - scenario: native_six_owner_and_closeout_commit_scope_regression
+    validation_result_type: executable_native_regression_with_release_lock_separation
+    result: passed_complete_432_of_432_unit_tests_after_r15_lock_and_manifest_promotion
+  - scenario: official_skill_creator_and_repository_regression
+    validation_result_type: official_validation_static_parse_and_release_gate
+    result: passed_official_quick_validate_9_of_9_repository_301_19_19_upstream_and_adopted_verifiers_Ruff_and_git_diff_check
+  - scenario: deterministic_local_r15_artifact_and_frozen_rc2
+    validation_result_type: reproducible_build_and_historical_lock_regression
+    result: passed_2_byte_identical_r15_builds_63_entries_sha256_8b8f80da07503964620a135208159a313d3b00252c2ddde943904e4c10c685c1_and_rc2_manifest_a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2_unchanged
+real_project_validation:
+  - scenario: fresh_session_or_real_model_behavior
+    validation_result_type: not_authorized
+  - scenario: new_artifact_update_rollback_or_public_release
+    validation_result_type: not_authorized
+adoption_decision: adopted_verified_local_r15
+rollback_triggers:
+  - any_Trellis_runtime_Skill_hook_state_or_task_authority_enters_product
+  - understanding_reconstruction_creates_second_truth_or_runs_for_ordinary_same_route_L3_L4
+  - failure_memory_returns_more_than_three_cards_or_root_skill_alone_admits_a_pattern
+  - first_failure_budget_can_repeat_or_cross_user_owned_boundary
+  - architecture_size_or_keyword_overrides_impact_classification
+  - router_changes_bytes_outside_one_marker_block_or_accepts_malformed_markers
+  - literal_absent_session_handoff_reads_project_or_calls_tools
+  - native_six_owner_or_closeout_exact_scope_regresses
+  - adapted_MIT_content_is_reported_as_byte_identical_or_loses_license_notice
+review_after: next_real_model_external_UAT_global_install_or_public_action_decision
+```
+
+本条目记录的是已通过完整仓库门禁和确定性构建的本地采用：r15 精确绑定 9 个 Skill、61 个目标文件和 r14 第一 predecessor。它不把本地采用描述成公开 release，也不把 r13 的 G06 历史真实项目验收改写成 r15 证据。任何真实模型、外部 UAT、全局安装、push、tag、Release、submission 或 publish 仍需用户另行授权。

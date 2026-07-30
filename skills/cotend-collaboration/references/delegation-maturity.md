@@ -235,7 +235,11 @@ Do not expand the state to another category, project, protected L0-L2 scope, mod
 These always remain `ask_each_time`, regardless of acceptance history:
 
 - any current-MVP L0-L2 product meaning, including root goal, MVP/main chain, important feature responsibility/result, final product shape, product direction, or scope expansion;
-- major architecture reshaping, technology-stack replacement, schema/public API/external-contract change;
+- architecture or technology-stack change that alters confirmed L0-L2,
+  user-visible results, irreversible data semantics, security/privacy, real
+  cost, public API, external contract, release posture, or another canonical
+  stop boundary. Purely technical, reversible, impact-neutral L3/L4 reshaping
+  remains Primary-owned and is not a delegation sample;
 - every Critical / Never-Unattended stop;
 - secrets, privacy, other people's data, real data, real payment/cost, destructive or irreversible action;
 - push, deploy, release, publish, public sharing or making the product available to others;

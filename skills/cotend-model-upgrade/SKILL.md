@@ -8,9 +8,9 @@ metadata:
 
 # CoTend Model Upgrade
 
-Version: 1.13
+Version: 1.14
 
-Compatibility baseline: `cotend-collaboration-v1.71`.
+Compatibility baseline: `cotend-collaboration-v1.76`.
 
 Use this skill to coordinate a cost-efficient current model and a stronger premium model on the same project, including one-shot advice, user-approved takeover, milestone re-entry advisor rounds, non-authorizing runtime-profile recommendations, and cold-path framework thinning review after the user confirms a new primary development model.
 
@@ -143,7 +143,10 @@ The premium model is explicitly allowed to:
 The constraints are about truth activation and execution, not imagination:
 
 - Label evidence, inference, current-model claims, user-confirmed facts, and advisor suggestions separately.
-- Ask the user before changing product direction, milestone meaning, user workflow, data/privacy/security boundaries, or large architecture direction.
+- Ask the user before changing product direction, milestone meaning, user
+  workflow, or an architecture choice that changes a canonical impact boundary
+  from Execution Authorization. Code size or a technically large but
+  reversible impact-neutral L3/L4 refactor does not itself require approval.
 - Do not implement or hand control back without a clear plan, validation expectations, and handoff.
 - Cost-saving should guide read order and evidence sampling; it should not suppress high-value insight.
 
@@ -177,7 +180,7 @@ Prefer verifying over guessing: a claim the premium model verifies becomes evide
 | Depth | Use When | Required Understanding |
 |---|---|---|
 | `slice_advisor` | The user asks only for a narrow next-step decision and cost should stay very low. | Enough evidence to answer that slice. Do not claim whole-project or takeover readiness. |
-| `takeover_ready` | First premium-model pass on a project, model-upgrade reassessment, possible future takeover, full project health review, or user asks whether the premium model understands the project. | Independent product intent, end-to-end workflow, current progress, architecture, validation, risks, and open decisions. |
+| `takeover_ready` | First premium-model pass on a project, model-upgrade reassessment, possible future takeover, full project health review, or user asks whether the premium model understands the project. | Plan Tree's canonical `full_current_mvp` Project Understanding Reconstruction plus independent architecture/code mapping, validation, risks, and open decisions. |
 
 Default to `takeover_ready` for the first packet in a project, when the user is evaluating a stronger model, or when the user might allow the premium model to become the developer. Later packets may use `slice_advisor` only if a fresh baseline context pack already exists and the user request is narrow.
 
@@ -187,10 +190,22 @@ The premium model must state its understanding depth before giving recommendatio
 - `slice_sufficient`: it can answer the current slice but should not claim deep product mastery.
 - `insufficient_context`: it needs more reading or user answers before advising.
 
-`takeover_ready` is a falsifiable claim, not vibes. It requires both:
+`takeover_ready` is a falsifiable claim, not vibes. It requires all of:
 
+- the canonical triggered `plan_tree_alignment.project_understanding_reconstruction`
+  record has scope `full_current_mvp`, outcome `ready`, and connects the active
+  leaf to the complete current-MVP main chain; Model Upgrade references this
+  result and does not redefine its trigger, read set, synthesis, or failure
+  route;
 - the premium model can walk the end-to-end workflow stage by stage and name the concrete files/modules implementing each stage;
 - the premium model has run at least one real verification (test, build, smoke, or repro) via Non-Mutating Verification, or explicitly explains why nothing is runnable.
+
+The first two bullets are complementary: Plan Tree owns current product
+understanding, while Model Upgrade's code mapping challenges packet claims
+against the repository. File-read receipts, hashes, a packet summary, or an
+active-leaf description cannot satisfy either. A `slice_advisor` narrow
+consultation does not force full reconstruction and must not claim
+`takeover_ready`.
 
 ## Framework Thinning Review
 
@@ -317,8 +332,8 @@ When `new_primary_confirmed`, add or update an entry in `UPSTREAM-SOURCES.md` fo
 2. Exclude a same-Primary new-session-only request from Model Upgrade. Without a literal `$cotend-session-handoff` invocation, return only the explicit-invocation instruction and load or generate nothing. If the literal is present, leave Model Upgrade and let the independently invoked Session Handoff proceed. If a real identity or role change is present, stay in Model Upgrade and record that no same-primary packet was generated.
 3. Classify `model_role_decision` when the user mentions model upgrade, primary-model replacement, trial use, runtime-profile recommendation, or framework overhead after a model change. Ask the role question unless current user-confirmed evidence already answers it.
 4. Preserve the selected runtime profile and continuous-risk tier for advisor, trial, unknown, replacement, and rollback cases. Produce a recommendation only when the user asks or current evidence makes it useful.
-5. If the current model is invoked before opening the premium model, choose `review_depth`, refresh **Baseline Context Pack** when needed, then run **Packet Preparation**.
-6. If the premium model is invoked with a prepared packet, run **Premium Advisor**, **Premium Takeover**, Runtime Profile Eligibility Assessment, and/or **Framework Thinning Review** based on the user-selected mode and model-role decision.
+5. If the current model is invoked before opening the premium model, choose `review_depth`, refresh **Baseline Context Pack** when needed, then run **Packet Preparation**. The pack remains navigation input and cannot become a parallel Project Understanding Reconstruction contract.
+6. If the premium model is invoked with a prepared packet, run **Premium Advisor**, **Premium Takeover**, Runtime Profile Eligibility Assessment, and/or **Framework Thinning Review** based on the user-selected mode and model-role decision. At `takeover_ready`, or before a confirmed replacement Primary performs product implementation, consume Plan Tree's `full_current_mvp` reconstruction and stop on a non-ready result.
 7. If the current model is invoked after premium outputs exist, run **Consolidation And Execution**.
 8. If a prior advisor round exists and the user is returning at a milestone or recall trigger, run **Milestone Re-Entry Preparation** instead of a fresh full packet when the previous packet is still trustworthy.
 9. If the user is still deciding between advisor and takeover, recommend `advisor_guided` as the cost-efficient default and explain when takeover is worth it.
@@ -392,6 +407,9 @@ Write these files:
 
 Rules:
 
+- The baseline pack is a reading and navigation aid only. It supplies pointers
+  to Plan Tree's `full_current_mvp` reconstruction but does not own a second
+  trigger set, synthesis, readiness result, or product truth.
 - Put human intent and consensus first. The premium model should read `PRODUCT-INTENT.md` and `CONSENSUS-LEDGER.md` before technical maps.
 - If `PROJECT-UNDERSTANDING/` exists, list relevant expanded understanding docs near the top of `CONTEXT-MANIFEST.md` as `must_read_before_opinion` for whole-project, takeover, or product-direction review. If `USER-DEVELOPMENT-PROFILE.md` exists, list it as `skim_for_context` for the user's development style, delegation preferences, and safety boundaries. If `PROJECT-DECISION-LOG.md` exists, list unresolved/recent decision entries that affect product direction, active path, model role, risk, release, acceptance, or pending confirmations immediately after the relevant understanding/profile docs. If `PROJECT-KNOWLEDGE-CHANGELOG.md` exists, list unresolved/recent entries that affect the active path, product direction, or pending confirmations immediately after the relevant decision entries. These docs are source pointers, not proof by themselves.
 - Put `CONTEXT-MANIFEST.md` immediately after the intent and consensus docs so the premium model can see both current summaries and historical saved context.
@@ -433,7 +451,7 @@ For `primary_takeover`, also write `TAKEOVER-PACKET.md` with current work state,
 Rules:
 
 - Keep summaries compact. Prefer pointers to files over copying large content.
-- Stamp packets with `packet_version: cotend-model-upgrade-v1.13` and `generated_at_commit` when git is available so the advisor can check freshness.
+- Stamp packets with `packet_version: cotend-model-upgrade-v1.14` and `generated_at_commit` when git is available so the advisor can check freshness.
 - Include `model_role_decision` in `ADVISOR-PACKET.md` when the user is evaluating a model replacement, running a trial model, confirming a new primary development model, reverting/downgrading the primary model, or asking whether the framework can become thinner after a model change.
 - Include `runtime_profile_assessment_request` whenever the user asks which profile is recommended for the current setup, reports overlapping native/framework orchestration, or reverts/downgrades a model.
 - Separate `user_confirmed`, `current_model_inference`, `direct_code_evidence`, `advisor_request`, and `unknown`.
@@ -508,7 +526,7 @@ At `review_depth: takeover_ready`, write the full set:
 
 If `framework_thinning_review` is triggered, also write `FRAMEWORK-THINNING-REVIEW.md` and include only a concise pointer summary in `EXECUTION-HANDOFF.md`. This extra output does not replace any takeover-ready required file.
 
-If runtime-profile assessment is triggered, also write `RUNTIME-PROFILE-ASSESSMENT.md`. Preserve the historical filename and v1.11 advisory fields for packet compatibility, while stamping the current v1.13 packet: `selection_authority: user_only`, one recommendation result, separate evidence layers, and `profile_changed_by_assessment: no`. Reviewer, advisor, trial, replacement, and rollback states all preserve the selected profile.
+If runtime-profile assessment is triggered, also write `RUNTIME-PROFILE-ASSESSMENT.md`. Preserve the historical filename and v1.11 advisory fields for packet compatibility, while stamping the current v1.14 packet: `selection_authority: user_only`, one recommendation result, separate evidence layers, and `profile_changed_by_assessment: no`. Reviewer, advisor, trial, replacement, and rollback states all preserve the selected profile.
 
 `ADVISOR-REVIEW.md` is optional at takeover depth. If written, keep it to 15 lines or fewer as a user-readable pointer summary only. It must not duplicate the independent thesis, strongest challenge, detailed strengths/risks, or must/should/could guidance; those belong in `EXECUTION-HANDOFF.md`.
 
@@ -539,7 +557,9 @@ For re-entry rounds, suffix output filenames with `-R<N>` where `<N>` is the rou
 
 `TAKEOVER-VALUE-PROPOSAL.md` may be ambitious. The premium model should say when it would refactor, simplify architecture, change sequencing, or rebuild a weak subsystem. However:
 
-- Mark all product-direction changes and large architecture changes as requiring user confirmation.
+- Mark product-direction changes and architecture changes that cross the
+  canonical impact boundaries as requiring user confirmation; do not classify
+  by size alone.
 - Explain why the premium model is likely to do better than the current model for that work.
 - Explain what the current model can still execute cheaply and safely.
 - Compare value against cost, risk, disruption, and verification burden.
@@ -594,7 +614,10 @@ Then:
 - Convert accepted guidance into vertical slices with validation and a clear milestone boundary.
 - Preserve `Return-To-Advisor Triggers` from `EXECUTION-HANDOFF.md` in the active plan. Recommend recall when any trigger fires.
 - When recall is needed, write `MILESTONE-REPORT.md` before sending the user back to the premium model.
-- Ask the user before changing product direction, final shape, user experience preference, public/release posture, data/privacy/security boundaries, or large architecture direction.
+- Ask the user before changing product direction, final shape, user experience
+  preference, public/release posture, or an architecture decision that crosses
+  the canonical impact boundaries; keep impact-neutral L3/L4 architecture
+  execution with the Primary.
 - Never invent new product consensus while consolidating. If the premium model and old active truth conflict, explain the conflict and ask the user.
 
 After consolidation, normal development may resume under the selected executor model.
@@ -612,6 +635,8 @@ The packet should let a premium model quickly know:
 - where the current model may be wrong;
 - what high-value questions to ask the user;
 - whether the model is only slice-sufficient or truly takeover-ready;
+- the canonical Plan Tree reconstruction scope/result when `takeover_ready` is
+  claimed, without creating a parallel understanding owner;
 - how guidance should flow back into executable work.
 - when to return to the premium model for a cheap re-entry round, and when repeated re-entry indicates takeover may be cheaper.
 - when a confirmed new primary model may make reversible scaffold mechanisms thinner, and which constitution/interface mechanisms remain non-negotiable.

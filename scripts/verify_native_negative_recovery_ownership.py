@@ -984,23 +984,23 @@ def _validate_no_regression_baseline(root: Path) -> dict[str, Any]:
     skill_files, skill_digest = native_closeout.skill_manifest(root)
     if (
         framework_lock.get("release_id")
-        != "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
+        != "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14"
         or framework_lock.get("framework_protocol")
-        != "cotend-collaboration-v1.71"
+        != "cotend-collaboration-v1.76"
         or not isinstance(source_release, dict)
         or source_release.get("type") != "exact_source_commit"
         or source_release.get("commit")
-        != "9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
+        != "774aab64e778d2e3a57b66cfd65d808ac8235e14"
         or source_release.get("publication_state") != "not_public_release"
         or framework_lock.get("skill_count") != 9
-        or framework_lock.get("skill_file_count") != 51
+        or framework_lock.get("skill_file_count") != 59
         or capability_map.get("capability_count") != 19
         or capability_ids != EXPECTED_CAPABILITY_IDS
         or role_map.get("skill_count") != 9
         or target_skills != EXPECTED_TARGET_SKILLS
         or not isinstance(target, dict)
-        or target.get("artifact_id") != "cotend-codex-r000014"
-        or target.get("revision") != 14
+        or target.get("artifact_id") != "cotend-codex-r000015"
+        or target.get("revision") != 15
         or target.get("manifest_sha256") != skill_digest
         or target_lock.get("skill_count") != 9
         or target_lock.get("skill_file_count") != len(skill_files)

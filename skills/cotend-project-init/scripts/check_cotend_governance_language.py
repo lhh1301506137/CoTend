@@ -7,12 +7,13 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
 
-CHECKER_ID = "cotend-governance-language.v1"
+CHECKER_ID = "cotend-governance-language.v2"
 SUPPORTED_TAGS = {"en", "zh-CN", "zh-TW"}
 MIN_VISIBLE_LETTERS = 4
 MIN_ENGLISH_SHARE = 0.80
@@ -42,6 +43,114 @@ MACHINE_VALUE = re.compile(
 )
 TECHNICAL_ATOM = re.compile(r"^[A-Za-z0-9_.:/\\|+\-]+$")
 TECHNICAL_SIGNAL = re.compile(r"[0-9_./:\\|+]")
+MACHINE_TOKEN = re.compile(r"(?=.*[0-9_.:/|+\-])[A-Za-z0-9_.:/|+\-]+")
+TABLE_DELIMITER_CELL = re.compile(r"^:?-{3,}:?$")
+
+
+def run_git(path: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", "-C", str(path), *args],
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        capture_output=True,
+        check=False,
+        timeout=15,
+    )
+
+
+def resolve_evaluation_text(path: Path, full_text: str) -> tuple[str, dict[str, Any]]:
+    """Prefer operation-owned Git additions while hashing the whole file."""
+
+    try:
+        root_result = run_git(path.parent, "rev-parse", "--show-toplevel")
+    except (OSError, subprocess.TimeoutExpired):
+        root_result = None
+    if root_result is None or root_result.returncode != 0:
+        return full_text, {
+            "evaluation_scope": "whole_file_no_git",
+            "git_added_line_count": None,
+        }
+
+    try:
+        root = Path(root_result.stdout.strip()).resolve()
+        relative = path.resolve().relative_to(root).as_posix()
+    except (OSError, RuntimeError, ValueError):
+        return full_text, {
+            "evaluation_scope": "whole_file_outside_git_root",
+            "git_added_line_count": None,
+        }
+
+    try:
+        tracked = run_git(root, "ls-files", "--error-unmatch", "--", relative)
+    except (OSError, subprocess.TimeoutExpired):
+        tracked = None
+    if tracked is None or tracked.returncode != 0:
+        return full_text, {
+            "evaluation_scope": "git_untracked_whole_file",
+            "git_added_line_count": len(full_text.splitlines()),
+        }
+
+    try:
+        head = run_git(root, "rev-parse", "--verify", "HEAD")
+    except (OSError, subprocess.TimeoutExpired):
+        head = None
+    if head is None or head.returncode != 0:
+        return full_text, {
+            "evaluation_scope": "git_unborn_whole_file",
+            "git_added_line_count": len(full_text.splitlines()),
+        }
+
+    try:
+        diff = run_git(
+            root,
+            "diff",
+            "--no-ext-diff",
+            "--no-color",
+            "--no-renames",
+            "--unified=0",
+            "HEAD",
+            "--",
+            relative,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        diff = None
+    if diff is None or diff.returncode != 0:
+        return "", {
+            "evaluation_scope": "git_added_lines_unavailable",
+            "git_added_line_count": None,
+            "scope_error": "git_diff_failed",
+        }
+
+    added_lines = [
+        line[1:]
+        for line in diff.stdout.splitlines()
+        if line.startswith("+") and not line.startswith("+++")
+    ]
+    if not diff.stdout.strip():
+        return full_text, {
+            "evaluation_scope": "whole_file_no_git_delta",
+            "git_added_line_count": 0,
+        }
+    return "\n".join(added_lines), {
+        "evaluation_scope": "git_added_lines",
+        "git_added_line_count": len(added_lines),
+    }
+
+
+def markdown_table_cells(line: str) -> list[str] | None:
+    stripped = line.strip()
+    if not (stripped.startswith("|") and stripped.endswith("|")):
+        return None
+    return [cell.strip() for cell in stripped.strip("|").split("|")]
+
+
+def is_machine_table_cell(line: str) -> bool:
+    value = line.strip().strip("`")
+    if not value or TABLE_DELIMITER_CELL.fullmatch(value):
+        return True
+    tokens = [token for token in value.split() if token not in {"/", "|", "+", "-"}]
+    return bool(tokens) and all(MACHINE_TOKEN.fullmatch(token) for token in tokens)
 
 
 def _without_technical_fragments(value: str, exclusions: set[str]) -> str:
@@ -80,29 +189,45 @@ def visible_governance_prose(text: str) -> tuple[str, list[str]]:
         stripped = raw_line.strip()
         if not stripped:
             continue
-        if COMMAND_LINE.match(stripped):
-            exclusions.add("command")
-            continue
 
-        candidate = stripped
-        key_value = KEY_VALUE.match(raw_line)
-        if key_value:
-            candidate = key_value.group("value").strip().strip("\"'")
-            if not candidate or MACHINE_VALUE.fullmatch(candidate):
-                exclusions.add("machine_field")
+        table_cells = markdown_table_cells(raw_line)
+        candidates = table_cells if table_cells is not None else [raw_line]
+        if table_cells is not None:
+            exclusions.add("markdown_table_structure")
+
+        for raw_candidate in candidates:
+            candidate = raw_candidate.strip()
+            if not candidate:
                 continue
-            exclusions.add("schema_key")
+            if COMMAND_LINE.match(candidate):
+                exclusions.add("command")
+                continue
 
-        candidate = _without_technical_fragments(candidate, exclusions)
-        if not candidate:
-            continue
-        if TECHNICAL_ATOM.fullmatch(candidate) and TECHNICAL_SIGNAL.search(candidate):
-            exclusions.add("identifier")
-            continue
-        if not CJK_CHARACTER.search(candidate) and not LATIN_LETTER.search(candidate):
-            exclusions.add("identifier")
-            continue
-        visible.append(candidate)
+            key_value = KEY_VALUE.match(raw_candidate)
+            if key_value:
+                candidate = key_value.group("value").strip().strip("\"'")
+                if not candidate or MACHINE_VALUE.fullmatch(candidate):
+                    exclusions.add("machine_field")
+                    continue
+                exclusions.add("schema_key")
+
+            candidate = _without_technical_fragments(candidate, exclusions)
+            if not candidate:
+                continue
+            if table_cells is not None and is_machine_table_cell(candidate):
+                exclusions.add("machine_table_cell")
+                continue
+            if TECHNICAL_ATOM.fullmatch(candidate) and TECHNICAL_SIGNAL.search(
+                candidate
+            ):
+                exclusions.add("identifier")
+                continue
+            if not CJK_CHARACTER.search(candidate) and not LATIN_LETTER.search(
+                candidate
+            ):
+                exclusions.add("identifier")
+                continue
+            visible.append(candidate)
 
     return "\n".join(visible), sorted(exclusions) or ["none"]
 
@@ -198,7 +323,24 @@ def main() -> int:
         )
         return 3
 
-    payload = evaluate(args.normalized_tag, text)
+    evaluation_text, scope = resolve_evaluation_text(path, text)
+    if scope.get("scope_error"):
+        payload = {
+            "checker": CHECKER_ID,
+            "normalized_tag": args.normalized_tag,
+            "actual_bytes_checked": True,
+            "user_visible_prose": "present",
+            "body_result": "unchecked",
+            "excluded_technical_segments": ["none"],
+            "metrics": {},
+            "reason": scope["scope_error"],
+        }
+    else:
+        payload = evaluate(args.normalized_tag, evaluation_text)
+    payload.update(scope)
+    payload["whole_file_sha256_checked"] = True
+    payload["whole_file_byte_count"] = len(data)
+    payload["evaluated_text_byte_count"] = len(evaluation_text.encode("utf-8"))
     payload["path"] = str(path)
     payload["sha256"] = hashlib.sha256(data).hexdigest()
     sys.stdout.write(

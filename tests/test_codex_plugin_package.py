@@ -81,7 +81,7 @@ class CodexPluginPackageTests(unittest.TestCase):
             "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
         )
 
-    def test_rc2_build_uses_locked_historical_skills_not_current_r11(self) -> None:
+    def test_rc2_build_uses_locked_historical_skills_not_current_r15(self) -> None:
         output = self.build("historical-source")
         contract = package.validate_contract()
         packaged = package.path_hash_manifest(output / "skills")
@@ -90,6 +90,20 @@ class CodexPluginPackageTests(unittest.TestCase):
         result = package.verify_package(output)
         self.assertTrue(result["repository_source_ahead"])
         self.assertEqual(result["source_commit"], contract["source_commit"])
+
+    def test_rc2_build_uses_locked_historical_support_not_current_r15(self) -> None:
+        output = self.build("historical-support")
+        contract = package.validate_contract()
+        packaged_support = {
+            relative: package.sha256_file(output / relative)
+            for relative in package.PACKAGE_SUPPORT_FILES
+        }
+        current_support = {
+            relative: package.sha256_file(source)
+            for relative, source in package.PACKAGE_SUPPORT_FILES.items()
+        }
+        self.assertEqual(packaged_support, contract["support_manifest"])
+        self.assertNotEqual(packaged_support, current_support)
 
     def test_historical_source_commit_must_be_full_available_ancestor(self) -> None:
         for value in ("37e657f", "G" * 40, "0" * 40):

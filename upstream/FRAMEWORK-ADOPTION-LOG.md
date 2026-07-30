@@ -530,3 +530,64 @@ CoTend 将协议推进到 v1.71、DMU packet 推进到 1.13，并新增显式 `c
 G01-G05 随 r14 做当前仓库回归。G06 保留为已完成并由用户接受的 r13 历史真实项目验收；其 verifier 从可信 r13 commit 重建旧 source，本轮不重写外部 UAT 或假称完成 r14 真实项目验收。冻结 rc.2 仍由原 source commit 重建，package identity、manifest 和 ZIP 摘要不变。
 
 本记录只覆盖仓库内 exact-source review、CoTend 产品适配、r14 锁、本地 artifact 与必要本地提交。它不授权全局安装、真实模型调用、Claude v1.71 适配、push、tag、Release、submission 或 publish。
+
+## exact-source-2026-07-30-1-v1-76-adoption
+
+```yaml
+status: adopted_verified_local
+source_identity: exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14
+source_anchor_type: exact_source_commit
+source_commit: 774aab64e778d2e3a57b66cfd65d808ac8235e14
+source_tree: ebcc0b2930146aca1ce299215f9a2f936b12d4c8
+source_tree_path: skills-backup/codex
+target_publication_state: not_public_release
+consumer_handoff: 2026.07.30.1
+handoff_json_sha256: a2e23ab5a58fadc3dd4e454f9fd42ef7681c91ccb0f70fe6c85e330d6688298e
+handoff_markdown_sha256: 0fbde80f3e491442c21281c09f1abbe6e9dcb2cc32fd1d08fdd11a75695f5675
+handoff_checksums_sha256: ae76f6101e9562740ffbf15ba6cd9841d21bfd85721bdc1994b2be123a64d3cb
+latest_public_release: 2026.07.28.2
+latest_public_tag_object: d26994355921b9c43956f7300069c892884496e0
+latest_public_release_commit: 4540f9e0543e85c6a7cceb1d7501467feee8b440
+latest_public_source_tree: 2eae0ca4447cace17bdf93df3b04b665293deecb
+reviewed_commit_range: 27_commits_from_v1_71_exact_source_exclusive_to_v1_76_exact_source_inclusive
+contract_change_commits: 9
+evidence_only_commits: 17
+consumer_not_applicable_commits: 1
+unclassified_commits: 0
+framework_protocol: cotend-collaboration-v1.76
+model_upgrade_packet_family: cotend-model-upgrade-v1.14
+skill_count: 9
+upstream_skill_file_count: 59
+target_skill_file_count: 61
+target_artifact_id: cotend-codex-r000015
+target_revision: 15
+target_manifest_sha256: acc17586cf713acc85fef9e6be02013de6bc012b7864ade22bed495ee68a9e7b
+local_artifact_file: cotend-codex-r000015-local-acc17586cf71.zip
+local_artifact_entry_count: 63
+local_artifact_sha256: 8b8f80da07503964620a135208159a313d3b00252c2ddde943904e4c10c685c1
+predecessor_target_artifact_id: cotend-codex-r000014
+predecessor_manifest_sha256: 07ac592c82ed87f1759b38f04ed1f453c44e21d454fd12b4ce9eca459e4f3ed4
+G06_status: frozen_completed_user_accepted_r13_not_rerun_for_r15
+rc2_status: frozen_unchanged
+resulting_CoTend_commit: containing_commit
+live_install_performed: false
+model_call_performed: false
+external_UAT_modified: false
+push_release_or_publish: not_performed
+```
+
+### 区间分类
+
+上游 consumer handoff 以已经采用的 v1.71 exact-source commit 为排他基线，到 v1.76 exact-source commit 共覆盖 27 个提交：9 个 included change、17 个 evidence-only 和 1 个 CoTend 不适用项，没有未分类提交。最近公开 release 仍是 `.28.2`；当前精确提交明确不是公开 release。
+
+### 产品化适配结论
+
+CoTend 将协议推进到 v1.76、DMU packet 推进到 1.14，并用原生 owner 承接 Failure Memory、授权与 CodeGraph 收敛、Skill 检索加固、项目 AGENTS 路由维护、显式会话移交和精确提交范围控制。项目真相仍由 CoTend 的 Project Truth、Plan Tree、Decision Log、Implementer、Checker 与 Closeout 唯一承接；未复制或恢复 Trellis runtime、Skill、hook、状态目录或任务权威。
+
+当前 target 是 9 Skills / 61 files 的 r15；r14 是精确第一 predecessor。`grill-me` 保持已审查字节，`karpathy-guidelines` 保留 MIT 许可与归属并适配 CoTend 执行权限语义。上游 Project Init 的内部单元测试由仓库级 CoTend 测试承接，不作为产品 Skill 文件复制。
+
+### 历史与授权边界
+
+G01-G05 随 r15 做当前仓库回归。G06 保留为已完成并由用户接受的 r13 历史真实项目验收；本轮不重写外部 UAT，不执行真实模型，也不假称完成 r15 真实项目验收。冻结 rc.2 仍由原 source commit 重建，package identity、manifest 和 ZIP 摘要不变。
+
+本记录只覆盖仓库内 exact-source review、CoTend 产品适配、r15 锁、本地 artifact 与必要本地提交。它不授权全局安装、真实模型调用、Claude v1.76 适配、push、tag、Release、submission 或 publish。

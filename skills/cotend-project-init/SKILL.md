@@ -1,16 +1,15 @@
 ---
 name: cotend-project-init
 description: >-
-  Initialize, update, repair, migrate, or resume a CoTend-governed coding project. Auto-classifies native workflow and external-framework state; consumes only explicitly invoked and supplied same-Primary point-in-time session handoffs through freshness preflight; exclusively resolves and persists user-facing governance language; preserves protected L0-L2 semantics, authority, risk, review, runtime-profile, and explicit-handback boundaries; progressively loads ten direct references; and deterministically validates actual changed governance bytes before declaring Init ready.
+  Initialize, update, repair, migrate, or resume a CoTend-governed coding project. Auto-classifies native workflow and external-framework state; consumes only explicitly invoked and supplied same-Primary point-in-time session handoffs through freshness preflight; detects and propagates Plan Tree's triggered Project Understanding Reconstruction result without becoming a second owner; exclusively resolves and persists user-facing governance language; preserves protected L0-L2 semantics, authority, risk, review, runtime-profile, and explicit-handback boundaries; progressively loads direct references; and deterministically validates actual changed governance bytes before declaring Init ready.
 ---
 
 # CoTend Project Init
 
-Protocol target: `cotend-collaboration-v1.71`
+Protocol target: `cotend-collaboration-v1.76`
 
-Initialize or resume CoTend without requiring the user to paste a long prompt.
-This Skill is an orchestrator, not a product-development, diagnosis, or
-semantic-alignment flow.
+Initialize or resume CoTend without requiring a long prompt. This Skill is an
+orchestrator, not a product-development, diagnosis, or semantic-alignment flow.
 
 ## Constitutional Boundaries
 
@@ -27,6 +26,13 @@ semantic-alignment flow.
 - Do not create protected L0-L2 meaning, confirmation, a parallel semantic
   tree, a second language resolver, a language ledger, or an automatic
   canonical writer.
+- Do not define a second project-understanding trigger/parser, synthesis,
+  readiness rule, or record. Pass trigger evidence to Plan Tree and propagate
+  its canonical triggered-only `plan_tree_alignment` block unchanged.
+- A reconstruction failure is report-only routing during Init. Do not
+  automatically invoke Semantic Alignment; only Plan Tree's existing
+  reconciliation flow may identify a protected semantic write/confirmation
+  need for the later direct route.
 - Do not treat a supplied `same_primary_session_handoff` as current truth, infer identity from its carrier name, or create a session ledger. It is a point-in-time resume input whose current owners must be compared before product work.
 - Do not discover or auto-consume a handoff after app restart/reconnect or ordinary resume. Session-handoff preflight is eligible only when the current user input contains the literal `$cotend-session-handoff` and supplies the packet.
 - Do not start product development in the same response for a standalone explicit Init. When the same instruction explicitly authorizes a bounded follow-on and no specialized decision blocks it, report Init first and execute that follow-on through the normal workflow without a duplicate prompt.
@@ -62,7 +68,7 @@ preload all references for ordinary work.
 | `references/maintenance-and-coordination.md` | `legacy_update`, `partial_repair`, native state repair, external-framework reconciliation, Code Context setup, or repeated-process failure. |
 | `references/routing-and-planning.md` | Role assignment, active-truth reconciliation, dynamic route selection, plan review, slicing, or a decision checkpoint. |
 | `references/initialization-core-workflow.md` | Execute only the detailed steps triggered by the selected mode; it preserves the established initialization order. |
-| `references/plan-tree-and-semantic-safety.md` | Multi-stage/standard/full projects, a Plan Tree, protected L0-L2, semantic-contract freshness, Route Rebase, or material-node closure. |
+| `references/plan-tree-and-semantic-safety.md` | Multi-stage/standard/full projects, a Plan Tree, protected L0-L2, semantic-contract freshness, Route Rebase, material-node closure, or any canonical Project Understanding Reconstruction trigger/result. |
 | `references/verification-and-closeout-workflow.md` | Unattended work, Acceptance/Test Harness, AI UAT, Done Gate, release trigger, Harness Ratchet, or Code Context trigger. |
 | `references/governance-language-pre-handback.md` | Init created or changed any user-visible governance document, or the changed set cannot yet be established. |
 | `references/reporting-and-handback.md` | Every final Init report and explicit outer handback. |
@@ -75,20 +81,16 @@ Project Init reference as a prerequisite.
 ## Orchestration
 
 1. **Inspect and classify without writing.**
-   Read current CoTend truth, applicable project instructions, active route,
-   native state, runtime-profile evidence, classified external-framework
-   artifacts, any explicitly invoked and supplied canonical
-   `same_primary_session_handoff`, and only the minimum standing semantic
-   evidence required by Auto Mode. For a supplied packet, compare its hash and
-   containing-commit method. A committed packet additionally requires a single
-   parent equal to `source_snapshot_commit`, the exact two-output delta, and
-   reachability from current `HEAD`; `HEAD == containing_commit` may be
-   current, a determinable descendant is stale, and contradictory history is
-   conflict. Also compare branch/worktree ownership, active task/truth/path,
-   pending gates, verification, and reliable resume boundary; classify
-   `current | stale | conflict` before readiness. Load
-   `references/auto-mode-and-onboarding.md` and select exactly one recorded
-   mode.
+   Read current CoTend truth, project instructions, active route, native state,
+   runtime-profile evidence, classified external-framework artifacts, any explicitly
+   invoked and supplied canonical `same_primary_session_handoff`, and the minimum
+   standing semantic evidence required by Auto Mode. For a supplied packet, compare
+   its hash and containing-commit method. A committed packet requires a single parent
+   equal to `source_snapshot_commit`, the exact two-output delta, and reachability:
+   equal `HEAD` is current, a determinable descendant is stale, and contradictory
+   history is conflict. Compare branch/worktree, active truth/path, pending gates,
+   verification, and resume boundary; classify before readiness. Then load
+   `references/auto-mode-and-onboarding.md` and select exactly one recorded mode.
 
 2. **Resolve governance language before affected writes.**
    Load `references/language-and-runtime.md`. Apply conflict guards before
@@ -108,16 +110,23 @@ Project Init reference as a prerequisite.
    machine-wide legacy preference.
 
 4. **Load only triggered detail and perform safe framework work.**
-   Follow the selected mode through the direct references above. Preserve
-   user-authored and historical records, existing filenames/mappings, explicit
-   confirmation evidence, unaffected confirmed routes, and the canonical one
-   outer handback.
+   Follow the selected mode through the direct references above. Preserve user-authored
+   and historical records, existing filenames/mappings, confirmation evidence,
+   unaffected routes, and the one outer handback. Pass only observable Project
+   Understanding Reconstruction trigger evidence to Plan Tree and copy its canonical
+   result under `plan_tree_alignment`; do not reproduce owner logic in Init. After
+   language resolution, run `maintain_project_agents_router.py --apply` against the
+   canonical project root. It owns one marked root `AGENTS.md` block, preserves all
+   other bytes, and consumes the resolved tag without re-resolving it. Malformed or
+   duplicate markers are `review_pending`; never replace the whole file.
 
 5. **Track real governance writes.**
    Keep operation write receipts for every governance file created or changed,
    including ignored or untracked status, review, decision, Plan Tree, and
-   handoff carriers. Do not substitute a hand-authored final `changed_files`
-   list for VCS evidence.
+   handoff carriers. When the router maintainer reports `created` or `updated`,
+   include `AGENTS.md` as a write receipt. Run its `--check` mode before
+   readiness; `drift` or `blocked` prevents `continue_ready`. Do not substitute
+   a hand-authored final `changed_files` list for VCS evidence.
 
 6. **Run the deterministic pre-handback gate when triggered.**
    Load `references/governance-language-pre-handback.md` and execute the
@@ -191,6 +200,16 @@ broad edits. The required order is:
 Use the installed Project Init root, not a copied script:
 
 ```powershell
+python -X utf8 <cotend-project-init-root>/scripts/maintain_project_agents_router.py `
+  --project-root <canonical-project-root> `
+  --normalized-tag <resolved-tag> `
+  --apply
+
+python -X utf8 <cotend-project-init-root>/scripts/maintain_project_agents_router.py `
+  --project-root <canonical-project-root> `
+  --normalized-tag <resolved-tag> `
+  --check
+
 python -X utf8 <cotend-project-init-root>/scripts/validate_governance_language.py `
   --project-root <canonical-project-root> `
   --status-carrier <STATUS.md-or-mapped-equivalent> `
@@ -199,9 +218,8 @@ python -X utf8 <cotend-project-init-root>/scripts/validate_governance_language.p
   --write-receipt <governance-file-created-or-changed>
 ```
 
-Repeat `--write-receipt` for every affected operation write. The validator
-emits `cotend.governance-language-pre-handback.v1`; the canonical language
-record uses `cotend.user-facing-language-resolution.v1`.
+Repeat `--write-receipt` for every affected operation write. The validator emits
+`cotend.governance-language-pre-handback.v1`; the canonical language record uses `cotend.user-facing-language-resolution.v1`.
 
 ## Readiness And Handback
 
@@ -210,10 +228,14 @@ record uses `cotend.user-facing-language-resolution.v1`.
   follow-on authority in the same user instruction may satisfy the generic
   handback after the Init result is reported.
 - An explicitly invoked and supplied same-Primary session packet may support
-  `continue_ready` only after a `current` preflight and required
+  `continue_ready` only after a `current` preflight, Plan Tree's
+  `full_current_mvp` reconstruction with `outcome: ready`, and required
   resolved-language takeover teachback. `stale` first reconciles known
   successor differences and recomputes the reliable boundary; `conflict` is
   `human_needed` or routes to the existing recovery owner.
+- Any other triggered reconstruction with a non-ready outcome prevents
+  `continue_ready` for the affected route. Report Plan Tree's failure route;
+  never auto-run Semantic Alignment from Init.
 - `review_pending` means evidence, framework change, or the pre-handback gate
   must close first.
 - `human_needed` uses the one Human Rejoin decision and cannot be answered by

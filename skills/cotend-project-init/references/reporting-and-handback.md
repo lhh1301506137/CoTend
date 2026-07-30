@@ -85,7 +85,7 @@ Default compact summary:
   external_framework_owner: false
 - runtime_profile:
   effective: full | adaptive
-  display_name: v1.71-full | v1.71-A
+  display_name: v1.76-full | v1.76-A
   source: session_explicit | project_persistent | cotend_product_default | migrated_legacy_project_selection | invalid
   persistence: session | project | product_default
   user_selected: true | false
@@ -145,7 +145,7 @@ Detailed audit template:
 ## Detailed Initialization Audit
 
 Project initialization report:
-- protocol: cotend-collaboration-v1.71
+- protocol: cotend-collaboration-v1.76
 - report_mode: summary_only | summary_plus_detail | full_audit | blocked_decision
 - detail_policy: full_required | changed_or_relevant_only
 - omitted_unchanged_sections:
@@ -221,7 +221,7 @@ Project initialization report:
   active:
   superseded:
   temporary:
-- plan_tree_alignment: <use the canonical schema from cotend-collaboration/references/templates.md>
+- plan_tree_alignment: <use the canonical schema from cotend-collaboration/references/templates.md; include project_understanding_reconstruction only when Plan Tree triggered it, propagate that block unchanged, and omit it for ordinary same-route L3/L4 continuation>
 - same_primary_session_handoff: <when explicitly invoked and supplied, reference the immutable canonical point-in-time packet and the separate same_primary_session_takeover_result; report current | stale | conflict, reconciliation, reliable boundary, pending gates, and resolved-language takeover teachback without writing back into the packet; otherwise omit>
 - route_rebase: <use the canonical triggered-only schema from cotend-collaboration/references/templates.md by reference to its existing carrier; otherwise omit>
 - semantic_baseline: <use the canonical schema from cotend-collaboration/references/templates.md>
@@ -340,7 +340,12 @@ Project initialization report:
 
 If no specialized user question is needed, set `user_question: none`, report whether the project is safe to continue, and still return control once for a standalone explicit invocation. With no active material rebase, use a concise prompt such as `Initialization is complete. Reply continue to resume the same confirmed route.` For `evaluating`, the prompt must say that `continue` resumes only materiality/semantic-impact/authority classification and does not reactivate the previous path. For `applying` / `revalidating` with no human gate, it must say that `continue` resumes only authorized propagation/repair from the reliable boundary. For `blocked`, do not offer affected-route continuation; a generic handback may name only a separately confirmed, dependency-isolated route. Do not start unrequested product development in the same response. If the same instruction explicitly authorized a bounded ordinary follow-on and no specialized decision is pending, report Init first, set `explicit_skill_handback.pending: no` and `satisfied_by: same_instruction_authorized_follow_on`, then run only that follow-on without a duplicate prompt. If a specialized decision is pending, including an existing high-level Route Rebase confirmation, it satisfies the handback and the generic prompt must be omitted. For a composite semantic invocation, the independent direct next action remains the outer handback: omit the generic `continue` prompt and do not execute that separate control action inside Init. A recommended fresh-intake `semantic_onboarding_handoff` is likewise the sole outer handback, with `explicit_skill_handback.satisfied_by: semantic_alignment_entry_choice`; ask `1` to start independent alignment or `2` to stop after Init, and never treat `1` as product-semantic confirmation.
 
-For an explicitly invoked and supplied same-Primary packet, do not use the generic prompt until preflight is `current` and the resolved-language takeover teachback is complete. `stale` reports reconciliation as the next action; `conflict` uses the specialized `human_needed` or recovery handback. Bare `continue` never answers a preserved pending gate.
+For an explicitly invoked and supplied same-Primary packet, do not use the
+generic prompt until preflight is `current`, Plan Tree's
+`full_current_mvp` reconstruction is `ready`, and the resolved-language
+takeover teachback is complete. `stale` reports reconciliation as the next
+action; `conflict` uses the specialized `human_needed` or recovery handback.
+Bare `continue` never answers a preserved pending gate.
 
 For `current_resume`, prefer:
 

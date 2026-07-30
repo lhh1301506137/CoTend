@@ -15,16 +15,19 @@ import verify_cotend_project_init as project_init  # noqa: E402
 
 
 class CoTendProjectInitContractTests(unittest.TestCase):
-    def test_repository_has_concise_core_ten_references_and_two_scripts(self) -> None:
+    def test_repository_has_concise_core_ten_references_and_three_scripts(self) -> None:
         result = project_init.load_project_init_contract()
         self.assertEqual(result["status"], "cotend_project_init_topology_verified")
-        self.assertEqual(result["file_count"], 14)
+        self.assertEqual(result["file_count"], 15)
         self.assertEqual(result["reference_count"], 10)
-        self.assertEqual(result["script_count"], 2)
+        self.assertEqual(result["script_count"], 3)
         self.assertLessEqual(result["core_lines"], 260)
         self.assertIn(
             "cotend.governance-language-pre-handback.v1", result["combined"]
         )
+        self.assertIn('CONTRACT = "cotend.project-router.v1"', result["router"])
+        self.assertIn("$cotend-collaboration", result["router"])
+        self.assertIn("$cotend-session-handoff", result["router"])
 
     def test_nested_project_init_reference_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory(prefix="cotend-project-init-topology-") as temp:
