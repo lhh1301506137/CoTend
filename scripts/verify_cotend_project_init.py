@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 from typing import Any
@@ -10,6 +11,7 @@ PROJECT_INIT_RELATIVE = Path("skills") / "cotend-project-init"
 EXPECTED_REFERENCES = (
     "auto-mode-and-onboarding.md",
     "external-reviewer-sync.md",
+    "framework-update-routing.md",
     "governance-language-pre-handback.md",
     "initialization-core-workflow.md",
     "language-and-runtime.md",
@@ -22,11 +24,13 @@ EXPECTED_REFERENCES = (
 EXPECTED_SCRIPTS = (
     "check_cotend_governance_language.py",
     "maintain_project_agents_router.py",
+    "resolve_framework_update.py",
     "validate_governance_language.py",
 )
 EXPECTED_FILES = {
     "SKILL.md",
     "agents/openai.yaml",
+    "references/framework-impact-index.json",
     *(f"references/{name}" for name in EXPECTED_REFERENCES),
     *(f"scripts/{name}" for name in EXPECTED_SCRIPTS),
 }
@@ -42,7 +46,9 @@ def _read(path: Path) -> str:
     try:
         return path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
-        raise ProjectInitContractError(f"Project Init file is unreadable: {path}") from exc
+        raise ProjectInitContractError(
+            f"Project Init file is unreadable: {path}"
+        ) from exc
 
 
 def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
@@ -51,6 +57,8 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
         path.relative_to(skill_root).as_posix()
         for path in skill_root.rglob("*")
         if path.is_file()
+        and "__pycache__" not in path.parts
+        and path.suffix != ".pyc"
     }
     if actual_files != EXPECTED_FILES:
         missing = sorted(EXPECTED_FILES - actual_files)
@@ -63,10 +71,10 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
     direct_references = set(DIRECT_REFERENCE_RE.findall(core))
     if direct_references != set(EXPECTED_REFERENCES):
         raise ProjectInitContractError(
-            "Project Init direct-reference routing does not cover the exact ten modules"
+            "Project Init direct-reference routing does not cover the exact eleven modules"
         )
     core_lines = len(core.splitlines())
-    if core_lines > 260:
+    if core_lines > 300:
         raise ProjectInitContractError(
             f"Project Init core is no longer concise: {core_lines} lines"
         )
@@ -80,11 +88,35 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
             )
         references[name] = text
 
+    impact_index_text = _read(
+        skill_root / "references" / "framework-impact-index.json"
+    )
+    try:
+        impact_index = json.loads(impact_index_text)
+    except json.JSONDecodeError as exc:
+        raise ProjectInitContractError("CoTend framework impact index is invalid JSON") from exc
+    entries = impact_index.get("entries")
+    if (
+        impact_index.get("schema") != "cotend.framework-impact-index"
+        or impact_index.get("schema_version") != 1
+        or impact_index.get("indexed_through") != "v1.79"
+        or not isinstance(entries, list)
+        or len(entries) != 14
+        or len(
+            {item.get("id") for item in entries if isinstance(item, dict)}
+        )
+        != 14
+    ):
+        raise ProjectInitContractError("CoTend framework impact index contract drifted")
+
     checker = _read(
         skill_root / "scripts" / "check_cotend_governance_language.py"
     )
     router = _read(skill_root / "scripts" / "maintain_project_agents_router.py")
     validator = _read(skill_root / "scripts" / "validate_governance_language.py")
+    update_resolver = _read(
+        skill_root / "scripts" / "resolve_framework_update.py"
+    )
     required_checker_markers = (
         'CHECKER_ID = "cotend-governance-language.v2"',
         'SUPPORTED_TAGS = {"en", "zh-CN", "zh-TW"}',
@@ -128,6 +160,18 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
     )
     if any(marker not in validator for marker in required_validator_markers):
         raise ProjectInitContractError("CoTend governance validator contract drifted")
+    required_update_resolver_markers = (
+        'RESULT_CONTRACT = "cotend.framework-update-resolution.v1"',
+        'INDEX_SCHEMA = "cotend.framework-impact-index"',
+        '"inventory_bootstrap_required"',
+        '"writes_performed": False',
+        '"network_calls": 0',
+    )
+    if any(
+        marker not in update_resolver
+        for marker in required_update_resolver_markers
+    ):
+        raise ProjectInitContractError("CoTend framework-update resolver contract drifted")
 
     combined = "\n".join([core, *(references[name] for name in EXPECTED_REFERENCES)])
     required_router_documentation = (
@@ -144,9 +188,11 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
         "\n".join(
             [
                 combined,
+                impact_index_text,
                 checker,
                 router,
                 validator,
+                update_resolver,
                 _read(skill_root / "agents" / "openai.yaml"),
             ]
         )
@@ -159,7 +205,9 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
         "status": "cotend_project_init_topology_verified",
         "core": core,
         "references": references,
+        "impact_index": impact_index,
         "router": router,
+        "update_resolver": update_resolver,
         "combined": combined,
         "file_count": len(actual_files),
         "reference_count": len(references),

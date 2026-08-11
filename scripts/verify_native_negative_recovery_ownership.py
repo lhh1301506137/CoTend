@@ -51,6 +51,7 @@ EXPECTED_TARGET_SKILLS = {
     "cotend-semantic-alignment",
     "cotend-model-upgrade",
     "cotend-session-handoff",
+    "cotend-tooling",
     "grill-me",
     "karpathy-guidelines",
 }
@@ -984,25 +985,25 @@ def _validate_no_regression_baseline(root: Path) -> dict[str, Any]:
     skill_files, skill_digest = native_closeout.skill_manifest(root)
     if (
         framework_lock.get("release_id")
-        != "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14"
+        != "exact-source:c14d4133bf0438d435048858554c88c89a7870a3"
         or framework_lock.get("framework_protocol")
-        != "cotend-collaboration-v1.76"
+        != "cotend-collaboration-v1.79"
         or not isinstance(source_release, dict)
         or source_release.get("type") != "exact_source_commit"
         or source_release.get("commit")
-        != "774aab64e778d2e3a57b66cfd65d808ac8235e14"
+        != "c14d4133bf0438d435048858554c88c89a7870a3"
         or source_release.get("publication_state") != "not_public_release"
-        or framework_lock.get("skill_count") != 9
-        or framework_lock.get("skill_file_count") != 59
+        or framework_lock.get("skill_count") != 10
+        or framework_lock.get("skill_file_count") != 69
         or capability_map.get("capability_count") != 19
         or capability_ids != EXPECTED_CAPABILITY_IDS
-        or role_map.get("skill_count") != 9
+        or role_map.get("skill_count") != 10
         or target_skills != EXPECTED_TARGET_SKILLS
         or not isinstance(target, dict)
-        or target.get("artifact_id") != "cotend-codex-r000015"
-        or target.get("revision") != 15
+        or target.get("artifact_id") != "cotend-codex-r000016"
+        or target.get("revision") != 16
         or target.get("manifest_sha256") != skill_digest
-        or target_lock.get("skill_count") != 9
+        or target_lock.get("skill_count") != 10
         or target_lock.get("skill_file_count") != len(skill_files)
     ):
         raise NativeNegativeRecoveryError(

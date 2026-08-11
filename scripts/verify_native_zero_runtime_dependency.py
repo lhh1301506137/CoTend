@@ -22,9 +22,12 @@ CONTRACT_PATH = ROOT / "upstream" / "TRELLIS-DECOUPLING-PLAN.json"
 TARGET_LOCK_PATH = ROOT / "delivery" / "codex-artifact.lock.json"
 PACKAGE_LOCK_PATH = ROOT / "packaging" / "codex-plugin" / "package.lock.json"
 
-EXPECTED_TARGET_ID = "cotend-codex-r000015"
-EXPECTED_TARGET_REVISION = 15
+EXPECTED_TARGET_ID = "cotend-codex-r000016"
+EXPECTED_TARGET_REVISION = 16
 EXPECTED_TARGET_MANIFEST = (
+    "a7f7ece2522a5901030e19cd5944359f80c027482f66f822a2053fc5080dcfb5"
+)
+EXPECTED_R15_MANIFEST = (
     "acc17586cf713acc85fef9e6be02013de6bc012b7864ade22bed495ee68a9e7b"
 )
 EXPECTED_R14_MANIFEST = (
@@ -55,6 +58,7 @@ EXPECTED_PREDECESSORS = [
         manifest,
     )
     for revision, manifest in (
+        (15, EXPECTED_R15_MANIFEST),
         (14, EXPECTED_R14_MANIFEST),
         (13, EXPECTED_R13_MANIFEST),
         (12, EXPECTED_R12_MANIFEST),
@@ -242,7 +246,11 @@ def scan_runtime(skills_root: Path) -> dict[str, list[str]]:
     }
     texts: dict[str, str] = {}
     for path in sorted(skills_root.rglob("*")):
-        if not path.is_file():
+        if (
+            not path.is_file()
+            or "__pycache__" in path.parts
+            or path.suffix == ".pyc"
+        ):
             continue
         relative = path.relative_to(skills_root).as_posix()
         text = path.read_text(encoding="utf-8")
@@ -288,6 +296,8 @@ def _manifest(root: Path) -> tuple[dict[str, str], str]:
         path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in sorted(root.rglob("*"))
         if path.is_file()
+        and "__pycache__" not in path.parts
+        and path.suffix != ".pyc"
     }
     digest = hashlib.sha256(
         json.dumps(
@@ -306,10 +316,10 @@ def validate_target_lock(
     expected_source = {
         "framework_lock": "upstream/framework.lock.json",
         "release_id": (
-            "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14"
+            "exact-source:c14d4133bf0438d435048858554c88c89a7870a3"
         ),
         "carrier": "skills/",
-        "framework_protocol": "cotend-collaboration-v1.76",
+        "framework_protocol": "cotend-collaboration-v1.79",
     }
     expected_target = {
         "platform": "Codex",
@@ -325,10 +335,10 @@ def validate_target_lock(
         or lock.get("source") != expected_source
         or lock.get("target") != expected_target
         or lock.get("product") != {"version": None}
-        or lock.get("skill_count") != 9
+        or lock.get("skill_count") != 10
         or lock.get("skill_file_count") != skill_file_count
     ):
-        raise NativeZeroRuntimeDependencyError("r15 target lock envelope drifted")
+        raise NativeZeroRuntimeDependencyError("r16 target lock envelope drifted")
 
     expected_predecessors = [
         {
@@ -337,7 +347,9 @@ def validate_target_lock(
             "artifact_id": f"cotend-codex-r{revision:06d}",
             "revision": revision,
             "source_release_id": (
-                "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
+                "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14"
+                if revision == 15
+                else "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
                 if revision == 14
                 else "2026.07.28.2"
                 if revision == 13
@@ -346,7 +358,9 @@ def validate_target_lock(
                 else "2026.07.23.2"
             ),
             "framework_protocol": (
-                "cotend-collaboration-v1.71"
+                "cotend-collaboration-v1.76"
+                if revision == 15
+                else "cotend-collaboration-v1.71"
                 if revision == 14
                 else "cotend-collaboration-v1.67"
                 if revision == 13
@@ -360,7 +374,7 @@ def validate_target_lock(
     ]
     if lock.get("predecessor_targets") != expected_predecessors:
         raise NativeZeroRuntimeDependencyError(
-            "r14-r2 predecessor identity chain drifted"
+            "r15-r2 predecessor identity chain drifted"
         )
 
 
@@ -441,14 +455,14 @@ def validate_decoupling_contract(contract: dict[str, Any]) -> None:
         "push_release_submission_or_publish": False,
         "validation_gate_completed": "G05-zero-runtime-dependency",
     }
-    current_r14_slice = {
+    current_r16_slice = {
         "skill_behavior_changed": True,
         "trellis_route_removed": False,
         "removed_capability_ids": [],
         "target_artifact_changed": True,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
-        "validation_gate_completed": "G01-G05-regression-for-r15",
+        "validation_gate_completed": "G01-G05-regression-for-r16",
         "g06_current_target_status": "not_rerun_frozen_r13_evidence",
     }
     lifecycle = (
@@ -465,7 +479,7 @@ def validate_decoupling_contract(contract: dict[str, Any]) -> None:
         (
             "complete",
             "native_runtime_decoupled_real_project_verified",
-            current_r14_slice,
+            current_r16_slice,
         ),
     ):
         raise NativeZeroRuntimeDependencyError(
@@ -529,14 +543,14 @@ def verify_no_regression(root: Path = ROOT) -> dict[str, Any]:
         result.get("status") != "native_negative_recovery_ownership_verified"
         or result.get("native_capabilities_composed") != 8
         or result.get("dual_capability_baseline") != 19
-        or result.get("mapped_skill_roles") != 9
+        or result.get("mapped_skill_roles") != 10
         or result.get("target_artifact") != EXPECTED_TARGET_ID
         or result.get("target_manifest_sha256") != EXPECTED_TARGET_MANIFEST
         or result.get("real_project_claimed") is not False
         or result.get("real_user_acceptance_claimed") is not False
     ):
         raise NativeZeroRuntimeDependencyError(
-            "C01-C19, eight Skills, or G02-G04 regressed"
+            "C01-C19, ten Skills, or G02-G04 regressed"
         )
     return result
 
@@ -557,10 +571,10 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
     assert_runtime_scan_clean(source_scan, "source runtime")
     runtime = verify_disposable_runtime(root)
     if (
-        runtime["skill_files"] != 61
+        runtime["skill_files"] != 71
         or runtime["manifest_sha256"] != EXPECTED_TARGET_MANIFEST
     ):
-        raise NativeZeroRuntimeDependencyError("r15 Skill manifest drifted")
+        raise NativeZeroRuntimeDependencyError("r16 Skill manifest drifted")
 
     lock = _load_json(root / TARGET_LOCK_PATH.relative_to(ROOT), "target lock")
     validate_target_lock(
@@ -599,7 +613,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
         "mapped_skill_roles": regression["mapped_skill_roles"],
         "target_artifact": EXPECTED_TARGET_ID,
         "target_manifest_sha256": EXPECTED_TARGET_MANIFEST,
-        "predecessor_target": "cotend-codex-r000014",
+        "predecessor_target": "cotend-codex-r000015",
         "frozen_rc2": frozen,
         "real_project_claimed": False,
         "real_user_acceptance_claimed": False,

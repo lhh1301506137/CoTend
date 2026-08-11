@@ -6,7 +6,7 @@
   "decision": "preserve_governance_capabilities_replace_trellis_identity_authority_and_runtime_dependency",
   "current_candidate": "cotend@0.1.0-rc.2_local_unpublished",
   "target_candidate": "cotend@0.1.0-rc.3_after_parity",
-  "development_target_artifact": "cotend-codex-r000015",
+  "development_target_artifact": "cotend-codex-r000016",
   "source_boundary": {
     "trellis_relationship": "restricted_design_inspiration_and_legacy_runtime_integration",
     "trellis_source_adoption": "none",
@@ -382,7 +382,7 @@
     "target_artifact_changed": true,
     "package_identity_changed": false,
     "push_release_submission_or_publish": false,
-    "validation_gate_completed": "G01-G05-regression-for-r15",
+    "validation_gate_completed": "G01-G05-regression-for-r16",
     "g06_current_target_status": "not_rerun_frozen_r13_evidence"
   }
 }

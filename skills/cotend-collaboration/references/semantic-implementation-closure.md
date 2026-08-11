@@ -8,6 +8,7 @@ Use this cold-path module to turn confirmed product meaning into a genuinely clo
 - [Trigger](#trigger)
 - [Non-Triggers](#non-triggers)
 - [Ordered Closure Workflow](#ordered-closure-workflow)
+- [Conditional Solution Adequacy](#conditional-solution-adequacy)
 - [Compact State](#compact-state)
 - [Three-Boundary Gate](#three-boundary-gate)
 - [Closure Decision](#closure-decision)
@@ -20,6 +21,7 @@ Use this cold-path module to turn confirmed product meaning into a genuinely clo
 - `plan-tree.md` remains the owner of the route, nodes, active path, and next leaf.
 - `templates.md` remains the only schema owner of the triggered `route_rebase` packet; this module consumes its resulting path, dispositions, and reliable resume boundary without redefining them.
 - `acceptance-test-harness.md` remains the only owner of `capability_completion_claim`, its six dimensions, evidence vocabulary, stable-ID decomposition, and result derivation.
+- This module owns triggered `solution_adequacy`; `plan-tree.md` alone owns any route mutation, supersession, or rebase it reveals.
 - `goal-completion.md` remains the owner of MVP/full-goal Done decisions.
 - This module connects those owners at an important implementation boundary. Never copy their schemas or create another semantic tree, completion dashboard, or project truth file.
 
@@ -34,6 +36,7 @@ Load and apply this module when any of these is true:
 - a cross-layer implementation may disconnect the current responsibility from its upstream input or downstream output;
 - preparing to move Plan Tree `current_next_leaf` to the next important node;
 - making a decision-relevant claim that an important node is implemented, available, integrated, working, or ready to supply the next step.
+- an important L3/L4 route has material fit uncertainty, significant cost or lock-in, a contradicted key assumption, accumulating patch complexity, or a substantive user-supplied candidate.
 
 Treat materiality by product responsibility, not code size. A small change can trigger the gate when it closes an important product boundary; a large internal refactor need not trigger it separately when it remains an L3/L4 child of an open parent closure.
 
@@ -45,6 +48,7 @@ Do not run a separate closure cycle for:
 - ordinary progress wording that does not change navigation or another actor's next decision;
 - a future non-current-MVP node;
 - every commit, test, or child leaf inside the same open parent L2.
+- a known implementation defect, local parameter/design issue, hard constraint with one viable route, or evidenced reversible choice with no material fit uncertainty.
 
 Aggregate related L3/L4 work under the parent L2 closure. Do not emit a per-leaf table or ask the user to confirm AI-owned implementation details.
 
@@ -56,12 +60,62 @@ Apply this sequence to the triggered scope:
 2. **Derive acceptance before current implementation.** Before new or repair code, derive scenarios, invariants, failure behavior, and forbidden behavior from that charter. For already-existing legacy work, reconstruct the contract before further modification or closure and label it `legacy_or_existing_state_reconstructed`; do not pretend the original work was test-first.
 3. **Audit the active reality.** Inspect the actual code, data, APIs, UI, runtime entrypoints, integration wiring, tests, and legacy paths. Plans, schemas, empty tables, fixtures, and isolated modules are not proof that the active product path uses them.
 4. **Assess the exact evidence gap.** Invoke the canonical `capability_completion_claim` from `acceptance-test-harness.md` for the exact important node scope. Reuse stable capability IDs and bind its canonical freshness basis to the verified semantic contracts plus minimum sufficient implementation/verification identity. When Route Rebase or any basis change requires evidence refresh, derive a new result under the resulting semantics and active path; old evidence/results are historical inputs only. Keep its partial/blocked/unknown result as the working gap until freshness and dimensions support the claim; do not redefine either schema here.
-5. **Plan the repair.** Decide what to retain, refactor, replace, isolate, or remove; include data migration/recovery, legacy-path disposition, verification layers, and one real vertical path from input to this step's output.
-6. **Implement the vertical path.** Make the active runtime path carry the responsibility. An isolated table, script, endpoint, UI shell, or fixture-only test cannot close a broader capability.
-7. **Verify proportionately.** Exercise applicable static, unit, integration, real-data/local-data, interaction, degraded, and blocked cases. Preserve the evidence vocabulary; inspection is not executed behavior.
-8. **Re-review from meaning.** Re-read the confirmed charter and judge the resulting product behavior from it. Never infer that the existing code defines the intended product.
-9. **Check all three boundaries.** Evaluate `local`, `adjacent`, and `cumulative` independently using the rules below.
-10. **Close or block navigation.** Refresh the canonical completion claim, record compact closure state in existing durable surfaces, and advance only when the closure decision permits it.
+5. **Run conditional solution adequacy.** Only when a trigger below fires, restate the outcome and real conditions, separate hard constraints from preferences and assumptions, compare enough candidate classes to discriminate the live uncertainty, and run the lowest-cost outcome-corresponding validation. Classify any failure before choosing repair or rebase.
+6. **Plan repair or route rebase.** For `implementation_defect` or `parameter_or_local_design_issue`, decide what to retain, refactor, replace, isolate, or remove inside the current route. For `route_assumption_failure`, hand the evidence to Plan Tree for `modify_node | supersede_node` and canonical Route Rebase; do not conceal a failed route with patch stacking. A `protected_outcome_or_constraint_change` requires the existing user/semantic boundary.
+7. **Implement the vertical path.** Make the active runtime path carry the responsibility. An isolated table, script, endpoint, UI shell, or fixture-only test cannot close a broader capability.
+8. **Verify proportionately.** Exercise applicable static, unit, integration, real-data/local-data, interaction, degraded, and blocked cases. Preserve the evidence vocabulary; inspection is not executed behavior.
+9. **Re-review from meaning.** Re-read the confirmed charter and judge the resulting product behavior from it. Never infer that the existing code defines the intended product.
+10. **Check all three boundaries.** Evaluate `local`, `adjacent`, and `cumulative` independently using the rules below.
+11. **Close or block navigation.** Refresh the canonical completion claim, record compact closure state in existing durable surfaces, and advance only when the closure decision permits it.
+
+## Conditional Solution Adequacy
+
+Run this check only when at least one material trigger is present:
+
+- material uncertainty that the current route fits the confirmed outcome or real-use conditions;
+- significant cost, irreversibility, lock-in, blast radius, maintenance burden, or recovery difficulty;
+- evidence contradicting a key assumption required by the route;
+- accumulating patch complexity, regressions, or side effects suggesting the route may be wrong;
+- a substantive user-supplied candidate that could materially change the route choice.
+
+Do not open a fixed comparison ceremony for a clear known defect, a local parameter issue, a hard constraint that leaves one viable route, or a reversible choice already supported by proportionate evidence. Patch count alone is a signal to inspect assumptions, not proof of route failure. A user-supplied solution is one candidate and evidence source; its provenance is not acceptance, confirmation, or implementation authority.
+
+When triggered:
+
+1. confirm the protected outcome and the real-use or observation conditions;
+2. separate hard constraints, downstream contracts, engineering preferences, and key assumptions;
+3. generate or retain enough materially distinct candidate classes to resolve the uncertainty, without a fixed candidate count;
+4. choose the lowest-cost discriminating validation that corresponds to the actual outcome rather than a convenient proxy;
+5. compare outcome fit, constraints/contracts, reversibility, complexity, cost, maintenance, and risk;
+6. classify the result exactly as `implementation_defect | parameter_or_local_design_issue | route_assumption_failure | protected_outcome_or_constraint_change`.
+
+The first two classes remain on the current route. `route_assumption_failure` routes to Plan Tree for modification/supersession and rebase. `protected_outcome_or_constraint_change` stops at the existing user-owned semantic boundary.
+
+```yaml
+solution_adequacy:
+  triggers:
+    - material_fit_uncertainty | significant_cost_or_lock_in | key_assumption_contradicted | patch_complexity_accumulating | substantive_user_candidate
+  confirmed_outcome:
+  real_use_or_observation_conditions: []
+  hard_constraints: []
+  downstream_contracts: []
+  engineering_preferences: []
+  key_assumptions: []
+  candidate_classes:
+    - candidate:
+      provenance: primary_generated | user_supplied | existing_route
+      conditions: []
+      expected_outcome:
+      constraint_and_downstream_fit:
+      tradeoffs:
+  discriminating_validation:
+    evidence_pointer:
+    outcome_correspondence:
+  failure_class: none | implementation_defect | parameter_or_local_design_issue | route_assumption_failure | protected_outcome_or_constraint_change
+  disposition: continue_current_route | repair_current_route | route_rebase | semantic_confirmation_required
+```
+
+Omit `solution_adequacy` entirely when no trigger fires. Full and Adaptive use the same trigger, comparison, evidence, classification, and disposition.
 
 ## Compact State
 
@@ -106,6 +160,7 @@ semantic_implementation_closure:
     legacy_path: absent | intentionally_retained | undeclared_active | unknown
   completion_claim_ref: <pointer to the canonical Acceptance Harness claim and exact result>
   completion_freshness: current | stale | unknown
+  solution_adequacy: <include the canonical triggered block above; otherwise omit>
   evidence_epoch: current_resulting_semantics | pre_rebase_evidence_revalidation_pending
   boundaries:
     local:
@@ -155,6 +210,7 @@ Set `status: closed` and `next_step_allowed: yes` only when all are true:
 - active code/data/entrypoints and legacy paths were inspected;
 - the refreshed canonical completion claim is `supported` with `freshness_basis.status: current` for the exact node scope;
 - any material Route Rebase is at `revalidating` with no pending human gate or blocking disposition, and the closure evidence was generated or explicitly revalidated under the resulting confirmed semantics/path;
+- any triggered `solution_adequacy` is resolved, its discriminating evidence corresponds to the confirmed outcome, and no `route_assumption_failure` remains open on the current path;
 - `local`, `adjacent`, and `cumulative` are all `supported`;
 - no undeclared active legacy fallback or identity break remains;
 - `semantic_delta.status` is not `l0_l2_confirmation_required`;

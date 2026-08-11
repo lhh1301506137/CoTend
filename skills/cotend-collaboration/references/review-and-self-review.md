@@ -55,6 +55,7 @@ Ordinary implementation self-check is not formal review. A formal self-review mu
 - re-read diffs/files/tests/project records;
 - check correctness, regressions, missing tests, scope creep, direction risk, risk classification, Sentinel signals;
 - when an important L2/main-chain node is being closed or advanced, inspect its confirmed charter, actual active runtime/data path, legacy-path disposition, canonical exact-scope completion claim, and local/adjacent/cumulative closure evidence; local tests alone cannot approve the transition;
+- when `solution_adequacy` triggered, inspect the confirmed outcome and real conditions, hard constraints versus preferences, key assumptions, materially distinct candidate classes, outcome-corresponding discriminator, failure classification, and resulting continue/repair/rebase/semantic route;
 - record verdict in `REVIEW-LOG.md` or project convention;
 - mark that it is `ai_generated` and not independent external review or user acceptance.
 
@@ -93,6 +94,13 @@ Primary handoff intent and `review_request` are focus hints, not review boundari
 Reviewer must perform strategic alignment review: is this the right step toward the agreed final shape, not merely locally correct?
 
 When `semantic-implementation-closure.md` triggers, independently verify whether the Primary checked the active entrypoint and cumulative main-chain path. A review may approve implementation findings while still keeping `next_step_allowed: no`; do not infer navigation approval from a general `APPROVE` verdict.
+
+Strategically challenge whether a convention or implementation preference was
+mistaken for a hard constraint, whether a user-supplied solution was accepted
+reflexively, or whether path dependence is accumulating patches on a route
+whose required assumption has failed. Also reject the opposite failure:
+opening an elaborate comparison for a known defect or evidenced reversible
+choice, or declaring route failure from patch count alone.
 
 Record the review boundary using the actual identities:
 

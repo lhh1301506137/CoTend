@@ -872,7 +872,7 @@ def main() -> int:
             "success_scenario": success,
             "failure_recovery_scenario": failure,
             "verification": {
-                "skills": len(package.EXPECTED_SKILLS),
+                "skills": len(package.CURRENT_REPOSITORY_SKILLS),
                 "write_roots_redirected": len(lifecycle.WRITE_ROOT_ENV_KEYS),
                 "credential_inheritance": False,
                 "proxy_policy": "direct_or_credential_free_loopback",
@@ -889,7 +889,7 @@ def main() -> int:
             f"head={expected_head} "
             f"steps={success['lifecycle']['step_count']} "
             f"recovery={failure['recovery']['step_count']} "
-            f"skills={len(package.EXPECTED_SKILLS)} "
+            f"skills={len(package.CURRENT_REPOSITORY_SKILLS)} "
             f"roots={len(lifecycle.WRITE_ROOT_ENV_KEYS)} "
             "purged=true protected_unchanged=true real_user_write=false"
         )

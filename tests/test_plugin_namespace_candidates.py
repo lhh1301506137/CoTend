@@ -37,6 +37,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
             "cotend-project-init": "project-init",
             "cotend-semantic-alignment": "semantic-alignment",
             "cotend-session-handoff": "session-handoff",
+            "cotend-tooling": "tooling",
         }
         self.assertEqual(namespace.SHORT_NAME_MAP, expected)
         self.assertEqual(
@@ -56,24 +57,25 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
             namespace.base.SOURCE_SKILLS_ROOT, namespace.USER_OWNED_SKILLS
         )
         expected_by_identifier = {
-            "cotend-collaboration": 102,
+            "cotend-collaboration": 109,
             "cotend-diagnose-only": 26,
             "cotend-init": 14,
             "cotend-model-upgrade": 22,
-            "cotend-project-init": 25,
+            "cotend-project-init": 30,
             "cotend-semantic-alignment": 52,
-            "cotend-session-handoff": 47,
+            "cotend-session-handoff": 49,
+            "cotend-tooling": 20,
         }
         expected_by_category = {
-            "agent_self_prompt": 7,
-            "explicit_invocation": 126,
+            "agent_self_prompt": 8,
+            "explicit_invocation": 136,
             "fallback_path": 4,
-            "frontmatter_name": 7,
-            "plain_reference": 55,
-            "protocol_or_version": 21,
-            "reference_path": 68,
+            "frontmatter_name": 8,
+            "plain_reference": 62,
+            "protocol_or_version": 22,
+            "reference_path": 82,
         }
-        self.assertEqual(inventory["files"], 40)
+        self.assertEqual(inventory["files"], 46)
         self.assertEqual(inventory["by_identifier"], expected_by_identifier)
         self.assertEqual(inventory["by_category"], expected_by_category)
         self.assertEqual(
@@ -149,9 +151,9 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
             )
 
         preserve = results["N1-preserve"]
-        self.assertEqual(preserve["skills"], 9)
-        self.assertEqual(preserve["skill_files"], 61)
-        self.assertEqual(preserve["package_files"], 67)
+        self.assertEqual(preserve["skills"], 10)
+        self.assertEqual(preserve["skill_files"], 71)
+        self.assertEqual(preserve["package_files"], 77)
         self.assertEqual(transforms["N1-preserve"], [])
         self.assertTrue(preserve["source_comparison"]["byte_identical"])
         self.assertEqual(preserve["source_comparison"]["moved_path_count"], 0)
@@ -160,28 +162,28 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         )
         self.assertEqual(
             preserve["residual_source_identifier_inventory"]["occurrences"],
-            288,
+            322,
         )
         self.assertEqual(preserve["residual_migration_review_required"], 0)
-        self.assertEqual(preserve["plugin_sensitive_reference_count"], 137)
+        self.assertEqual(preserve["plugin_sensitive_reference_count"], 148)
 
         short = results["N2-short"]
-        self.assertEqual(short["skills"], 9)
-        self.assertEqual(short["skill_files"], 61)
-        self.assertEqual(short["package_files"], 67)
-        self.assertEqual(len(transforms["N2-short"]), 14)
-        self.assertEqual(short["source_comparison"]["moved_path_count"], 59)
+        self.assertEqual(short["skills"], 10)
+        self.assertEqual(short["skill_files"], 71)
+        self.assertEqual(short["package_files"], 77)
+        self.assertEqual(len(transforms["N2-short"]), 16)
+        self.assertEqual(short["source_comparison"]["moved_path_count"], 69)
         self.assertEqual(
-            short["source_comparison"]["byte_changed_file_count"], 14
+            short["source_comparison"]["byte_changed_file_count"], 16
         )
         self.assertFalse(short["source_comparison"]["byte_identical"])
         self.assertEqual(
             short["residual_source_identifier_inventory"]["occurrences"],
-            274,
+            306,
         )
-        self.assertEqual(short["residual_migration_review_required"], 253)
-        self.assertEqual(short["plugin_sensitive_reference_count"], 130)
-        self.assertEqual(len(short["target_entrypoints"]), 7)
+        self.assertEqual(short["residual_migration_review_required"], 284)
+        self.assertEqual(short["plugin_sensitive_reference_count"], 140)
+        self.assertEqual(len(short["target_entrypoints"]), 8)
         self.assertEqual(
             {item["canonical_name"] for item in short["target_entrypoints"]},
             {
@@ -192,6 +194,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
                 "cotend:project-init",
                 "cotend:semantic-alignment",
                 "cotend:session-handoff",
+                "cotend:tooling",
             },
         )
         candidate_root = self.evaluation_root / "N2-short"
@@ -220,6 +223,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
                     f"Use ${namespace.PLUGIN_ID}:{target_name}".encode(),
                     1,
                 )
+            expected = expected.replace(b"\r\n", b"\n")
             target_bytes = target.read_bytes()
             self.assertEqual(target_bytes, expected)
             self.assertNotIn(b"\r\n", target_bytes)
@@ -343,7 +347,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
                     "interfaces": interfaces,
                     "plugin_names": [
                         f"cotend:{name}"
-                        for name in namespace.base.EXPECTED_SKILLS
+                        for name in namespace.CURRENT_SKILLS
                     ],
                 }
             }
@@ -351,7 +355,7 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         overlay = namespace.display_led_overlay(n1_result)
         self.assertEqual(overlay["physical_package"], "N1-preserve")
         self.assertEqual(overlay["additional_package_bytes"], 0)
-        self.assertEqual(overlay["friendly_display_name_count"], 7)
+        self.assertEqual(overlay["friendly_display_name_count"], 8)
         self.assertTrue(overlay["display_names_unique"])
         self.assertTrue(overlay["canonical_double_prefix_remains"])
         self.assertEqual(

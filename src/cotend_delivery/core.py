@@ -20,19 +20,25 @@ EXPECTED_SKILLS = (
     "cotend-project-init",
     "cotend-semantic-alignment",
     "cotend-session-handoff",
+    "cotend-tooling",
     "grill-me",
     "karpathy-guidelines",
 )
-FIRST_PARTY_SKILLS = EXPECTED_SKILLS[:7]
-SHAREABLE_COMPANION_SKILLS = EXPECTED_SKILLS[7:]
+FIRST_PARTY_SKILLS = EXPECTED_SKILLS[:8]
+SHAREABLE_COMPANION_SKILLS = EXPECTED_SKILLS[8:]
+R14_TO_R15_SKILLS = tuple(
+    skill for skill in EXPECTED_SKILLS if skill != "cotend-tooling"
+)
 R2_TO_R13_SKILLS = tuple(
-    skill for skill in EXPECTED_SKILLS if skill != "cotend-session-handoff"
+    skill for skill in R14_TO_R15_SKILLS if skill != "cotend-session-handoff"
 )
 R1_SKILLS = tuple(
     skill for skill in R2_TO_R13_SKILLS if skill != "cotend-semantic-alignment"
 )
-EXPECTED_FILE_COUNT = 61
-CURRENT_SOURCE_FRAMEWORK_FILE_COUNT = 59
+EXPECTED_FILE_COUNT = 71
+CURRENT_SOURCE_FRAMEWORK_FILE_COUNT = 69
+R15_FILE_COUNT = 61
+R15_SOURCE_FRAMEWORK_FILE_COUNT = 59
 R14_FILE_COUNT = 54
 R14_SOURCE_FRAMEWORK_FILE_COUNT = 51
 R13_FILE_COUNT = 52
@@ -155,8 +161,10 @@ def _target_artifact_id(lineage: str, revision: int) -> str:
 
 
 def _expected_file_count(revision: int) -> int:
-    if revision >= 15:
+    if revision >= 16:
         return EXPECTED_FILE_COUNT
+    if revision == 15:
+        return R15_FILE_COUNT
     if revision == 14:
         return R14_FILE_COUNT
     if revision == 13:
@@ -173,16 +181,20 @@ def _expected_file_count(revision: int) -> int:
 
 
 def _expected_skills(revision: int) -> tuple[str, ...]:
-    if revision >= 14:
+    if revision >= 16:
         return EXPECTED_SKILLS
+    if revision >= 14:
+        return R14_TO_R15_SKILLS
     if revision >= 2:
         return R2_TO_R13_SKILLS
     return R1_SKILLS
 
 
 def _expected_source_file_count(revision: int) -> int:
-    if revision >= 15:
+    if revision >= 16:
         return CURRENT_SOURCE_FRAMEWORK_FILE_COUNT
+    if revision == 15:
+        return R15_SOURCE_FRAMEWORK_FILE_COUNT
     if revision == 14:
         return R14_SOURCE_FRAMEWORK_FILE_COUNT
     if revision == 13:

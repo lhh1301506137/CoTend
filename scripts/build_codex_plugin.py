@@ -44,6 +44,18 @@ EXPECTED_SKILLS = (
     "grill-me",
     "karpathy-guidelines",
 )
+CURRENT_REPOSITORY_SKILLS = (
+    "cotend-collaboration",
+    "cotend-diagnose-only",
+    "cotend-init",
+    "cotend-model-upgrade",
+    "cotend-project-init",
+    "cotend-semantic-alignment",
+    "cotend-session-handoff",
+    "cotend-tooling",
+    "grill-me",
+    "karpathy-guidelines",
+)
 FROZEN_RC2_SKILLS = tuple(
     skill for skill in EXPECTED_SKILLS if skill != "cotend-session-handoff"
 )
@@ -341,14 +353,14 @@ def source_skill_manifest() -> dict[str, str]:
     actual_directories = tuple(
         sorted(path.name for path in SOURCE_SKILLS_ROOT.iterdir() if path.is_dir())
     )
-    if actual_directories != EXPECTED_SKILLS:
+    if actual_directories != CURRENT_REPOSITORY_SKILLS:
         raise PluginPackageError("repository Skill directory inventory drifted")
     manifest = path_hash_manifest(SOURCE_SKILLS_ROOT)
-    if len(manifest) != 61:
+    if len(manifest) != 71:
         raise PluginPackageError(
-            f"expected 61 repository Skill files, found {len(manifest)}"
+            f"expected 71 repository Skill files, found {len(manifest)}"
         )
-    for skill in EXPECTED_SKILLS:
+    for skill in CURRENT_REPOSITORY_SKILLS:
         if f"{skill}/SKILL.md" not in manifest:
             raise PluginPackageError(f"repository Skill is missing SKILL.md: {skill}")
     return manifest
@@ -567,8 +579,8 @@ def validate_contract() -> dict[str, Any]:
     if (
         target.get("platform") != "Codex"
         or target.get("lineage") != "cotend-codex"
-        or target.get("artifact_id") != "cotend-codex-r000015"
-        or target.get("revision") != 15
+        or target.get("artifact_id") != "cotend-codex-r000016"
+        or target.get("revision") != 16
         or not isinstance(target.get("manifest_sha256"), str)
         or len(target["manifest_sha256"]) != 64
     ):

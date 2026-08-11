@@ -52,7 +52,7 @@ class CoTendV176AdaptationTests(unittest.TestCase):
         self.assertIn("one bounded repair and recheck", authority)
         self.assertIn("Architecture authority is classified by impact", authority)
         self.assertIn("same impact classification", authority)
-        self.assertIn("cotend-collaboration-v1.76", text(
+        self.assertIn("cotend-collaboration-v1.79", text(
             "skills/cotend-collaboration/SKILL.md"
         ))
 
@@ -108,7 +108,7 @@ class CoTendV176AdaptationTests(unittest.TestCase):
             "skills/cotend-project-init/scripts/maintain_project_agents_router.py"
         )
         model_upgrade = text("skills/cotend-model-upgrade/SKILL.md")
-        self.assertIn("cotend-collaboration-v1.76", project_init)
+        self.assertIn("cotend-collaboration-v1.79", project_init)
         self.assertIn("cotend.project-router.v1", router)
         self.assertIn("COTEND:PROJECT-ROUTER:START", router)
         self.assertIn("Version: 1.14", model_upgrade)

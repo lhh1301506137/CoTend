@@ -64,7 +64,7 @@ EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS = 0
 
 REQUIRED_PROJECT_INIT_MARKERS = (
     "## Native Initialization And Resume Boundary",
-    "classify exactly one Auto Mode;",
+    "classify exactly one Auto Mode when the no-op fast path does not apply;",
     "report readiness and return control exactly once.",
     "a second run with unchanged inputs",
     "must produce no diff.",
@@ -523,7 +523,11 @@ def _require_markers(text: str, markers: tuple[str, ...], label: str) -> None:
 def trellis_inventory(root: Path = ROOT) -> dict[str, int]:
     inventory: dict[str, int] = {}
     for path in sorted((root / "skills").rglob("*")):
-        if not path.is_file():
+        if (
+            not path.is_file()
+            or "__pycache__" in path.parts
+            or path.suffix == ".pyc"
+        ):
             continue
         count = len(re.findall("trellis", path.read_text(encoding="utf-8"), re.I))
         if count:
@@ -591,6 +595,8 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         path.read_text(encoding="utf-8")
         for path in sorted((root / "skills").rglob("*"))
         if path.is_file()
+        and "__pycache__" not in path.parts
+        and path.suffix != ".pyc"
     )
     for command in REMOVED_TD02_COMMANDS:
         if command in combined_skills:

@@ -1,0 +1,4 @@
+interface:
+  display_name: "CoTend Tooling"
+  short_description: "Govern reusable development capabilities safely"
+  default_prompt: "Use $cotend-tooling to inventory or evaluate reusable capabilities for this project without automatic side effects."

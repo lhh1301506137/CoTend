@@ -22,16 +22,16 @@ class LocalCodexArtifactTests(unittest.TestCase):
 
         self.assertEqual(first_artifact, second_artifact)
         self.assertEqual(first, second)
-        self.assertEqual(first_artifact.artifact_id, "cotend-codex-r000015")
-        self.assertEqual(first_artifact.revision, 15)
-        self.assertEqual(len(first_artifact.skills), 9)
-        self.assertEqual(len(first_artifact.files), 61)
+        self.assertEqual(first_artifact.artifact_id, "cotend-codex-r000016")
+        self.assertEqual(first_artifact.revision, 16)
+        self.assertEqual(len(first_artifact.skills), 10)
+        self.assertEqual(len(first_artifact.files), 71)
 
         with zipfile.ZipFile(local_artifact.io.BytesIO(first)) as archive:
-            self.assertEqual(len(archive.infolist()), 63)
+            self.assertEqual(len(archive.infolist()), 73)
             self.assertTrue(
                 all(
-                    info.filename.startswith("cotend-codex-r000015/")
+                    info.filename.startswith("cotend-codex-r000016/")
                     for info in archive.infolist()
                 )
             )

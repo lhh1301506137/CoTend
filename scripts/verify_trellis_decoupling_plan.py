@@ -193,7 +193,13 @@ def load_contract(path: Path = CONTRACT_PATH) -> dict[str, Any]:
 def runtime_inventory(root: Path = ROOT) -> dict[str, int]:
     inventory: dict[str, int] = {}
     skill_root = root / "skills"
-    for path in sorted(item for item in skill_root.rglob("*") if item.is_file()):
+    for path in sorted(
+        item
+        for item in skill_root.rglob("*")
+        if item.is_file()
+        and "__pycache__" not in item.parts
+        and item.suffix != ".pyc"
+    ):
         try:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError as exc:
@@ -258,7 +264,7 @@ def validate_contract(
         raise TrellisDecouplingPlanError("current candidate identity drifted")
     if contract.get("target_candidate") != "cotend@0.1.0-rc.3_after_parity":
         raise TrellisDecouplingPlanError("target candidate identity drifted")
-    if contract.get("development_target_artifact") != "cotend-codex-r000015":
+    if contract.get("development_target_artifact") != "cotend-codex-r000016":
         raise TrellisDecouplingPlanError("development target artifact drifted")
 
     source = contract.get("source_boundary")
@@ -584,11 +590,11 @@ def validate_contract(
         "target_artifact_changed": True,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
-        "validation_gate_completed": "G01-G05-regression-for-r15",
+        "validation_gate_completed": "G01-G05-regression-for-r16",
         "g06_current_target_status": "not_rerun_frozen_r13_evidence",
     }:
         raise TrellisDecouplingPlanError(
-            "r15 adaptation and frozen-r13 G06 boundary drifted"
+            "r16 adaptation and frozen-r13 G06 boundary drifted"
         )
 
     for marker in EXPECTED_DOCUMENT_MARKERS:

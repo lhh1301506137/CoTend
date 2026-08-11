@@ -757,6 +757,18 @@ Classify the change:
 - `new_goal_or_scope`: user decision required;
 - `reject_or_defer`: interesting but not needed for current goal.
 
+Before stacking another patch or reopening the route, classify the observed
+failure:
+
+- `implementation_defect`: the selected route remains valid; repair as a bugfix under the node;
+- `parameter_or_local_design_issue`: the route remains valid; make a bounded local design/parameter repair;
+- `route_assumption_failure`: evidence contradicts a condition the current route needs. Patch stacking is a signal to investigate, not proof by itself; modify or supersede the affected node and run canonical Route Rebase;
+- `protected_outcome_or_constraint_change`: record a proposal only and stop at the existing user-confirmation/Semantic Alignment boundary.
+
+Consume the triggered `solution_adequacy` evidence from
+`semantic-implementation-closure.md`; do not duplicate its comparison schema
+or turn a route failure into a second project tree.
+
 If that classification implies a material active-route, dependency, meaning, recovery, or evidence-trust change, enter the Dynamic Active-Path Rebase lifecycle and use the canonical packet. The classifications above describe why reconciliation started; they do not create permanent mainline/branch types or bypass the L0-L2 authority test.
 
 Update `PROJECT-PLAN-TREE.md`, affected node docs, relevant expanded understanding docs, `PROJECT-DECISION-LOG.md`, and `PROJECT-KNOWLEDGE-CHANGELOG.md` before implementation when the change affects route, priority, acceptance, dependencies, linked evidence, or high-level understanding. Keep `PLAN-CHANGELOG.md` only as a legacy/project-specific plan log when already in use; on the next init/update, migrate still-current `PLAN-CHANGELOG.md` items into `PROJECT-KNOWLEDGE-CHANGELOG.md` or mark them historical, then treat `PLAN-CHANGELOG.md` as legacy history. The decision log is the default audit trail for user-facing decisions, and the knowledge changelog is the default audit trail for Plan Tree and understanding changes.

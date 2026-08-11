@@ -2,7 +2,7 @@
 
 Protocol version: `cotend-session-handoff-v1.3`
 
-Compatibility baseline: `cotend-collaboration-v1.76`.
+Compatibility baseline: `cotend-collaboration-v1.79`.
 
 This workflow is a cold path. It may be read only after the entry `SKILL.md`
 has verified that the current user input contains the literal

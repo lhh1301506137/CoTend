@@ -2,22 +2,22 @@
   "schema": "cotend.framework-lock",
   "schema_version": 1,
   "status": "adopted_verified",
-  "release_id": "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14",
-  "framework_protocol": "cotend-collaboration-v1.76",
+  "release_id": "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
+  "framework_protocol": "cotend-collaboration-v1.79",
   "model_upgrade_packet_family": "cotend-model-upgrade-v1.14",
   "source_anchor": {
     "type": "exact_source_commit",
     "publication_state": "not_public_release",
-    "commit": "774aab64e778d2e3a57b66cfd65d808ac8235e14",
-    "canonical_source_tree": "ebcc0b2930146aca1ce299215f9a2f936b12d4c8",
+    "commit": "c14d4133bf0438d435048858554c88c89a7870a3",
+    "canonical_source_tree": "a6824559e087f87da90a55bcc6403576db1027c1",
     "canonical_source_tree_path": "skills-backup/codex",
     "consumer_handoff": {
-      "id": "2026.07.30.1",
+      "id": "2026.08.01.1",
       "schema": "dual-ai.consumer-range-handoff",
       "schema_version": 1,
-      "handoff_json_sha256": "a2e23ab5a58fadc3dd4e454f9fd42ef7681c91ccb0f70fe6c85e330d6688298e",
-      "handoff_markdown_sha256": "0fbde80f3e491442c21281c09f1abbe6e9dcb2cc32fd1d08fdd11a75695f5675",
-      "checksums_sha256": "ae76f6101e9562740ffbf15ba6cd9841d21bfd85721bdc1994b2be123a64d3cb"
+      "handoff_json_sha256": "4d16e8a1ba29a2a71e0974e79f0967b2ec4cfa8afe42e0d24c43b32102df47af",
+      "handoff_markdown_sha256": "fe8dfcbd787cfa9116567f6f2730dd3bb345b0774a882c1a4987614394d6c52c",
+      "checksums_sha256": "6ea9ad1602d3cc331314b2ec8b06e7f29019b6715dfc553da7c1481d9cd3ea3a"
     }
   },
   "latest_public_release": {
@@ -33,16 +33,17 @@
   },
   "target_platform": "Codex",
   "source_carrier": "skills/",
-  "skill_count": 9,
-  "skill_file_count": 59,
+  "skill_count": 10,
+  "skill_file_count": 69,
   "source_skill_trees": {
     "diagnose-only": "dd5ba26517f032c3dfcdd5c69fabc27825c6bf25",
-    "dual-ai-collaboration": "fde20c6c554cfae1c17b4239aac2b725727493e2",
-    "dual-ai-init": "8dfda33031d0aad19f035a7d9de74bfcd52d29c6",
-    "dual-ai-project-init": "a2945ffe225c3ab502eaa43bcf14fc9c231aa220",
-    "dual-ai-semantic-alignment": "e6e145dc1fb66032ee01aaa0abae4afa77c12ff8",
-    "dual-ai-session-handoff": "9f97fbafdb510e47aff83f3e111c01e946b69d92",
-    "dual-model-upgrade": "96babb80a3ed68776c2a1d11df4093a93469f99b",
+    "dual-ai-collaboration": "82146af99b711170878d0b396d3936919b3f4f24",
+    "dual-ai-init": "3e5998f4742585656d1d585b2bf2338b848809ae",
+    "dual-ai-project-init": "ce9974142862fb3e6a4c18523433b212079c8a1b",
+    "dual-ai-semantic-alignment": "943c95550ccd6a9602d406f9cd3348b494b7e5f1",
+    "dual-ai-session-handoff": "cef063bf0c6821938dcdd094635a8e6f4d6a1c26",
+    "dual-ai-tooling": "73bda7067e0299e68202217df748ae325eec7f6d",
+    "dual-model-upgrade": "fb58aa7c246bae683a1204901f6a9a61ca6c026b",
     "grill-me": "70df660726ef12349a40dc0353a681c82414fe95",
     "karpathy-guidelines": "32d7f4abb8c9dd8ab17a793b5e0b1a3a1fa35aeb"
   },
@@ -90,6 +91,12 @@
       "implementation_mode": "platform_adaptation"
     },
     {
+      "source": "dual-ai-tooling",
+      "target": "cotend-tooling",
+      "disposition": "adapted",
+      "implementation_mode": "platform_adaptation"
+    },
+    {
       "source": "grill-me",
       "target": "grill-me",
       "disposition": "adopted",
@@ -103,7 +110,7 @@
     }
   ],
   "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-  "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-07-30-1-v1-76-adoption",
+  "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-08-01-1-v1-79-adoption",
   "provenance_records": [
     "upstream/FRAMEWORK-CANDIDATE.json",
     "upstream/CODEX-SKILL-ROLE-MAP.json",

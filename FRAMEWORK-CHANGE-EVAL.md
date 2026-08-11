@@ -1761,3 +1761,118 @@ review_after: next_real_model_external_UAT_global_install_or_public_action_decis
 ```
 
 本条目记录的是已通过完整仓库门禁和确定性构建的本地采用：r15 精确绑定 9 个 Skill、61 个目标文件和 r14 第一 predecessor。它不把本地采用描述成公开 release，也不把 r13 的 G06 历史真实项目验收改写成 r15 证据。任何真实模型、外部 UAT、全局安装、push、tag、Release、submission 或 publish 仍需用户另行授权。
+
+## 2026-08-01 Dual exact source / CoTend v1.79 r16 本地采用
+
+```yaml
+current_framework_version: cotend-collaboration-v1.79
+previous_framework_version: cotend-collaboration-v1.76
+model_upgrade_packet: cotend-model-upgrade-v1.14
+source_identity:
+  base: exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14
+  target: exact-source:c14d4133bf0438d435048858554c88c89a7870a3
+  target_tree: a6824559e087f87da90a55bcc6403576db1027c1
+  publication_state: not_public_release
+consumer_handoff: consumer-handoff:2026.08.01.1
+change_classification: high_impact_workflow_behavior
+authority: product_owner_authorized_local_promotion_precommit
+change_summary: 独立采用 v1.77 Tooling、v1.78 结果驱动方案充分性和 v1.79 影响导向更新/增量 inventory；由 CoTend 原生 owner 承接，不把派生错误差异表或外部开发框架状态带入产品
+intent:
+  - 让可复用 Skill、MCP、库、服务、CLI 和技术资料有统一但只读优先的证据化评估入口
+  - 只在高价值不确定性、证据推翻假设、补丁堆叠或实质候选路线出现时比较方案，普通确定实现保持轻量
+  - 让 Project Init 先按 14 项影响索引选择最低充分读取范围，再把能力 inventory 委派给唯一 Tooling owner
+  - 让 inventory 首次有界全量、后续优先可靠 checkpoint 增量对账，未知或冲突状态失败关闭
+expected_benefit:
+  - 用户不需要手工维护第二套工具清单或判断每次更新应重读哪些治理模块
+  - 外部候选只能成为证据或建议，不能静默获得安装、采用、项目真相或发布权限
+  - Full 与 Adaptive 保持相同候选、权限、处置和停止结果
+  - CoTend 的需求、计划、实施、检查、收尾和提交范围 owner 继续完整自有化
+possible_harm:
+  - Tooling 若被误当安装器或联网搜索器，会绕过既有权限和供应链边界
+  - 方案充分性若无条件触发，会把普通修复膨胀成低价值多方案评审
+  - 影响索引或 checkpoint 若不可靠却被继续使用，会漏读必要 owner 或遗漏变更
+  - 冻结公开 rc.2 与当前仓库载体若共用同一 Skill 清单常量，会错误限制当前产品或篡改历史包
+affected_workflows:
+  - cotend_tooling_catalog_evaluate_find_inventory_refresh_retire
+  - project_init_framework_update_impact_routing
+  - collaboration_solution_adequacy_and_review
+  - project_truth_plan_and_authority_boundaries
+  - current_root_marketplace_and_user_delivery_inventory
+  - native_G01_G05_regression_and_frozen_rc2_boundary
+deviations:
+  - dual-ai-tooling 改为 cotend-tooling，并以 C14/C19 既有能力承接，不新增 C20
+  - catalog 只保存可验证 metadata；UPSTREAM-SOURCES 继续拥有来源关系与许可权威
+  - Project Init 只路由 inventory，不复制 Tooling checkpoint 或建立平行状态树
+  - 错误的 27 行 handoff contract_deltas 属于另一 lineage，保持拒绝且不进入实现或两份 lock
+  - 冻结 rc.2 使用历史 8-Skill/37-source-file 合同；当前仓库、根 Marketplace 和用户交付使用独立 10-Skill/71-file 合同
+mechanism_budget:
+  new_long_lived_skills: 1_cotend_tooling
+  new_capability_ids: 0
+  new_parallel_truth_or_state_trees: 0
+  new_bounded_scripts: 3_catalog_inventory_and_framework_impact_resolver
+  new_compact_data_contracts: 2_capability_catalog_and_framework_impact_index
+  candidate_cap: 3
+  inventory_policy: bootstrap_full_then_reliable_incremental_reconcile
+  cheaper_alternative_considered: 只把 Tooling 内容塞回 Project Init 或只改版本号；前者会制造职责膨胀和第二 owner，后者缺失 v1.77-v1.79 行为，均拒绝
+  retirement_or_thinning_trigger: 平台原生提供同等可审计 catalog/inventory/impact routing 时，评估删除脚本而保留行为与权威边界
+embedded_dependency_review:
+  status: completed
+  reason: 不新增自动安装、联网、遥测、付费依赖或外部开发框架运行时。CodeGraph 仍仅是可选结构/影响证据 provider；grill-me 保持审查字节，karpathy-guidelines 保留 MIT 归属与 CoTend 权限适配说明。
+adopted_inventory:
+  skills: 10
+  skill_files: 71
+  source_skill_files: 69
+  previous_locked_skill_files: 61
+  excluded_preexisting_untracked_file: COTEND-SKILLS-GUIDE.html
+  framework_lock_changed: true
+  artifact_lock_changed: true
+  artifact_generated: true
+  artifact_entries: 73
+  artifact_manifest_sha256: a7f7ece2522a5901030e19cd5944359f80c027482f66f822a2053fc5080dcfb5
+  artifact_sha256: 2779bb7a49f66fbb2a637b74fcf3ae3918e2e5d5aec2c158706b8ad78173482d
+validation_scenarios:
+  - scenario: exact_source_handoff_ancestry_range_tree_and_inventory
+    validation_result_type: executable_git_object_and_repository_verification
+    result: passed_exact_commit_tree_three_handoff_hashes_13_commits_3_included_10_evidence_only_and_27_bad_delta_rows_excluded
+  - scenario: tooling_catalog_candidate_cap_authority_and_negative_matrix
+    validation_result_type: executable_unit_and_contract_verification
+    result: passed_catalog_schema_zero_to_three_candidates_no_automatic_adoption_install_or_project_write
+  - scenario: bounded_inventory_checkpoint_tamper_and_fallback_matrix
+    validation_result_type: executable_unit_test
+    result: passed_bootstrap_incremental_reconcile_checkpoint_resume_tamper_fail_safe_and_git_or_digest_full_fallback
+  - scenario: solution_adequacy_trigger_near_miss_and_route_classes
+    validation_result_type: deterministic_contract_test
+    result: passed_high_value_triggers_and_ordinary_same_route_L3_L4_near_misses
+  - scenario: project_init_14_item_impact_index_and_fail_closed_routing
+    validation_result_type: executable_unit_and_project_init_topology_verification
+    result: passed_minimum_sufficient_read_set_future_trigger_preservation_unknown_conflict_and_major_migration_stops
+  - scenario: native_owner_zero_runtime_and_predecessor_regression
+    validation_result_type: executable_native_G01_G05_suite
+    result: passed_all_native_verifiers_target_r16_zero_runtime_inventory_and_exact_r15_first_predecessor
+  - scenario: official_skill_repository_and_full_unit_regression
+    validation_result_type: official_validation_static_lint_and_complete_test_suite
+    result: passed_10_of_10_skill_validation_repository_312_19_19_Ruff_scripts_src_tests_git_diff_check_and_441_of_441_unit_tests
+  - scenario: deterministic_local_r16_artifact_and_frozen_rc2
+    validation_result_type: reproducible_build_and_historical_lock_regression
+    result: passed_2_byte_identical_r16_builds_73_entries_sha256_2779bb7a49f66fbb2a637b74fcf3ae3918e2e5d5aec2c158706b8ad78173482d_and_rc2_manifest_a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2_unchanged
+real_project_validation:
+  - scenario: r16_fresh_session_or_real_model_behavior
+    validation_result_type: not_authorized
+  - scenario: r16_independent_or_external_UAT
+    validation_result_type: not_authorized
+  - scenario: global_install_push_tag_release_submission_or_publish
+    validation_result_type: not_authorized
+adoption_decision: adopted_verified_local_r16_precommit
+rollback_triggers:
+  - exact commit, ancestry, canonical tree, per-Skill tree or handoff hashes cannot be reproduced
+  - any of 13 exact-range commits becomes unclassified or a rejected delta enters a lock
+  - Tooling installs, searches the network, writes project truth or becomes a second adoption owner without explicit authority
+  - solution adequacy runs for ordinary deterministic same-route work
+  - impact resolver loads more than the minimum sufficient set or continues on unknown/conflicting state
+  - inventory trusts a tampered checkpoint or performs semantic inference from file metadata
+  - current carrier differs from 10 Skills / 71 files or r15 ceases to be the exact first predecessor
+  - G06 r13 evidence, r13/r15 local artifact or frozen rc2 bytes change
+review_after: local_commit_real_model_independent_UAT_global_install_or_public_action_decision
+```
+
+本条目证明 Dual v1.77-v1.79 的细节和设计意图已通过原始 Git 对象、源码树、行为测试与 CoTend owner 映射传递到位。r16 是本地已验证、尚未提交和尚未公开的 CoTend artifact；G06 仍是用户已接受的 r13 历史事实，不能用 441 项仓库回归冒充 r16 真实项目验收。真实模型、独立/外部 UAT、全局安装、commit、push、tag、Release、submission 和 publish 均仍在本轮授权之外。

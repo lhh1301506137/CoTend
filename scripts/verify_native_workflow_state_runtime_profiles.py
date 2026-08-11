@@ -43,8 +43,8 @@ REQUIRED_RUNTIME_MARKERS = (
     "2. one valid native project record;",
     "3. one unambiguous project-local legacy selection",
     "4. the CoTend product default `full`.",
-    "`full` | `v1.76-full` | `delegated_pair`",
-    "`adaptive` | `v1.76-A` | `inline`",
+    "`full` | `v1.79-full` | `delegated_pair`",
+    "`adaptive` | `v1.79-A` | `inline`",
     "Migrate only when all of these are true:",
     "Do not modify, delete, or normalize the source file.",
 )
@@ -498,7 +498,11 @@ def _require_markers(text: str, markers: tuple[str, ...], label: str) -> None:
 def scan_forbidden_state_owners(root: Path = ROOT) -> list[str]:
     findings: list[str] = []
     for path in sorted((root / "skills").rglob("*")):
-        if not path.is_file():
+        if (
+            not path.is_file()
+            or "__pycache__" in path.parts
+            or path.suffix == ".pyc"
+        ):
             continue
         text = path.read_text(encoding="utf-8")
         for label, pattern in FORBIDDEN_STATE_PATTERNS.items():
@@ -541,6 +545,8 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         path.read_text(encoding="utf-8")
         for path in sorted((root / "skills").rglob("*"))
         if path.is_file()
+        and "__pycache__" not in path.parts
+        and path.suffix != ".pyc"
     )
     _require_markers(
         combined_skill_text,

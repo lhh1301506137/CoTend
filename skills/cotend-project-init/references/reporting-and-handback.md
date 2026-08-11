@@ -85,7 +85,7 @@ Default compact summary:
   external_framework_owner: false
 - runtime_profile:
   effective: full | adaptive
-  display_name: v1.76-full | v1.76-A
+  display_name: v1.79-full | v1.79-A
   source: session_explicit | project_persistent | cotend_product_default | migrated_legacy_project_selection | invalid
   persistence: session | project | product_default
   user_selected: true | false
@@ -145,7 +145,7 @@ Detailed audit template:
 ## Detailed Initialization Audit
 
 Project initialization report:
-- protocol: cotend-collaboration-v1.76
+- protocol: cotend-collaboration-v1.79
 - report_mode: summary_only | summary_plus_detail | full_audit | blocked_decision
 - detail_policy: full_required | changed_or_relevant_only
 - omitted_unchanged_sections:

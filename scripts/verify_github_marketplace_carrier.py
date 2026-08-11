@@ -51,7 +51,7 @@ CARRIER_IDENTITY = lifecycle.PluginLifecycleIdentity(
     plugin_id=package.PLUGIN_NAME,
     plugin_version=package.PLUGIN_VERSION,
     marketplace_name=MARKETPLACE_NAME,
-    expected_skills=package.EXPECTED_SKILLS,
+    expected_skills=package.CURRENT_REPOSITORY_SKILLS,
 )
 EXTERNAL_PROJECT_PREFIX = "cotend-L54-projects-"
 
@@ -378,7 +378,7 @@ def verify_carrier_root(plugin_root: Path) -> dict[str, Any]:
     return {
         "manifest": manifest_result,
         "marketplace_source": "url_relative_root",
-        "skills": len(package.EXPECTED_SKILLS),
+        "skills": len(package.CURRENT_REPOSITORY_SKILLS),
         "skill_files": len(actual_skills),
         "source_bytes_identical": True,
         "duplicate_skill_tree": False,
@@ -433,7 +433,7 @@ def materialize_scenario(
         "# Root-carrier coexistence project\n", encoding="utf-8"
     )
     standalone_root = coexist_project / ".agents" / "skills"
-    for skill in package.EXPECTED_SKILLS:
+    for skill in package.CURRENT_REPOSITORY_SKILLS:
         shutil.copytree(package.SOURCE_SKILLS_ROOT / skill, standalone_root / skill)
     (fixture / "evidence" / "commands").mkdir(parents=True)
     return {"marketplace_root": marketplace_root, "carrier": carrier}
@@ -1122,7 +1122,7 @@ def main() -> int:
             "success_scenario": success,
             "failure_recovery_scenario": failure,
             "verification": {
-                "skills": len(package.EXPECTED_SKILLS),
+                "skills": len(package.CURRENT_REPOSITORY_SKILLS),
                 "skill_files": len(package.source_skill_manifest()),
                 "write_roots_redirected": len(lifecycle.WRITE_ROOT_ENV_KEYS),
                 "protected_user_boundaries": len(success_boundary),
@@ -1139,7 +1139,7 @@ def main() -> int:
             f"version={package.PLUGIN_VERSION} "
             f"steps={success['lifecycle']['step_count']} "
             f"recovery={failure['recovery']['step_count']} "
-            f"skills={len(package.EXPECTED_SKILLS)} "
+            f"skills={len(package.CURRENT_REPOSITORY_SKILLS)} "
             f"roots={len(lifecycle.WRITE_ROOT_ENV_KEYS)} "
             "purged=true protected_unchanged=true remote_git=not_run"
         )

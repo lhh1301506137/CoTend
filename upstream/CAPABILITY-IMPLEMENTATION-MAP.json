@@ -2,8 +2,8 @@
   "schema": "cotend.capability-implementation-map",
   "schema_version": 1,
   "status": "adopted_verified",
-  "source_release": "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14",
-  "source_anchor": "774aab64e778d2e3a57b66cfd65d808ac8235e14",
+  "source_release": "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
+  "source_anchor": "c14d4133bf0438d435048858554c88c89a7870a3",
   "source_publication_state": "not_public_release",
   "target_platform": "Codex",
   "skill_set_path": "skills/",
@@ -157,7 +157,11 @@
       "coverage_status": "mapped",
       "owners": [
         "skills/cotend-collaboration/references/upstream-dependency-review.md",
-        "skills/cotend-collaboration/references/framework-change-evaluation.md"
+        "skills/cotend-collaboration/references/framework-change-evaluation.md",
+        "skills/cotend-tooling/SKILL.md",
+        "skills/cotend-tooling/references/workflow.md",
+        "skills/cotend-tooling/references/capability-catalog.json",
+        "skills/cotend-tooling/scripts/capability_catalog.py"
       ]
     },
     {
@@ -219,6 +223,10 @@
       "coverage_status": "mapped",
       "owners": [
         "skills/cotend-project-init/SKILL.md",
+        "skills/cotend-project-init/references/framework-update-routing.md",
+        "skills/cotend-project-init/references/framework-impact-index.json",
+        "skills/cotend-project-init/scripts/resolve_framework_update.py",
+        "skills/cotend-tooling/scripts/project_inventory.py",
         "skills/cotend-collaboration/references/code-context-harness.md",
         "skills/cotend-collaboration/references/templates.md"
       ]

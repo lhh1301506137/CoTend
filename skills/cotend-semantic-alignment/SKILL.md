@@ -5,7 +5,7 @@ description: Use as the direct, independent writable entry when the user wants t
 
 # CoTend Semantic Alignment
 
-Companion version: `cotend-collaboration-v1.76`
+Companion version: `cotend-collaboration-v1.79`
 
 Align product meaning before implementation details. Preserve one Plan Tree and its linked truth files; do not create a second semantic tree.
 

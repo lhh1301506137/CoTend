@@ -20,8 +20,8 @@ class NativeCloseoutPassTests(unittest.TestCase):
         self.assertEqual(result["runtime_mentions"], 0)
         self.assertEqual(result["runtime_files"], 0)
         self.assertEqual(result["td07_compatibility_terms"], 0)
-        self.assertEqual(result["skill_files"], 61)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000015")
+        self.assertEqual(result["skill_files"], 71)
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000016")
 
     def test_full_and_adaptive_use_the_same_result_contract(self) -> None:
         full = closeout.evaluate_closeout(profile="full")

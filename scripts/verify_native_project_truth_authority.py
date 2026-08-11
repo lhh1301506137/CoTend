@@ -199,7 +199,11 @@ EXPECTED_SCENARIOS = {
 def scan_forbidden_authority(root: Path = ROOT) -> list[str]:
     findings: list[str] = []
     for path in sorted((root / "skills").rglob("*")):
-        if not path.is_file():
+        if (
+            not path.is_file()
+            or "__pycache__" in path.parts
+            or path.suffix == ".pyc"
+        ):
             continue
         text = path.read_text(encoding="utf-8")
         for label, pattern in FORBIDDEN_AUTHORITY_PATTERNS.items():

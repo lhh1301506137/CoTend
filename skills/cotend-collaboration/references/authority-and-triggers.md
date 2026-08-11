@@ -143,6 +143,16 @@ or the impact cannot yet be classified safely. Multiple technical
 implementations inside the unchanged boundary are not a user decision. Full
 and Adaptive use the same impact classification; only orchestration differs.
 
+Comparing, selecting, replacing, or materially reshaping an L3/L4 solution
+inside those unchanged boundaries remains Primary-owned. A user-suggested
+implementation, library, architecture, or route is one candidate and evidence
+source: independently assess the conditions under which it works, outcome fit,
+tradeoffs, cost, maintenance, reversibility, and risk. User provenance alone
+does not make it `accepted`, `user_confirmed`, or implementation-authorized.
+Ask the user only when the comparison would change a protected outcome,
+constraint, scope, risk, external effect, or another canonical user-only
+boundary.
+
 A user-authorized task, plan, slice, or mission covers one closure loop: implementation -> checking -> in-scope repair -> rechecking -> evidence/status updates -> already-authorized local closeout. The selected runtime profile supplies exactly one execution posture:
 
 - Adaptive uses `active_route_continuous`: continue across successive L3/L4 leaves on the same confirmed active route, including reversible candidate promotion/rejection and route-local refactoring, and report decisions/evidence at material checkpoints.

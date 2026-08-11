@@ -591,3 +591,68 @@ CoTend 将协议推进到 v1.76、DMU packet 推进到 1.14，并用原生 owner
 G01-G05 随 r15 做当前仓库回归。G06 保留为已完成并由用户接受的 r13 历史真实项目验收；本轮不重写外部 UAT，不执行真实模型，也不假称完成 r15 真实项目验收。冻结 rc.2 仍由原 source commit 重建，package identity、manifest 和 ZIP 摘要不变。
 
 本记录只覆盖仓库内 exact-source review、CoTend 产品适配、r15 锁、本地 artifact 与必要本地提交。它不授权全局安装、真实模型调用、Claude v1.76 适配、push、tag、Release、submission 或 publish。
+
+## exact-source-2026-08-01-1-v1-79-adoption
+
+```yaml
+status: adopted_verified_local
+source_identity: exact-source:c14d4133bf0438d435048858554c88c89a7870a3
+source_anchor_type: exact_source_commit
+source_commit: c14d4133bf0438d435048858554c88c89a7870a3
+source_tree: a6824559e087f87da90a55bcc6403576db1027c1
+source_tree_path: skills-backup/codex
+target_publication_state: not_public_release
+consumer_handoff: 2026.08.01.1
+handoff_json_sha256: 4d16e8a1ba29a2a71e0974e79f0967b2ec4cfa8afe42e0d24c43b32102df47af
+handoff_markdown_sha256: fe8dfcbd787cfa9116567f6f2730dd3bb345b0774a882c1a4987614394d6c52c
+handoff_checksums_sha256: 6ea9ad1602d3cc331314b2ec8b06e7f29019b6715dfc553da7c1481d9cd3ea3a
+latest_public_release: 2026.07.28.2
+latest_public_tag_object: d26994355921b9c43956f7300069c892884496e0
+latest_public_release_commit: 4540f9e0543e85c6a7cceb1d7501467feee8b440
+latest_public_source_tree: 2eae0ca4447cace17bdf93df3b04b665293deecb
+reviewed_commit_range: 13_commits_from_v1_76_exact_source_exclusive_to_v1_79_exact_source_inclusive
+contract_change_commits: 3
+evidence_only_commits: 10
+consumer_not_applicable_commits: 0
+unclassified_commits: 0
+rejected_handoff_contract_delta_rows: 27
+rejected_delta_disposition: excluded_from_implementation_framework_lock_and_artifact_lock
+framework_protocol: cotend-collaboration-v1.79
+model_upgrade_packet_family: cotend-model-upgrade-v1.14
+skill_count: 10
+upstream_skill_file_count: 69
+target_skill_file_count: 71
+target_artifact_id: cotend-codex-r000016
+target_revision: 16
+target_manifest_sha256: a7f7ece2522a5901030e19cd5944359f80c027482f66f822a2053fc5080dcfb5
+local_artifact_file: cotend-codex-r000016-local-a7f7ece2522a.zip
+local_artifact_entry_count: 73
+local_artifact_sha256: 2779bb7a49f66fbb2a637b74fcf3ae3918e2e5d5aec2c158706b8ad78173482d
+predecessor_target_artifact_id: cotend-codex-r000015
+predecessor_manifest_sha256: acc17586cf713acc85fef9e6be02013de6bc012b7864ade22bed495ee68a9e7b
+G06_status: frozen_completed_user_accepted_r13_not_rerun_for_r16
+rc2_status: frozen_unchanged
+resulting_CoTend_commit: containing_commit
+live_install_performed: false
+model_call_performed: false
+external_UAT_modified: false
+push_release_or_publish: not_performed
+```
+
+### 区间分类与证据处置
+
+已采用的 v1.76 exact-source commit 是排他基线，到 v1.79 target 共 13 个提交：3 个 included behavior change 和 10 个 evidence-only，没有未分类提交。CoTend 直接核验 Git ancestry、完整提交清单、三项源码差异、目标 tree、逐 Skill tree 和 69/71 文件 inventory。
+
+handoff 中另有 27 行 `contract_deltas` 描述不同的 baseline-to-latest-public-release lineage，不能代表本次 v1.76→v1.79 区间。它们保持被拒绝状态，不复制、不修复，也不进入实现或两份 lock。R349 证明更直接的 exact-source 证据足以独立承载采用身份与行为范围，因此该派生缺陷被披露但不再阻断本地采用。
+
+### 产品化适配结论
+
+CoTend 将协议推进到 v1.79，并新增第 10 个第一方入口 `cotend-tooling`。它承接 catalog、evaluate、最多三候选、只读 inventory 与 checkpoint，不拥有安装、采用授权、项目真相或第二状态树。Collaboration 条件式承接结果驱动方案充分性；Project Init 按 14 项影响索引选择最低充分读取范围并把 inventory 委派给 Tooling。
+
+当前 target 是 10 Skills / 71 files 的 r16；r15 是精确第一 predecessor。C01-C19、Full 首次使用默认、Full/Adaptive 的候选与停止等价性、CoTend 原生六类治理 owner、两个 MIT Skill 的许可边界、零外部开发框架运行依赖和冻结 rc.2 均保持不变。
+
+### 历史与授权边界
+
+G01-G05 随 r16 做当前仓库回归。G06 保留为已完成并由用户接受的 r13 历史真实项目验收；本轮不重写外部 UAT，不执行真实模型，也不假称完成 r16 真实项目验收。
+
+本记录只覆盖仓库内 exact-source review、CoTend 本地产品适配、r16 锁、本地 artifact 和确定性复审。DEC-170 要求停在本地提交前；全局安装、真实模型、独立/外部 UAT、Claude v1.79 适配、push、tag、Release、submission 和 publish 均未获授权。

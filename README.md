@@ -7,7 +7,7 @@
 
 > CoTend is available as a GitHub Open Beta for Codex. It is not yet available in the Public Plugin Directory and is not a stable release.
 
-CoTend helps people who do not read code, or who prefer not to manage development details themselves, keep AI-assisted software projects understandable and under control. It gives the AI a repeatable way to start or resume a project, continue an approved plan, verify work, diagnose failures, prepare model handoffs, and stop when a human decision is required.
+CoTend helps developers keep AI-assisted software projects understandable, verifiable, and under control without having to manually coordinate every development detail. It gives the AI a repeatable way to start or resume a project, continue an approved plan, verify work, diagnose failures, prepare model handoffs, and stop when a human decision is required.
 
 CoTend is not a coding model, IDE, hosted service, or sample app. It is a governance layer for an AI coding tool. The current pre-release adapter targets Codex; support for other platforms is future work, not a current compatibility claim.
 
@@ -71,9 +71,9 @@ These starter prompts describe the main workflows:
 
 For an independent stronger-model review or possible takeover, ask CoTend to prepare a model handoff. CoTend keeps prior conclusions separate from verified facts so the receiving model can reason independently, then returns the advisor-or-takeover choice to you.
 
-## How the nine Skills fit together
+## How the ten Skills fit together
 
-You are not expected to manage nine commands in ordinary use. `CoTend Init` is the normal start or resume entry; the other Skills are delegated, contextual, advanced, or supporting capabilities.
+You are not expected to manage ten commands in ordinary use. `CoTend Init` is the normal start or resume entry; the other Skills are delegated, contextual, advanced, or supporting capabilities.
 
 <!-- skill-catalog-start -->
 | Display name | Skill ID | Role |
@@ -85,11 +85,12 @@ You are not expected to manage nine commands in ordinary use. `CoTend Init` is t
 | CoTend Semantic Alignment | `cotend-semantic-alignment` | Direct writable entry for confirming or repairing product meaning before affected implementation continues. |
 | CoTend Model Upgrade | `cotend-model-upgrade` | Advanced advisor, trial, takeover, rollback, and milestone handoff workflow. |
 | CoTend Session Handoff | `cotend-session-handoff` | Explicit-only same-Primary session transfer with frozen state and freshness preflight. |
+| CoTend Tooling | `cotend-tooling` | Evidence-backed capability catalog, evaluation, and read-only project inventory without automatic adoption or installation. |
 | Grill Me | `grill-me` | MIT-licensed clarification companion for resolving a plan one decision at a time. |
 | Karpathy Guidelines | `karpathy-guidelines` | MIT-licensed implementation-discipline companion for simpler, verifiable code changes. |
 <!-- skill-catalog-end -->
 
-The seven CoTend-owned Skills use the `cotend-` prefix. The two bundled companions retain their upstream identities and license notices.
+The eight CoTend-owned Skills use the `cotend-` prefix. The two bundled companions retain their upstream identities and license notices.
 
 ## Current availability
 
@@ -99,10 +100,10 @@ The initial submission identity and version are confirmed for repository prepara
 
 | Area | Current state |
 |---|---|
-| Source carrier | Nine Codex Skills are adopted in [`skills/`](skills/) as internal target r15 from an exact private-upstream source commit that is explicitly not a public Dual release. |
-| Package candidate | `cotend@0.1.0-rc.2` remains frozen at its historical eight-Skill, 48-file source and is unpublished; r15 does not silently change that package identity. |
+| Source carrier | Ten Codex Skills are adopted in [`skills/`](skills/) as internal target r16 from an exact private-upstream source commit that is explicitly not a public Dual release. |
+| Package candidate | `cotend@0.1.0-rc.2` remains frozen at its historical eight-Skill, 48-file source and is unpublished; r16 does not silently change that package identity. |
 | Isolated lifecycle | Package add, install, discovery, coexistence, remove, recovery, and cleanup are verified in redirected disposable roots. |
-| GitHub Marketplace carrier | The local repository-root carrier verifies nine-Skill discovery; remote fetch, refresh, install, remove, recovery, and cleanup must be revalidated against a future authorized public commit. |
+| GitHub Marketplace carrier | The local repository-root carrier verifies ten-Skill discovery; remote fetch, refresh, install, remove, recovery, and cleanup must be revalidated against a future authorized public commit. |
 | Submission materials | English listing, three starter prompts, five positive cases, three negative cases, and release-note structure exist as a repository draft. |
 | Public installation | GitHub Open Beta is available through the personal Marketplace commands above. The Plugin has not been submitted to or published in the Public Plugin Directory. |
 | External readiness | Repository Logo assets are ready, but Portal format is not yet verified. Publisher identity, public support and legal URLs, availability, and policy attestations remain unresolved. |

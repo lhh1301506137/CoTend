@@ -29,7 +29,7 @@ Do not start large product development until this workflow is complete.
 
 4. Select the runtime profile, then load collaboration rules.
    - Load `cotend-collaboration/references/runtime-profiles.md`, preserve a session/project selection across framework and model changes, use the applicable product default only when no choice exists, ignore model/Model Upgrade facts as selector inputs, and map the effective profile to `delegated_pair | inline` idempotently in the native record.
-   - Use `cotend-collaboration` v1.76 semantics.
+   - Use `cotend-collaboration` v1.79 semantics.
    - Treat `cotend-collaboration` as modular: load core first, then required `references/*.md` modules by trigger.
    - Load `cotend-collaboration/references/authority-and-triggers.md` whenever exact authority labels, stop boundaries, Chrome/release/decision triggers, or checkpoint measurement rules are needed.
    - Always include `loaded_protocol_modules` in initialization, handoff, review, unattended wake-up, approval, acceptance, Done Gate, and release-hardening outputs.

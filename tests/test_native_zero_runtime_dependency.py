@@ -36,9 +36,9 @@ class NativeZeroRuntimeDependencyTests(unittest.TestCase):
         self.assertEqual(result["external_task_spec_authority"], 0)
         self.assertEqual(result["native_capabilities"], 8)
         self.assertEqual(result["dual_capabilities"], 19)
-        self.assertEqual(result["mapped_skill_roles"], 9)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000015")
-        self.assertEqual(result["predecessor_target"], "cotend-codex-r000014")
+        self.assertEqual(result["mapped_skill_roles"], 10)
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000016")
+        self.assertEqual(result["predecessor_target"], "cotend-codex-r000015")
         self.assertFalse(result["real_project_claimed"])
         self.assertFalse(result["real_user_acceptance_claimed"])
         self.assertFalse(result["rc3_built"])
@@ -68,7 +68,7 @@ class NativeZeroRuntimeDependencyTests(unittest.TestCase):
         scan = zero_runtime.scan_runtime(ROOT / "skills")
         zero_runtime.assert_runtime_scan_clean(scan, "source")
         result = zero_runtime.verify_disposable_runtime()
-        self.assertEqual(result["skill_files"], 61)
+        self.assertEqual(result["skill_files"], 71)
         self.assertEqual(
             result["manifest_sha256"], zero_runtime.EXPECTED_TARGET_MANIFEST
         )
@@ -175,7 +175,7 @@ class NativeZeroRuntimeDependencyTests(unittest.TestCase):
             zero_runtime.validate_target_lock(
                 changed,
                 manifest_sha256=zero_runtime.EXPECTED_TARGET_MANIFEST,
-                skill_file_count=61,
+                skill_file_count=71,
             )
 
     def test_current_manifest_mutation_is_rejected(self) -> None:
@@ -186,7 +186,7 @@ class NativeZeroRuntimeDependencyTests(unittest.TestCase):
             zero_runtime.validate_target_lock(
                 changed,
                 manifest_sha256=zero_runtime.EXPECTED_TARGET_MANIFEST,
-                skill_file_count=61,
+                skill_file_count=71,
             )
 
     def test_frozen_rc2_mutation_is_rejected(self) -> None:

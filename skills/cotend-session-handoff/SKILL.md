@@ -8,7 +8,7 @@ description: >-
 
 Protocol version: `cotend-session-handoff-v1.3`
 
-Compatibility baseline: `cotend-collaboration-v1.76`.
+Compatibility baseline: `cotend-collaboration-v1.79`.
 
 ## Literal Invocation Gate
 

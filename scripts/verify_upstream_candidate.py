@@ -10,24 +10,24 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_COMMIT = "774aab64e778d2e3a57b66cfd65d808ac8235e14"
+SOURCE_COMMIT = "c14d4133bf0438d435048858554c88c89a7870a3"
 SOURCE_ROOT = "skills-backup/codex"
-SOURCE_TREE = "ebcc0b2930146aca1ce299215f9a2f936b12d4c8"
+SOURCE_TREE = "a6824559e087f87da90a55bcc6403576db1027c1"
 SOURCE_IDENTITY = f"exact-source:{SOURCE_COMMIT}"
-DUAL_PROTOCOL = "dual-ai-" + "collaboration-v1.76"
-ADOPTION_BASE_COMMIT = "9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
-ADOPTION_BASE_TREE = "8218cbfb8906bc3cc0f3bf76f4480d866ecb392e"
+DUAL_PROTOCOL = "dual-ai-" + "collaboration-v1.79"
+ADOPTION_BASE_COMMIT = "774aab64e778d2e3a57b66cfd65d808ac8235e14"
+ADOPTION_BASE_TREE = "ebcc0b2930146aca1ce299215f9a2f936b12d4c8"
 BASELINE_COMMIT = "4540f9e0543e85c6a7cceb1d7501467feee8b440"
 BASELINE_TAG = "dual-ai-share-2026.07.28.2"
 BASELINE_TAG_OBJECT = "d26994355921b9c43956f7300069c892884496e0"
 BASELINE_SOURCE_TREE = "2eae0ca4447cace17bdf93df3b04b665293deecb"
 PACKAGE_ROOT = "dual-ai-collaboration-skill-share"
 PACKAGE_TREE = "686a507d904b08c6a43ef6c5d40c1d43083d8f1b"
-HANDOFF_ROOT = Path("consumer-handoffs/cotend/2026.07.30.1")
+HANDOFF_ROOT = Path("consumer-handoffs/cotend/2026.08.01.1")
 HANDOFF_HASHES = {
-    "HANDOFF.json": "a2e23ab5a58fadc3dd4e454f9fd42ef7681c91ccb0f70fe6c85e330d6688298e",
-    "HANDOFF.md": "0fbde80f3e491442c21281c09f1abbe6e9dcb2cc32fd1d08fdd11a75695f5675",
-    "SHA256SUMS": "ae76f6101e9562740ffbf15ba6cd9841d21bfd85721bdc1994b2be123a64d3cb",
+    "HANDOFF.json": "4d16e8a1ba29a2a71e0974e79f0967b2ec4cfa8afe42e0d24c43b32102df47af",
+    "HANDOFF.md": "fe8dfcbd787cfa9116567f6f2730dd3bb345b0774a882c1a4987614394d6c52c",
+    "SHA256SUMS": "6ea9ad1602d3cc331314b2ec8b06e7f29019b6715dfc553da7c1481d9cd3ea3a",
 }
 
 
@@ -113,21 +113,21 @@ def verify_handoff(upstream_repo: Path, errors: list[str]) -> dict[str, Any] | N
         or baseline.get("carrier_tree") != ADOPTION_BASE_TREE
         or baseline.get("anchor_type") != "exact_source_commit"
         or baseline.get("carrier_protocol")
-        != "dual-ai-" + "collaboration-v1.71"
+        != "dual-ai-" + "collaboration-v1.76"
     ):
         errors.append("consumer handoff baseline drift")
     commits = coverage.get("commits")
-    if not isinstance(commits, list) or coverage.get("accounted_count") != 27:
+    if not isinstance(commits, list) or coverage.get("accounted_count") != 13:
         errors.append("consumer handoff commit coverage count drift")
     else:
         dispositions = [
             item.get("disposition") for item in commits if isinstance(item, dict)
         ]
         if (
-            len(dispositions) != 27
-            or dispositions.count("included_change") != 9
-            or dispositions.count("evidence_only") != 17
-            or dispositions.count("consumer_not_applicable") != 1
+            len(dispositions) != 13
+            or dispositions.count("included_change") != 3
+            or dispositions.count("evidence_only") != 10
+            or dispositions.count("consumer_not_applicable") != 0
         ):
             errors.append("consumer handoff commit disposition coverage drift")
     if handoff.get("target_publication_state") != "not_public_release":
@@ -176,9 +176,9 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
                 "--count",
                 f"{ADOPTION_BASE_COMMIT}..{SOURCE_COMMIT}",
             )
-            != "27"
+            != "13"
         ):
-            errors.append("exact-source handoff range is not the recorded 27 commits")
+            errors.append("exact-source handoff range is not the recorded 13 commits")
     except subprocess.CalledProcessError as exc:
         return errors + [f"cannot resolve exact source or release-history anchor: {exc}"]
 
@@ -190,7 +190,7 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
         or candidate.get("candidate_only") is not False
         or candidate.get("release_id") != SOURCE_IDENTITY
         or candidate.get("target_publication_state") != "not_public_release"
-        or candidate.get("framework_protocol_version") != "1.76"
+        or candidate.get("framework_protocol_version") != "1.79"
         or candidate.get("dual_model_upgrade_version") != "1.14"
     ):
         errors.append("candidate exact-source identity or finalized state drift")
@@ -235,7 +235,7 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
     claude_trees = claude.get("skill_trees")
     if not isinstance(codex_trees, dict) or not isinstance(claude_trees, dict):
         return errors + ["candidate Skill tree maps are invalid"]
-    if codex.get("skill_count") != 9 or codex.get("skill_file_count") != 59:
+    if codex.get("skill_count") != 10 or codex.get("skill_file_count") != 69:
         errors.append("candidate exact-source Codex inventory drift")
     for skill_id, expected_tree in codex_trees.items():
         try:
@@ -283,7 +283,7 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
         role_map.get("status") != "adopted_verified"
         or role_map.get("candidate_release") != SOURCE_IDENTITY
         or role_map.get("candidate_publication_state") != "not_public_release"
-        or role_map.get("skill_count") != 9
+        or role_map.get("skill_count") != 10
         or not isinstance(role_entries, list)
     ):
         return errors + ["role map exact-source identity or inventory drift"]
@@ -292,8 +292,8 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
         for entry in role_entries
         if isinstance(entry, dict)
     }
-    if set(by_source) != set(codex_trees) or len(role_entries) != 9:
-        errors.append("role map does not cover the exact nine-Skill source set")
+    if set(by_source) != set(codex_trees) or len(role_entries) != 10:
+        errors.append("role map does not cover the exact ten-Skill source set")
 
     required_markers = {
         "dual-ai-collaboration": (
@@ -312,6 +312,12 @@ def verify(upstream_repo: Path, candidate_path: Path, role_map_path: Path) -> li
             "not_started | current | stale | conflict",
         ),
         "dual-model-upgrade": ("packet_version: dual-model-upgrade-v1.14",),
+        "dual-ai-tooling": (
+            "# Dual AI Tooling",
+            "call -> compose -> adapt -> build",
+            "Select at most three relevant records",
+            "Inventory is read-only discovery",
+        ),
     }
     for skill_id, entry in by_source.items():
         if entry.get("source_tree") != codex_trees.get(skill_id):

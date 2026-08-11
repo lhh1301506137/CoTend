@@ -43,7 +43,8 @@ class PublicReadmeTests(unittest.TestCase):
     def test_readme_is_english_and_novice_first(self) -> None:
         self.assertTrue(self.text.startswith("# CoTend\n"))
         self.assertIn("AI development governance framework", self.text)
-        self.assertIn("people who do not read code", self.text)
+        self.assertIn("people who build software with AI", self.text)
+        self.assertNotIn("people who do not read code", self.text)
         self.assertIn("The current pre-release adapter targets Codex", self.text)
         self.assertNotRegex(self.text, r"[\u3400-\u9fff]")
 
@@ -70,8 +71,8 @@ class PublicReadmeTests(unittest.TestCase):
             "<!-- skill-catalog-end -->", 1
         )[0]
         ids = re.findall(r"^\| [^|]+ \| `([^`]+)` \|", section, re.MULTILINE)
-        self.assertEqual(len(ids), 9)
-        self.assertEqual(set(ids), set(package.EXPECTED_SKILLS))
+        self.assertEqual(len(ids), 10)
+        self.assertEqual(set(ids), set(package.CURRENT_REPOSITORY_SKILLS))
         self.assertIn("`CoTend Init` is the normal start or resume entry", self.text)
 
     def test_readme_starter_prompts_match_submission_contract(self) -> None:

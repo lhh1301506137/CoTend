@@ -7,7 +7,7 @@ scope: project_meaning_requirements_route_decisions_status_reality_and_local_con
 runtime_contract: ../skills/cotend-collaboration/references/authority-and-triggers.md
 executable_verifier: ../scripts/verify_native_project_truth_authority.py
 introduced_target_artifact: cotend-codex-r000003
-current_target_artifact: cotend-codex-r000015
+current_target_artifact: cotend-codex-r000016
 rollback_candidate: cotend@0.1.0-rc.2_local_unpublished
 analysis_language: zh-CN
 ```
@@ -63,7 +63,7 @@ L62 只关闭 TD08“项目真相权限”缺口。以下是当时仍保留的�
 - Checker（TD05 已由 L68 原生化）；
 - finish/archive/recovery（TD07 已由 L69 原生化）。
 
-L62 首次形成内部 target `cotend-codex-r000003`；L63 推进到 `cotend-codex-r000004`；L64 推进到 `cotend-codex-r000005`；L65 推进到 `cotend-codex-r000006`；L66 推进到 `cotend-codex-r000007`；L67 推进到 `cotend-codex-r000008`；L68 推进到 `cotend-codex-r000009`；L69 推进到 `cotend-codex-r000010`；L72 在清除第一方运行依赖并完成不降级复验后推进到 `cotend-codex-r000011`；后续锁定采用形成 r12、r13、r14，本轮 v1.76 exact-source 适配形成当前 `cotend-codex-r000015`。这些都表示同一 Codex lineage 的开发字节，不是公开产品版本。`cotend@0.1.0-rc.2` 仍是未发布回滚候选，固定到其已验证 Git 来源提交，包体和 ZIP 摘要不能随后续开发 target 改变。G01-G05 对 r15 重新回归；G06 的真实项目、用户验收和精确回滚/恢复证据冻结在 r13，没有冒充 r15 验收。构建 rc.3 与任何发布动作仍需独立授权。
+L62 首次形成内部 target `cotend-codex-r000003`；L63 推进到 `cotend-codex-r000004`；L64 推进到 `cotend-codex-r000005`；L65 推进到 `cotend-codex-r000006`；L66 推进到 `cotend-codex-r000007`；L67 推进到 `cotend-codex-r000008`；L68 推进到 `cotend-codex-r000009`；L69 推进到 `cotend-codex-r000010`；L72 在清除第一方运行依赖并完成不降级复验后推进到 `cotend-codex-r000011`；后续锁定采用形成 r12、r13、r14、r15，本轮 v1.79 exact-source 适配形成当前 `cotend-codex-r000016`。这些都表示同一 Codex lineage 的开发字节，不是公开产品版本。`cotend@0.1.0-rc.2` 仍是未发布回滚候选，固定到其已验证 Git 来源提交，包体和 ZIP 摘要不能随后续开发 target 改变。G01-G05 对 r16 重新回归；G06 的真实项目、用户验收和精确回滚/恢复证据冻结在 r13，没有冒充 r16 验收。构建 rc.3 与任何发布动作仍需独立授权。
 
 ## 已执行验证
 

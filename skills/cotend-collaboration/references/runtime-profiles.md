@@ -35,7 +35,7 @@ cotend_workflow:
   schema_version: 1
   state: current | dormant | conflict
   state_reason:
-  protocol: cotend-collaboration-v1.76
+  protocol: cotend-collaboration-v1.79
   runtime_profile: full | adaptive
   runtime_profile_source: user_explicit_project | product_default_materialized | migrated_existing_selection
   runtime_profile_confirmed_by_user: true | false
@@ -68,12 +68,12 @@ An external conflict with `affects_current_route: true` produces native `state: 
 
 | Machine value | User-visible name | Execution mode |
 |---|---|---|
-| `full` | `v1.76-full` | `delegated_pair` |
-| `adaptive` | `v1.76-A` | `inline` |
+| `full` | `v1.79-full` | `delegated_pair` |
+| `adaptive` | `v1.79-A` | `inline` |
 
 The CoTend product default is `full` when no prior selection exists. It is product-scoped, not model-, carrier-, or external-framework-scoped.
 
-The default is only an initial value. Once a project records `full` or `adaptive`, framework updates preserve that stable machine value. Upgrading an earlier A selection to v1.76 produces `v1.76-A`; it must not silently become `v1.76-full`. The same rule preserves Full.
+The default is only an initial value. Once a project records `full` or `adaptive`, framework updates preserve that stable machine value. Upgrading an earlier A selection to v1.79 produces `v1.79-A`; it must not silently become `v1.79-full`. The same rule preserves Full.
 
 Carrier, provider, actual model, reasoning configuration, role, Model Upgrade evidence, self-assessment, historical performance, and delegation maturity are not selector inputs. They may support truthful identity, tool compatibility, review independence, or a non-authorizing recommendation, but they never activate, reject, invalidate, restore, or migrate a runtime profile.
 
@@ -198,7 +198,7 @@ runtime_profile_selection:
   previous_display_name: <versioned display | none>
   legacy_machine_preference: absent | ignored_non_authorizing
   effective: full | adaptive
-  display_name: v1.76-full | v1.76-A
+  display_name: v1.79-full | v1.79-A
   execution_mode: delegated_pair | inline
   recommendation: none | advisory_recommended
   recommendation_pointer: none | <non-authorizing evidence or guide>

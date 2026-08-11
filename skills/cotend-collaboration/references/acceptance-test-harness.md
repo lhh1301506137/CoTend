@@ -6,7 +6,7 @@ This module chooses the verification surface and owns capability-completion evid
 
 ## Principles
 
-- Prefer the cheapest verification that proves the current slice.
+- Prefer the cheapest verification that directly proves the current slice or discriminates a live material route uncertainty.
 - Do not stop at "code compiles" when the change is user-visible.
 - Do not run a full browser/UAT matrix for every tiny internal edit.
 - Record skipped checks and why they were not useful or not runnable.
@@ -16,6 +16,7 @@ This module chooses the verification surface and owns capability-completion evid
 - A material Route Rebase may classify old completion evidence as needing refresh or invalidation, but it cannot set a completion result. This Harness alone re-derives the exact-scope claim from current evidence.
 - In multi-agent work, every write packet still proves its exact local scope before integration. The root then proves the integrated path; a centralized terminal batch cannot replace skipped packet-level verification.
 - Project Init alone resolves user-facing governance language. This Harness consumes the persisted normalized tag and verifies changed governance bytes; it never infers or re-resolves a language.
+- Outcome correspondence outranks convenience: evidence must exercise the behavior and conditions that decide the claim or route, not merely a nearby proxy that is easy to measure.
 
 ## Verification Ladder
 
@@ -41,6 +42,15 @@ Use this routing before choosing a browser surface:
 | Existing user Chrome login/session/cookies/profile, current Chrome tab, Chrome extension, OAuth/third-party account already signed in, Chrome-only bug, or explicit user request to use Chrome. | `chrome:control-chrome` |
 
 Do not use Chrome merely because a connector/API auth expired. Ask the user to fix auth or explicitly approve Chrome fallback.
+
+## Outcome-Corresponding Discrimination
+
+When `semantic-implementation-closure.md` triggers `solution_adequacy`, select the lowest-cost validation that can distinguish the live candidate classes under the confirmed real-use or observation conditions.
+
+- Prefer direct outcome evidence: the actual runtime path, representative data, user-visible interaction, boundary contract, recovery behavior, or other observation that the confirmed outcome depends on.
+- A proxy is acceptable only when its relationship to the outcome is explicit, current, and strong enough to distinguish the candidates. Record the limitation; do not silently promote proxy success to outcome success.
+- Do not impose a fixed domain tier or candidate count. Evidence depth follows the uncertainty, cost, reversibility, and downstream impact.
+- A validation that all candidates pass equally does not discriminate the route. Choose another proportionate check or keep the uncertainty open.
 
 ## Chrome Escalation Triggers
 
@@ -159,6 +169,7 @@ Before saying a slice is verified, answer:
 - Did any Chrome escalation trigger appear?
 - If user-visible, did we run at least one real interaction or explain why impossible?
 - Are skipped checks acceptable for the current risk/stage?
+- If solution adequacy triggered, did the discriminating validation test the confirmed outcome under real conditions rather than only a proxy?
 - If multiple packets contributed, did their local evidence survive integration and did the root rerun the affected cross-packet path?
 - If a material multi-agent boundary closed, did a fresh non-implementing review context inspect the integrated evidence under `review-and-self-review.md`?
 

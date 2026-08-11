@@ -1,12 +1,12 @@
 ---
 name: cotend-project-init
 description: >-
-  Initialize, update, repair, migrate, or resume a CoTend-governed coding project. Auto-classifies native workflow and external-framework state; consumes only explicitly invoked and supplied same-Primary point-in-time session handoffs through freshness preflight; detects and propagates Plan Tree's triggered Project Understanding Reconstruction result without becoming a second owner; exclusively resolves and persists user-facing governance language; preserves protected L0-L2 semantics, authority, risk, review, runtime-profile, and explicit-handback boundaries; progressively loads direct references; and deterministically validates actual changed governance bytes before declaring Init ready.
+  Initialize, update, repair, migrate, or resume a CoTend-governed coding project. Resolve framework-update impact before loading detail, delegate once-if-absent capability inventory to CoTend Tooling, auto-classify native workflow and external-framework state, preserve current truth and protected boundaries, and deterministically validate actual changed governance bytes before declaring Init ready.
 ---
 
 # CoTend Project Init
 
-Protocol target: `cotend-collaboration-v1.76`
+Protocol target: `cotend-collaboration-v1.79`
 
 Initialize or resume CoTend without requiring a long prompt. This Skill is an
 orchestrator, not a product-development, diagnosis, or semantic-alignment flow.
@@ -29,6 +29,9 @@ orchestrator, not a product-development, diagnosis, or semantic-alignment flow.
 - Do not define a second project-understanding trigger/parser, synthesis,
   readiness rule, or record. Pass trigger evidence to Plan Tree and propagate
   its canonical triggered-only `plan_tree_alignment` block unchanged.
+- Do not define a second framework-impact selector or copy capability inventory
+  logic into Init. The versioned impact index chooses the minimum required
+  update work; `$cotend-tooling` alone owns the delegated inventory result.
 - A reconstruction failure is report-only routing during Init. Do not
   automatically invoke Semantic Alignment; only Plan Tree's existing
   reconciliation flow may identify a protected semantic write/confirmation
@@ -63,8 +66,9 @@ preload all references for ordinary work.
 
 | Direct reference | Must Read trigger |
 |---|---|
-| `references/auto-mode-and-onboarding.md` | Every Init: classify Auto Mode, readiness, composite requests, and fresh-intake handback. |
-| `references/language-and-runtime.md` | Every Init before governance writes or runtime-profile mapping. It is the detailed sole-resolver and persistent Full/Adaptive selector contract. |
+| `references/framework-update-routing.md` | Every Init/update/resume first: resolve the impact range, guard state, and minimum read/action scope before loading other detail. |
+| `references/auto-mode-and-onboarding.md` | When the impact result is not a reliable no-op fast path: classify Auto Mode, readiness, composite requests, and fresh-intake handback. |
+| `references/language-and-runtime.md` | Before governance writes or runtime-profile mapping; a reliable no-op fast path may reuse the already-valid persisted result without reloading this detail. It is the detailed sole-resolver and persistent Full/Adaptive selector contract. |
 | `references/maintenance-and-coordination.md` | `legacy_update`, `partial_repair`, native state repair, external-framework reconciliation, Code Context setup, or repeated-process failure. |
 | `references/routing-and-planning.md` | Role assignment, active-truth reconciliation, dynamic route selection, plan review, slicing, or a decision checkpoint. |
 | `references/initialization-core-workflow.md` | Execute only the detailed steps triggered by the selected mode; it preserves the established initialization order. |
@@ -80,7 +84,17 @@ Project Init reference as a prerequisite.
 
 ## Orchestration
 
-1. **Inspect and classify without writing.**
+1. **Resolve framework-update impact without writing.**
+   Read current CoTend truth and the minimum version/state evidence required by
+   `references/framework-update-routing.md`, then run
+   `scripts/resolve_framework_update.py`. A reliable, initialized, clear
+   current-to-current result may take the no-op fast path. An unknown/legacy
+   source, unreliable checkpoint, conflict, missing required index entry, or
+   selected action with an unmet guard fails closed at the affected boundary.
+   The resolver selects work; it never performs writes, installs, network
+   access, model calls, semantic inference, or version advancement.
+
+2. **Inspect and classify without writing when selected.**
    Read current CoTend truth, project instructions, active route, native state,
    runtime-profile evidence, classified external-framework artifacts, any explicitly
    invoked and supplied canonical `same_primary_session_handoff`, and the minimum
@@ -92,13 +106,13 @@ Project Init reference as a prerequisite.
    verification, and resume boundary; classify before readiness. Then load
    `references/auto-mode-and-onboarding.md` and select exactly one recorded mode.
 
-2. **Resolve governance language before affected writes.**
+3. **Resolve governance language before affected writes.**
    Load `references/language-and-runtime.md`. Apply conflict guards before
    precedence and persist one canonical record in `STATUS.md` or the already
    mapped equivalent. A `human_needed` resolution is the sole outer handback
    and prohibits every affected governance write.
 
-3. **Resolve native state, persistent runtime profile, and risk independently.**
+4. **Resolve native state, persistent runtime profile, and risk independently.**
    Preserve a valid user/project Full or Adaptive choice across framework,
    model, provider, carrier, role, reasoning, and Model Upgrade changes.
    CoTend defaults first-use projects to `full`, maps the result to
@@ -109,18 +123,24 @@ Project Init reference as a prerequisite.
    from a private Dual owner default, private Dual machine state, or any
    machine-wide legacy preference.
 
-4. **Load only triggered detail and perform safe framework work.**
+5. **Load only selected detail and perform safe framework work.**
    Follow the selected mode through the direct references above. Preserve user-authored
    and historical records, existing filenames/mappings, confirmation evidence,
    unaffected routes, and the one outer handback. Pass only observable Project
    Understanding Reconstruction trigger evidence to Plan Tree and copy its canonical
-   result under `plan_tree_alignment`; do not reproduce owner logic in Init. After
+   result under `plan_tree_alignment`; do not reproduce owner logic in Init.
+   When the impact result reports `inventory_bootstrap_required: true` with
+   action `delegate_tooling_inventory_once_if_absent`, invoke the bounded
+   read-only inventory mode of `$cotend-tooling` exactly once for that absent
+   checkpoint. Consume only its receipt and checkpoint;
+   inventory evidence does not authorize adoption, installation, project
+   writes, or a new truth tree. After
    language resolution, run `maintain_project_agents_router.py --apply` against the
    canonical project root. It owns one marked root `AGENTS.md` block, preserves all
    other bytes, and consumes the resolved tag without re-resolving it. Malformed or
    duplicate markers are `review_pending`; never replace the whole file.
 
-5. **Track real governance writes.**
+6. **Track real governance writes.**
    Keep operation write receipts for every governance file created or changed,
    including ignored or untracked status, review, decision, Plan Tree, and
    handoff carriers. When the router maintainer reports `created` or `updated`,
@@ -128,7 +148,7 @@ Project Init reference as a prerequisite.
    readiness; `drift` or `blocked` prevents `continue_ready`. Do not substitute
    a hand-authored final `changed_files` list for VCS evidence.
 
-6. **Run the deterministic pre-handback gate when triggered.**
+7. **Run the deterministic pre-handback gate when triggered.**
    Load `references/governance-language-pre-handback.md` and execute the
    bundled read-only validator against the real project root, mapped status
    carrier, resolved normalized tag, bundled CoTend checker, VCS changes, and
@@ -136,21 +156,21 @@ Project Init reference as a prerequisite.
    for stability, and emits the canonical evidence packet. Structured
    self-report never proves a pass.
 
-7. **Use exactly one bounded same-turn recheck opportunity.**
+8. **Use exactly one bounded same-turn recheck opportunity.**
    On the first `fail`, repair only reported governance files when safe inside
    the already-authorized Init scope, then run the same validator once more. A
    safely establishable missing checker or changed-set input may instead be
    supplied before that one rerun, consuming the same budget. Never repair a
    language-source conflict or unreadable bytes, and never start a retry loop.
 
-8. **Fail closed before readiness and handback.**
+9. **Fail closed before readiness and handback.**
    Only validator `pass` or a genuine `not_applicable` may feed readiness.
    Across one Init turn, execute the validator at most twice total. A remaining
    `fail` or `blocked` result makes `can_continue_with_继续: no`, prevents
    `continue_ready`, and returns the applicable blocked, `review_pending`, or
    existing `human_needed` result.
 
-9. **Reconcile and report once.**
+10. **Reconcile and report once.**
    Run triggered post-init consistency checks, load
    `references/reporting-and-handback.md`, report actual files/evidence and
    readiness in the resolved language, then return control exactly once for a
@@ -162,13 +182,14 @@ Project Init reference as a prerequisite.
 Project Init owns the complete native entry lifecycle. It must finish these
 phases in order:
 
-1. classify exactly one Auto Mode;
-2. resolve and persist user-facing governance language or stop affected writes;
-3. resolve the native workflow state, runtime profile, and continuous-risk tier;
-4. preserve or safely repair durable CoTend truth and control-plane files;
-5. run the deterministic pre-handback validator when triggered;
-6. run post-init consistency checks;
-7. report readiness and return control exactly once.
+1. resolve framework-update impact, guards, and minimum scope;
+2. classify exactly one Auto Mode when the no-op fast path does not apply;
+3. resolve and persist user-facing governance language or stop affected writes;
+4. resolve the native workflow state, runtime profile, and continuous-risk tier;
+5. perform only selected safe work, delegating capability inventory to Tooling;
+6. preserve or safely repair durable CoTend truth and control-plane files;
+7. run the deterministic pre-handback validator and post-init checks when triggered;
+8. report readiness and return control exactly once.
 
 Safe setup, update, repair, and migration writes are idempotent. Preserve
 user-authored truth and unrelated files; a second run with unchanged inputs
@@ -200,6 +221,15 @@ broad edits. The required order is:
 Use the installed Project Init root, not a copied script:
 
 ```powershell
+python -X utf8 <cotend-project-init-root>/scripts/resolve_framework_update.py `
+  resolve `
+  --index <cotend-project-init-root>/references/framework-impact-index.json `
+  --from-version <v1.xx|unknown> `
+  --to-version <target> `
+  --inventory-status <absent|initialized|degraded> `
+  --state-reliability <reliable|unreliable|conflict> `
+  --guard-status <clear|human_needed|blocked|unknown>
+
 python -X utf8 <cotend-project-init-root>/scripts/maintain_project_agents_router.py `
   --project-root <canonical-project-root> `
   --normalized-tag <resolved-tag> `
@@ -227,6 +257,9 @@ Repeat `--write-receipt` for every affected operation write. The validator emits
   permission to start product work inside the Init response. Separate explicit
   follow-on authority in the same user instruction may satisfy the generic
   handback after the Init result is reported.
+- A reliable current-to-current no-op may report readiness without replaying
+  unchanged detail. It must still preserve the same language, profile, risk,
+  truth, stop, evidence, and handback boundaries as the full path.
 - An explicitly invoked and supplied same-Primary session packet may support
   `continue_ready` only after a `current` preflight, Plan Tree's
   `full_current_mvp` reconstruction with `outcome: ready`, and required

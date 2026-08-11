@@ -1,4 +1,4 @@
 interface:
   display_name: "CoTend Init"
   short_description: "Init workflow and route idea baseline"
-  default_prompt: "Use $cotend-init as the thin v1.76 entry. Delegate project-state classification, governance-language resolution, project-root AGENTS router maintenance, actual-byte validation, supplied Session Handoff preflight, and Plan Tree-owned Project Understanding Reconstruction propagation to $cotend-project-init. Do not create parallel owners. Preserve Full/Adaptive, separate user-owned risk, confirmed L0-L2, pending decisions, Route Rebase, and reliable boundary. Report Init first and normally return control."
+  default_prompt: "Use $cotend-init as the thin v1.79 entry. Delegate impact-directed update routing, project-state classification, governance-language resolution, project-root router maintenance, actual-byte validation, and once-if-absent capability inventory to $cotend-project-init and $cotend-tooling. Do not create parallel owners. Preserve Full/Adaptive, separate user-owned risk, confirmed L0-L2, pending decisions, Route Rebase, and reliable boundary. Report Init first and normally return control."

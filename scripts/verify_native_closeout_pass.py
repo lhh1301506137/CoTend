@@ -89,7 +89,10 @@ ResumePhase = Literal[
 
 EXPECTED_TRELLIS_MENTIONS = 0
 EXPECTED_TRELLIS_FILES = 0
-EXPECTED_SKILL_FILES = 61
+EXPECTED_SKILL_FILES = 71
+EXPECTED_R15_MANIFEST = (
+    "acc17586cf713acc85fef9e6be02013de6bc012b7864ade22bed495ee68a9e7b"
+)
 EXPECTED_R14_MANIFEST = (
     "07ac592c82ed87f1759b38f04ed1f453c44e21d454fd12b4ce9eca459e4f3ed4"
 )
@@ -725,7 +728,11 @@ def _require_markers(text: str, markers: tuple[str, ...], label: str) -> None:
 def runtime_inventory(root: Path = ROOT) -> dict[str, int]:
     inventory: dict[str, int] = {}
     for path in sorted((root / "skills").rglob("*")):
-        if not path.is_file():
+        if (
+            not path.is_file()
+            or "__pycache__" in path.parts
+            or path.suffix == ".pyc"
+        ):
             continue
         text = path.read_text(encoding="utf-8")
         count = len(re.findall("trellis", text, re.IGNORECASE))
@@ -741,6 +748,8 @@ def skill_manifest(root: Path = ROOT) -> tuple[dict[str, str], str]:
         ).hexdigest()
         for path in sorted((root / "skills").rglob("*"))
         if path.is_file()
+        and "__pycache__" not in path.parts
+        and path.suffix != ".pyc"
     }
     digest = hashlib.sha256(
         json.dumps(
@@ -803,6 +812,8 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         path.read_text(encoding="utf-8")
         for path in sorted((root / "skills").rglob("*"))
         if path.is_file()
+        and "__pycache__" not in path.parts
+        and path.suffix != ".pyc"
     )
     lowered = skill_text.lower()
     for term in REMOVED_TD07_TERMS:
@@ -828,7 +839,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     source_lock = json.loads(
         (root / SOURCE_LOCK_PATH.relative_to(ROOT)).read_text(encoding="utf-8")
     )
-    if source_lock.get("skill_file_count") != 59:
+    if source_lock.get("skill_file_count") != 69:
         raise NativeCloseoutPassError("current upstream source inventory drifted")
 
     lock = json.loads(
@@ -838,24 +849,24 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000015"
-        or target.get("revision") != 15
+        target.get("artifact_id") != "cotend-codex-r000016"
+        or target.get("revision") != 16
         or target.get("manifest_sha256") != digest
-        or lock.get("skill_count") != 9
+        or lock.get("skill_count") != 10
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
         or len(files) != EXPECTED_SKILL_FILES
     ):
-        raise NativeCloseoutPassError("r15 target identity or manifest drifted")
+        raise NativeCloseoutPassError("r16 target identity or manifest drifted")
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000014",
-        "revision": 14,
-        "source_release_id": "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826",
-        "framework_protocol": "cotend-collaboration-v1.71",
-        "manifest_sha256": EXPECTED_R14_MANIFEST,
+        "artifact_id": "cotend-codex-r000015",
+        "revision": 15,
+        "source_release_id": "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14",
+        "framework_protocol": "cotend-collaboration-v1.76",
+        "manifest_sha256": EXPECTED_R15_MANIFEST,
     }:
-        raise NativeCloseoutPassError("r14 predecessor identity drifted")
+        raise NativeCloseoutPassError("r15 predecessor identity drifted")
 
     _require_markers(
         texts["evidence"],

@@ -1,0 +1,232 @@
+{
+  "schema": "cotend.framework-impact-index",
+  "schema_version": 1,
+  "fce_owner": "FRAMEWORK-CHANGE-EVAL.md",
+  "supported_from": "v1.66",
+  "indexed_through": "v1.79",
+  "scope_order": [
+    "none",
+    "trigger_only",
+    "named_carrier",
+    "active_path",
+    "affected_domain",
+    "full_current_mvp",
+    "legacy_bounded_audit"
+  ],
+  "entries": [
+    {
+      "id": "v166-governance-language",
+      "version": "v1.66",
+      "fce_anchor": "CoTend v1.66 Deterministic Governance Language Resolution",
+      "minimum_scope": "named_carrier",
+      "project_action": "ensure_governance_language_resolution",
+      "canonical_owner": "cotend-project-init/references/language-and-runtime.md",
+      "named_carriers": ["STATUS.md|mapped project status carrier"],
+      "acceptance": [
+        "one canonical resolved record or an explicit human_needed stop exists before affected governance writes",
+        "ambient conversation host locale and repository language are not resolver inputs"
+      ],
+      "replay_policy": "once_per_project",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": []
+    },
+    {
+      "id": "v167-project-init-pre-handback",
+      "version": "v1.67",
+      "fce_anchor": "CoTend v1.67 Project Init Reliability",
+      "minimum_scope": "trigger_only",
+      "project_action": "activate_actual_byte_gate_on_next_governance_write",
+      "canonical_owner": "cotend-project-init/references/governance-language-pre-handback.md",
+      "named_carriers": [],
+      "acceptance": ["the read-only pre-handback validator checks actual changed governance bytes when a later write occurs"],
+      "replay_policy": "future_trigger_only",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": ["v166-governance-language"]
+    },
+    {
+      "id": "v168-same-primary-session-handoff",
+      "version": "v1.68",
+      "fce_anchor": "CoTend v1.68 Same-Primary Session Handoff",
+      "minimum_scope": "trigger_only",
+      "project_action": "defer_same_primary_handoff_until_explicit_trigger",
+      "canonical_owner": "cotend-session-handoff/references/session-handoff-workflow.md",
+      "named_carriers": [],
+      "acceptance": ["no update-time packet discovery or project read occurs"],
+      "replay_policy": "future_trigger_only",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": []
+    },
+    {
+      "id": "v169-explicit-session-handoff-gate",
+      "version": "v1.69",
+      "fce_anchor": "CoTend v1.69 Explicit Session Handoff Invocation",
+      "minimum_scope": "trigger_only",
+      "project_action": "require_literal_session_handoff_invocation",
+      "canonical_owner": "cotend-session-handoff/SKILL.md",
+      "named_carriers": [],
+      "acceptance": ["natural-language near misses load no handoff workflow or project state"],
+      "replay_policy": "future_trigger_only",
+      "execution": "merged",
+      "supersedes": ["v168-same-primary-session-handoff"],
+      "ordered_after": []
+    },
+    {
+      "id": "v170-adaptive-continuous-authorization",
+      "version": "v1.70",
+      "fce_anchor": "CoTend v1.70 Adaptive Continuous Authorization",
+      "minimum_scope": "none",
+      "project_action": "apply_current_execution_authorization_contract",
+      "canonical_owner": "cotend-collaboration/references/authority-and-triggers.md",
+      "named_carriers": [],
+      "acceptance": ["profile choice remains user-owned and project state requires no migration"],
+      "replay_policy": "none",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": []
+    },
+    {
+      "id": "v171-user-owned-continuous-risk",
+      "version": "v1.71",
+      "fce_anchor": "CoTend v1.71 User-Owned Continuous Risk",
+      "minimum_scope": "named_carrier",
+      "project_action": "normalize_continuous_risk_selection",
+      "canonical_owner": "cotend-collaboration/references/risk-and-approval.md",
+      "named_carriers": ["STATUS.md|mapped project status carrier"],
+      "acceptance": ["valid user selections are preserved and historical non-authorizing aliases normalize without raising authority"],
+      "replay_policy": "once_per_project",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": []
+    },
+    {
+      "id": "v172-project-understanding-reconstruction",
+      "version": "v1.72",
+      "fce_anchor": "CoTend v1.72 Triggered Project Understanding Reconstruction",
+      "minimum_scope": "full_current_mvp",
+      "project_action": "reconstruct_current_mvp_once",
+      "canonical_owner": "cotend-collaboration/references/plan-tree.md",
+      "named_carriers": [
+        "current Plan Tree and linked understanding carriers",
+        "STATUS.md|mapped project status carrier"
+      ],
+      "acceptance": [
+        "Plan Tree records one ready or explicitly blocked current-MVP reconstruction result",
+        "a completed once-per-project receipt prevents later framework updates from repeating reconstruction"
+      ],
+      "replay_policy": "once_per_project",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": []
+    },
+    {
+      "id": "v173-bounded-failure-memory",
+      "version": "v1.73",
+      "fce_anchor": "CoTend v1.73 Bounded AI Failure Memory",
+      "minimum_scope": "trigger_only",
+      "project_action": "defer_failure_memory_until_relevant_failure_trigger",
+      "canonical_owner": "cotend-collaboration/references/failure-memory.md",
+      "named_carriers": [],
+      "acceptance": ["ordinary updates load no failure-pattern body"],
+      "replay_policy": "future_trigger_only",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": []
+    },
+    {
+      "id": "v174-authority-codegraph-convergence",
+      "version": "v1.74",
+      "fce_anchor": "CoTend v1.74 Authority And CodeGraph Convergence",
+      "minimum_scope": "trigger_only",
+      "project_action": "defer_provider_and_failure_contract_until_trigger",
+      "canonical_owner": "cotend-collaboration/references/code-context-harness.md",
+      "named_carriers": [],
+      "acceptance": ["no automatic index creation installation or update-time project scan occurs"],
+      "replay_policy": "future_trigger_only",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": []
+    },
+    {
+      "id": "v175-efficiency-architecture-convergence",
+      "version": "v1.75",
+      "fce_anchor": "CoTend v1.75 Efficiency And Architecture Convergence",
+      "minimum_scope": "none",
+      "project_action": "use_thinner_current_framework_contract",
+      "canonical_owner": "cotend-collaboration/SKILL.md",
+      "named_carriers": [],
+      "acceptance": ["no project migration or project read is required"],
+      "replay_policy": "none",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": []
+    },
+    {
+      "id": "v176-project-router-breadcrumb",
+      "version": "v1.76",
+      "fce_anchor": "CoTend v1.76 Skill Retrieval Hardening",
+      "minimum_scope": "named_carrier",
+      "project_action": "maintain_project_agents_router_block",
+      "canonical_owner": "cotend-project-init/scripts/maintain_project_agents_router.py",
+      "named_carriers": ["AGENTS.md"],
+      "acceptance": [
+        "the managed router block passes check mode and bytes outside its markers remain unchanged",
+        "a language conflict stops before the router write"
+      ],
+      "replay_policy": "once_per_project",
+      "execution": "ordered_migration",
+      "supersedes": [],
+      "ordered_after": ["v166-governance-language"]
+    },
+    {
+      "id": "v177-tooling-capability-registry",
+      "version": "v1.77",
+      "fce_anchor": "CoTend v1.77 Tooling Capability Registry",
+      "minimum_scope": "trigger_only",
+      "project_action": "defer_tooling_reuse_decision_until_concrete_need",
+      "canonical_owner": "cotend-tooling/references/workflow.md",
+      "named_carriers": [],
+      "acceptance": ["ordinary framework updates do not query the capability catalog"],
+      "replay_policy": "future_trigger_only",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": []
+    },
+    {
+      "id": "v178-outcome-driven-solution-adequacy",
+      "version": "v1.78",
+      "fce_anchor": "CoTend v1.78 Outcome-Driven Solution Adequacy",
+      "minimum_scope": "trigger_only",
+      "project_action": "defer_solution_adequacy_until_material_route_trigger",
+      "canonical_owner": "cotend-collaboration/references/semantic-implementation-closure.md",
+      "named_carriers": [],
+      "acceptance": ["update-time project semantics are not reread and future material triggers use the current owner"],
+      "replay_policy": "future_trigger_only",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": []
+    },
+    {
+      "id": "v179-project-capability-inventory",
+      "version": "v1.79",
+      "fce_anchor": "CoTend v1.79 Impact-Directed Init And Tooling Inventory",
+      "minimum_scope": "named_carrier",
+      "project_action": "delegate_tooling_inventory_once_if_absent",
+      "canonical_owner": "cotend-tooling/references/workflow.md",
+      "named_carriers": [
+        "STATUS.md|mapped project status carrier",
+        "PROJECT-CAPABILITIES.md only when the existing carrier is unreadable or active capability count is at least four"
+      ],
+      "acceptance": [
+        "capability_inventory is marked initialized even when the bounded evidence surface is empty",
+        "Project Init delegates evidence scanning and reconciliation to cotend-tooling instead of copying that logic"
+      ],
+      "replay_policy": "once_if_absent",
+      "execution": "merged",
+      "supersedes": [],
+      "ordered_after": []
+    }
+  ]
+}

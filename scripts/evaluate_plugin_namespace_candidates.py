@@ -20,6 +20,18 @@ DEFAULT_FIXTURE = (
     ROOT / ".private-provenance" / "L32-plugin-namespace-evaluation"
 )
 PLUGIN_ID = "cotend"
+CURRENT_SKILLS = (
+    "cotend-collaboration",
+    "cotend-diagnose-only",
+    "cotend-init",
+    "cotend-model-upgrade",
+    "cotend-project-init",
+    "cotend-semantic-alignment",
+    "cotend-session-handoff",
+    "cotend-tooling",
+    "grill-me",
+    "karpathy-guidelines",
+)
 SHORT_NAME_MAP = {
     "cotend-collaboration": "collaboration",
     "cotend-diagnose-only": "diagnose-only",
@@ -28,10 +40,11 @@ SHORT_NAME_MAP = {
     "cotend-project-init": "project-init",
     "cotend-semantic-alignment": "semantic-alignment",
     "cotend-session-handoff": "session-handoff",
+    "cotend-tooling": "tooling",
 }
 USER_OWNED_SKILLS = tuple(SHORT_NAME_MAP)
 COMPANION_SKILLS = tuple(
-    skill for skill in base.EXPECTED_SKILLS if skill not in SHORT_NAME_MAP
+    skill for skill in CURRENT_SKILLS if skill not in SHORT_NAME_MAP
 )
 TEXT_SUFFIXES = {".md", ".yaml", ".yml", ".json", ".toml", ".txt", ".py"}
 NOT_RUN = (
@@ -324,7 +337,7 @@ def materialize_candidate_payload(
     skills_root = plugin_root / "skills"
     skills_root.mkdir(parents=True, exist_ok=True)
     transform_records: list[dict[str, str]] = []
-    for source_name in base.EXPECTED_SKILLS:
+    for source_name in CURRENT_SKILLS:
         target_name = target_skill_name(
             source_name, short_names=candidate.short_names
         )
@@ -375,7 +388,7 @@ def materialize_candidate_payload(
         f"# {candidate.candidate_id} coexistence project\n", encoding="utf-8"
     )
     standalone_root = coexist_project / ".agents" / "skills"
-    for skill in base.EXPECTED_SKILLS:
+    for skill in CURRENT_SKILLS:
         shutil.copytree(base.SOURCE_SKILLS_ROOT / skill, standalone_root / skill)
     (candidate_root / "evidence" / "commands").mkdir(parents=True, exist_ok=True)
     return {
@@ -454,7 +467,7 @@ def verify_candidate_static(
 
     expected_targets = {
         target_skill_name(skill, short_names=candidate.short_names)
-        for skill in base.EXPECTED_SKILLS
+        for skill in CURRENT_SKILLS
     }
     actual_targets = {
         path.name for path in (plugin_root / "skills").iterdir() if path.is_dir()
@@ -758,10 +771,10 @@ def discover_candidate(
     items = entry.get("skills", [])
     target_names = {
         target_skill_name(skill, short_names=candidate.short_names)
-        for skill in base.EXPECTED_SKILLS
+        for skill in CURRENT_SKILLS
     }
     expected_plugin_names = {f"{PLUGIN_ID}:{name}" for name in target_names}
-    expected_standalone_names = set(base.EXPECTED_SKILLS)
+    expected_standalone_names = set(CURRENT_SKILLS)
     project_root = project.resolve()
     plugin_groups: dict[str, list[dict[str, Any]]] = {}
     standalone_groups: dict[str, list[dict[str, Any]]] = {}
