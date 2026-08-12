@@ -23,7 +23,14 @@ TEMPLATES_PATH = (
     / "skills"
     / "cotend-collaboration"
     / "references"
-    / "templates.md"
+    / "route-rebase-template.md"
+)
+ROUTE_REBASE_PATH = (
+    ROOT
+    / "skills"
+    / "cotend-collaboration"
+    / "references"
+    / "route-rebase.md"
 )
 DECISION_LOG_PATH = (
     ROOT
@@ -49,39 +56,38 @@ ExternalState = Literal["none", "aligned", "stale", "conflict"]
 InterruptedAt = Literal["none", "applying", "revalidating"]
 
 REQUIRED_PLAN_MARKERS = (
-    "### CoTend Native Specification Ownership",
-    "Semantic Alignment is the only writable owner",
-    "Plan Tree is the only route owner.",
-    "External project or framework specifications are classified evidence only.",
-    "Rejected, deferred, and superseded candidates remain recoverable history.",
+    "Plan Tree is the sole navigation tree",
+    "This module is the sole owner of material active-route behavior.",
     "Do not open a packet for an ordinary next-leaf choice",
     "A bare `继续`",
     "Set `reliable_resume_boundary`",
-    "Link classified external task/PRD evidence without making it the packet owner.",
+    "current task/specification links",
+    "create `ROUTE-REBASE.md`, a branch ledger, or another task tree",
 )
 REQUIRED_TEMPLATE_MARKERS = (
     "status: evaluating | pending_user_confirmation | applying | revalidating | blocked | closed",
-    "durable_carrier: existing_plan_tree_node | cotend_owned_project_spec | status | decision_log | knowledge_changelog",
+    "durable_carrier: existing_plan_tree_node | active_cotend_workflow_or_prd | status | decision_log | knowledge_changelog",
     "disposition: unaffected | reusable | rework_required | revalidation_required | invalidated | superseded",
 )
 REQUIRED_SEMANTIC_MARKERS = (
     "## Protected Route Rebase And Impact Propagation",
-    "A bare `继续`",
+    "Follow the material route lifecycle owned by `route-rebase.md`",
+    "instantiate only the canonical `route_rebase` packet",
     "An old `done` node",
-    "Set the canonical reliable resume boundary",
     "If the user rejects the candidate",
 )
 REQUIRED_INTEGRATION_MARKERS = {
     DECISION_LOG_PATH: (
-        "a CoTend-owned project PRD, spec, or brief for current detailed requirements.",
-        "docs/<active-spec>.md",
+        "`superseded` entries stay in the log",
+        "`rejected` entries stay in the log",
     ),
     CLOSURE_PATH: (
-        "existing CoTend-owned Plan Tree node, project PRD/spec evidence section",
+        "active CoTend-governed task/PRD",
+        "one current\n`cotend.execution-closure.v1` result",
     ),
     INIT_SKILL_PATH: (
-        "existing CoTend-owned Plan Tree/project-spec/STATUS/decision/knowledge carrier",
-        "closeout, task, PRD, spec, state, profile",
+        "apply_coherence_sized_execution_on_active_route",
+        "one plan/implement/verify/triggered-review/primary-owner-state/commit",
     ),
 }
 REQUIRED_DOCUMENT_MARKERS = (
@@ -445,13 +451,19 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         / "cotend-collaboration"
         / "references"
         / "plan-tree.md"
+    ).read_text(encoding="utf-8") + "\n" + (
+        root
+        / "skills"
+        / "cotend-collaboration"
+        / "references"
+        / "route-rebase.md"
     ).read_text(encoding="utf-8")
     template_text = (
         root
         / "skills"
         / "cotend-collaboration"
         / "references"
-        / "templates.md"
+        / "route-rebase-template.md"
     ).read_text(encoding="utf-8")
     semantic_text = (
         root / "skills" / "cotend-semantic-alignment" / "SKILL.md"

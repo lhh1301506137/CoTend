@@ -1,23 +1,24 @@
-# Impact-Directed CoTend Update Routing
+# Impact-Directed Framework Update Routing
 
-Use this compact reference first for Init, framework update/check, or resume.
-A fresh project uses the installed target as both version endpoints and an
-absent inventory; an existing project supplies its durable protocol when known.
-It owns update preflight and minimum read scope. It does not own Tooling evidence,
-project meaning, language resolution, acceptance, or the reasons in
-`FRAMEWORK-CHANGE-EVAL.md`.
+Use this cold owner only for a framework version update/check. It selects the
+minimum read/action set from the machine impact index; it does not own Tooling
+evidence, project meaning, language, risk, acceptance, or FCE rationale.
+
+## Contents
+
+- [Compact Preflight](#compact-preflight)
+- [Scope And Guard Rules](#scope-and-guard-rules)
+- [Action Selection](#action-selection)
+- [Tooling Bootstrap](#tooling-bootstrap)
+- [State And Result](#state-and-result)
 
 ## Compact Preflight
 
-Before Auto Mode or other broad Init references, read only:
-
-1. compact `framework_update`, `capability_inventory`, canonical language
-   status, and pending human/safety/integrity gates in `STATUS.md` or its mapped
-   carrier;
-2. applicable root project instructions needed to detect a current conflict;
-3. `references/framework-impact-index.json`.
-
-Run the read-only resolver:
+Before Auto Mode or broad Init reads, inspect only compact
+`framework_update`, `capability_inventory`, canonical language status and
+pending human/safety/integrity gates in the mapped status carrier, applicable
+root instructions needed to detect a conflict, and
+`references/framework-impact-index.json`.
 
 ```powershell
 python -X utf8 scripts/resolve_framework_update.py validate `
@@ -25,91 +26,115 @@ python -X utf8 scripts/resolve_framework_update.py validate `
 
 python -X utf8 scripts/resolve_framework_update.py resolve `
   --index references/framework-impact-index.json `
-  --from-version <v1.xx|unknown> `
-  --to-version v1.79 `
+  --from-version <compatibility-checked-through|legacy-applied-through|unknown> `
+  --to-version v2.01 `
+  --framework-state-contract <cotend.framework-update-state.v2|legacy_applied_through> `
+  --last-material-project-migration <v1.xx|unknown> `
   --inventory-status <absent|initialized|degraded> `
   --state-reliability <reliable|unreliable|conflict> `
   --guard-status <clear|human_needed|blocked|unknown> `
   --completed-once <change-id>
 ```
 
-Only integrity-bound receipts may use `--completed-once`. `guard-status: clear`
-requires bounded inspection to establish either an absent fresh carrier or a
-readable existing carrier; any existing language state must be valid and
-nonconflicting, and every existing human/safety/integrity gate must be
-explicitly clear. Missing fields in an existing carrier are `unknown`. The
-helper emits routing metadata only: no product semantics, writes,
-installations, network calls, or model calls.
+`--from-version` is v2 `compatibility_checked_through` or the reliable legacy
+`applied_through` compatibility seed. Legacy material needs a separate durable
+migration receipt. Missing guards are `unknown`; only `clear` may be fast. The
+read-only, network-free helper proposes transitions, never writes or readiness.
 
-## Scope Lattice
+## Scope And Guard Rules
 
-The index minimum is authoritative:
+The index lattice is authoritative:
 
-1. `none`: no project action or read;
-2. `trigger_only`: load the owner only when the future trigger occurs;
-3. `named_carrier`: read only exact listed carriers;
-4. `active_path`: read the active leaf and direct dependencies;
-5. `affected_domain`: read the affected domain and dependency path;
-6. `full_current_mvp`: pay the Plan Tree-owned one-time reconstruction cost;
-7. `legacy_bounded_audit`: inspect bounded current truth, pending gates, and
-   version evidence before advancing.
+`none < trigger_only < named_carrier < active_path < affected_domain <
+full_current_mvp < legacy_bounded_audit`.
 
-Project evidence may widen scope with a recorded reason, never narrow the index
-minimum. Unknown/unindexed versions, conflicting anchors, unreliable receipts,
-or incompatible schema require `legacy_bounded_audit`.
+Project evidence may widen the scope only with a recorded reason. It may never
+narrow the index minimum. `unknown`, an unindexed version, unreliable state,
+receipt/anchor conflict or incompatible schema becomes
+`legacy_bounded_audit`, never `none`.
 
-## Merge, Replay, And Tooling Delegation
+A fast path reduces reads; it does not reduce authority or stop conditions.
+Any language conflict, pending human/safety/critical/release gate, unreadable
+carrier or integrity failure exits the fast path. The CLI requires
+`--guard-status`; every non-clear value emits a stop and forbids advance.
 
-- Select entries after `applied_through` through the target, discard entries
-  superseded by a later selected entry, and group normal actions by owner.
-- Skip `once_per_project` only with the exact reliable receipt.
+## Action Selection
+
+- Select entries after the reliable baseline through the target. Collapse
+  superseded entries and group selected work by canonical owner. Do not load
+  the same owner once per historical version.
+- `replay_policy: none` is framework-only; it performs no project read or
+  migration. `future_trigger_only` returns a cold owner/action/acceptance
+  pointer without loading that owner.
+- A lifecycle `future_trigger_only` result never stats a carrier, invokes its
+  helper/owner, reads a history index/chunk, or runs migration during ordinary
+  Init/update. Later explicit history/maintenance loads the owner; only an
+  explicit physical-health request or already-triggered carrier/Sentinel check
+  may run stat-first health and load the owner on an over-limit result.
+- Skip `once_per_project` only for its exact reliable receipt. A version marker
+  alone cannot prove a required current-MVP reconstruction or other receipt.
 - Evaluate `once_if_absent` independently of the version marker. An absent
-  inventory always delegates exactly one `inventory/bootstrap_full` run to
-  `$cotend-tooling`; a zero-result run is initialized.
-- `future_trigger_only` stays visible but loads no owner during update.
-- Execute sequentially only for a real `ordered_after` dependency.
-- Project Init must not copy Tooling evidence patterns, checkpoint logic,
-  capability flags, or carrier-threshold rules.
-- `initialized` or `degraded` prevents ordinary updates from repeating
-  bootstrap. Degraded reliability remains a later Tooling reconcile concern.
+  capability inventory remains selected even at the current version.
+- Execute entries sequentially only for declared `ordered_migration`
+  dependencies; otherwise merge by owner. A version number is not a dependency.
+- Consume the resolver's selected action, owner, scope, named carriers,
+  acceptance, deferred triggers, receipts, guards and fallback. Do not copy
+  per-version behavior paragraphs into Project Init.
 
-## Guards And Writes
+No project action at `none | trigger_only` returns compact
+`framework_update_only` and `fast_path_no_migration: true`. Explicit target
+advance or legacy conversion writes only the proposed receipt to the mapped
+status carrier and runs language/write/actual-byte gates; this metadata is not
+material migration. Current reliable v2 and ordinary continue/resume do not
+write it.
 
-Fast paths reduce reads, not authority. Pending human gates, language conflict,
-safety/risk stops, unreadable carriers, integrity failures, or contradictory
-instructions exit the fast path and load the existing owner. Every non-clear
-guard emits `guard_stop: true` and `advance_allowed: false`.
+## Tooling Bootstrap
 
-When no action is required, return `framework_update_only` with
-`fast_path_no_migration: true` and do not write a carrier merely to cache a
-no-op. If migration or an inventory receipt changes governance, apply existing
-language/write receipts and actual-byte validation. Advance `applied_through`
-only after every selected action and acceptance check succeeds.
+When `capability_inventory.status` is absent, delegate one
+`inventory/bootstrap_full` to `$cotend-tooling` after existing guards. Project
+Init never copies its evidence patterns, digests, capability flags or
+reconciliation logic. Zero evidence still initializes the marker and prevents
+ordinary framework updates from repeating bootstrap.
 
-## Existing-Carrier State
+Unknown/legacy version state does not erase this requirement; defer it until
+the bounded audit and existing guards close. `initialized` or `degraded`
+prevents repeat bootstrap. Degraded evidence is a later Tooling reconciliation
+concern, not permission to rescan now.
+
+## State And Result
+
+Keep only a compact cache in the existing status carrier:
 
 ```yaml
 framework_update:
-  contract: cotend.framework-update-state.v1
-  applied_through: v1.xx | unknown
+  contract: cotend.framework-update-state.v2
+  compatibility_checked_through: v1.xx | unknown
+  last_material_project_migration: v1.xx | unknown
   impact_index_schema: 1
-  completed_once:
-    - change_id: <indexed id>
-      receipt: <existing carrier pointer and integrity evidence>
-  pending:
-    - change_id: <indexed id>
-      reason:
-      owner:
+  completed_once: [<change id + integrity receipt>]
+  pending: [<change id + reason + owner>]
   last_resolution:
-    from_version:
-    to_version:
+    framework_loaded:
+    checked_range:
     required_scope:
     loaded_owners: []
-    widened_scope_reason: none | <specific evidence>
+    compatibility_receipt: updated | already_current | blocked
+    material_project_changes: none | completed
+    widened_scope_reason: none | <evidence>
     validation:
 ```
 
-This compact cache stays inside existing truth; it is not a second project
-tree. Full and Adaptive must produce identical candidates, minimum scope,
-actions, stops, inventory requirement, and validation. Only orchestration
-cadence may differ.
+Legacy `applied_through` seeds compatibility only; material stays `unknown`
+without a separate durable migration receipt. Compatibility is v2's next
+exclusive lower bound; material is history, not selection input.
+
+The resolver proposes only. Receipt-only advances compatibility after receipt
+bytes validate; completed material work advances both after actions,
+Acceptance and byte validation. Guard/pending/write/validation failure advances
+neither and forbids compatible/upgrade-complete/ready claims.
+
+Report baseline, framework, range, scope/reads/actions/owners, triggers,
+receipts, bootstrap, guards/fallback, actual validation, material changes and
+readiness. `from/to + no migration` never means migrated. Full and Adaptive
+must match on candidates, transitions, writes, stops, acceptance and readiness.
+Static bytes do not prove token or quality improvement.

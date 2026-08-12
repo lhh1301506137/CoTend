@@ -52,15 +52,19 @@ class CoTendV176AdaptationTests(unittest.TestCase):
         self.assertIn("one bounded repair and recheck", authority)
         self.assertIn("Architecture authority is classified by impact", authority)
         self.assertIn("same impact classification", authority)
-        self.assertIn("cotend-collaboration-v1.79", text(
+        self.assertIn("cotend-collaboration-v2.01", text(
             "skills/cotend-collaboration/SKILL.md"
         ))
 
     def test_project_understanding_reconstruction_has_one_native_owner(self) -> None:
-        plan = text("skills/cotend-collaboration/references/plan-tree.md")
-        templates = text("skills/cotend-collaboration/references/templates.md")
+        intelligence = text(
+            "skills/cotend-collaboration/references/project-intelligence.md"
+        )
+        templates = text(
+            "skills/cotend-collaboration/references/semantic-contract-templates.md"
+        )
         project_init = text("skills/cotend-project-init/SKILL.md")
-        self.assertIn("## Project Understanding Reconstruction", plan)
+        self.assertIn("# Project Intelligence", intelligence)
         for trigger in (
             "first_project_entry",
             "same_primary_new_session",
@@ -68,12 +72,14 @@ class CoTendV176AdaptationTests(unittest.TestCase):
             "cross_domain_architecture_or_cumulative_main_chain",
             "drift_rework_route_break_or_stale_assumption",
         ):
-            self.assertIn(trigger, plan)
-        self.assertIn("full_current_mvp", plan)
-        self.assertIn("affected_l1_domain", plan)
-        self.assertIn("active_path_delta", plan)
-        self.assertIn("project_understanding_reconstruction:", templates)
-        self.assertIn("Do not define a second project-understanding", project_init)
+            self.assertIn(trigger, intelligence)
+        self.assertIn("full_current_project", intelligence)
+        self.assertIn("affected_l1_domain", intelligence)
+        self.assertIn("active_path_delta", intelligence)
+        self.assertIn("project_intelligence:", templates)
+        self.assertIn(
+            "a second impact/language/reconstruction resolver", project_init
+        )
 
     def test_codegraph_read_equivalence_and_no_automatic_init(self) -> None:
         context = text(
@@ -99,8 +105,8 @@ class CoTendV176AdaptationTests(unittest.TestCase):
         self.assertIn("If the literal is absent:", entry)
         self.assertIn("do not call tools", entry)
         self.assertIn("references/session-handoff-workflow.md", entry)
-        self.assertIn("full_current_mvp", workflow)
-        self.assertIn("Project Understanding Reconstruction", workflow)
+        self.assertIn("full_current_project", workflow)
+        self.assertIn("Project Intelligence", workflow)
 
     def test_project_init_router_and_model_upgrade_contracts_are_current(self) -> None:
         project_init = text("skills/cotend-project-init/SKILL.md")
@@ -108,12 +114,12 @@ class CoTendV176AdaptationTests(unittest.TestCase):
             "skills/cotend-project-init/scripts/maintain_project_agents_router.py"
         )
         model_upgrade = text("skills/cotend-model-upgrade/SKILL.md")
-        self.assertIn("cotend-collaboration-v1.79", project_init)
-        self.assertIn("cotend.project-router.v1", router)
+        self.assertIn("cotend-collaboration-v2.01", project_init)
+        self.assertIn("cotend.project-router.v2", router)
         self.assertIn("COTEND:PROJECT-ROUTER:START", router)
-        self.assertIn("Version: 1.14", model_upgrade)
-        self.assertIn("full_current_mvp", model_upgrade)
-        self.assertIn("impact-neutral L3/L4", model_upgrade)
+        self.assertIn("Version: 1.16", model_upgrade)
+        self.assertIn("current full-scope Project", model_upgrade)
+        self.assertIn("Full and Adaptive produce the same", model_upgrade)
 
 
 if __name__ == "__main__":

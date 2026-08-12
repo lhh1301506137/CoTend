@@ -1,12 +1,12 @@
-# CoTend v1.79 / Codex r16 exact-source 适配计划
+# CoTend v2.01 / Codex r17 exact-source 适配计划
 
 ```yaml
-status: implemented_verified
-candidate_release: exact-source:c14d4133bf0438d435048858554c88c89a7870a3
-source_identity: exact-source:c14d4133bf0438d435048858554c88c89a7870a3
+status: implemented_verification_in_progress
+candidate_release: exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d
+source_identity: exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d
 source_anchor_type: exact_source_commit
 target_publication_state: not_public_release
-consumer_handoff: 2026.08.01.1
+consumer_handoff: 2026.08.12.2
 target_platform: Codex
 target_source_carrier: skills/
 live_install_target: not_authorized
@@ -15,15 +15,31 @@ implementation_authority: product_owner_confirmed
 adoption_state: adopted
 final_framework_lock_exists: true
 analysis_language: zh-CN
-framework_protocol: cotend-collaboration-v1.79
-model_upgrade_packet_family: cotend-model-upgrade-v1.14
-source_skill_count: 10
-source_skill_file_count: 69
+framework_protocol: cotend-collaboration-v2.01
+model_upgrade_packet_family: cotend-model-upgrade-v1.16
+source_skill_count: 9
+source_skill_file_count: 94
 target_skill_count: 10
-target_skill_file_count: 71
-target_artifact_id: cotend-codex-r000016
-target_revision: 16
+target_skill_file_count: 104
+target_artifact_id: cotend-codex-r000017
+target_revision: 17
 ```
+
+## 当前 r17 执行摘要
+
+本计划以已提交的 v1.79/r16 为精确前序，把修正版 `2026.08.12.2`
+handoff 固定的 188 提交区间适配到 CoTend v2.01/r17。25 项
+`included_change` 全部由 CoTend 原生 owner 承接；150 项只作证据，13
+项不适用于消费者。目标保留 10 个产品 Skill / 104 个文件、C01-C19、
+Full/Adaptive 语义等价、单一 Plan Tree/项目真相及原生实施、检查、收尾
+权威，不复制上游私有 adapter、runtime、hook、状态目录或任务树。
+
+本地实现、lock、确定性 artifact 与任务本地提交属于本次授权；全局
+Skills 安装、真实模型、外部 UAT、push、tag、release、submission 和
+publish 不属于本次授权。`karpathy-guidelines` 按 CoTend 既有决定保留为
+非默认、非 owner 的 MIT companion，不冒充当前 Dual 目标树成员。
+
+## v1.79/r16 前序计划（历史基线）
 
 ## 目标
 

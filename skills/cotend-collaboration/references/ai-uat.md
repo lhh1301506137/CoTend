@@ -14,7 +14,7 @@ Judge from product goal and feature responsibility:
 
 ## Real Interaction
 
-Before choosing the interaction surface, read `acceptance-test-harness.md` when browser/UI verification is involved. When possible, run the app and use the selected surface like a user: click, type, submit, refresh, navigate, inspect visible state, and capture evidence. Use the canonical Chrome Escalation Triggers in `authority-and-triggers.md`; when they appear, consider `chrome:control-chrome` and either use it or record why not.
+Before choosing the interaction surface, read `acceptance-test-harness.md` plus `browser-acceptance.md` when browser/UI verification is involved. When possible, run the app and use the selected surface like a user: click, type, submit, refresh, navigate, inspect visible state, and capture evidence. Use the canonical Chrome Escalation Triggers in `authority-and-triggers.md`; when they appear, consider `chrome:control-chrome` and either use it or record why not.
 
 ## Self-Repair Boundary
 

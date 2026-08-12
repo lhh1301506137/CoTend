@@ -4,7 +4,9 @@ Use for formal self-review, external-model review, carrier/model role swaps, rev
 
 ## Runtime Identity Contract
 
-`Codex`, `Claude`, a Skill installation path, or a UI model label may name a carrier without proving which model actually produced the response. Normalize identity only when role/model identity affects review, handoff, Model Upgrade, a non-authorizing runtime-profile recommendation, delegation evidence, or tool compatibility:
+A carrier brand, Skill installation path or UI model label may fail to prove
+which model produced a response. Normalize identity only when it affects review,
+handoff, DMU, non-authorizing profile advice, delegation evidence or tools:
 
 ```yaml
 runtime_identity:
@@ -41,21 +43,31 @@ role_assignment:
 
 Public/share packages contain this schema only. They must not contain the maintainer's current active assignment.
 
-## Role Defaults
+## Role Resolution
 
-- Default carrier assignment: the active Codex carrier is primary and the same verified actual model performs the formal self-review pass.
-- A Claude carrier is an optional external-review carrier unless the user assigns another role. Its actual configured model must be recorded when it matters; it is not assumed to be an Anthropic Claude model.
-- Role swap phrases like "Claude 主开发，Codex 审查" change semantic roles, not risk boundaries. Resolve the actual model on each carrier before claiming model-specific capability or independence.
-- `CodexSelf` and `ClaudeSelf` remain accepted legacy aliases. Normalize both to `same_model_self_review` for the actual model running that carrier/session; neither alias proves an external or different-provider review.
+- Explicit current/project role assignments take priority. When absent, consume
+  only the applicable adapter's recommendation; do not copy it into this owner.
+- A role-swap phrase changes semantic roles, not risk boundaries. Resolve actual
+  identity before claiming capability or independence.
+- Historical `*Self` carrier aliases normalize to `same_model_self_review` for
+  the actual runtime; no alias proves external/different-provider review.
 
 ## Formal Self-Review
 
 Ordinary implementation self-check is not formal review. A formal self-review must be a separate pass after implementation:
 
+Review the selected coherence-sized execution unit as one integrated boundary.
+Do not repeat the same formal review once per internal leaf, file, layer, agent
+packet, or recovery commit. Adaptive enters formal Plan Review only through the
+substantive-impact trigger owned by `authority-and-triggers.md`; Full retains its
+conservative plan posture, but both profiles use the same final evidence,
+finding severity, repair, stop, and completion result.
+
 - re-read diffs/files/tests/project records;
 - check correctness, regressions, missing tests, scope creep, direction risk, risk classification, Sentinel signals;
 - when an important L2/main-chain node is being closed or advanced, inspect its confirmed charter, actual active runtime/data path, legacy-path disposition, canonical exact-scope completion claim, and local/adjacent/cumulative closure evidence; local tests alone cannot approve the transition;
-- when `solution_adequacy` triggered, inspect the confirmed outcome and real conditions, hard constraints versus preferences, key assumptions, materially distinct candidate classes, outcome-corresponding discriminator, failure classification, and resulting continue/repair/rebase/semantic route;
+- when Project Intelligence triggered, inspect the affected thesis/four-plane basis, domain-relevant design views, hidden assumptions, one compact adversarial challenge, pressure-source/strength/disposition discipline, freshness, and every decision-relevant observable predicate; reject proxy evidence that proves only a narrower fact;
+- when `solution_adequacy` triggered, inspect the confirmed outcome and real conditions, hard constraints versus engineering preferences, key assumptions, substantively different candidates, outcome-corresponding discriminator, failure class, and resulting route disposition;
 - record verdict in `REVIEW-LOG.md` or project convention;
 - mark that it is `ai_generated` and not independent external review or user acceptance.
 
@@ -63,26 +75,80 @@ For a material multi-agent integration, perform the terminal review from a fresh
 
 External review is recommended according to the advisor trigger map below. It is not required for every small change.
 
+## Fresh Challenger Protocol
+
+Use one bounded fresh challenger only when independent counterevidence has clear
+net benefit: a material/high-risk closure, contradicted or unknown evidence, a
+rubber-stamp signal, or repeated substantive failure. Treat this as a closed
+fact gate, not a keyword gate or a reason to re-run ordinary formal review.
+Typos, formatting, and clear low-risk mechanical changes do not trigger it;
+near-miss words without those facts do not trigger it either. Existing direct
+deterministic counterevidence, including an applicable TDD RED, already defeats
+the same behavior claim and must not be repurchased from a reviewer.
+
+The root creates a blind packet from the submitted artifact, exact scope and
+contract, bound facts, the minimum necessary evidence, and explicit limits on
+what that evidence proves. It excludes the author's CLAIM, chain of thought,
+self-score, historical verdicts/scores, and unrelated context. Hash the complete
+normalized visible packet as one review-input identity, while retaining the
+artifact hash inside it. The reviewer independently inspects that
+packet and returns only evidence-linked findings, or an explicit no-finding
+result. It cannot set product value, accept risk, change route or user meaning,
+or issue final closure/acceptance; any non-empty authority output is invalid.
+Do not simulate independence by fanning out fixed personas.
+
+The root reconciles every finding separately in this fixed order:
+`contract_misread`, `actionable`, `trade_off`, then `noise`. Each item records
+its evidence, disposition, next step, and change target. `contract_misread`
+means the reviewer flagged a problem because the supplied review contract was
+unclear or incomplete: repair that contract first, issue a new review-input
+identity, and reclassify on the next cycle. `actionable` requires an artifact
+change; `trade_off` and `noise` do not silently become repair. An actionable
+hard finding is a veto until repaired or routed to an existing authority;
+means, majority votes, reviewer confidence, or any broad aggregation cannot
+erase it. The root remains the single final disposition owner.
+
+Deduplicate by exact review-input identity: never relaunch the same artifact,
+review contract, necessary evidence, scope, and evidence limits. Allow at most
+three substantive cycles. Advance only after a reconciliation-linked artifact
+or review-contract revision produces a new review-input hash; a contract-only
+revision may advance even when artifact bytes stay unchanged. Stop on a fully
+duplicate input, no findings, a resolved noise-only result, or three completed
+substantive cycles. Route an unresolved trade-off or cycle-three disagreement
+to the user or existing high-risk/semantic owner; do not start cycle four.
+
+When a real reviewer is used, retain a receipt with actual source and hashes,
+carrier, provider/model evidence, context-isolation method, override state, and
+limitations. Unknown identity stays `unverified`; it cannot become
+different-model, different-provider, or independent-behavior evidence. Full
+and Adaptive use the same trigger facts, blind packet, finding meaning,
+reconciliation priority, hard veto, and stop result. Adaptive may omit needless
+orchestration, not weaken the result.
+
 ## External Advisor Trigger Map
 
-Default to the active primary model's formal self-review for ordinary implementation. Escalate to a separately identified external model/advisor when independence or strategic judgment is materially valuable.
+Ordinary implementation requires the active Primary's separate formal
+self-review unless project truth assigns another valid reviewer. Escalate to a
+separately identified external model/advisor only when independence or strategic
+judgment has material value.
 
 Trigger external advisor/reviewer when any is true:
 
-- the user asks for Claude/Gemini/Kimi/external review or asks another model to judge direction;
+- the user asks an independently identified external model to judge direction;
 - a `dev_high` or unattended batch reaches a review-debt checkpoint, spans multiple slices, or is about to close without user inspection;
 - a multi-agent batch is closing an important main-chain node or substantial cross-packet integration;
-- the next step involves architecture, stack, schema, persistence, auth, privacy, payment, release/public exposure, model-role change, or high-impact framework behavior;
+- the next step involves high-impact/foundational architecture, stack, schema, persistence, auth, privacy, payment, release/public exposure, model-role change, or high-impact framework behavior;
 - product direction, Plan Tree route, MVP/full-goal interpretation, acceptance meaning, or user intent is uncertain;
 - Quality Sentinel escalates, repeated fixes fail, verification is weak/unclear, or the primary self-review and evidence disagree;
 - Done Gate, AI UAT, release hardening, takeover/advisor packet, or model-upgrade milestone would benefit from independent judgment;
-- the work changes this development framework, external sync rules, Claude/Gemini adaptation, or share-package behavior.
+- explicit framework-maintenance work changes framework or consumer adaptation/sync behavior.
 
 Do not escalate by default for:
 
 - single-slice low-risk fixes with clear tests or smoke evidence;
 - docs-only or formatting-only edits with no behavior/risk change;
 - mechanical version/log updates after the substantive batch already passed review;
+- ordinary low-impact design nodes or visual predicates whose direct evidence is clear and whose assumptions do not create material cross-domain lock-in or conflict;
 - questions Codex can answer from local source files without strategic judgment.
 
 When external review is skipped despite a trigger-like situation, record the reason in `REVIEW-LOG.md`, handoff, or the active task. The reason may be `user_declined`, `self_review_sufficient`, `no_external_runtime_available`, `already_reviewed_same_boundary`, or `low_risk_mechanical_followup`.
@@ -93,14 +159,17 @@ Primary handoff intent and `review_request` are focus hints, not review boundari
 
 Reviewer must perform strategic alignment review: is this the right step toward the agreed final shape, not merely locally correct?
 
-When `semantic-implementation-closure.md` triggers, independently verify whether the Primary checked the active entrypoint and cumulative main-chain path. A review may approve implementation findings while still keeping `next_step_allowed: no`; do not infer navigation approval from a general `APPROVE` verdict.
+When `semantic-implementation-closure.md` triggers, independently inspect the one canonical `execution_closure` reference: current basis, direct obligations, exact capability result, active entrypoint/legacy disposition, and local/adjacent/cumulative path. A review may approve implementation findings while the result still has `advance_allowed: no`; never infer navigation approval from a general `APPROVE` verdict or create a parallel review closure.
 
-Strategically challenge whether a convention or implementation preference was
-mistaken for a hard constraint, whether a user-supplied solution was accepted
-reflexively, or whether path dependence is accumulating patches on a route
-whose required assumption has failed. Also reject the opposite failure:
-opening an elaborate comparison for a known defect or evidenced reversible
-choice, or declaring route failure from patch count alone.
+For a triggered route decision, explicitly challenge three failure modes: an unconfirmed engineering convention promoted to a hard constraint; reflexive acceptance of a user-suggested solution without independent conditions/benefits/costs/risks; and path dependence that keeps patching the first route after its key assumption failed. Also reject the opposite error of reopening route space for a known implementation defect or directly evidenced reversible choice, or treating patch count alone as proof of route-assumption failure.
+
+For triggered Project Intelligence design, also challenge a future scenario
+promoted above its recorded derivation strength, a domain fixture turned into a
+universal architecture checklist, a stale design silently controlling the
+route, and a convenient proxy reported as direct product-result evidence. Use
+a fresh non-implementing/external context only when the existing high-impact
+architecture, material cross-domain lock-in, evidence-conflict, or other
+independence trigger applies.
 
 Record the review boundary using the actual identities:
 
@@ -125,7 +194,8 @@ review_independence:
 The user may select a different reviewer model for one review run without changing the primary model:
 
 - update only `role_assignment.reviewer` with `selection_scope: review_run` and normally `status: trial_evaluation` on first use;
-- keep the existing primary assignment, user-selected runtime profile, framework-thinning state, and project delegation maturity unchanged;
+- keep the existing primary assignment, user-selected runtime profile, adapter
+  default record and framework-thinning state unchanged;
 - do not invoke a primary-model replacement or re-thickening path merely because the reviewer carrier/model changed;
 - on first use of a new carrier/model/configuration, run a minimal read/tool/identity smoke and report missing tool capabilities rather than inventing equivalents.
 
@@ -151,4 +221,4 @@ Use `APPROVE`, `APPROVE_WITH_NOTES`, `DISCUSS`, or `REQUEST_CHANGES`. A format-i
 
 An in-scope actionable finding inside an already-authorized task closure is Primary-owned repair work: fix it, rerun the affected checks, and update evidence without asking the user to approve the repair or recheck. A P1 or validation failure consumes the single bounded repair/recheck budget owned by `authority-and-triggers.md`; it does not start a retry loop. Stop when that budget is exhausted, the finding is P0, changes protected L0-L2 meaning, expands scope, crosses a canonical boundary, creates high-impact reviewer disagreement, or cannot be verified/reconciled.
 
-When the user explicitly invokes a Collaboration/formal review as a bounded control operation, finish and report the review before unrelated product development resumes. If `DISCUSS`, a material `REQUEST_CHANGES`, strategic disagreement, or another finding already requires user disposition, that specialized decision satisfies the explicit Skill handback; do not add a generic second prompt. If no specialized decision is pending, ask once whether to resume the same confirmed route, unless the same instruction already authorized the follow-on repair or work; in that case report the review result first and continue without a duplicate prompt. Implicit/default Collaboration governance and routine review checkpoints inside an already authorized batch do not create this handback.
+When the user explicitly invokes a Collaboration/formal review as a bounded control operation, finish and report the review before unrelated product development resumes. If `DISCUSS`, a material `REQUEST_CHANGES`, strategic disagreement, or another finding already requires user disposition, that specialized decision satisfies the explicit Skill handback; do not add a generic second prompt. If no specialized decision is pending, ask once whether to resume the same confirmed route, unless the same instruction already authorized the follow-on repair/work; in that case report the review result first and continue without a duplicate prompt. Implicit/default Collaboration governance and routine review checkpoints inside an already authorized batch do not create this handback.

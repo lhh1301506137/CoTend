@@ -86,7 +86,10 @@ REMOVED_TD05_COMMAND = "trellis-check"
 REQUIRED_REMAINING_COMMANDS: tuple[str, ...] = ()
 EXPECTED_TRELLIS_MENTIONS = 0
 EXPECTED_TRELLIS_FILES = 0
-EXPECTED_SKILL_FILES = 71
+EXPECTED_SKILL_FILES = 104
+EXPECTED_R16_MANIFEST = (
+    "a7f7ece2522a5901030e19cd5944359f80c027482f66f822a2053fc5080dcfb5"
+)
 EXPECTED_R15_MANIFEST = (
     "acc17586cf713acc85fef9e6be02013de6bc012b7864ade22bed495ee68a9e7b"
 )
@@ -126,36 +129,36 @@ REQUIRED_VERIFICATION_MARKERS = (
     "## Authority Boundary",
 )
 REQUIRED_COLLABORATION_MARKERS = (
-    "read `references/verification-pass.md`",
-    "Full dispatches an independent Checker role and Adaptive enters the same Checker contract inline",
-    "native Implementation Pass, native Verification Pass, formal review, and Native Closeout Pass",
+    "fixed Native\n  Implementation/Verification pair",
+    "Adaptive performs the same contracts\n  inline",
+    "Native Closeout alone owns exact staging",
 )
 REQUIRED_ACCEPTANCE_MARKERS = (
-    "Checker result contract in `verification-pass.md`",
-    "This section is the single canonical owner of `capability_completion_claim`.",
+    "This module owns verification-surface selection and direct observations.",
+    "The canonical evidence and result values remain owned",
 )
 REQUIRED_REVIEW_MARKERS = (
     "Ordinary implementation self-check is not formal review.",
     "`ai_generated` and not independent external review or user acceptance",
 )
 REQUIRED_RUNTIME_MARKERS = (
-    "independently scoped Checker executes `verification-pass.md`",
-    "distinct inline checking phase and executes `verification-pass.md`",
-    "remove obsolete compatibility entries only after reconciling any in-flight side effect",
-    "Both profiles finish verified checkpoints through `closeout-pass.md`",
+    "Native Implementation Pass -> Native Verification Pass",
+    "performs the Native Verification Pass inline",
+    "Local commit/Native Closeout remains opt-in",
+    "Local closeout never implies push/release/publication",
 )
 REQUIRED_ORCHESTRATION_MARKERS = (
-    "Checker always uses the native `verification-pass.md` contract",
-    "dispatch an independently scoped Checker through `verification-pass.md`",
+    "Full profile's fixed `Native Implementation Pass -> Native Verification Pass` pair",
+    "single integration owner",
 )
 REQUIRED_PROJECT_INIT_MARKERS = (
-    "check through `cotend-collaboration/references/verification-pass.md`",
-    "independently scoped native Checker",
-    "Local closeout always uses `cotend-collaboration/references/closeout-pass.md`",
+    "apply_coherence_sized_execution_on_active_route",
+    "apply_outcome_triggered_governance_on_active_route",
+    "one plan/implement/verify/triggered-review/primary-owner-state/commit",
 )
 REQUIRED_MODEL_MARKERS = (
-    "Checker always uses its native Verification Pass",
-    "same Implementation Pass and Verification Pass inline",
+    "`takeover_ready` requires current full-scope Project",
+    "Full and Adaptive produce the same identity",
 )
 REQUIRED_DOCUMENT_MARKERS = (
     "# CoTend 原生检查阶段",
@@ -748,7 +751,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         raise NativeVerificationPassError("exact TD05 runtime Trellis inventory drifted")
 
     source_lock = json.loads((root / SOURCE_LOCK_PATH.relative_to(ROOT)).read_text(encoding="utf-8"))
-    if source_lock.get("skill_file_count") != 69:
+    if source_lock.get("skill_file_count") != 94:
         raise NativeVerificationPassError("current upstream source inventory drifted")
 
     lock = json.loads((root / TARGET_LOCK_PATH.relative_to(ROOT)).read_text(encoding="utf-8"))
@@ -756,24 +759,24 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000016"
-        or target.get("revision") != 16
+        target.get("artifact_id") != "cotend-codex-r000017"
+        or target.get("revision") != 17
         or target.get("manifest_sha256") != digest
         or lock.get("skill_count") != 10
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
         or len(files) != EXPECTED_SKILL_FILES
     ):
-        raise NativeVerificationPassError("r16 target identity or manifest drifted")
+        raise NativeVerificationPassError("r17 target identity or manifest drifted")
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000015",
-        "revision": 15,
-        "source_release_id": "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14",
-        "framework_protocol": "cotend-collaboration-v1.76",
-        "manifest_sha256": EXPECTED_R15_MANIFEST,
+        "artifact_id": "cotend-codex-r000016",
+        "revision": 16,
+        "source_release_id": "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
+        "framework_protocol": "cotend-collaboration-v1.79",
+        "manifest_sha256": EXPECTED_R16_MANIFEST,
     }:
-        raise NativeVerificationPassError("r15 predecessor identity drifted")
+        raise NativeVerificationPassError("r16 predecessor identity drifted")
 
     _require_markers(
         texts["evidence"],

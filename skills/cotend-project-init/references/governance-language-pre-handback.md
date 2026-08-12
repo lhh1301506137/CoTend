@@ -20,8 +20,11 @@ review, handoff, Human Rejoin, AI UAT, acceptance, Done, and release records.
 Project Init remains the sole language resolver. The generic validator consumes
 the already-resolved normalized tag and the persisted canonical record; it does
 not resolve, infer, materialize, translate, or repair. The adapter owns the
-body-language checker. Shared core owns the changed-set, actual-byte, evidence,
-result, and fail-closed rules.
+body-language checker. Collaboration's direct
+`references/governance-language-acceptance.md` module owns the shared trigger,
+changed-set, actual-byte, evidence, result, repair-budget, and fail-closed
+rules; this file is only Project Init's invocation adapter and must not redefine
+that shared contract.
 
 ## Inputs And Changed-Set Evidence
 
@@ -57,14 +60,14 @@ were forgotten.
 
 ## Validator Invocation
 
-CoTend example:
+Adapter-neutral invocation:
 
 ```powershell
 python -X utf8 <cotend-project-init-root>/scripts/validate_governance_language.py `
   --project-root <project-root> `
   --status-carrier STATUS.md `
-  --expected-normalized-tag zh-CN `
-  --checker <cotend-project-init-root>/scripts/check_cotend_governance_language.py `
+  --expected-normalized-tag <persisted-normalized-tag> `
+  --checker <adapter-declared-checker> `
   --write-receipt STATUS.md `
   --write-receipt REVIEW-LOG.md
 ```
@@ -172,14 +175,13 @@ Nonzero exit, malformed JSON, a path mismatch, a tag mismatch, a checker/file
 SHA-256 mismatch, a body/prose-state contradiction, or
 `actual_bytes_checked != true` blocks the shared gate. The shared validator
 also rereads the target after checker execution and blocks if the bytes changed
-during validation. It does not know adapter-specific thresholds.
+during validation. It does not know any adapter's thresholds.
 
-`scripts/check_cotend_governance_language.py` is the bundled CoTend adapter.
-Its operation-scoped Git evaluation never excludes natural-language headings,
-short bullets, or table cells merely because they are short or tabular; only
-concrete machine-only table cells are technical. CoTend owns its checker
-identity, localized templates, supported tags, and thresholds without changing
-shared result semantics.
+The checker path, localized templates and thresholds belong to the applicable
+adapter. Operation-scoped Git evaluation never excludes natural-language
+headings, short bullets, or table cells merely because they are short or
+tabular; only concrete machine-only table cells are technical. The shared
+validator neither names a product checker nor supplies a fallback threshold.
 
 ## Evidence Packet
 

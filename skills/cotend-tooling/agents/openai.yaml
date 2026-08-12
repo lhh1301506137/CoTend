@@ -1,4 +1,4 @@
 interface:
   display_name: "CoTend Tooling"
-  short_description: "Govern reusable development capabilities safely"
-  default_prompt: "Use $cotend-tooling to inventory or evaluate reusable capabilities for this project without automatic side effects."
+  short_description: "Inventory and govern reusable development capabilities"
+  default_prompt: "Use $cotend-tooling to inventory or evaluate reusable capabilities for the active goal without inferring use from installation or taking side effects; for refresh, follow a named authority locator, stop on missing or unverified identity, recompare fit only for a material delta, and return a non-mutating disposition."

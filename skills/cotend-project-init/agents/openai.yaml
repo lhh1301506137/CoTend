@@ -1,4 +1,4 @@
 interface:
   display_name: "CoTend Project Init"
-  short_description: "Init workflow and route idea baseline"
-  default_prompt: "Use $cotend-project-init Auto Mode for CoTend v1.79. Resolve framework-update impact first, load only selected one-level references, and delegate once-if-absent capability inventory to $cotend-tooling. Preserve canonical language, the marked project router, Full/Adaptive, user-owned risk, Plan Tree truth, and actual-byte validation without creating another owner. Report Init first and return one handback unless the same instruction already authorizes an unblocked bounded follow-on."
+  short_description: "Impact-directed project initialization"
+  default_prompt: "Use $cotend-project-init with the v2.01 collaboration contract to initialize, update, repair, migrate, or resume CoTend. Resolve framework impact before broad reads, load only selected owners, preserve Full/Adaptive and user-owned risk, validate actual changed bytes with at most one repair/recheck, and return one handback. A named upstream Dual handoff/install or external adapter sync alone loads external-reviewer-sync; ordinary Init never interprets product meaning or runs CodeGraph initialization without explicit approval."

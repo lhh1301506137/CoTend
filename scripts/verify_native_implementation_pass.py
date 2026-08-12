@@ -63,7 +63,10 @@ REMOVED_TD04_COMMAND = "trellis-implement"
 REQUIRED_REMAINING_COMMANDS: tuple[str, ...] = ()
 EXPECTED_TRELLIS_MENTIONS = 0
 EXPECTED_TRELLIS_FILES = 0
-EXPECTED_SKILL_FILES = 71
+EXPECTED_SKILL_FILES = 104
+EXPECTED_R16_MANIFEST = (
+    "a7f7ece2522a5901030e19cd5944359f80c027482f66f822a2053fc5080dcfb5"
+)
 EXPECTED_R15_MANIFEST = (
     "acc17586cf713acc85fef9e6be02013de6bc012b7864ade22bed495ee68a9e7b"
 )
@@ -104,32 +107,32 @@ REQUIRED_IMPLEMENTATION_MARKERS = (
     "route_or_release: false",
 )
 REQUIRED_COLLABORATION_MARKERS = (
-    "read `references/implementation-pass.md`",
-    "Full delegates its native Implementer role and Adaptive executes the same contract inline",
-    "Full dispatches an independent Checker role and Adaptive enters the same Checker contract inline",
+    "fixed Native\n  Implementation/Verification pair",
+    "Adaptive performs the same contracts\n  inline",
+    "Native Closeout alone owns exact staging",
 )
 REQUIRED_RUNTIME_MARKERS = (
-    "The Implementer executes `implementation-pass.md` through a bounded role packet",
-    "The Primary executes the native `implementation-pass.md` contract",
-    "Both profiles finish verified checkpoints through `closeout-pass.md`",
-    "neither delegates closeout to an external framework",
+    "Native Implementation Pass -> Native Verification Pass",
+    "main Primary implements inline",
+    "performs the Native Verification Pass inline",
+    "Local commit/Native Closeout remains opt-in",
 )
 REQUIRED_ORCHESTRATION_MARKERS = (
-    "The Implementer always uses the native `implementation-pass.md` contract",
-    "dispatch the Implementer through `implementation-pass.md`",
+    "Full profile's fixed `Native Implementation Pass -> Native Verification Pass` pair",
+    "single integration owner",
 )
 REQUIRED_PROJECT_INIT_MARKERS = (
-    "Both profiles implement through `cotend-collaboration/references/implementation-pass.md` and check through `cotend-collaboration/references/verification-pass.md`.",
-    "dispatch a bounded native Implementer",
-    "Local closeout always uses `cotend-collaboration/references/closeout-pass.md`",
+    "apply_coherence_sized_execution_on_active_route",
+    "apply_outcome_triggered_governance_on_active_route",
+    "one plan/implement/verify/triggered-review/primary-owner-state/commit",
 )
 REQUIRED_MODEL_MARKERS = (
-    "The Implementer always uses CoTend's native Implementation Pass",
-    "the Checker always uses its native Verification Pass",
+    "`takeover_ready` requires current full-scope Project",
+    "Full and Adaptive produce the same identity",
 )
 REQUIRED_MODEL_PACKET_MARKERS = (
-    "framework_fixed_behavior: native_implementation_pass -> checker_contract",
-    "- inline Checker contract",
+    "Identity, role, depth, packet trust and same-Primary exclusion",
+    "Takeover packet/plan, active execution and return handoff",
 )
 REQUIRED_DOCUMENT_MARKERS = (
     "# CoTend 原生实现阶段",
@@ -506,8 +509,8 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000016"
-        or target.get("revision") != 16
+        target.get("artifact_id") != "cotend-codex-r000017"
+        or target.get("revision") != 17
         or target.get("manifest_sha256") != digest
         or lock.get("skill_count") != 10
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
@@ -516,13 +519,13 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000015",
-        "revision": 15,
-        "source_release_id": "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14",
-        "framework_protocol": "cotend-collaboration-v1.76",
-        "manifest_sha256": EXPECTED_R15_MANIFEST,
+        "artifact_id": "cotend-codex-r000016",
+        "revision": 16,
+        "source_release_id": "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
+        "framework_protocol": "cotend-collaboration-v1.79",
+        "manifest_sha256": EXPECTED_R16_MANIFEST,
     }:
-        raise NativeImplementationPassError("r15 predecessor identity drifted")
+        raise NativeImplementationPassError("r16 predecessor identity drifted")
     if len(files) != EXPECTED_SKILL_FILES:
         raise NativeImplementationPassError("current Skill file inventory drifted")
     _require_markers(

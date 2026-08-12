@@ -34,12 +34,12 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-class CoTendV179AdaptationTests(unittest.TestCase):
-    def test_v179_identity_is_promoted_to_exact_r16_locks(self) -> None:
+class CoTendV201AdaptationTests(unittest.TestCase):
+    def test_v201_identity_is_promoted_to_exact_r17_locks(self) -> None:
         role_map = json.loads(read("upstream/CODEX-SKILL-ROLE-MAP.json"))
         self.assertEqual(
             role_map["candidate_release"],
-            "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
+            "exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d",
         )
         self.assertEqual(role_map["skill_count"], 10)
         self.assertNotIn("candidate_overlay", role_map)
@@ -48,16 +48,16 @@ class CoTendV179AdaptationTests(unittest.TestCase):
         artifact_lock = json.loads(read("delivery/codex-artifact.lock.json"))
         self.assertEqual(
             framework_lock["release_id"],
-            "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
+            "exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d",
         )
         self.assertEqual(
-            framework_lock["framework_protocol"], "cotend-collaboration-v1.79"
+            framework_lock["framework_protocol"], "cotend-collaboration-v2.01"
         )
-        self.assertEqual(artifact_lock["target"]["artifact_id"], "cotend-codex-r000016")
+        self.assertEqual(artifact_lock["target"]["artifact_id"], "cotend-codex-r000017")
         self.assertEqual(artifact_lock["skill_count"], 10)
         self.assertEqual(
             artifact_lock["predecessor_targets"][0]["artifact_id"],
-            "cotend-codex-r000015",
+            "cotend-codex-r000016",
         )
 
     def test_tooling_catalog_validates_and_selection_never_authorizes_adoption(self) -> None:
@@ -71,10 +71,9 @@ class CoTendV179AdaptationTests(unittest.TestCase):
             "--authority-root",
             str(ROOT),
         )
-        self.assertEqual(validated["status"], "validated")
+        self.assertEqual(validated["status"], "valid")
         self.assertEqual(validated["record_count"], 9)
-        self.assertFalse(validated["writes_performed"])
-        self.assertEqual(validated["network_calls"], 0)
+        self.assertEqual(validated["update_locator_count"], 9)
 
         selected = run_json(
             script,
@@ -95,10 +94,11 @@ class CoTendV179AdaptationTests(unittest.TestCase):
             "3",
         )
         self.assertEqual(selected["selected_count"], 1)
-        self.assertEqual(selected["records"][0]["id"], "codegraph")
-        self.assertFalse(selected["adoption_authorized"])
-        self.assertFalse(selected["writes_performed"])
-        self.assertEqual(selected["network_calls"], 0)
+        self.assertEqual(selected["candidates"][0]["id"], "codegraph")
+        self.assertEqual(
+            selected["candidates"][0]["adoption_disposition"], "adopt_partial"
+        )
+        self.assertNotIn("adoption_authorized", selected)
 
     def test_inventory_is_bounded_read_only_and_initializes_empty_or_nonempty_state(self) -> None:
         watched = [
@@ -127,15 +127,15 @@ class CoTendV179AdaptationTests(unittest.TestCase):
         self.assertIn("STATUS.md", paths)
         self.assertNotIn(".private-provenance", "\n".join(paths))
 
-    def test_impact_resolver_selects_only_v179_action_and_preserves_future_triggers(self) -> None:
+    def test_impact_resolver_selects_v201_actions_and_preserves_future_triggers(self) -> None:
         script = str(PROJECT_INIT / "scripts" / "resolve_framework_update.py")
         result = run_json(
             script,
             "resolve",
             "--from-version",
-            "v1.76",
-            "--to-version",
             "v1.79",
+            "--to-version",
+            "v2.01",
             "--inventory-status",
             "absent",
             "--state-reliability",
@@ -143,22 +143,28 @@ class CoTendV179AdaptationTests(unittest.TestCase):
             "--guard-status",
             "clear",
         )
+        selected_actions = [
+            action
+            for item in result["merged_actions"]
+            for action in item["project_actions"]
+        ] + [item["project_action"] for item in result["ordered_actions"]]
         self.assertEqual(
-            [item["action"] for item in result["actions"]],
-            ["delegate_tooling_inventory_once_if_absent"],
-        )
-        self.assertEqual(
-            result["future_trigger_entries"],
+            selected_actions,
             [
-                "v177-tooling-capability-registry",
-                "v178-outcome-driven-solution-adequacy",
+                "reconstruct_current_mvp_once",
+                "delegate_tooling_inventory_once_if_absent",
+                "apply_coherence_sized_execution_on_active_route",
+                "apply_outcome_triggered_governance_on_active_route",
+                "maintain_project_agents_router_block",
             ],
         )
-        self.assertEqual(result["effective_scope"], "named_carrier")
+        self.assertIn(
+            "v183-adaptive-development-experience",
+            [item["change_id"] for item in result["deferred_triggers"]],
+        )
+        self.assertEqual(result["required_scope"], "full_current_mvp")
         self.assertFalse(result["advance_allowed"])
-        self.assertFalse(result["writes_performed"])
-        self.assertEqual(result["network_calls"], 0)
-        self.assertEqual(result["model_calls"], 0)
+        self.assertTrue(result["compatibility_receipt"]["existing_carrier_only"])
 
     def test_inventory_reconciles_from_checkpoint_and_fails_safe_on_tamper(self) -> None:
         script = str(TOOLING / "scripts" / "project_inventory.py")
@@ -217,20 +223,30 @@ class CoTendV179AdaptationTests(unittest.TestCase):
             script,
             "resolve",
             "--from-version",
-            "v1.79",
+            "v2.01",
             "--to-version",
-            "v1.79",
+            "v2.01",
+            "--completed-once",
+            "v172-project-understanding-reconstruction",
             "--inventory-status",
             "absent",
             "--state-reliability",
             "reliable",
             "--guard-status",
             "clear",
+            "--framework-state-contract",
+            "cotend.framework-update-state.v2",
+            "--last-material-project-migration",
+            "v2.01",
         )
         self.assertFalse(fresh["fast_path_no_migration"])
         self.assertTrue(fresh["inventory_bootstrap_required"])
         self.assertEqual(
-            [item["action"] for item in fresh["actions"]],
+            [
+                action
+                for item in fresh["merged_actions"]
+                for action in item["project_actions"]
+            ],
             ["delegate_tooling_inventory_once_if_absent"],
         )
 
@@ -238,15 +254,21 @@ class CoTendV179AdaptationTests(unittest.TestCase):
             script,
             "resolve",
             "--from-version",
-            "v1.79",
+            "v2.01",
             "--to-version",
-            "v1.79",
+            "v2.01",
+            "--completed-once",
+            "v172-project-understanding-reconstruction",
             "--inventory-status",
             "initialized",
             "--state-reliability",
             "reliable",
             "--guard-status",
             "clear",
+            "--framework-state-contract",
+            "cotend.framework-update-state.v2",
+            "--last-material-project-migration",
+            "v2.01",
         )
         self.assertTrue(fast["fast_path_no_migration"])
         self.assertTrue(fast["advance_allowed"])
@@ -258,7 +280,7 @@ class CoTendV179AdaptationTests(unittest.TestCase):
             "--from-version",
             "unknown",
             "--to-version",
-            "v1.79",
+            "v2.01",
             "--inventory-status",
             "absent",
             "--state-reliability",
@@ -266,7 +288,7 @@ class CoTendV179AdaptationTests(unittest.TestCase):
             "--guard-status",
             "unknown",
         )
-        self.assertEqual(legacy["effective_scope"], "legacy_bounded_audit")
+        self.assertEqual(legacy["required_scope"], "legacy_bounded_audit")
         self.assertTrue(legacy["guard_stop"])
         self.assertFalse(legacy["advance_allowed"])
 
@@ -274,10 +296,12 @@ class CoTendV179AdaptationTests(unittest.TestCase):
         closure = read(
             "skills/cotend-collaboration/references/semantic-implementation-closure.md"
         )
+        solution = read(
+            "skills/cotend-collaboration/references/solution-adequacy.md"
+        )
         acceptance = read(
             "skills/cotend-collaboration/references/acceptance-test-harness.md"
         )
-        plan = read("skills/cotend-collaboration/references/plan-tree.md")
         for marker in (
             "material_fit_uncertainty",
             "significant_cost_or_lock_in",
@@ -289,12 +313,12 @@ class CoTendV179AdaptationTests(unittest.TestCase):
             "route_assumption_failure",
             "protected_outcome_or_constraint_change",
         ):
-            self.assertIn(marker, closure)
-        self.assertIn("known implementation defect", closure)
-        self.assertIn("reversible choice", closure)
-        self.assertIn("Outcome-Corresponding Discrimination", acceptance)
-        self.assertIn("Before stacking another patch", plan)
-        self.assertIn("Full and Adaptive use the same trigger", closure)
+            self.assertIn(marker, solution)
+        self.assertIn("known implementation defects", solution)
+        self.assertIn("directly evidenced reversible", solution)
+        self.assertIn("Outcome-Corresponding Evidence", acceptance)
+        self.assertIn("patch stacking", closure)
+        self.assertIn("Full and Adaptive must produce the same trigger", solution)
 
     def test_candidate_keeps_c01_c19_and_adds_no_parallel_authority(self) -> None:
         capability_map = json.loads(read("upstream/CAPABILITY-IMPLEMENTATION-MAP.json"))
@@ -314,23 +338,19 @@ class CoTendV179AdaptationTests(unittest.TestCase):
         )
         tooling = read("skills/cotend-tooling/SKILL.md")
         workflow = read("skills/cotend-tooling/references/workflow.md")
-        self.assertIn("must not create a second truth tree", tooling)
-        self.assertIn("never a new authority", workflow)
-
-    def test_all_active_compatibility_markers_are_v179(self) -> None:
-        historical = ROOT / "skills" / "cotend-collaboration" / "references" / "failure-patterns"
-        stale: list[str] = []
-        for path in (ROOT / "skills").rglob("*"):
-            if not path.is_file() or path.suffix not in {".md", ".yaml"}:
-                continue
-            if historical in path.parents:
-                continue
-            if "v1.76" in path.read_text(encoding="utf-8", errors="ignore"):
-                stale.append(path.relative_to(ROOT).as_posix())
-        self.assertEqual(stale, [])
         self.assertIn(
-            "Protocol version: `cotend-collaboration-v1.79`",
+            "never\ndecide product meaning, adoption authority or completion", tooling
+        )
+        self.assertIn("not adoption or execution authority", workflow)
+
+    def test_all_active_compatibility_markers_are_v201(self) -> None:
+        self.assertIn(
+            "Protocol version: `cotend-collaboration-v2.01`",
             read("skills/cotend-collaboration/SKILL.md"),
+        )
+        self.assertIn(
+            "Compatibility baseline: `cotend-collaboration-v2.01`",
+            read("skills/cotend-model-upgrade/SKILL.md"),
         )
 
 

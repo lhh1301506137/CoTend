@@ -35,8 +35,10 @@ R2_TO_R13_SKILLS = tuple(
 R1_SKILLS = tuple(
     skill for skill in R2_TO_R13_SKILLS if skill != "cotend-semantic-alignment"
 )
-EXPECTED_FILE_COUNT = 71
-CURRENT_SOURCE_FRAMEWORK_FILE_COUNT = 69
+EXPECTED_FILE_COUNT = 104
+CURRENT_SOURCE_FRAMEWORK_FILE_COUNT = 94
+R16_FILE_COUNT = 71
+R16_SOURCE_FRAMEWORK_FILE_COUNT = 69
 R15_FILE_COUNT = 61
 R15_SOURCE_FRAMEWORK_FILE_COUNT = 59
 R14_FILE_COUNT = 54
@@ -161,8 +163,10 @@ def _target_artifact_id(lineage: str, revision: int) -> str:
 
 
 def _expected_file_count(revision: int) -> int:
-    if revision >= 16:
+    if revision >= 17:
         return EXPECTED_FILE_COUNT
+    if revision == 16:
+        return R16_FILE_COUNT
     if revision == 15:
         return R15_FILE_COUNT
     if revision == 14:
@@ -191,8 +195,10 @@ def _expected_skills(revision: int) -> tuple[str, ...]:
 
 
 def _expected_source_file_count(revision: int) -> int:
-    if revision >= 16:
+    if revision >= 17:
         return CURRENT_SOURCE_FRAMEWORK_FILE_COUNT
+    if revision == 16:
+        return R16_SOURCE_FRAMEWORK_FILE_COUNT
     if revision == 15:
         return R15_SOURCE_FRAMEWORK_FILE_COUNT
     if revision == 14:
@@ -319,7 +325,11 @@ def _directory_manifest(root: Path, skills: tuple[str, ...]) -> dict[str, str]:
                     "symlink_boundary",
                     f"Managed Skill contains a symlink: {path}",
                 )
-            if path.is_file():
+            if (
+                path.is_file()
+                and "__pycache__" not in path.parts
+                and path.suffix != ".pyc"
+            ):
                 manifest[path.relative_to(root).as_posix()] = _sha256(path)
     return manifest
 
@@ -4055,8 +4065,11 @@ class DeliveryManager:
                     details={"issues": issues},
                 )
         self._active_owned_skills = set(component_plan.owned_skills)
-        for skill in component_plan.owned_skills:
-            shutil.copytree(artifact.root / skill, staged / skill)
+        for relative in sorted(component_plan.owned_files):
+            source = artifact.root / PurePosixPath(relative)
+            destination_file = staged / PurePosixPath(relative)
+            destination_file.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination_file)
         if (
             _directory_manifest(staged, component_plan.owned_skills)
             != component_plan.owned_files

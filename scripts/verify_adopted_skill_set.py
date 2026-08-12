@@ -7,217 +7,184 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-
-import verify_cotend_project_init as project_init_contract
+from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE_ROOT = "dual-ai-collaboration-skill-share"
-TAG = "dual-ai-share-2026.07.28.2"
-SOURCE_COMMIT = "c14d4133bf0438d435048858554c88c89a7870a3"
+SOURCE_COMMIT = "fe21e970bc2bdc69de5e2ce1710aef2dd156a54d"
+SOURCE_BASE_COMMIT = "c14d4133bf0438d435048858554c88c89a7870a3"
 SOURCE_ROOT = "skills-backup/codex"
-SOURCE_TREE = "a6824559e087f87da90a55bcc6403576db1027c1"
+SOURCE_TREE = "076099a1c6888ede804189e1aa125eba92380e94"
 SOURCE_IDENTITY = f"exact-source:{SOURCE_COMMIT}"
-
-SKILLS = {
+HANDOFF_ID = "2026.08.12.2"
+HANDOFF_HASHES = {
+    "HANDOFF.json": "1367e88f6dd9ec73482ec537cb17149681d7d00c88ed8473745d8ac5d1137b48",
+    "HANDOFF.md": "6626cf9720bc871009e5d3866555def48eefaca275433f9f952f5835c0d2083e",
+    "SHA256SUMS": "b58045caf8ba36bc391e13aeef1336049a6f006c2774457965a2e76445a80208",
+}
+SOURCE_SKILLS = {
+    "diagnose-only": {
+        "target": "cotend-diagnose-only",
+        "tree": "7bb5b228c675f778ce4b62a46385a9e507a3691f",
+        "files": 2,
+    },
+    "dual-ai-collaboration": {
+        "target": "cotend-collaboration",
+        "tree": "335e3f0fe98ef2bb6a3f26fce83dc955e518bed0",
+        "files": 43,
+    },
     "dual-ai-init": {
         "target": "cotend-init",
-        "tree": "3e5998f4742585656d1d585b2bf2338b848809ae",
-        "mode": "adapted",
+        "tree": "0447d65ef270153d69858953b174e97e2666e409",
         "files": 2,
     },
     "dual-ai-project-init": {
         "target": "cotend-project-init",
-        "tree": "ce9974142862fb3e6a4c18523433b212079c8a1b",
-        "mode": "adapted",
+        "tree": "1b3d56e52d489cbc6241d4e1e8e71268ea01147d",
         "files": 19,
-    },
-    "dual-ai-collaboration": {
-        "target": "cotend-collaboration",
-        "tree": "82146af99b711170878d0b396d3936919b3f4f24",
-        "mode": "adapted",
-        "files": 28,
-    },
-    "diagnose-only": {
-        "target": "cotend-diagnose-only",
-        "tree": "dd5ba26517f032c3dfcdd5c69fabc27825c6bf25",
-        "mode": "adapted",
-        "files": 2,
     },
     "dual-ai-semantic-alignment": {
         "target": "cotend-semantic-alignment",
-        "tree": "943c95550ccd6a9602d406f9cd3348b494b7e5f1",
-        "mode": "adapted",
+        "tree": "59508c69b48143f22ebb5fea8c932511caa457cd",
         "files": 3,
     },
     "dual-ai-session-handoff": {
         "target": "cotend-session-handoff",
-        "tree": "cef063bf0c6821938dcdd094635a8e6f4d6a1c26",
-        "mode": "adapted",
+        "tree": "b5fd5ac0604e24cd842cd70c34946af1df16daa3",
         "files": 3,
+    },
+    "dual-ai-tooling": {
+        "target": "cotend-tooling",
+        "tree": "aec8d2f776962a15697700e2634b9843187aa047",
+        "files": 14,
     },
     "dual-model-upgrade": {
         "target": "cotend-model-upgrade",
-        "tree": "fb58aa7c246bae683a1204901f6a9a61ca6c026b",
-        "mode": "adapted",
-        "files": 3,
+        "tree": "809e7f5a32943b8a60bb6d29d364bf81cf3ef008",
+        "files": 7,
     },
     "grill-me": {
         "target": "grill-me",
         "tree": "70df660726ef12349a40dc0353a681c82414fe95",
-        "mode": "adopted",
         "files": 1,
     },
-    "karpathy-guidelines": {
-        "target": "karpathy-guidelines",
-        "tree": "32d7f4abb8c9dd8ab17a793b5e0b1a3a1fa35aeb",
-        "mode": "adapted",
-        "files": 1,
-    },
-    "dual-ai-tooling": {
-        "target": "cotend-tooling",
-        "tree": "73bda7067e0299e68202217df748ae325eec7f6d",
-        "mode": "adapted",
-        "files": 7,
-    },
 }
-
-NATIVE_TARGET_ADDITIONS = {
-    "cotend-collaboration": {
-        "references/closeout-pass.md",
-        "references/implementation-pass.md",
-        "references/verification-pass.md",
-    },
+PRODUCT_SKILLS = (
+    "cotend-collaboration",
+    "cotend-diagnose-only",
+    "cotend-init",
+    "cotend-model-upgrade",
+    "cotend-project-init",
+    "cotend-semantic-alignment",
+    "cotend-session-handoff",
+    "cotend-tooling",
+    "grill-me",
+    "karpathy-guidelines",
+)
+SOURCE_FILE_COUNT = 94
+PRODUCT_FILE_COUNT = 104
+PATH_MAPPINGS = {
+    (
+        "dual-ai-collaboration",
+        "references/private-dual-adapter.md",
+    ): "references/cotend-adapter.md",
+    (
+        "dual-ai-project-init",
+        "scripts/check_private_dual_governance_language.py",
+    ): "scripts/check_cotend_governance_language.py",
 }
-
-SOURCE_TARGET_PATH_MAPPINGS = {
-    "cotend-project-init": {
-        "scripts/check_private_dual_governance_language.py": (
-            "scripts/check_cotend_governance_language.py"
-        ),
-    },
-}
-
-SOURCE_TARGET_OMISSIONS = {
-    "cotend-project-init": {
+SOURCE_OMISSIONS = {
+    (
+        "dual-ai-project-init",
         "scripts/test_check_private_dual_governance_language.py",
-    },
+    ),
 }
-
-DISPLAY_NAMES = {
-    "cotend-init": "CoTend Init",
-    "cotend-project-init": "CoTend Project Init",
-    "cotend-collaboration": "CoTend Collaboration",
-    "cotend-diagnose-only": "CoTend Diagnose Only",
-    "cotend-model-upgrade": "CoTend Model Upgrade",
-    "cotend-semantic-alignment": "CoTend Semantic Alignment",
-    "cotend-session-handoff": "CoTend Session Handoff",
-    "cotend-tooling": "CoTend Tooling",
+REQUIRED_PRODUCT_PATHS = {
+    "cotend-collaboration/references/implementation-pass.md",
+    "cotend-collaboration/references/verification-pass.md",
+    "cotend-collaboration/references/closeout-pass.md",
+    "cotend-collaboration/references/cotend-adapter.md",
+    "cotend-collaboration/references/project-intelligence.md",
+    "cotend-collaboration/references/adaptive-development-experience.md",
+    "cotend-collaboration/references/governance-carrier-lifecycle.md",
+    "cotend-collaboration/references/semantic-contract-templates.md",
+    "cotend-collaboration/references/semantic-reconciliation.md",
+    "cotend-collaboration/scripts/development_experience.py",
+    "cotend-collaboration/scripts/governance_history.py",
+    "cotend-collaboration/scripts/validate_understanding_artifacts.py",
+    "cotend-project-init/references/framework-maintenance/external-reviewer-sync.md",
 }
-
 REQUIRED_MARKERS = {
-    "cotend-init": (
-        "Load and follow `cotend-project-init` Auto Mode",
-        "canonical user-facing governance language",
-        ".codex\\skills\\cotend-project-init\\SKILL.md",
-        ".codex/skills/cotend-project-init/SKILL.md",
+    "cotend-collaboration/SKILL.md": (
+        "Protocol version: `cotend-collaboration-v2.01`",
+        "references/project-intelligence.md",
+        "references/cotend-adapter.md",
     ),
-    "cotend-project-init": (
-        "Protocol target: `cotend-collaboration-v1.79`",
-        "Project Init is the sole owner of `user_facing_language_resolution`",
-        "**cotend-collaboration** owns collaboration governance",
-        "`$cotend-diagnose-only`",
-        "`karpathy-guidelines` for coding behavior",
-        "Do not use grill-me",
-        "cotend.governance-language-pre-handback.v1",
-        "check_cotend_governance_language.py",
-        "at most twice total",
+    "cotend-project-init/SKILL.md": (
+        "Protocol target: `cotend-collaboration-v2.01`",
+        "upstream Dual handoff/adoption/install",
+        "references/framework-maintenance/external-reviewer-sync.md",
     ),
-    "cotend-collaboration": (
-        "Protocol version: `cotend-collaboration-v1.79`",
-        "inspect their actual prose against the persisted resolved language",
-        "CoTend Core never grants project-truth authority",
-        "through `cotend-project-init` Auto Mode",
-        "`$cotend-diagnose-only` owns read-only checks",
+    "cotend-collaboration/references/cotend-adapter.md": (
+        "runtime_profile: full",
+        "user_facing_language: en",
+        "continuous_risk: medium",
+        "disabled_requires_explicit_project_record",
     ),
-    "cotend-diagnose-only": (
-        "Default: **read-only investigation**",
-        "Do not change files",
+    "cotend-collaboration/references/runtime-profiles.md": (
+        "v2.01-full",
+        "v2.01-A",
+        "Native Implementation Pass -> Native Verification Pass",
     ),
-    "cotend-model-upgrade": (
-        "packet_version: cotend-model-upgrade-v1.14",
-        "cotend-collaboration/references/authority-and-triggers.md",
-        "primary_model_reverted_or_downgraded",
-        "milestone re-entry",
+    "cotend-collaboration/references/project-intelligence.md": (
+        "full_current_project",
+        "actual-byte",
+        "Unknown",
     ),
-    "cotend-semantic-alignment": (
-        "Companion version: `cotend-collaboration-v1.79`",
-        "`cotend.semantic-contract.v1`",
-        "scripts/semantic-contract.mjs",
-        "Independent Entry And Minimum Truth",
+    "cotend-collaboration/references/continuous-and-unattended.md": (
+        "local_closeout_authorization.status: active",
+        "Native Closeout Pass",
     ),
-    "cotend-session-handoff": (
-        "Protocol version: `cotend-session-handoff-v1.3`",
-        "Compatibility baseline: `cotend-collaboration-v1.79`",
-        "literal `$cotend-session-handoff`",
-        "not_started | current | stale | conflict",
-        "same_primary_session_takeover_result",
+    "cotend-model-upgrade/SKILL.md": (
+        "cotend-model-upgrade-v1.16",
+        "cotend-collaboration-v2.01",
     ),
-    "grill-me": (
-        "Ask the questions one at a time",
-        "replying only `1` means",
-    ),
-    "karpathy-guidelines": (
-        "Simplicity First",
-        "Surgical Changes",
-        "Goal-Driven Execution",
-    ),
-    "cotend-tooling": (
-        "Protocol version: `cotend-tooling-v1.0`",
-        "call -> compose -> adapt -> build",
-        "Select at most three relevant records",
-        "Inventory is read-only discovery",
-    ),
-}
-
-LEGACY_ALLOWLIST = {
-    "skills/cotend-init/SKILL.md": ("legacy",),
-    "skills/cotend-project-init/SKILL.md": ("legacy", "Old dual-ai"),
-    "skills/cotend-collaboration/SKILL.md": ("legacy",),
-    "skills/cotend-collaboration/references/idea-to-consensus.md": ("legacy",),
-    "skills/cotend-collaboration/references/upstream-dependency-review.md": (
-        "dual-ai",
+    "cotend-tooling/SKILL.md": (
+        "intake",
+        "evaluate",
+        "inventory",
+        "refresh",
+        "retire",
     ),
 }
 
 
 def git_bytes(repo: Path, *args: str) -> bytes:
-    result = subprocess.run(
+    return subprocess.run(
         ["git", "-C", str(repo), *args],
         check=True,
         capture_output=True,
-    )
-    return result.stdout
+    ).stdout
 
 
 def git_text(repo: Path, *args: str) -> str:
     return git_bytes(repo, *args).decode("utf-8").strip()
 
 
-def tagged_file(repo: Path, relative_path: str) -> bytes:
-    return git_bytes(repo, "show", f"{TAG}:{PACKAGE_ROOT}/{relative_path}")
-
-
-def load_json(path: Path) -> dict[str, object]:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
+def load_json(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
         raise ValueError(f"expected JSON object: {path}")
-    return data
+    return value
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def source_inventory(repo: Path, source_id: str) -> list[str]:
     prefix = f"{SOURCE_ROOT}/{source_id}"
-    paths = git_text(
+    output = git_text(
         repo,
         "ls-tree",
         "-r",
@@ -225,825 +192,311 @@ def source_inventory(repo: Path, source_id: str) -> list[str]:
         SOURCE_COMMIT,
         "--",
         prefix,
-    ).splitlines()
-    return sorted(path.removeprefix(f"{prefix}/") for path in paths if path)
-
-
-def target_inventory(target_dir: Path) -> list[str]:
+    )
     return sorted(
-        path.relative_to(target_dir).as_posix()
-        for path in target_dir.rglob("*")
-        if path.is_file()
+        line.removeprefix(f"{prefix}/")
+        for line in output.splitlines()
+        if line
     )
 
 
-def frontmatter(skill_text: str) -> tuple[str | None, set[str]]:
-    parts = skill_text.split("---", 2)
-    if len(parts) != 3 or parts[0].strip():
-        return None, set()
-    block = parts[1]
-    name_match = re.search(r"^name:\s*([^\s]+)\s*$", block, re.MULTILINE)
-    keys = set(re.findall(r"^([A-Za-z][A-Za-z0-9_-]*):", block, re.MULTILINE))
-    return (name_match.group(1) if name_match else None), keys
+def product_inventory() -> list[str]:
+    root = ROOT / "skills"
+    return sorted(
+        path.relative_to(root).as_posix()
+        for path in root.rglob("*")
+        if path.is_file()
+        and "__pycache__" not in path.parts
+        and path.suffix != ".pyc"
+    )
 
 
-def metadata_value(text: str, key: str) -> str | None:
-    match = re.search(rf"^\s*{re.escape(key)}:\s*([^\s#]+)", text, re.MULTILINE)
-    return match.group(1) if match else None
+def manifest_digest(paths: list[str]) -> str:
+    root = ROOT / "skills"
+    files = {
+        path: hashlib.sha256((root / path).read_bytes()).hexdigest()
+        for path in paths
+    }
+    payload = json.dumps(
+        files,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
-def verify_source_topology(upstream_repo: Path, errors: list[str]) -> None:
-    for source_id, record in SKILLS.items():
-        target_id = str(record["target"])
-        target_dir = ROOT / "skills" / target_id
-        if not target_dir.is_dir():
-            errors.append(f"target Skill directory is missing: {target_id}")
-            continue
+def verify_source(upstream_repo: Path, errors: list[str]) -> None:
+    try:
+        if git_text(upstream_repo, "cat-file", "-t", SOURCE_COMMIT) != "commit":
+            errors.append("exact source target is not a commit")
+        if (
+            git_text(upstream_repo, "rev-parse", f"{SOURCE_COMMIT}:{SOURCE_ROOT}")
+            != SOURCE_TREE
+        ):
+            errors.append("exact source canonical tree drift")
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(upstream_repo),
+                "merge-base",
+                "--is-ancestor",
+                SOURCE_BASE_COMMIT,
+                SOURCE_COMMIT,
+            ],
+            check=True,
+            capture_output=True,
+        )
+        range_count = int(
+            git_text(
+                upstream_repo,
+                "rev-list",
+                "--count",
+                f"{SOURCE_BASE_COMMIT}..{SOURCE_COMMIT}",
+            )
+        )
+        if range_count != 188:
+            errors.append(f"exact source range count drift: {range_count}")
+    except (subprocess.CalledProcessError, ValueError) as exc:
+        errors.append(f"cannot resolve exact source identity: {exc}")
+        return
+
+    total = 0
+    for source_id, record in SOURCE_SKILLS.items():
         try:
-            source_tree = git_text(
+            tree = git_text(
                 upstream_repo,
                 "rev-parse",
                 f"{SOURCE_COMMIT}:{SOURCE_ROOT}/{source_id}",
             )
-            source_files = source_inventory(upstream_repo, source_id)
+            files = source_inventory(upstream_repo, source_id)
         except subprocess.CalledProcessError as exc:
-            errors.append(f"cannot resolve exact source Skill {source_id}: {exc}")
+            errors.append(f"cannot resolve source Skill {source_id}: {exc}")
             continue
-        if source_tree != record["tree"]:
-            errors.append(f"exact source tree drift: {source_id}")
-        target_files = target_inventory(target_dir)
-        native_additions = NATIVE_TARGET_ADDITIONS.get(target_id, set())
-        path_mappings = SOURCE_TARGET_PATH_MAPPINGS.get(target_id, {})
-        omissions = SOURCE_TARGET_OMISSIONS.get(target_id, set())
-        mapped_source_files = {
-            path_mappings.get(path, path)
-            for path in source_files
-            if path not in omissions
-        }
-        expected_target_files = sorted(mapped_source_files | native_additions)
-        if expected_target_files != target_files:
-            errors.append(
-                f"source/target file topology drift: {source_id} -> {target_id}"
-            )
-        if len(source_files) != record["files"]:
-            errors.append(f"exact source file count drift: {source_id}")
-        if len(target_files) != (
-            record["files"] - len(omissions) + len(native_additions)
-        ):
-            errors.append(f"target file count drift: {target_id}")
+        if tree != record["tree"]:
+            errors.append(f"source Skill tree drift: {source_id}")
+        if len(files) != record["files"]:
+            errors.append(f"source Skill file count drift: {source_id}")
+        total += len(files)
+        target = str(record["target"])
+        for relative in files:
+            if (source_id, relative) in SOURCE_OMISSIONS:
+                continue
+            mapped = PATH_MAPPINGS.get((source_id, relative), relative)
+            if not (ROOT / "skills" / target / mapped).is_file():
+                errors.append(
+                    f"source behavior has no CoTend carrier: {source_id}/{relative}"
+                )
+    if total != SOURCE_FILE_COUNT:
+        errors.append(f"source Skill file total drift: {total}")
 
 
-def verify_skill_metadata(errors: list[str]) -> None:
-    for record in SKILLS.values():
-        target_id = str(record["target"])
-        skill_path = ROOT / "skills" / target_id / "SKILL.md"
+def verify_handoff(upstream_repo: Path, errors: list[str]) -> None:
+    root = upstream_repo / "consumer-handoffs" / "cotend" / HANDOFF_ID
+    for name, expected in HANDOFF_HASHES.items():
+        path = root / name
+        if not path.is_file():
+            errors.append(f"handoff file missing: {name}")
+        elif sha256(path) != expected:
+            errors.append(f"handoff hash drift: {name}")
+
+
+def verify_product(errors: list[str]) -> tuple[list[str], str]:
+    skill_root = ROOT / "skills"
+    actual_skills = tuple(
+        sorted(path.name for path in skill_root.iterdir() if path.is_dir())
+    )
+    if actual_skills != PRODUCT_SKILLS:
+        errors.append(
+            f"product Skill inventory drift: {actual_skills!r}"
+        )
+    paths = product_inventory()
+    if len(paths) != PRODUCT_FILE_COUNT:
+        errors.append(f"product Skill file count drift: {len(paths)}")
+    missing = sorted(REQUIRED_PRODUCT_PATHS - set(paths))
+    if missing:
+        errors.append(f"required native product paths missing: {missing}")
+
+    for skill in PRODUCT_SKILLS:
+        skill_path = skill_root / skill / "SKILL.md"
         if not skill_path.is_file():
+            errors.append(f"SKILL.md missing: {skill}")
             continue
         text = skill_path.read_text(encoding="utf-8")
-        behavior_text = text
-        if target_id == "cotend-project-init":
-            try:
-                behavior_text = project_init_contract.load_project_init_contract(ROOT)[
-                    "combined"
-                ]
-            except project_init_contract.ProjectInitContractError as exc:
-                errors.append(str(exc))
-        elif target_id == "cotend-session-handoff":
-            workflow = (
-                skill_path.parent
-                / "references"
-                / "session-handoff-workflow.md"
-            )
-            if workflow.is_file():
-                behavior_text = text + "\n" + workflow.read_text(encoding="utf-8")
-            else:
-                errors.append("cotend-session-handoff workflow reference is missing")
-        name, keys = frontmatter(text)
-        if name != target_id:
-            errors.append(f"Skill frontmatter name mismatch: {target_id}")
-        if "description" not in keys:
-            errors.append(f"Skill frontmatter description is missing: {target_id}")
-        if (
-            record["mode"] == "adapted"
-            and target_id != "karpathy-guidelines"
-            and keys not in (
-            {"name", "description"},
-            {"name", "description", "metadata"},
-            )
-        ):
-            errors.append(
-                f"adapted Skill frontmatter has unsupported keys: {target_id}"
-            )
-        for marker in REQUIRED_MARKERS[target_id]:
-            if marker not in behavior_text:
-                errors.append(f"Skill behavior marker missing: {target_id}: {marker}")
+        parts = text.split("---", 2)
+        name = None
+        if len(parts) == 3 and not parts[0].strip():
+            match = re.search(r"^name:\s*([^\s]+)\s*$", parts[1], re.MULTILINE)
+            name = match.group(1) if match else None
+        if name != skill:
+            errors.append(f"Skill frontmatter name mismatch: {skill}")
 
-        agent_path = skill_path.parent / "agents" / "openai.yaml"
-        if target_id in DISPLAY_NAMES:
-            if not agent_path.is_file():
-                errors.append(f"agents/openai.yaml is missing: {target_id}")
-                continue
-            agent_text = agent_path.read_text(encoding="utf-8")
-            display = re.search(
-                r'^\s*display_name:\s*"([^"]+)"', agent_text, re.MULTILINE
-            )
-            short = re.search(
-                r'^\s*short_description:\s*"([^"]+)"', agent_text, re.MULTILINE
-            )
-            prompt = re.search(
-                r'^\s*default_prompt:\s*"(.+)"\s*$', agent_text, re.MULTILINE
-            )
-            if display is None or display.group(1) != DISPLAY_NAMES[target_id]:
-                errors.append(f"agent display_name mismatch: {target_id}")
-            if short is None or not 25 <= len(short.group(1)) <= 64:
-                errors.append(f"agent short_description length mismatch: {target_id}")
-            if prompt is None or f"${target_id}" not in prompt.group(1):
-                errors.append(
-                    f"agent default_prompt does not invoke Skill: {target_id}"
-                )
-            elif len(prompt.group(1)) > 1024:
-                errors.append(
-                    f"agent default_prompt exceeds Codex 1024-character limit: {target_id}"
-                )
-        elif agent_path.exists():
-            errors.append(
-                f"directly adopted third-party Skill gained agent metadata: {target_id}"
-            )
-
-
-def verify_references(errors: list[str]) -> None:
-    try:
-        project_init_contract.load_project_init_contract(ROOT)
-    except project_init_contract.ProjectInitContractError as exc:
-        errors.append(str(exc))
-    collaboration = ROOT / "skills" / "cotend-collaboration"
-    skill_path = collaboration / "SKILL.md"
-    references_dir = collaboration / "references"
-    if not skill_path.is_file() or not references_dir.is_dir():
-        errors.append("cotend-collaboration Skill or references directory is missing")
-        return
-    reference_names = {path.name for path in references_dir.glob("*.md")}
-    skill_text = skill_path.read_text(encoding="utf-8")
-    for name in reference_names:
-        if f"references/{name}" not in skill_text:
-            errors.append(
-                f"collaboration reference is not discoverable from SKILL.md: {name}"
-            )
-    if len(reference_names) != 25:
-        errors.append("cotend-collaboration reference count must be 25")
-    packet = (
-        ROOT
-        / "skills"
-        / "cotend-model-upgrade"
-        / "references"
-        / "packet-templates.md"
-    )
-    if not packet.is_file():
-        errors.append("cotend-model-upgrade packet templates are missing")
-
-
-def verify_legacy_brand_boundary(errors: list[str]) -> None:
-    private_patterns = (
-        re.compile(r"\bstartskills\b", re.IGNORECASE),
-        re.compile(r"[A-Za-z]:\\Users\\", re.IGNORECASE),
-    )
-    maintainer_residue_patterns = (
-        re.compile(r"\bthis user's\b", re.IGNORECASE),
-        re.compile(r"\bon this machine\b", re.IGNORECASE),
-        re.compile(r"codegraph-mcp\.ps1", re.IGNORECASE),
-        re.compile(r"\bDEC-\d{3}\b"),
-        re.compile(r"\bv1\.50\b", re.IGNORECASE),
-        re.compile(r"skills-backup|SKILLS-INDEX|command-backups", re.IGNORECASE),
-        re.compile(
-            r"report in Chinese|written in Chinese|must be Chinese", re.IGNORECASE
-        ),
-        re.compile(r"^\s*language:\s*zh-CN\s*$", re.IGNORECASE),
-    )
-    for path in (ROOT / "skills").rglob("*"):
+    for relative, markers in REQUIRED_MARKERS.items():
+        path = skill_root / relative
         if not path.is_file():
+            errors.append(f"required marker file missing: {relative}")
             continue
-        try:
-            text = path.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
+        text = path.read_text(encoding="utf-8")
+        for marker in markers:
+            if marker not in text:
+                errors.append(f"required marker missing: {relative}: {marker}")
+
+    forbidden: list[str] = []
+    private_path = "private-dual-adapter"
+    for path in skill_root.rglob("*"):
+        if not path.is_file() or "__pycache__" in path.parts or path.suffix == ".pyc":
             continue
         relative = path.relative_to(ROOT).as_posix()
-        for number, line in enumerate(text.splitlines(), start=1):
-            if re.search(r"dual-ai", line, re.IGNORECASE):
-                allowed = LEGACY_ALLOWLIST.get(relative, ())
-                if not any(fragment.lower() in line.lower() for fragment in allowed):
-                    errors.append(
-                        f"legacy brand outside allowlist: {relative}:{number}"
-                    )
-            if re.search(r"Dual AI|Dual Model", line):
-                errors.append(f"legacy display brand remains: {relative}:{number}")
-            if any(pattern.search(line) for pattern in private_patterns):
-                errors.append(
-                    f"private path or identifier in Skill: {relative}:{number}"
-                )
-            if any(pattern.search(line) for pattern in maintainer_residue_patterns):
-                errors.append(
-                    f"private maintainer residue in Skill: {relative}:{number}"
-                )
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        if "trellis" in text.casefold() or private_path in text.casefold():
+            forbidden.append(relative)
+    if forbidden:
+        errors.append(f"legacy/private carrier residue in product Skills: {forbidden}")
 
+    catalog_path = skill_root / "cotend-tooling/references/capability-catalog.json"
+    catalog = load_json(catalog_path)
+    optional_records = [
+        item
+        for item in catalog.get("records", [])
+        if isinstance(item, dict) and item.get("id") == "karpathy-guidelines"
+    ]
+    if len(optional_records) != 1 or (
+        optional_records[0].get("adoption_disposition"),
+        optional_records[0].get("runtime_state"),
+        optional_records[0].get("eligible_routes"),
+    ) != ("adopt_partial", "available", ["call"]):
+        errors.append("optional Karpathy catalog boundary drift")
 
-def verify_third_party(upstream_repo: Path, errors: list[str]) -> None:
-    grill_target = ROOT / "skills" / "grill-me" / "SKILL.md"
-    try:
-        expected_grill = tagged_file(
-            upstream_repo, "codex-skills/grill-me/SKILL.md"
-        )
-    except subprocess.CalledProcessError as exc:
-        errors.append(f"cannot read tagged third-party Skill grill-me: {exc}")
-    else:
-        if not grill_target.is_file() or grill_target.read_bytes() != expected_grill:
-            errors.append("third-party Skill is not byte-identical: grill-me")
-
-    karpathy_target = ROOT / "skills" / "karpathy-guidelines" / "SKILL.md"
-    try:
-        karpathy_source = git_bytes(
-            upstream_repo,
-            "show",
-            f"{SOURCE_COMMIT}:{SOURCE_ROOT}/karpathy-guidelines/SKILL.md",
-        )
-    except subprocess.CalledProcessError as exc:
-        errors.append(f"cannot read exact-source karpathy-guidelines: {exc}")
-    else:
-        if not karpathy_target.is_file():
-            errors.append("adapted third-party Skill is missing: karpathy-guidelines")
-        else:
-            karpathy_bytes = karpathy_target.read_bytes()
-            if karpathy_bytes == karpathy_source:
-                errors.append("karpathy-guidelines lost the required CoTend adaptation")
-            karpathy_text = karpathy_bytes.decode("utf-8")
-            if (
-                "When CoTend governance is active" not in karpathy_text
-                or "When Dual governance is active" in karpathy_text
-            ):
-                errors.append("karpathy-guidelines CoTend authority adaptation drift")
-
-    for skill_id in ("grill-me", "karpathy-guidelines"):
-        try:
-            license_name = f"{skill_id}-MIT.txt"
-            expected_license = tagged_file(
-                upstream_repo, f"THIRD-PARTY-LICENSES/{license_name}"
-            )
-        except subprocess.CalledProcessError as exc:
-            errors.append(
-                f"cannot read tagged third-party license {license_name}: {exc}"
-            )
-            continue
-        license_path = ROOT / "THIRD-PARTY-LICENSES" / license_name
-        if not license_path.is_file() or license_path.read_bytes() != expected_license:
-            errors.append(f"third-party license is not byte-identical: {license_name}")
-
-    try:
-        registry = load_json(ROOT / "THIRD-PARTY-SOURCES.json")
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        errors.append(f"cannot load third-party source registry: {exc}")
-        return
-    components = registry.get("components")
-    if not isinstance(components, list) or len(components) != 2:
-        errors.append("third-party source registry must contain exactly two components")
-        return
-    by_name = {
-        item.get("component"): item for item in components if isinstance(item, dict)
-    }
-    for skill_id in ("grill-me", "karpathy-guidelines"):
-        item = by_name.get(skill_id)
-        if item is None:
-            errors.append(f"third-party registry entry is missing: {skill_id}")
-            continue
-        expected_registry_tree = (
-            SKILLS[skill_id]["tree"]
-            if skill_id == "grill-me"
-            else "e119339197d600aa39a24fd7a95c946800c9c949"
-        )
-        if item.get("source_tree") != expected_registry_tree:
-            errors.append(f"third-party registry source tree drift: {skill_id}")
-        if item.get("license") != "MIT":
-            errors.append(f"third-party registry license drift: {skill_id}")
-        expected_policy = (
-            "byte_identical_to_tagged_release"
-            if skill_id == "grill-me"
-            else "cotend_adapted_from_reviewed_source"
-        )
-        if item.get("content_policy") != expected_policy:
-            errors.append(f"third-party registry content policy drift: {skill_id}")
-        if item.get("relationship") != "adapted_third_party":
-            errors.append(f"third-party registry relationship drift: {skill_id}")
-        if item.get("line_ending_policy") != "text_eol_lf":
-            errors.append(f"third-party registry line-ending policy drift: {skill_id}")
-    attributes_path = ROOT / ".gitattributes"
-    if not attributes_path.is_file():
-        errors.append(".gitattributes is missing for protected third-party files")
-    else:
-        attributes = attributes_path.read_text(encoding="utf-8")
-        for protected_path in (
-            "/skills/grill-me/SKILL.md",
-            "/skills/karpathy-guidelines/SKILL.md",
-            "/THIRD-PARTY-LICENSES/grill-me-MIT.txt",
-            "/THIRD-PARTY-LICENSES/karpathy-guidelines-MIT.txt",
+    routed_karpathy = []
+    for path in skill_root.rglob("*"):
+        if (
+            not path.is_file()
+            or "karpathy-guidelines" in path.parts
+            or path.name == "framework-impact-index.json"
+            or path == catalog_path
         ):
-            if f"{protected_path} text eol=lf" not in attributes:
-                errors.append(
-                    f"protected third-party LF policy is missing: {protected_path}"
-                )
-    notice_path = ROOT / "THIRD-PARTY-NOTICES.md"
-    if not notice_path.is_file():
-        errors.append("third-party notice is missing")
-        return
-    notice = notice_path.read_text(encoding="utf-8")
-    for marker in ("## grill-me", "## karpathy-guidelines", "does not relicense"):
-        if marker not in notice:
-            errors.append(f"third-party notice marker is missing: {marker}")
-    cotend_notice = ROOT / "NOTICE"
-    if not cotend_notice.is_file() or not cotend_notice.read_text(
-        encoding="utf-8"
-    ).startswith("CoTend\n"):
-        errors.append("NOTICE does not identify CoTend")
-
-
-def verify_capability_map(errors: list[str], final: bool) -> None:
-    try:
-        mapping = load_json(ROOT / "upstream" / "CAPABILITY-IMPLEMENTATION-MAP.json")
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        errors.append(f"cannot load capability implementation map: {exc}")
-        return
-    expected_state = "adopted_verified" if final else "implementation_in_progress"
-    if mapping.get("status") != expected_state:
-        errors.append("capability implementation map status mismatch")
-    capabilities = mapping.get("capabilities")
-    if not isinstance(capabilities, list):
-        errors.append("capability implementation map entries are invalid")
-        return
-    by_id = {
-        item.get("capability_id"): item
-        for item in capabilities
-        if isinstance(item, dict)
-    }
-    expected_ids = {f"C{number:02d}" for number in range(1, 20)}
-    if set(by_id) != expected_ids:
-        errors.append("capability implementation map must contain C01-C19")
-        return
-    for capability_id, item in by_id.items():
-        if item.get("upstream_productization_trace") != "mapped":
-            errors.append(f"capability trace is not mapped: {capability_id}")
-        mode = item.get("implementation_mode")
-        if mode not in {"platform_adaptation", "mixed"}:
-            errors.append(f"capability implementation mode is invalid: {capability_id}")
-        expected_coverage = "mapped_partial" if capability_id == "C16" else "mapped"
-        if item.get("coverage_status") != expected_coverage:
-            errors.append(f"capability coverage status mismatch: {capability_id}")
-        if capability_id == "C16" and not item.get("deferred_gap"):
-            errors.append("C16 must record the deferred live-delivery gap")
-        owners = item.get("owners")
-        if not isinstance(owners, list) or not owners:
-            errors.append(f"capability owners are missing: {capability_id}")
-        else:
-            for owner in owners:
-                if not isinstance(owner, str) or not (ROOT / owner).is_file():
-                    errors.append(
-                        f"capability owner path is invalid: {capability_id}: {owner}"
-                    )
-        spec_path = next(
-            (ROOT / "docs" / "behavior-specs").glob(f"{capability_id}-*.md"), None
-        )
-        if spec_path is None:
-            errors.append(f"behavior spec is missing: {capability_id}")
             continue
-        spec_text = spec_path.read_text(encoding="utf-8")
-        if metadata_value(spec_text, "upstream_productization_trace") != "mapped":
-            errors.append(f"behavior spec trace mismatch: {capability_id}")
-        if metadata_value(spec_text, "implementation_mode") != mode:
-            errors.append(
-                f"behavior spec implementation mode mismatch: {capability_id}"
-            )
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        if "karpathy-guidelines" in text.casefold():
+            routed_karpathy.append(path.relative_to(ROOT).as_posix())
+    if routed_karpathy:
+        errors.append(f"optional Karpathy companion remains routed: {routed_karpathy}")
+    return paths, manifest_digest(paths)
 
 
-def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> None:
-    try:
-        lock = load_json(ROOT / "upstream" / "framework.lock.json")
-        target_lock = load_json(ROOT / "delivery" / "codex-artifact.lock.json")
-        candidate = load_json(ROOT / "upstream" / "FRAMEWORK-CANDIDATE.json")
-        role_map = load_json(ROOT / "upstream" / "CODEX-SKILL-ROLE-MAP.json")
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        errors.append(f"cannot load final adoption records: {exc}")
-        return
-    expected_lock = {
-        "schema": "cotend.framework-lock",
-        "release_id": SOURCE_IDENTITY,
-        "framework_protocol": "cotend-collaboration-v1.79",
-        "model_upgrade_packet_family": "cotend-model-upgrade-v1.14",
-        "skill_count": 10,
-        "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-        "adoption_record": (
-            "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-08-01-1-v1-79-adoption"
-        ),
-    }
-    for key, expected in expected_lock.items():
-        if lock.get(key) != expected:
-            errors.append(f"framework lock mismatch: {key}")
-    expected_source_anchor = {
-        "type": "exact_source_commit",
-        "publication_state": "not_public_release",
-        "commit": SOURCE_COMMIT,
-        "canonical_source_tree": SOURCE_TREE,
-        "canonical_source_tree_path": SOURCE_ROOT,
-        "consumer_handoff": {
-            "id": "2026.08.01.1",
-            "schema": "dual-ai.consumer-range-handoff",
-            "schema_version": 1,
-            "handoff_json_sha256": (
-                "4d16e8a1ba29a2a71e0974e79f0967b2ec4cfa8afe42e0d24c43b32102df47af"
-            ),
-            "handoff_markdown_sha256": (
-                "fe8dfcbd787cfa9116567f6f2730dd3bb345b0774a882c1a4987614394d6c52c"
-            ),
-            "checksums_sha256": (
-                "6ea9ad1602d3cc331314b2ec8b06e7f29019b6715dfc553da7c1481d9cd3ea3a"
-            ),
-        },
-    }
-    if lock.get("status") != "adopted_verified":
-        errors.append("framework lock status is not adopted_verified")
-    if lock.get("source_anchor") != expected_source_anchor:
-        errors.append("framework lock exact source anchor drift")
+def verify_records(paths: list[str], digest: str, errors: list[str]) -> None:
+    lock = load_json(ROOT / "upstream" / "framework.lock.json")
+    artifact = load_json(ROOT / "delivery" / "codex-artifact.lock.json")
+    candidate = load_json(ROOT / "upstream" / "FRAMEWORK-CANDIDATE.json")
+    role_map = load_json(ROOT / "upstream" / "CODEX-SKILL-ROLE-MAP.json")
+    capability = load_json(ROOT / "upstream" / "CAPABILITY-IMPLEMENTATION-MAP.json")
+
     if (
-        lock.get("source_carrier") != "skills/"
-        or lock.get("skill_file_count") != 69
+        lock.get("status") != "adopted_verified"
+        or lock.get("release_id") != SOURCE_IDENTITY
+        or lock.get("framework_protocol") != "cotend-collaboration-v2.01"
+        or lock.get("model_upgrade_packet_family")
+        != "cotend-model-upgrade-v1.16"
+        or lock.get("skill_count") != 10
+        or lock.get("source_skill_count") != 9
+        or lock.get("skill_file_count") != SOURCE_FILE_COUNT
     ):
-        errors.append("framework lock source carrier or file count drift")
-    expected_trees = {source_id: record["tree"] for source_id, record in SKILLS.items()}
+        errors.append("framework lock current identity/count drift")
+    anchor = lock.get("source_anchor")
+    if not isinstance(anchor, dict) or (
+        anchor.get("commit"),
+        anchor.get("canonical_source_tree"),
+    ) != (SOURCE_COMMIT, SOURCE_TREE):
+        errors.append("framework lock source anchor drift")
+    expected_trees = {
+        source: record["tree"] for source, record in SOURCE_SKILLS.items()
+    }
     if lock.get("source_skill_trees") != expected_trees:
         errors.append("framework lock source Skill tree inventory drift")
-    carrier_files = {
-        path.relative_to(ROOT / "skills").as_posix(): hashlib.sha256(
-            path.read_bytes()
-        ).hexdigest()
-        for path in sorted((ROOT / "skills").rglob("*"))
-        if path.is_file()
-    }
-    carrier_manifest = hashlib.sha256(
-        json.dumps(
-            carrier_files,
-            ensure_ascii=True,
-            separators=(",", ":"),
-            sort_keys=True,
-        ).encode("utf-8")
-    ).hexdigest()
-    expected_target_lock = {
-        "schema": "cotend.target-artifact-lock",
-        "schema_version": 1,
-        "status": "verified",
-        "source": {
-            "framework_lock": "upstream/framework.lock.json",
-            "release_id": lock.get("release_id"),
-            "carrier": lock.get("source_carrier"),
-            "framework_protocol": lock.get("framework_protocol"),
-        },
-        "target": {
-            "platform": "Codex",
-            "lineage": "cotend-codex",
-            "artifact_id": "cotend-codex-r000016",
-            "revision": 16,
-            "manifest_sha256": carrier_manifest,
-        },
-        "product": {"version": None},
-        "skill_count": 10,
-        "skill_file_count": 71,
-        "predecessor_targets": [
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000015",
-                "revision": 15,
-                "source_release_id": (
-                    "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14"
-                ),
-                "framework_protocol": "cotend-collaboration-v1.76",
-                "manifest_sha256": (
-                    "acc17586cf713acc85fef9e6be02013de6bc012b7864ade22bed495ee68a9e7b"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000014",
-                "revision": 14,
-                "source_release_id": (
-                    "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
-                ),
-                "framework_protocol": "cotend-collaboration-v1.71",
-                "manifest_sha256": (
-                    "07ac592c82ed87f1759b38f04ed1f453c44e21d454fd12b4ce9eca459e4f3ed4"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000013",
-                "revision": 13,
-                "source_release_id": "2026.07.28.2",
-                "framework_protocol": "cotend-collaboration-v1.67",
-                "manifest_sha256": (
-                    "39e1455b11f482d80d33dff421e0db5c08182f597c175f0391bd679750f903fd"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000012",
-                "revision": 12,
-                "source_release_id": "2026.07.28.1",
-                "framework_protocol": "cotend-collaboration-v1.66",
-                "manifest_sha256": (
-                    "44419b00c17ab0036477c6c3b9843f239a6a567ee714ccf7828b40a4af195276"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000011",
-                "revision": 11,
-                "source_release_id": "2026.07.23.2",
-                "framework_protocol": "cotend-collaboration-v1.65",
-                "manifest_sha256": (
-                    "eac48844295f9ba12d64df469aa25fab9e76a8c9ceb9817857350b5029767627"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000010",
-                "revision": 10,
-                "source_release_id": "2026.07.23.2",
-                "framework_protocol": "cotend-collaboration-v1.65",
-                "manifest_sha256": (
-                    "0715c20f517f906996d4882e47c664449a23cf6f7747b6a2d42835f35591b8a9"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000009",
-                "revision": 9,
-                "source_release_id": "2026.07.23.2",
-                "framework_protocol": "cotend-collaboration-v1.65",
-                "manifest_sha256": (
-                    "32049aa36e25d0a46eacf92ce2cf06c42b688947e93fc3c6d6b1ae478a019072"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000008",
-                "revision": 8,
-                "source_release_id": "2026.07.23.2",
-                "framework_protocol": "cotend-collaboration-v1.65",
-                "manifest_sha256": (
-                    "84c4c02a2d56502b7ed9457fad23e0077ff8a9cf567c544ea7fdaf54c6a94bc3"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000007",
-                "revision": 7,
-                "source_release_id": "2026.07.23.2",
-                "framework_protocol": "cotend-collaboration-v1.65",
-                "manifest_sha256": (
-                    "246b16c990a85a2e183e0033c0b3a15a087e793ce0ace1f18e3d736f5a8fd045"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000006",
-                "revision": 6,
-                "source_release_id": "2026.07.23.2",
-                "framework_protocol": "cotend-collaboration-v1.65",
-                "manifest_sha256": (
-                    "58410dbbf9ab0945af62cea0583938c5f5bc733634a72035c5b06e6c71073271"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000005",
-                "revision": 5,
-                "source_release_id": "2026.07.23.2",
-                "framework_protocol": "cotend-collaboration-v1.65",
-                "manifest_sha256": (
-                    "319f9f889b400d7a642de6ac81319ceac4aea493209b7b5527dd947f9ccade23"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000004",
-                "revision": 4,
-                "source_release_id": "2026.07.23.2",
-                "framework_protocol": "cotend-collaboration-v1.65",
-                "manifest_sha256": (
-                    "9b82dc8689e19c9d95c7b867c18adc3b50d32d7c82aa772b6d397aa3a70a4abd"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000003",
-                "revision": 3,
-                "source_release_id": "2026.07.23.2",
-                "framework_protocol": "cotend-collaboration-v1.65",
-                "manifest_sha256": (
-                    "ae7c033c3038af5de34623d683c60f78370921dd80788785d52257f7c82f4fac"
-                ),
-            },
-            {
-                "platform": "Codex",
-                "lineage": "cotend-codex",
-                "artifact_id": "cotend-codex-r000002",
-                "revision": 2,
-                "source_release_id": "2026.07.23.2",
-                "framework_protocol": "cotend-collaboration-v1.65",
-                "manifest_sha256": (
-                    "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b"
-                ),
-            }
-        ],
-        "legacy_receipt_mappings": [
-            {
-                "receipt_schema_version": 1,
-                "artifact_id": "2026.07.23.2",
-                "protocol": "cotend-collaboration-v1.65",
-                "manifest_sha256": (
-                    "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b"
-                ),
-                "target_artifact_id": "cotend-codex-r000002",
-                "target_revision": 2,
-            },
-            {
-                "receipt_schema_version": 1,
-                "artifact_id": "2026.07.11.3",
-                "protocol": "cotend-collaboration-v1.52",
-                "manifest_sha256": (
-                    "f8ed51e76a19fb26debcb998fb2c5f8505908f5d73d4cf5351ea52a1c915c049"
-                ),
-                "target_artifact_id": "cotend-codex-r000001",
-                "target_revision": 1,
-            }
-        ],
-    }
-    if target_lock != expected_target_lock:
-        errors.append("Codex target artifact lock drift")
     mappings = lock.get("skill_mapping")
-    if not isinstance(mappings, list):
-        errors.append("framework lock Skill mapping is invalid")
-    else:
-        by_source = {
-            item.get("source"): item for item in mappings if isinstance(item, dict)
-        }
-        if len(mappings) != 10 or len(by_source) != 10 or set(by_source) != set(SKILLS):
-            errors.append("framework lock must map exactly ten source Skills")
-        for source_id, record in SKILLS.items():
-            item = by_source.get(source_id)
-            if item is None:
-                continue
-            expected_disposition = (
-                "adapted" if record["mode"] == "adapted" else "adopted"
-            )
-            expected_mode = (
-                "direct_adoption"
-                if record["mode"] == "adopted"
-                else "platform_adaptation"
-            )
-            if (
-                item.get("target"),
-                item.get("disposition"),
-                item.get("implementation_mode"),
-            ) != (record["target"], expected_disposition, expected_mode):
-                errors.append(f"framework lock Skill mapping drift: {source_id}")
-    boundaries = lock.get("delivery_boundaries")
-    if boundaries != {
-        "repository_source_adopted": True,
-        "live_install_performed": False,
-        "plugin_or_marketplace_carrier": "github_root_candidate_local_verified",
-        "claude_carrier": "deferred",
-        "push_release_or_publish": "not_performed",
-    }:
-        errors.append("framework lock delivery boundaries drift")
-    for forbidden_key in (
-        "adoption_commit",
-        "resulting_commit",
-        "containing_commit_hash",
-    ):
-        if forbidden_key in lock:
-            errors.append(
-                f"framework lock embeds a forbidden self hash: {forbidden_key}"
-            )
-    anchor = lock.get("adoption_anchor")
-    if anchor != {"type": "containing_commit", "path": "upstream/framework.lock.json"}:
-        errors.append("framework lock containing-commit anchor mismatch")
+    if not isinstance(mappings, list) or {
+        item.get("target") for item in mappings if isinstance(item, dict)
+    } != set(PRODUCT_SKILLS):
+        errors.append("framework lock target mapping drift")
+    companions = lock.get("retained_optional_companions")
     if (
-        candidate.get("status") != "adopted_verified"
-        or candidate.get("candidate_only") is not False
+        not isinstance(companions, list)
+        or len(companions) != 1
+        or companions[0].get("target") != "karpathy-guidelines"
+        or companions[0].get("routing") != "non_default_non_owner"
     ):
-        errors.append("framework candidate record is not finalized as adopted")
-    candidate_adoption = candidate.get("adoption")
-    if (
-        not isinstance(candidate_adoption, dict)
-        or candidate_adoption.get("state") != "adopted"
-    ):
-        errors.append("framework candidate adoption state is not adopted")
-    else:
-        imported = candidate_adoption.get("imported_files")
-        adapted = candidate_adoption.get("adapted_files")
-        if not isinstance(imported, list) or not isinstance(adapted, list):
-            errors.append("framework candidate file-level inventory is invalid")
-        else:
-            recorded = set(imported) | set(adapted)
-            actual = {
-                path.relative_to(ROOT).as_posix()
-                for path in (ROOT / "skills").rglob("*")
-                if path.is_file()
-            }
-            if (
-                len(imported) != len(set(imported))
-                or len(adapted) != len(set(adapted))
-                or set(imported) & set(adapted)
-                or recorded != actual
-                or len(actual) != 71
-            ):
-                errors.append(
-                    "framework candidate inventory does not equal the 71 current Skill files"
-                )
-        if candidate_adoption.get("final_framework_lock_exists") is not True:
-            errors.append("framework candidate does not record the final lock")
-        if candidate_adoption.get("required_before_lock") != []:
-            errors.append(
-                "framework candidate retains unresolved pre-lock requirements"
-            )
-    if role_map.get("status") != "adopted_verified":
-        errors.append("Codex role map is not finalized as adopted")
-    role_adoption = role_map.get("adoption")
-    if not isinstance(role_adoption, dict) or role_adoption.get("state") != "adopted":
-        errors.append("Codex role-map adoption state is not adopted")
-    else:
-        if role_adoption.get("live_install_performed") is not False:
-            errors.append("Codex role map incorrectly claims a live install")
-        if role_adoption.get("final_framework_lock_exists") is not True:
-            errors.append("Codex role map does not record the final lock")
-    if role_map.get("public_interface_authority") != (
-        "codex_skill_source_set_adopted_live_delivery_pending"
-    ):
-        errors.append("Codex role map interface authority drift")
-    entries = role_map.get("skills")
-    if not isinstance(entries, list):
-        errors.append("Codex role map Skill entries are invalid")
-    else:
-        by_source = {
-            item.get("source_skill_id"): item
-            for item in entries
-            if isinstance(item, dict)
-        }
-        if len(entries) != 10 or len(by_source) != 10 or set(by_source) != set(SKILLS):
-            errors.append("Codex role map must contain exactly ten source Skills")
-        for source_id, record in SKILLS.items():
-            item = by_source.get(source_id)
-            if item is None:
-                errors.append(f"Codex role map Skill is missing: {source_id}")
-                continue
-            expected_disposition = (
-                "adapted" if record["mode"] == "adapted" else "adopted"
-            )
-            expected_mode = (
-                "direct_adoption"
-                if record["mode"] == "adopted"
-                else "platform_adaptation"
-            )
-            if (
-                item.get("target_skill_id"),
-                item.get("adoption_status"),
-                item.get("implementation_mode"),
-            ) != (record["target"], expected_disposition, expected_mode):
-                errors.append(f"Codex role map target mapping drift: {source_id}")
-    adoption_log = ROOT / "upstream" / "FRAMEWORK-ADOPTION-LOG.md"
-    if not adoption_log.is_file():
-        errors.append("framework adoption log is missing")
-    else:
-        log_text = adoption_log.read_text(encoding="utf-8")
-        for marker in (
-            "## exact-source-2026-08-01-1-v1-79-adoption",
-            "status: adopted_verified_local",
-            "resulting_CoTend_commit: containing_commit",
-        ):
-            if marker not in log_text:
-                errors.append(f"framework adoption log marker is missing: {marker}")
+        errors.append("framework lock optional companion boundary drift")
 
-    if allow_uncommitted_anchor:
+    source = artifact.get("source")
+    target = artifact.get("target")
+    predecessors = artifact.get("predecessor_targets")
+    if not isinstance(source, dict) or not isinstance(target, dict):
+        errors.append("artifact lock sections invalid")
+    else:
+        if (
+            source.get("release_id"),
+            source.get("framework_protocol"),
+        ) != (SOURCE_IDENTITY, "cotend-collaboration-v2.01"):
+            errors.append("artifact source identity drift")
+        if (
+            target.get("artifact_id"),
+            target.get("revision"),
+            target.get("manifest_sha256"),
+        ) != ("cotend-codex-r000017", 17, digest):
+            errors.append("artifact target identity or manifest drift")
+    if (
+        artifact.get("skill_count"),
+        artifact.get("skill_file_count"),
+    ) != (10, PRODUCT_FILE_COUNT):
+        errors.append("artifact product count drift")
+    if (
+        not isinstance(predecessors, list)
+        or not predecessors
+        or predecessors[0].get("artifact_id") != "cotend-codex-r000016"
+        or predecessors[0].get("revision") != 16
+        or predecessors[0].get("source_release_id")
+        != f"exact-source:{SOURCE_BASE_COMMIT}"
+        or predecessors[0].get("manifest_sha256")
+        != "a7f7ece2522a5901030e19cd5944359f80c027482f66f822a2053fc5080dcfb5"
+    ):
+        errors.append("r16 predecessor lock drift")
+
+    expected_status = "adopted_verified"
+    for label, value in (
+        ("candidate", candidate),
+        ("role map", role_map),
+        ("capability map", capability),
+    ):
+        if value.get("status") != expected_status:
+            errors.append(f"{label} status is not adopted_verified")
+        if value.get("source_anchor", value.get("source_release")) not in (
+            SOURCE_COMMIT,
+            SOURCE_IDENTITY,
+        ):
+            errors.append(f"{label} source anchor drift")
+    if candidate.get("candidate_release") != SOURCE_IDENTITY:
+        errors.append("candidate release identity drift")
+    adoption = candidate.get("adoption")
+    if not isinstance(adoption, dict):
+        errors.append("candidate adoption record missing")
+    else:
+        recorded = set(adoption.get("imported_files", [])) | set(
+            adoption.get("adapted_files", [])
+        )
+        expected = {f"skills/{path}" for path in paths}
+        if recorded != expected:
+            errors.append("candidate file inventory differs from product Skills")
+    if role_map.get("skill_count") != 10:
+        errors.append("role map product Skill count drift")
+    if capability.get("capability_count") != 19:
+        errors.append("capability count drift")
+
+
+def verify_containing_commit(errors: list[str], *, allow_uncommitted: bool) -> None:
+    if allow_uncommitted:
         return
     try:
-        head = git_text(ROOT, "rev-parse", "HEAD")
         lock_status = git_text(
             ROOT,
             "status",
@@ -1051,6 +504,9 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
             "--",
             "upstream/framework.lock.json",
         )
+        if lock_status:
+            errors.append("framework lock has uncommitted changes")
+            return
         lock_commit = git_text(
             ROOT,
             "log",
@@ -1059,7 +515,7 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
             "--",
             "upstream/framework.lock.json",
         )
-        changed_paths = set(
+        paths = set(
             git_text(
                 ROOT,
                 "show",
@@ -1069,24 +525,16 @@ def verify_final_records(errors: list[str], allow_uncommitted_anchor: bool) -> N
             ).splitlines()
         )
     except subprocess.CalledProcessError as exc:
-        errors.append(f"cannot resolve containing-commit anchor: {exc}")
+        errors.append(f"cannot resolve containing commit: {exc}")
         return
-    if lock_status:
-        errors.append("framework lock has uncommitted changes")
-    try:
-        git_text(ROOT, "merge-base", "--is-ancestor", lock_commit, head)
-    except subprocess.CalledProcessError:
-        errors.append("framework lock containing commit is not an ancestor of HEAD")
-    for path in (
+    for required in (
         "upstream/framework.lock.json",
         "upstream/FRAMEWORK-ADOPTION-LOG.md",
     ):
-        if path not in changed_paths:
-            errors.append(f"containing adoption commit does not change {path}")
-    if not any(path.startswith("skills/") for path in changed_paths):
-        errors.append(
-            "containing adoption commit does not change the adopted Skill set"
-        )
+        if required not in paths:
+            errors.append(f"containing commit does not include {required}")
+    if not any(path.startswith("skills/") for path in paths):
+        errors.append("containing commit does not include product Skills")
 
 
 def verify(
@@ -1096,43 +544,28 @@ def verify(
     allow_uncommitted_anchor: bool,
 ) -> list[str]:
     errors: list[str] = []
-    try:
-        if git_text(upstream_repo, "cat-file", "-t", SOURCE_COMMIT) != "commit":
-            errors.append("exact source anchor is not a commit")
-        if (
-            git_text(upstream_repo, "rev-parse", f"{SOURCE_COMMIT}:{SOURCE_ROOT}")
-            != SOURCE_TREE
-        ):
-            errors.append("exact source canonical tree drift")
-        if git_text(upstream_repo, "cat-file", "-t", TAG) != "tag":
-            errors.append("latest public release history is not an annotated tag")
-    except subprocess.CalledProcessError as exc:
-        return [f"cannot resolve exact source or release-history anchor: {exc}"]
-    verify_source_topology(upstream_repo, errors)
-    verify_skill_metadata(errors)
-    verify_references(errors)
-    verify_legacy_brand_boundary(errors)
-    verify_third_party(upstream_repo, errors)
-    verify_capability_map(errors, final=not pre_lock)
-    lock_path = ROOT / "upstream" / "framework.lock.json"
-    if pre_lock:
-        if lock_path.exists():
-            errors.append("framework lock exists during pre-lock verification")
-    else:
-        verify_final_records(errors, allow_uncommitted_anchor)
+    verify_source(upstream_repo, errors)
+    verify_handoff(upstream_repo, errors)
+    paths, digest = verify_product(errors)
+    if not pre_lock:
+        verify_records(paths, digest, errors)
+        verify_containing_commit(
+            errors,
+            allow_uncommitted=allow_uncommitted_anchor,
+        )
     return errors
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Verify CoTend's adopted Codex Skill set against tagged upstream Git objects."
+        description="Verify CoTend v2.01/r17 against the exact Dual source handoff."
     )
     parser.add_argument("--upstream-repo", type=Path, required=True)
     parser.add_argument("--pre-lock", action="store_true")
     parser.add_argument("--allow-uncommitted-anchor", action="store_true")
     args = parser.parse_args()
     if args.pre_lock and args.allow_uncommitted_anchor:
-        parser.error("--allow-uncommitted-anchor is only valid for final verification")
+        parser.error("--allow-uncommitted-anchor is final-verification only")
     errors = verify(
         args.upstream_repo.resolve(),
         pre_lock=args.pre_lock,
@@ -1146,7 +579,8 @@ def main() -> int:
     print(
         "ADOPTED_SKILL_SET_VERIFICATION_OK "
         f"mode={'pre_lock' if args.pre_lock else 'final'} "
-        "skills=10 files=71 capabilities=19"
+        "source_skills=9 source_files=94 product_skills=10 product_files=104 "
+        "capabilities=19"
     )
     return 0
 

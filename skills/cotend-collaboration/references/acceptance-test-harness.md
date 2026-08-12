@@ -1,290 +1,163 @@
 # Acceptance And Test Harness
 
-Use this module when work is implemented, verification is being planned, a review/handoff needs evidence, a UI/browser flow changed, AI UAT is about to run, a release/public handoff is near, or a decision-relevant capability completion claim must be tested against evidence.
+Use this base module when implemented work needs verification, a review or
+handoff needs evidence, AI UAT is about to run, a release/public handoff is
+near, or a decision-relevant capability/closure result needs observation. Add
+`browser-acceptance.md`, `governance-language-acceptance.md`, or
+`capability-completion.md` only on its own trigger.
 
-This module chooses the verification surface and owns capability-completion evidence semantics. It does not replace the Checker result contract in `verification-pass.md`, user acceptance, `ai-uat.md`, Release Hardening, or project-specific tests.
+This module owns verification-surface selection and direct observations. The
+single current result shape, field meanings, evidence enums, freshness and
+derivation rules live only in `semantic-contract-templates.md` under
+`cotend.execution-closure.v1`. Contribute to that result's `acceptance`
+section; never emit a parallel current `acceptance_test_harness` packet.
 
-## Principles
+## Responsibilities
 
-- Prefer the cheapest verification that directly proves the current slice or discriminates a live material route uncertainty.
-- Do not stop at "code compiles" when the change is user-visible.
-- Do not run a full browser/UAT matrix for every tiny internal edit.
-- Record skipped checks and why they were not useful or not runnable.
-- AI-generated acceptance is evidence, not final user acceptance.
-- Decision-relevant claims must map to evidence. Use the shared evidence vocabulary: `executed`, `inspection`, `asserted_by_rule`, `deferred`, or `not_run`.
-- Product meaning, implementation, data, integration, verification, and operational readiness are different facts. Do not promote one proven slice into a broader capability claim.
-- A material Route Rebase may classify old completion evidence as needing refresh or invalidation, but it cannot set a completion result. This Harness alone re-derives the exact-scope claim from current evidence.
-- In multi-agent work, every write packet still proves its exact local scope before integration. The root then proves the integrated path; a centralized terminal batch cannot replace skipped packet-level verification.
-- Project Init alone resolves user-facing governance language. This Harness consumes the persisted normalized tag and verifies changed governance bytes; it never infers or re-resolves a language.
-- Outcome correspondence outranks convenience: evidence must exercise the behavior and conditions that decide the claim or route, not merely a nearby proxy that is easy to measure.
+- Derive the smallest obligations that distinguish the exact promised outcome,
+  including required normal, degraded, blocked, data and user/system behavior.
+- Choose the cheapest surface that can observe each obligation under its real
+  use conditions.
+- Record observations, evidence pointers, skipped checks and proxy limits in
+  the one `execution_closure` result.
+- Derive that section's aggregate `acceptance.result` only by the canonical
+  required-obligation rule; never let a hand-written pass label override an
+  observation.
+- Preserve packet-local evidence in multi-agent work, then re-observe the
+  integrated path where the result depends on integration.
+- Leave capability sufficiency to `capability-completion.md` and material
+  lifecycle/advance to `semantic-implementation-closure.md`.
 
-## Verification Ladder
+This module does not replace user acceptance, `Native Verification Pass`, AI UAT, Release
+Hardening, formal review, or project-specific tests.
 
-Choose the lowest tier that can honestly prove the current work, then add higher tiers when triggers apply.
+## Trigger And Detail Level
 
-| Tier | Use When | Typical Tools / Evidence |
-|---|---|---|
-| `static` | Most code/doc/config changes. | lint, typecheck, build, unit tests, `git diff --check`, schema checks. |
-| `integration` | Cross-module, API, data, persistence, queue, CLI, or service behavior changed. | integration tests, smoke command, test DB/disposable data, API probe. |
-| `browser_smoke` | User-visible web UI, route, form, navigation, rendering, or local preview changed. | `browser:control-in-app-browser` for local quick checks, `playwright` for repeatable flow/screenshot checks. |
-| `chrome_real_profile` | Verification depends on the user's real Chrome state. | `chrome:control-chrome`. |
-| `ai_uat` | Feature seems built but needs product-goal acceptance simulation. | `references/ai-uat.md` plus real interaction when possible. |
-| `release_hardening` | Public/deploy/release/share-with-others boundary appears. | `references/release-hardening.md`, security/privacy/secrets checks, user approval. |
+For an ordinary decision-useful verification checkpoint, contribute a compact
+`evidence_slice`. Do not add six dimensions, route boundaries, or a navigation
+decision. A one-off routine test or formatting check may remain only in its
+normal command/task evidence when no durable decision will consume it.
 
-## Browser Tool Routing
+Use `material_node_closure` only when Capability Completion or Semantic
+Implementation Closure triggers. Reuse an existing current result for the same
+scope and epoch. Do not create a second record because another owner joins.
 
-Use this routing before choosing a browser surface:
+Ordinary framework update/init/continue, same-route non-decision-relevant
+L3/L4 work, a future non-MVP node, or repeated evidence whose basis is still
+current does not trigger a full result or an extra user question.
 
-| Situation | Preferred Surface |
+## Verification Surface Selection
+
+Choose the lowest-cost applicable surface, then add another only when a real
+obligation remains unobserved:
+
+| Canonical surface | Use when it can directly distinguish |
 |---|---|
-| Localhost, 127.0.0.1, file preview, quick visual inspection inside Codex Desktop. | `browser:control-in-app-browser` |
-| Repeatable UI regression, scripted navigation, screenshots/traces, form flows, CI-like evidence. | `playwright` |
-| Existing user Chrome login/session/cookies/profile, current Chrome tab, Chrome extension, OAuth/third-party account already signed in, Chrome-only bug, or explicit user request to use Chrome. | `chrome:control-chrome` |
+| `static` | syntax, schema, types, buildability, deterministic source rules |
+| `integration` | module/API/data/persistence/queue/service wiring and behavior |
+| `browser_smoke` | user-visible route, form, navigation or rendering in a disposable/local surface |
+| `chrome_real_profile` | the result depends on the user's real authenticated browser state |
+| `ai_uat` | product-goal interaction needs an AI-generated acceptance pass |
+| `release_hardening` | public/deploy/share boundary needs its separate guard |
+| `focused_probe` | one executable discriminator settles a route/result uncertainty |
+| `representative_data` | correctness depends on realistic data identity, range or migration state |
+| `inspection` | the exact claim is a static fact that inspection can prove |
 
-Do not use Chrome merely because a connector/API auth expired. Ask the user to fix auth or explicitly approve Chrome fallback.
+Load `browser-acceptance.md` for browser selection. Project Init alone resolves
+user-facing governance language; the language acceptance owner verifies actual
+changed bytes. This Harness neither re-resolves language nor translates
+machine enums.
 
-## Outcome-Corresponding Discrimination
+## Outcome-Corresponding Evidence
 
-When `semantic-implementation-closure.md` triggers `solution_adequacy`, select the lowest-cost validation that can distinguish the live candidate classes under the confirmed real-use or observation conditions.
+An observation corresponds to the outcome only when it bears directly on what
+the user or downstream system must receive. Compilation, object/file presence,
+internal geometry, a well-formed schema, an isolated module, fixture-only data,
+model self-report, or code inspection may be useful facts; they are proxies for
+a broader perceptual, numerical, durable, accessible, safe, integrated or
+runtime promise.
 
-- Prefer direct outcome evidence: the actual runtime path, representative data, user-visible interaction, boundary contract, recovery behavior, or other observation that the confirmed outcome depends on.
-- A proxy is acceptable only when its relationship to the outcome is explicit, current, and strong enough to distinguish the candidates. Record the limitation; do not silently promote proxy success to outcome success.
-- Do not impose a fixed domain tier or candidate count. Evidence depth follows the uncertainty, cost, reversibility, and downstream impact.
-- A validation that all candidates pass equally does not discriminate the route. Choose another proportionate check or keep the uncertainty open.
+For each triggered observable obligation:
 
-## Chrome Escalation Triggers
+1. bind the exact claim/predicate and real condition;
+2. select a surface able to distinguish pass from failure;
+3. point to the command, trace, screenshot, runtime observation, test output or
+   other exact evidence identity;
+4. mark whether correspondence is direct or proxy;
+5. when proxy, populate canonical `proxy_limit` with exactly what it proves and
+   cannot prove;
+6. record a skipped/deferred/not-run check honestly and keep any dependent
+   broader claim non-supported.
 
-Use the canonical Chrome Escalation Triggers in `authority-and-triggers.md`. When any trigger appears, consider `chrome:control-chrome` and either use it or record why not.
+Never test every adjective. Test only predicates that can change the result or
+next decision. When Project Intelligence triggered, consume its current
+observable-evidence obligations, freshness and claim limits by reference; do
+not copy its algorithm or load it for ordinary verification.
 
-If Chrome is required but unavailable, report `chrome_required_but_unavailable` and ask the user to open/sign in/enable Chrome rather than substituting unrelated web search or a different source.
+Inspection can pass the inspected fact but is not executed behavior. A rule
+assertion proves the rule, not runtime conformance. `deferred` and `not_run`
+never become a passing observation. AI UAT that actually exercises a path may
+contribute executed evidence with an AI-UAT caveat; an unexercised path remains
+inspection or not-run. The canonical evidence and result values remain owned
+by `semantic-contract-templates.md`.
 
-## Acceptance Matrix
+Direct deterministic counterevidence outranks a broader proxy. If an applicable
+oracle or TDD RED already disproves the exact behavior claim, record that fact
+once and do not invoke a fresh challenger to rediscover it. Conversely, a
+compile pass, valid file, working technical pipeline, or operation permission
+cannot prove a distinct visible semantic predicate or product scope. Project
+the smallest exact artifact/contract/evidence subset needed for any triggered
+fresh review and route it to the protocol in `review-and-self-review.md`; this
+Harness owns the evidence fact, not the review lifecycle or final disposition.
 
-For each meaningful slice, record a compact matrix in `STATUS.md`, the active CoTend Plan Tree node/spec carrier, `REVIEW-LOG.md`, or handoff:
+## Before Calling Evidence Sufficient
 
-```yaml
-acceptance_test_harness:
-  scope:
-  selected_tiers:
-    - static
-    - integration
-    - browser_smoke
-  commands_or_tools:
-    -
-  browser_surface: none | in_app_browser | playwright | chrome_real_profile
-  chrome_decision: not_applicable | used | trigger_present_not_used | required_but_unavailable
-  chrome_reason:
-  ai_uat: not_needed | pending | run
-  result: pass | pass_with_notes | fail | blocked
-  skipped_checks:
-    -
-  governance_language_evidence: <use the canonical gate below when governance files changed; otherwise omit>
-  claim_to_evidence:
-    - claim:
-      decision_relevance: high | medium | low
-      evidence_type: executed | inspection | asserted_by_rule | deferred | not_run
-      evidence_pointer:
-      user_readable_meaning:
-      caveat:
-```
+Check all that apply:
 
-Keep the record short. Detailed logs belong in test output, screenshots, traces, or review artifacts.
+- What exact user/system outcome and real conditions does this slice claim?
+- Does every required obligation have an outcome-corresponding observation?
+- Did the active entrypoint and representative data/configuration run, or is
+  the evidence limited to a proxy/fixture/inspection?
+- If user-visible, did at least one real interaction run, or is impossibility
+  and its resulting claim limit explicit?
+- Did normal, degraded and blocked behavior receive the observations required
+  by the protected outcome?
+- Are skipped checks safe for this exact scope and stage?
+- Did packet-local evidence survive integration, and did the root recheck the
+  affected cross-packet path?
+- If governance prose changed, did the actual-byte language gate pass?
+- If a material multi-agent boundary closed, did a fresh non-implementing
+  review inspect the integrated evidence?
 
-## User-Facing Governance Language Gate
+If verification is weak twice in five review windows, route the quality signal
+to `quality-sentinel.md`; do not compensate by widening prose.
 
-Trigger this gate whenever the current operation creates or changes user-visible governance prose, including STATUS or its mapped equivalent, Plan Tree/understanding, decision, review, handoff, Human Rejoin, AI UAT, acceptance, and Done/release records. Project Init's persisted declaration and the actual changed prose are independent required evidence. A structured packet, model self-report, filename, or declared `normalized_tag` cannot by itself prove the body language.
+## Consumer Boundaries
 
-Derive the changed-governance file set from the real VCS diff plus operation write receipts, including untracked files; do not trust only a hand-authored `changed_files` list. Read the current bytes for every in-scope file. The CoTend adapter owns localized titles/templates and its body-language checker, including any script/character/token thresholds. The shared contract owns only the evidence and result rules and must not freeze one language heuristic as universal behavior.
+- Capability Completion reads the same result's basis and observations, then
+  contributes only decision-relevant exact-scope dimension judgments and safe
+  wording. Acceptance does not announce `supported`.
+- Semantic Implementation Closure consumes those contributions and adds the
+  material lifecycle and three boundaries. Acceptance does not set
+  `advance_allowed`.
+- Route Rebase may mark old evidence for refresh/invalidation but cannot set a
+  new result. Reusable evidence must be explicitly revalidated against the
+  resulting semantics, active path and identities.
+- Review, Handoff, Plan Tree, STATUS and Done consume the one result reference
+  plus a needed summary; they do not quote this module into another current
+  packet.
+- Browser/Playwright/Chrome/AI-UAT evidence never authorizes destructive,
+  paid, public, release, deploy or final user-acceptance actions.
 
-During Project Init, this is an executable pre-handback gate, not a later
-external-oracle suggestion. Use Project Init's bundled
-`scripts/validate_governance_language.py` with
-`scripts/check_cotend_governance_language.py` and operation write receipts.
-The generic validator is read-only: it consumes the already-resolved tag and
-canonical carrier, unions VCS evidence with receipts, reads actual bytes, calls
-the checker, and emits `cotend.governance-language-pre-handback.v1` JSON plus
-deterministic exit status. It must not resolve language, materialize state,
-translate prose, or trust final structured self-report.
+## Legacy Compatibility
 
-An adapter may scope language heuristics to operation-owned Git additions so
-legacy prose does not distort the current operation, but shared evidence must
-still bind the whole current file SHA-256/byte count and disclose the exact
-evaluation scope. Untracked, non-Git, or clean tracked receipt files use
-whole-file evaluation; unavailable diff evidence is unchecked.
+Existing `acceptance_test_harness` records are lazy historical evidence. Do
+not scan, merge or rewrite them during framework update/init/continue. At the
+next real verification/claim/closure trigger, judge their exact scope,
+identity, directness and freshness; reference useful evidence under the new
+result's historical inputs and write only one successor `execution_closure`.
+An old `pass` label never becomes a current broader pass by name alone.
 
-```yaml
-governance_language_evidence:
-  status: checked | blocked | not_applicable
-  validator_contract: cotend.governance-language-pre-handback.v1
-  validator_execution: executed | unavailable | not_triggered
-  canonical_resolution_pointer: <STATUS.md or mapped equivalent>#user_facing_language_resolution
-  declared_normalized_tag: <normalized BCP 47 tag> | missing
-  changed_file_set_source: vcs_diff_plus_write_receipts | vcs_diff | write_receipts_no_vcs | established_empty
-  adapter_checker: cotend-governance-language.v2 | missing
-  files:
-    - path:
-      sha256:
-      actual_bytes_checked: yes | no
-      user_visible_prose: present | absent
-      body_result: match | mismatch | technical_only | unchecked
-      evaluation_scope: git_added_lines | git_untracked_whole_file | git_unborn_whole_file | whole_file_no_git | whole_file_outside_git_root | whole_file_no_git_delta | git_added_lines_unavailable
-      git_added_line_count: <integer> | null
-      whole_file_sha256_checked: yes | no
-      whole_file_byte_count:
-      evaluated_text_byte_count:
-      excluded_technical_segments:
-        - none | schema_key | enum | identifier | path | hash | command | code | model_name | machine_field | markdown_table_structure | machine_table_cell
-      evidence_pointer:
-  result: pass | fail | blocked | not_applicable
-```
-
-Derive `result` deterministically:
-
-1. `not_applicable` only when the real changed set contains no user-facing governance file;
-2. `blocked` when Project Init's resolution is missing/`human_needed`, the changed file set cannot be established, actual bytes cannot be read, or the required adapter checker is unavailable;
-3. `fail` when the declaration differs from the canonical normalized tag, an in-scope changed file is omitted, any user-visible prose is `mismatch | unchecked`, or the only support is structured self-report;
-4. `pass` only when every changed governance file's actual bytes were inspected, the CoTend checker reports the same SHA-256 that shared core read and the file stays byte-stable through checker execution, and every user-visible prose segment matches the canonical tag. A technical-only file may use `technical_only` with concrete exclusions and does not fail merely because identifiers remain untranslated.
-
-Technical identifiers, schema keys, enum/status values, code, paths, hashes, commands, model names, URLs, and machine-readable fields are not user-facing prose and must not be counted as translation failures. Natural-language headings, short bullets, explanations, recommendations, decision menus, user-facing table cells, summaries, and acceptance meaning remain prose even when adjacent to machine fields. Full and Adaptive execute this identical gate and must return the same result for the same resolution and bytes.
-
-For Project Init, only `pass` or a genuine `not_applicable` may feed the normal
-readiness calculation. Across one Init turn, the validator runs at most twice:
-one initial check and one bounded recheck. The first `fail` may consume that
-recheck after one safe repair limited to reported governance files. A first
-`blocked` result already prevents readiness; only a safely establishable
-missing checker or changed-set input may consume the same sole recheck, and it
-does not preserve another content-repair attempt. Any `fail` or `blocked` that
-remains after the recheck, an unavailable checker, unreadable bytes, or an
-unestablished changed set prevents `continue_ready`. Do not repair a
-language-source conflict through this gate and do not create a retry loop.
-Full and Adaptive use the same one-repair/one-recheck budget and final stop
-result.
-
-## Done / Review Gate
-
-Before saying a slice is verified, answer:
-
-- What user or system behavior changed?
-- Which ladder tier proves that behavior?
-- Did any Chrome escalation trigger appear?
-- If user-visible, did we run at least one real interaction or explain why impossible?
-- Are skipped checks acceptable for the current risk/stage?
-- If solution adequacy triggered, did the discriminating validation test the confirmed outcome under real conditions rather than only a proxy?
-- If multiple packets contributed, did their local evidence survive integration and did the root rerun the affected cross-packet path?
-- If a material multi-agent boundary closed, did a fresh non-implementing review context inspect the integrated evidence under `review-and-self-review.md`?
-
-If verification is weak twice in five review windows, route to `quality-sentinel.md`.
-
-## Claim-To-Evidence Discipline
-
-Apply this to claims that would change a user decision in a Human Rejoin prompt, wake-up summary, handoff, milestone, or acceptance point.
-
-- `not_run` or `deferred` must not be described as "verified".
-- `inspection` must not be described as behavior-level executed validation.
-- UI/product usability claims should prefer real interaction, Playwright/browser evidence, or an explicit AI UAT caveat.
-- `user_readable_meaning` must use Project Init's resolved normalized tag unless the value is an untranslated technical identifier covered by the governance-language exclusions.
-- `ai_generated_acceptance` is an AI-UAT label, not an evidence-type value. If AI actually exercised the path, the related claim can use `executed` with an AI-UAT caveat; if it did not, use the real evidence type such as `inspection` or `not_run`.
-- Ordinary minor summary statements do not need a table unless they affect user decisions.
-
-## Conditional Capability Completion Claim
-
-This section is the single canonical owner of `capability_completion_claim`. It is a cold-path evidence guard, not a new Skill, project truth file, semantic-alignment mode, or standing six-axis report.
-
-Trigger it only when at least one of these is true:
-
-- an AI/user-facing statement expresses decision-relevant delivery-state intent that would change the user's or another AI's next decision. This includes completion, availability, integration, readiness, activity, and end-to-end delivery, as well as implemented/已实现, built/已构建, working/跑通/可运行, landed/已落地, and equivalent wording;
-- the user asks whether a capability or scoped outcome has reached any such delivery state, including equivalent questions such as "实现了吗？", "构建跑通了吗？", "is it implemented?", or "is it working?";
-- a confirmed semantic write would change an existing `status`, `current`, `active`, or `next` capability/navigation statement.
-- `semantic-implementation-closure.md` is deciding whether an important current-MVP L2/main-chain node may close or navigation may advance. The exact node result is decision-relevant even when no user-facing completion sentence has been drafted yet.
-- the canonical `route_rebase` packet marks completion evidence `revalidation_required | invalidated | superseded`, or changed semantics/runtime dependencies otherwise make the prior exact-scope result unsafe to reuse.
-
-These are semantic categories with representative examples, not an exhaustive keyword list. Interpret the current utterance, claim scope, and decision consequence together. A quoted historical statement, changelog entry, ordinary progress note, semantic draft, scoped alignment, or leaf implementation does not trigger the guard merely because it contains delivery-state words; if it makes no current decision-relevant claim, do not emit the block, fill six dimensions, or ask an extra question. Apply the guard directly from available evidence when triggered; do not ask the user to approve the delivery dimensions. The existing L0-L2 confirmation boundary remains the only semantic user gate.
-
-Use this conditional shape:
-
-```yaml
-capability_completion_claim:
-  trigger: explicit_decision_relevant_claim | user_completion_question | semantic_write_changes_navigation_state | material_node_navigation_gate | route_rebase_evidence_refresh
-  claims:
-    - capability_id: <stable existing capability ID when one exists; otherwise omit>
-      parent_capability_id: <stable existing parent ID when applicable; otherwise omit>
-      claim:
-      exact_scope:
-      freshness_basis:
-        status: current | stale | unknown
-        semantic_contracts:
-          - node_id:
-            contract_id:
-            decision_ref:
-            expected_digest: sha256:<64 lowercase hex> | legacy_unbound | missing
-            binding_status: verified | legacy_unbound | missing | mismatch | unverifiable
-        implementation_basis:
-          kind: git_commit | git_tree | file_set_digest | runtime_snapshot | exact_evidence_refs
-          scope:
-          identity:
-          status: current | stale | unknown
-        verification_basis:
-          - evidence_pointer:
-            identity:
-            status: current | stale | unknown
-        checked_at:
-      result: supported | partial | blocked | unknown
-      dimensions:
-        semantic: <completion_dimension_evidence>
-        implementation: <completion_dimension_evidence>
-        data: <completion_dimension_evidence>
-        integration: <completion_dimension_evidence>
-        verification: <completion_dimension_evidence>
-        operational: <completion_dimension_evidence>
-      safe_wording:
-      blocking_or_unknown_gaps:
-        -
-
-completion_dimension_evidence:
-  required: yes | no
-  status: sufficient_for_claim | insufficient_for_claim | blocked | unknown | not_applicable
-  evidence_type: executed | inspection | asserted_by_rule | deferred | not_run
-  evidence_pointer:
-  user_readable_meaning:
-  caveat:
-  not_applicable_reason:
-```
-
-Keep the outer key `capability_completion_claim`; one exact claim still uses a one-element `claims` list. When the target scope already has a stable capability tree or stable capability IDs, every list item must bind its existing `capability_id` and include `parent_capability_id` when that relationship exists. If required children under one parent have heterogeneous results, or the evidence proves only a subset of them, emit separate list items for the affected capability IDs. Do not collapse them into one free-text parent claim. For example, evidence may support `CAP-REL-CANDIDATE-INVENTORY` while leaving its sibling blocked; that support does not make `CAP-REL` supported.
-
-`freshness_basis` is required for every newly emitted or refreshed decision-relevant claim. It binds the exact claim to the protected semantic contracts it depends on and to the minimum sufficient implementation and verification identity that would reveal invalidation. It is not a whole-repository hash and must not become a standing per-edit ledger.
-
-- `semantic_contracts` references the canonical decision-log payloads and binding outcomes owned by `templates.md`; do not copy their schema here. Every required L0-L2 ancestor for the exact claim scope appears separately. A changed/mismatched contract makes freshness `stale`; a missing, ambiguous, unverifiable, or `legacy_unbound` contract makes freshness `unknown` at this trigger.
-- `implementation_basis` names the smallest stable identity that covers what the claim says: an exact Git commit/tree for the relevant component, a declared file-set digest, a runtime/build snapshot, or explicit evidence references. A different identity for a materially relevant file/path is `stale`; absence or inability to compare is `unknown`. Do not hash the whole repository when a smaller exact scope suffices.
-- `verification_basis` names the executed/inspection evidence identities the result relies on. Replaced inputs, a changed runtime/configuration, missing evidence, or evidence that no longer exercises the active path invalidates only the dependent claim/path.
-- `status: current` requires every required semantic binding to be `verified`, a non-empty implementation identity to match the active exact scope whenever implementation is required or relied upon, and every required verification identity to remain applicable. When the verification dimension is required or any conclusion relies on a test/inspection, `verification_basis` must contain at least one exact current evidence pointer; an empty/missing pointer makes freshness `unknown`, not vacuously current. Formatting-only semantic JSON changes that preserve the canonical digest do not make it stale.
-
-An old claim whose basis changed remains useful historical evidence, but it is not a current completion result. Keep its stable capability ID, record the stale/unknown basis, and derive a new current claim before it can control `STATUS`, navigation, handoff, Done Gate, or acceptance. Do not silently re-sign the semantic contract or update a file-set/evidence identity without rerunning the evidence appropriate to the exact claim.
-
-Derive a claimed parent's result conservatively from both its own required dimensions and every required child claim. A parent is `supported` only when its own required dimensions and all required children are supported. Any required child that is `partial`, `blocked`, `unknown`, or missing prevents a supported parent; retain the strongest evidenced non-supported result and list the child gap. A small project with no existing capability ID may use precise natural-language `exact_scope` and omit both ID fields. Do not create a parallel capability tree just to populate this schema.
-
-Determine `required` separately for each list item's exact claim scope and user-visible promise. A narrow statement such as "candidate enumeration implementation passed its unit tests" may require implementation and verification while data/integration/operational are `required: no`. A broad statement such as "relationship analysis is complete and available end-to-end" normally requires every dimension that the end-to-end promise depends on. Every `required: no` row must use `status: not_applicable` and state a concrete `not_applicable_reason`; absence of evidence is not a reason to mark a dimension not applicable. At least one dimension must be required per claim.
-
-`operational` is the canonical completion-guard key. If a project already has a standing axis named `operations`, explicitly map that project axis to `operational` while building each claim. Do not emit both keys, rewrite the project's standing schema, or create a seventh completion axis.
-
-Derive each list item's result deterministically:
-
-1. `blocked` when any required dimension is `blocked`;
-2. otherwise `supported` only when `freshness_basis.status: current`, every required dimension is `sufficient_for_claim`, and every non-required dimension has a reason;
-3. otherwise `partial` when any required dimension is known `insufficient_for_claim`, sufficient and unknown/insufficient required evidence coexist, or a previously supportable claim now has `freshness_basis.status: stale`;
-4. otherwise `unknown` when required evidence is wholly unknown/deferred/not run or freshness is `unknown` and no known insufficiency supports a more precise `partial` result.
-
-For `semantic`, `sufficient_for_claim` requires the applicable protected L0-L2 scope to have `coverage: complete_for_scope`, `authority: user_confirmed`, `currency: current`, and `consistency: aligned`, with per-node verified contract binding at this trigger. For implementation, data, integration, verification, and operational dimensions, the AI evaluates real evidence without asking the user to confirm L3/L4 or delivery mechanics. Preserve the shared evidence vocabulary: `inspection` never becomes `executed`, a rule assertion does not prove runtime behavior, and an implementation slice does not prove the whole user-visible capability.
-
-If a list item's `result` is not `supported`, replace its original wording with `safe_wording` that names the exact proven slice and the material gaps. Never retain the broader delivery-state phrase in a caveat and still let it control `STATUS`, Plan Tree, handoff, Done Gate, or navigation.
-
-For `route_rebase_evidence_refresh`, keep stable capability IDs but treat the old result as historical input, not the current result. Re-evaluate freshness and required dimensions against the resulting verified semantic contracts, active code/data/interface/entrypoint path, and newly executed or explicitly revalidated evidence. A reusable artifact may reduce rework; it does not preserve a supported conclusion. Return `partial | blocked | unknown` until the deterministic derivation above supports the exact resulting-route claim.
-
-## Boundaries
-
-- Chrome real-profile checks may touch the user's real logged-in state; do not perform destructive, paid, public, or data-changing actions without explicit user approval.
-- Playwright/browser/Chrome smoke tests do not authorize release, deploy, push, or final acceptance.
-- AI UAT remains `ai_generated_acceptance`; the user remains final product authority.
-- Route Rebase owns impact disposition only. It must not write `capability_completion_claim.result`, change the six dimensions, or treat `reusable` as supported completion evidence.
-- Semantic implementation closure may consume this canonical claim but must not redefine its dimensions or derivation. A supported exact-scope claim is necessary but not sufficient for that module's separate local/adjacent/cumulative navigation gate.
-- Full and Adaptive use the same freshness basis and derivation. Runtime-profile selection cannot grandfather stale evidence or make `legacy_unbound` current at a decision-relevant trigger.
+Full and Adaptive select the same obligations and surfaces and produce the
+same evidence meaning, proxy limits, skips and downstream result facts. They
+may differ only in orchestration scaffolding.

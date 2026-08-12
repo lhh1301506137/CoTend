@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT_INIT_RELATIVE = Path("skills") / "cotend-project-init"
 EXPECTED_REFERENCES = (
     "auto-mode-and-onboarding.md",
-    "external-reviewer-sync.md",
+    "framework-maintenance/external-reviewer-sync.md",
     "framework-update-routing.md",
     "governance-language-pre-handback.md",
     "initialization-core-workflow.md",
@@ -21,6 +21,7 @@ EXPECTED_REFERENCES = (
     "routing-and-planning.md",
     "verification-and-closeout-workflow.md",
 )
+COMPATIBILITY_REFERENCES = ("external-reviewer-sync.md",)
 EXPECTED_SCRIPTS = (
     "check_cotend_governance_language.py",
     "maintain_project_agents_router.py",
@@ -32,9 +33,12 @@ EXPECTED_FILES = {
     "agents/openai.yaml",
     "references/framework-impact-index.json",
     *(f"references/{name}" for name in EXPECTED_REFERENCES),
+    *(f"references/{name}" for name in COMPATIBILITY_REFERENCES),
     *(f"scripts/{name}" for name in EXPECTED_SCRIPTS),
 }
-DIRECT_REFERENCE_RE = re.compile(r"(?<!/)references/([a-z0-9-]+\.md)")
+DIRECT_REFERENCE_RE = re.compile(
+    r"(?<!/)references/((?:[a-z0-9-]+/)*[a-z0-9-]+\.md)"
+)
 FORBIDDEN_RUNTIME_RE = re.compile(r"trellis", re.IGNORECASE)
 
 
@@ -69,6 +73,7 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
 
     core = _read(skill_root / "SKILL.md")
     direct_references = set(DIRECT_REFERENCE_RE.findall(core))
+    direct_references.discard("cotend-adapter.md")
     if direct_references != set(EXPECTED_REFERENCES):
         raise ProjectInitContractError(
             "Project Init direct-reference routing does not cover the exact eleven modules"
@@ -80,11 +85,15 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
         )
 
     references: dict[str, str] = {}
-    for name in EXPECTED_REFERENCES:
+    for name in (*EXPECTED_REFERENCES, *COMPATIBILITY_REFERENCES):
         text = _read(skill_root / "references" / name)
-        if DIRECT_REFERENCE_RE.search(text):
+        nested_project_init_refs = set(DIRECT_REFERENCE_RE.findall(text)) & set(
+            (*EXPECTED_REFERENCES, *COMPATIBILITY_REFERENCES)
+        )
+        if nested_project_init_refs:
             raise ProjectInitContractError(
-                f"Project Init reference gained a nested Project Init dependency: {name}"
+                "Project Init reference gained a nested Project Init dependency: "
+                f"{name}: {sorted(nested_project_init_refs)}"
             )
         references[name] = text
 
@@ -99,13 +108,13 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
     if (
         impact_index.get("schema") != "cotend.framework-impact-index"
         or impact_index.get("schema_version") != 1
-        or impact_index.get("indexed_through") != "v1.79"
+        or impact_index.get("indexed_through") != "v2.01"
         or not isinstance(entries, list)
-        or len(entries) != 14
+        or len(entries) != 36
         or len(
             {item.get("id") for item in entries if isinstance(item, dict)}
         )
-        != 14
+        != 36
     ):
         raise ProjectInitContractError("CoTend framework impact index contract drifted")
 
@@ -136,7 +145,7 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
             "CoTend governance checker contains private-Dual identity or reason codes"
         )
     required_router_markers = (
-        'CONTRACT = "cotend.project-router.v1"',
+        'CONTRACT = "cotend.project-router.v2"',
         'START_MARKER = "<!-- COTEND:PROJECT-ROUTER:START -->"',
         'END_MARKER = "<!-- COTEND:PROJECT-ROUTER:END -->"',
         "$cotend-collaboration",
@@ -161,11 +170,11 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
     if any(marker not in validator for marker in required_validator_markers):
         raise ProjectInitContractError("CoTend governance validator contract drifted")
     required_update_resolver_markers = (
-        'RESULT_CONTRACT = "cotend.framework-update-resolution.v1"',
+        'RESOLUTION_CONTRACT = "cotend.framework-update-resolution.v2"',
+        'FRAMEWORK_STATE_CONTRACT = "cotend.framework-update-state.v2"',
         'INDEX_SCHEMA = "cotend.framework-impact-index"',
         '"inventory_bootstrap_required"',
-        '"writes_performed": False',
-        '"network_calls": 0',
+        '"compatibility_receipt"',
     )
     if any(
         marker not in update_resolver
@@ -173,7 +182,13 @@ def load_project_init_contract(root: Path = ROOT) -> dict[str, Any]:
     ):
         raise ProjectInitContractError("CoTend framework-update resolver contract drifted")
 
-    combined = "\n".join([core, *(references[name] for name in EXPECTED_REFERENCES)])
+    combined = "\n".join(
+        [
+            core,
+            *(references[name] for name in EXPECTED_REFERENCES),
+            *(references[name] for name in COMPATIBILITY_REFERENCES),
+        ]
+    )
     required_router_documentation = (
         "maintain_project_agents_router.py --apply",
         "--check",

@@ -15,21 +15,21 @@ import verify_cotend_project_init as project_init  # noqa: E402
 
 
 class CoTendProjectInitContractTests(unittest.TestCase):
-    def test_repository_has_concise_core_eleven_references_and_four_scripts(self) -> None:
+    def test_repository_has_concise_core_and_compatibility_references(self) -> None:
         result = project_init.load_project_init_contract()
         self.assertEqual(result["status"], "cotend_project_init_topology_verified")
-        self.assertEqual(result["file_count"], 18)
-        self.assertEqual(result["reference_count"], 11)
+        self.assertEqual(result["file_count"], 19)
+        self.assertEqual(result["reference_count"], 12)
         self.assertEqual(result["script_count"], 4)
         self.assertLessEqual(result["core_lines"], 300)
         self.assertIn(
             "cotend.governance-language-pre-handback.v1", result["combined"]
         )
-        self.assertIn('CONTRACT = "cotend.project-router.v1"', result["router"])
+        self.assertIn('CONTRACT = "cotend.project-router.v2"', result["router"])
         self.assertIn("$cotend-collaboration", result["router"])
         self.assertIn("$cotend-session-handoff", result["router"])
         self.assertIn(
-            'RESULT_CONTRACT = "cotend.framework-update-resolution.v1"',
+            'RESOLUTION_CONTRACT = "cotend.framework-update-resolution.v2"',
             result["update_resolver"],
         )
 

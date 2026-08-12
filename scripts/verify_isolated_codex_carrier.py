@@ -38,7 +38,7 @@ EXPECTED_SKILLS = {
 EXPECTED_INTERFACES = {
     "cotend-collaboration": (
         "CoTend Collaboration",
-        "Canonical CoTend project router",
+        "Carrier-aware actual-model collaboration",
     ),
     "cotend-diagnose-only": (
         "CoTend Diagnose Only",
@@ -46,7 +46,7 @@ EXPECTED_INTERFACES = {
     ),
     "cotend-init": (
         "CoTend Init",
-        "Init workflow and route idea baseline",
+        "Thin CoTend initialization entry",
     ),
     "cotend-model-upgrade": (
         "CoTend Model Upgrade",
@@ -54,7 +54,7 @@ EXPECTED_INTERFACES = {
     ),
     "cotend-project-init": (
         "CoTend Project Init",
-        "Init workflow and route idea baseline",
+        "Impact-directed project initialization",
     ),
     "cotend-semantic-alignment": (
         "CoTend Semantic Alignment",
@@ -62,11 +62,11 @@ EXPECTED_INTERFACES = {
     ),
     "cotend-session-handoff": (
         "CoTend Session Handoff",
-        "Literal-gated same-Primary handoff",
+        "Explicit same-primary session handoff",
     ),
     "cotend-tooling": (
         "CoTend Tooling",
-        "Govern reusable development capabilities safely",
+        "Inventory and govern reusable development capabilities",
     ),
 }
 LIVE_SCENARIO_IDS = {"init-delegation", "pending-decision", "diagnose-only"}
@@ -90,6 +90,8 @@ def file_manifest(root: Path, *, exclude: set[str] | None = None) -> dict[str, s
         path.relative_to(root).as_posix(): sha256(path)
         for path in sorted(root.rglob("*"))
         if path.is_file()
+        and "__pycache__" not in path.parts
+        and path.suffix != ".pyc"
         and not any(part in excluded for part in path.relative_to(root).parts)
     }
 
@@ -313,8 +315,8 @@ def verify_static(
     }
     if source_manifest != managed_manifest:
         raise CarrierError("installed Skill files differ from repository source")
-    if len(managed_manifest) != 71:
-        raise CarrierError(f"expected 71 managed Skill files, found {len(managed_manifest)}")
+    if len(managed_manifest) != 104:
+        raise CarrierError(f"expected 104 managed Skill files, found {len(managed_manifest)}")
 
     for skill in sorted(EXPECTED_SKILLS):
         skill_file = target_root / skill / "SKILL.md"

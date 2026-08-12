@@ -3,7 +3,7 @@ name: cotend-diagnose-only
 description: Use when the user wants root cause, semantic-drift, or read-only capability-completion analysis before changes; says 只诊断, 先分析原因, 先别改代码, 别改代码, 先别动, 先别修, 先不要改, 先定位, 先查原因, 先告诉我为什么, 先检查理解, 语义漂移检查, 看看 AI 对这个模块的理解是否正确, 检查 AI 对这个模块的理解是否正确, AI 对这个模块理解得对不对, or diagnose only; reports a bug or a feature that feels wrong/half-finished but asks not to fix yet; uses 看看, 检查, 是否正确, 对不对, or 有没有理解偏 specifically about AI/product understanding without separate explicit change authorization; asks whether a capability is complete/ready/end-to-end without authorizing changes; expresses doubt while withholding edits; or a verify/review/AI UAT failure needs investigation before replan/fix. Do not trigger semantic diagnosis from a bare evaluation word with no semantic/product-understanding context. Read-only/evaluative semantic wording outranks generic 理解对齐 or 语义对齐 wording. Distinguishes technical failure, product-semantic drift, and mixed causes, then reports evidence and a recommended route without modifying files.
 ---
 
-# CoTend Diagnose Only
+# Diagnose Only
 
 Diagnose the problem without changing project files.
 
@@ -41,7 +41,7 @@ If the same user instruction clearly asks to diagnose, then fix and verify, that
 - Classify the likely cause as `technical`, `semantic_drift`, `mixed`, or `insufficient_evidence`. Do not force a semantic explanation onto an ordinary reproducible bug.
 - For `semantic_drift` or `mixed`, classify scope before authorization: a full-project check remains full-project read-only, while a named-feature check stays local. Compare latest user-confirmed intent, original idea evidence, historical AI inference/proposals, current Plan Tree/requirements, and actual product behavior as separate surfaces. Code and AI-written documents show what exists; they do not prove what the user wanted.
 - Never update semantic authority, Plan Tree, requirements, decision records, or source code during diagnosis. A proposed L0-L2 correction remains `pending_user_confirmation` and hands off to `$cotend-semantic-alignment` only after explicit user authorization.
-- When the user asks about decision-relevant delivery-state intent for a capability—including completion/availability/integration/readiness/activity/end-to-end delivery, implementation/build, working/runnable, landing, or equivalent wording—load `cotend-collaboration/references/acceptance-test-harness.md` and use its conditional `capability_completion_claim`. Preserve existing stable capability IDs, keep exact scope, consume its semantic-contract/implementation/verification freshness basis, require reasons for `not_applicable`, and let AI assess non-semantic evidence without asking the user to confirm L3/L4. An old supported result with stale/unknown basis is historical only. Do not copy the claim/decomposition algorithm here or emit it for ordinary diagnosis.
+- When the user asks about decision-relevant delivery-state intent for a capability—including completion/availability/integration/readiness/activity/end-to-end delivery, implementation/build, working/runnable, landing, or equivalent wording—load `cotend-collaboration/references/acceptance-test-harness.md`, `cotend-collaboration/references/capability-completion.md`, and the unique `cotend.execution-closure.v1` shape in `semantic-contract-templates.md`. In read-only mode, evaluate or reference one exact-scope result without persisting it: preserve stable capability IDs, current semantic/design/implementation/verification basis, direct/proxy limits, necessary dimensions and safe wording. Old packets/results with stale/unknown basis are historical only. Do not copy the derivation here, expand ordinary diagnosis into six axes, or ask the user to confirm L3/L4.
 - For a native-agent first-response stall, load `cotend-collaboration/references/native-agent-orchestration.md`. Classify from evidence as `normal_reasoning_or_queueing | transport_or_connection_stall | completed_receipt_missing | tool_or_process_stall | insufficient_evidence`. Inspect available agent/thread status, last activity, transport errors, tool output, process/job state, durable receipts, and workspace/external effects. Do not infer "never executed" from silence. Read-only or proven-idempotent work may restart after the original is stopped or conclusively absent; ambiguous side-effecting work must be reconciled or stopped before retry. Do not impose a universal timeout, retry count, WebSocket/provider setting, or community success claim.
 
 ## Feedback Loop Preference
@@ -60,7 +60,7 @@ If the loop is flaky, state the observed reproduction rate.
 
 ## Output
 
-Respond in the project's recorded user-facing language, or English by default.
+Respond in Chinese unless the project convention requires otherwise.
 
 ```markdown
 ## Diagnose-Only Report
@@ -106,12 +106,12 @@ needs_user_or_reviewer:
 - yes | no
 - reason:
 
-capability_completion_claim: # include only when the canonical Acceptance Harness trigger fired
-  <use the canonical schema from cotend-collaboration/references/acceptance-test-harness.md>
+execution_closure: # read-only result/ref; include only when its trigger fired
+  <use the unique schema from cotend-collaboration/references/semantic-contract-templates.md; do not persist during diagnosis>
 
 semantic_drift: # include only for semantic_drift or mixed
   target_scope:
-  semantic_baseline: <use the canonical multidimensional schema from cotend-collaboration/references/templates.md>
+  semantic_baseline: <use the canonical multidimensional schema from cotend-collaboration/references/semantic-contract-templates.md>
   confirmed_intent_checked:
     -
   original_intent_checked:

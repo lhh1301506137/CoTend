@@ -40,7 +40,7 @@ class CoTendProjectAgentsRouterTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="cotend-router-") as temporary:
             root = Path(temporary)
             created = self.router.update_agents(root, "zh-CN", apply=True)
-            self.assertEqual(created["contract"], "cotend.project-router.v1")
+            self.assertEqual(created["contract"], "cotend.project-router.v2")
             self.assertEqual(created["result"], "created")
             text = (root / "AGENTS.md").read_text(encoding="utf-8")
             self.assertIn("<!-- COTEND:PROJECT-ROUTER:START -->", text)

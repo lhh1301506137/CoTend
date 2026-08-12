@@ -22,9 +22,12 @@ CONTRACT_PATH = ROOT / "upstream" / "TRELLIS-DECOUPLING-PLAN.json"
 TARGET_LOCK_PATH = ROOT / "delivery" / "codex-artifact.lock.json"
 PACKAGE_LOCK_PATH = ROOT / "packaging" / "codex-plugin" / "package.lock.json"
 
-EXPECTED_TARGET_ID = "cotend-codex-r000016"
-EXPECTED_TARGET_REVISION = 16
+EXPECTED_TARGET_ID = "cotend-codex-r000017"
+EXPECTED_TARGET_REVISION = 17
 EXPECTED_TARGET_MANIFEST = (
+    "f31c668349fc354402415f070f1ab90f1be47fa03d4141b5d8f5b58aee407cbe"
+)
+EXPECTED_R16_MANIFEST = (
     "a7f7ece2522a5901030e19cd5944359f80c027482f66f822a2053fc5080dcfb5"
 )
 EXPECTED_R15_MANIFEST = (
@@ -58,6 +61,7 @@ EXPECTED_PREDECESSORS = [
         manifest,
     )
     for revision, manifest in (
+        (16, EXPECTED_R16_MANIFEST),
         (15, EXPECTED_R15_MANIFEST),
         (14, EXPECTED_R14_MANIFEST),
         (13, EXPECTED_R13_MANIFEST),
@@ -77,27 +81,29 @@ EXPECTED_PREDECESSORS = [
 
 REQUIRED_RUNTIME_CAPABILITY_MARKERS = {
     "cotend-semantic-alignment/SKILL.md": (
-        "Plan Tree, implementation, verification, semantic implementation closure, formal review, AI UAT, and Done Gate routes",
+        "Preserve one Plan Tree and its linked truth files; do not create a second semantic tree.",
+        "Never create a second truth tree.",
     ),
     "cotend-collaboration/references/authority-and-triggers.md": (
-        "archived external-framework tasks",
-        "do not need mechanical renames",
+        "single canonical owner of execution authorization",
+        "must not create another permission system",
     ),
     "cotend-collaboration/references/framework-change-evaluation.md": (
-        "Plan Tree/external-framework/CodeGraph routing",
+        "canonical `cotend_workflow` binding/profile/execution mode",
+        "Foreign framework presence or activation metadata alone does not alter the canonical `current | stale | conflict` binding state.",
     ),
     "cotend-collaboration/references/plan-tree.md": (
-        "done_gate | external_framework | other",
-        "linked active/archived external-framework tasks",
-        "Older provider-specific source values remain evidence-only migration inputs",
-        "without granting the provider route authority",
+        "Current task/specification records remain linked evidence",
+        "remains the sole\nroute/navigation owner",
+        "Never invoke an external\ntask runtime or create a second task/state tree",
     ),
     "cotend-collaboration/references/quality-sentinel.md": (
-        "skipped required Skill/module/external-framework phase/review/verification step",
+        "skipped required Skill/module/CoTend governance phase/review/verification step",
     ),
     "cotend-collaboration/references/upstream-dependency-review.md": (
         "pure external-framework evidence",
         "exact-range disposition override with a non-empty reason",
+        "embedded_dependency_review.status: complete | not_applicable_with_evidence",
     ),
 }
 
@@ -316,10 +322,10 @@ def validate_target_lock(
     expected_source = {
         "framework_lock": "upstream/framework.lock.json",
         "release_id": (
-            "exact-source:c14d4133bf0438d435048858554c88c89a7870a3"
+            "exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d"
         ),
         "carrier": "skills/",
-        "framework_protocol": "cotend-collaboration-v1.79",
+        "framework_protocol": "cotend-collaboration-v2.01",
     }
     expected_target = {
         "platform": "Codex",
@@ -338,7 +344,7 @@ def validate_target_lock(
         or lock.get("skill_count") != 10
         or lock.get("skill_file_count") != skill_file_count
     ):
-        raise NativeZeroRuntimeDependencyError("r16 target lock envelope drifted")
+        raise NativeZeroRuntimeDependencyError("r17 target lock envelope drifted")
 
     expected_predecessors = [
         {
@@ -347,7 +353,9 @@ def validate_target_lock(
             "artifact_id": f"cotend-codex-r{revision:06d}",
             "revision": revision,
             "source_release_id": (
-                "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14"
+                "exact-source:c14d4133bf0438d435048858554c88c89a7870a3"
+                if revision == 16
+                else "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14"
                 if revision == 15
                 else "exact-source:9e6bbeeb4b91f98406e60dcbced923b3e1dd6826"
                 if revision == 14
@@ -358,7 +366,9 @@ def validate_target_lock(
                 else "2026.07.23.2"
             ),
             "framework_protocol": (
-                "cotend-collaboration-v1.76"
+                "cotend-collaboration-v1.79"
+                if revision == 16
+                else "cotend-collaboration-v1.76"
                 if revision == 15
                 else "cotend-collaboration-v1.71"
                 if revision == 14
@@ -374,7 +384,7 @@ def validate_target_lock(
     ]
     if lock.get("predecessor_targets") != expected_predecessors:
         raise NativeZeroRuntimeDependencyError(
-            "r15-r2 predecessor identity chain drifted"
+            "r16-r2 predecessor identity chain drifted"
         )
 
 
@@ -455,14 +465,14 @@ def validate_decoupling_contract(contract: dict[str, Any]) -> None:
         "push_release_submission_or_publish": False,
         "validation_gate_completed": "G05-zero-runtime-dependency",
     }
-    current_r16_slice = {
+    current_r17_slice = {
         "skill_behavior_changed": True,
         "trellis_route_removed": False,
         "removed_capability_ids": [],
         "target_artifact_changed": True,
         "package_identity_changed": False,
         "push_release_submission_or_publish": False,
-        "validation_gate_completed": "G01-G05-regression-for-r16",
+        "validation_gate_completed": "G01-G05-regression-for-r17",
         "g06_current_target_status": "not_rerun_frozen_r13_evidence",
     }
     lifecycle = (
@@ -479,7 +489,7 @@ def validate_decoupling_contract(contract: dict[str, Any]) -> None:
         (
             "complete",
             "native_runtime_decoupled_real_project_verified",
-            current_r16_slice,
+            current_r17_slice,
         ),
     ):
         raise NativeZeroRuntimeDependencyError(
@@ -571,10 +581,10 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
     assert_runtime_scan_clean(source_scan, "source runtime")
     runtime = verify_disposable_runtime(root)
     if (
-        runtime["skill_files"] != 71
+        runtime["skill_files"] != 104
         or runtime["manifest_sha256"] != EXPECTED_TARGET_MANIFEST
     ):
-        raise NativeZeroRuntimeDependencyError("r16 Skill manifest drifted")
+        raise NativeZeroRuntimeDependencyError("r17 Skill manifest drifted")
 
     lock = _load_json(root / TARGET_LOCK_PATH.relative_to(ROOT), "target lock")
     validate_target_lock(
@@ -613,7 +623,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
         "mapped_skill_roles": regression["mapped_skill_roles"],
         "target_artifact": EXPECTED_TARGET_ID,
         "target_manifest_sha256": EXPECTED_TARGET_MANIFEST,
-        "predecessor_target": "cotend-codex-r000015",
+        "predecessor_target": "cotend-codex-r000016",
         "frozen_rc2": frozen,
         "real_project_claimed": False,
         "real_user_acceptance_claimed": False,

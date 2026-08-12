@@ -20,7 +20,7 @@ class NativeInitResumeBeforeDevelopmentTests(unittest.TestCase):
         self.assertEqual(result["runtime_files"], 0)
         self.assertEqual(result["td02_commands"], 0)
         self.assertEqual(result["remaining_commands"], 0)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000016")
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000017")
 
     def test_all_entry_modes_and_stops_are_covered(self) -> None:
         result = native_entry.verify_repository()
@@ -55,7 +55,7 @@ class NativeInitResumeBeforeDevelopmentTests(unittest.TestCase):
         self.assertTrue(specialized.specialized_decision_preserved)
 
     def test_repeated_initialization_is_a_no_op(self) -> None:
-        first = native_entry.evaluate_entry("absent")
+        first = native_entry.evaluate_entry("uninitialized")
         repeated = native_entry.evaluate_entry("current")
         self.assertTrue(first.write_performed)
         self.assertFalse(repeated.write_performed)
@@ -93,7 +93,8 @@ class NativeInitResumeBeforeDevelopmentTests(unittest.TestCase):
 
     def test_repeated_predevelopment_preserves_scope_and_stops_writing(self) -> None:
         first = native_entry.evaluate_predevelopment(
-            provider_state="codegraph_unindexed"
+            provider_state="codegraph_unindexed",
+            safe_index_write_allowed=True,
         )
         repeated = native_entry.evaluate_predevelopment(
             provider_state="codegraph_fresh"
@@ -102,11 +103,21 @@ class NativeInitResumeBeforeDevelopmentTests(unittest.TestCase):
         self.assertFalse(repeated.generated_index_write)
         self.assertEqual(first.scope_signature, repeated.scope_signature)
 
+    def test_unindexed_codegraph_requires_approval_before_write(self) -> None:
+        result = native_entry.evaluate_predevelopment(
+            provider_state="codegraph_unindexed"
+        )
+        self.assertEqual(result.provider, "rg_fallback")
+        self.assertEqual(result.provider_action, "record_fallback")
+        self.assertFalse(result.generated_index_write)
+
     def test_td02_commands_and_all_remaining_compatibility_commands_are_removed(self) -> None:
         text = "\n".join(
             path.read_text(encoding="utf-8")
             for path in sorted((ROOT / "skills").rglob("*"))
             if path.is_file()
+            and "__pycache__" not in path.parts
+            and path.suffix != ".pyc"
         )
         for command in native_entry.REMOVED_TD02_COMMANDS:
             self.assertNotIn(command, text)

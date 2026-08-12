@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministically maintain the CoTend router block in project AGENTS.md."""
+"""Deterministically maintain the private-CoTend router block in project AGENTS.md."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-CONTRACT = "cotend.project-router.v1"
+CONTRACT = "cotend.project-router.v2"
 START_MARKER = "<!-- COTEND:PROJECT-ROUTER:START -->"
 END_MARKER = "<!-- COTEND:PROJECT-ROUTER:END -->"
 TAG_RE = re.compile(r"^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$")
@@ -41,9 +41,7 @@ def normalize_tag(raw: str) -> str:
     for part in parts[1:]:
         if len(part) == 4 and part.isalpha():
             normalized.append(part.title())
-        elif (len(part) == 2 and part.isalpha()) or (
-            len(part) == 3 and part.isdigit()
-        ):
+        elif (len(part) == 2 and part.isalpha()) or (len(part) == 3 and part.isdigit()):
             normalized.append(part.upper())
         else:
             normalized.append(part.lower())
@@ -85,6 +83,7 @@ def render_router_block(normalized_tag: str, newline: str = "\n") -> str:
             f"- 路由合同：`{CONTRACT}`。",
             "- 在会话首次进入、恢复或收到 `继续`，以及处理 L0-L2/主链语义、验收/完成/发布/风险、路线重基、审查、无人值守或多模型工作时，先加载 `$cotend-collaboration`，再按其单层路由读取必要模块。",
             "- 已确认路线内、范围明确且孤立的 L3/L4 工作可保持轻路径，不要求加载全部 CoTend 协议。",
+            "- CoTend 决定本地收口是否已有授权，Native Closeout Pass 仍负责精确暂存、commit 和持久状态/审查/交接顺序。当有效授权满足任务范围、归属、精确路径 staging、验证和停止边界时，已满足 Native Closeout 的 commit gate；AI 必须自动创建仅含本任务的本地 commit，并继续同一已授权路线。不得 push；未分类 dirty、归属不明、staged overlap 或 user-only/Critical 边界仍须停止。",
             "- 对显式专用 Skill（例如 `$cotend-session-handoff`）的自然语言近似请求，只提示用户输入字面调用；不得加载其工作流、读取项目或生成产物。",
             END_MARKER,
         )
@@ -96,6 +95,7 @@ def render_router_block(normalized_tag: str, newline: str = "\n") -> str:
             f"- Routing contract: `{CONTRACT}`.",
             "- At first session entry, resume, or `继续`, and for L0-L2/main-chain semantics, acceptance/completion/release/risk, route rebase, review, unattended, or multi-model work, load `$cotend-collaboration` first and then only its triggered one-level modules.",
             "- Ordinary isolated L3/L4 work inside a confirmed route may stay lightweight; do not preload the full CoTend protocol.",
+            "- CoTend owns whether local closeout is authorized; the Native Closeout Pass retains exact staging, commit, and durable status/review/handoff ordering. When an active authorization passes task scope, ownership, literal exact-path staging, verification, and stop guards, it satisfies the Native Closeout commit gate. The AI must create only the task-local commit and continue the same authorized route. Never push; unclassified dirty state, uncertain ownership, staged overlap, or user-only/Critical boundaries still stop.",
             "- For a natural-language approximation of an explicit-only Skill such as `$cotend-session-handoff`, only suggest its literal invocation; do not load its workflow, inspect the project, or generate artifacts.",
             END_MARKER,
         )
@@ -144,7 +144,7 @@ def atomic_write(path: Path, data: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     handle = tempfile.NamedTemporaryFile(
         mode="wb",
-        prefix=f".{path.name}.cotend-router.",
+        prefix=f".{path.name}.dual-router.",
         suffix=".tmp",
         dir=path.parent,
         delete=False,

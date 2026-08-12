@@ -2,7 +2,7 @@
   "schema": "cotend.codex-skill-role-map",
   "schema_version": 1,
   "status": "adopted_verified",
-  "candidate_release": "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
+  "candidate_release": "exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d",
   "candidate_publication_state": "not_public_release",
   "platform": "Codex",
   "launch_adapter": true,
@@ -10,19 +10,12 @@
   "role_layer_decision": "product_owner_confirmed",
   "user_owned_naming_decision": "product_owner_confirmed",
   "third_party_bundling_decision": "product_owner_confirmed",
-  "mapping_basis": [
-    "Skill frontmatter",
-    "agents/openai.yaml",
-    "explicit delegation references",
-    "PROMPTS.md",
-    "FRAMEWORK-INTRO.md",
-    "THIRD-PARTY-SOURCES.json"
-  ],
+  "mapping_basis": "exact_source_2026_08_12_2_plus_CoTend_native_owner_adaptation",
   "skill_count": 10,
   "skills": [
     {
       "source_skill_id": "dual-ai-init",
-      "source_tree": "3e5998f4742585656d1d585b2bf2338b848809ae",
+      "source_tree": "0447d65ef270153d69858953b174e97e2666e409",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "unified_visible_entry",
@@ -48,7 +41,7 @@
     },
     {
       "source_skill_id": "dual-ai-project-init",
-      "source_tree": "ce9974142862fb3e6a4c18523433b212079c8a1b",
+      "source_tree": "1b3d56e52d489cbc6241d4e1e8e71268ea01147d",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "internal_auto_mode_engine",
@@ -58,8 +51,7 @@
         "dual-ai-collaboration",
         "diagnose-only",
         "dual-ai-semantic-alignment",
-        "grill-me",
-        "karpathy-guidelines"
+        "grill-me"
       ],
       "role_evidence": [
         "dual-ai-init explicitly delegates to this Skill",
@@ -80,7 +72,7 @@
     },
     {
       "source_skill_id": "dual-ai-collaboration",
-      "source_tree": "82146af99b711170878d0b396d3936919b3f4f24",
+      "source_tree": "335e3f0fe98ef2bb6a3f26fce83dc955e518bed0",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "shared_governance_core",
@@ -110,7 +102,7 @@
     },
     {
       "source_skill_id": "diagnose-only",
-      "source_tree": "dd5ba26517f032c3dfcdd5c69fabc27825c6bf25",
+      "source_tree": "7bb5b228c675f778ce4b62a46385a9e507a3691f",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "contextual_read_only_diagnosis",
@@ -133,7 +125,7 @@
     },
     {
       "source_skill_id": "dual-ai-semantic-alignment",
-      "source_tree": "943c95550ccd6a9602d406f9cd3348b494b7e5f1",
+      "source_tree": "59508c69b48143f22ebb5fea8c932511caa457cd",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "direct_writable_semantic_alignment",
@@ -162,7 +154,7 @@
     },
     {
       "source_skill_id": "dual-model-upgrade",
-      "source_tree": "fb58aa7c246bae683a1204901f6a9a61ca6c026b",
+      "source_tree": "809e7f5a32943b8a60bb6d29d364bf81cf3ef008",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "advanced_model_role_lifecycle",
@@ -190,7 +182,7 @@
     },
     {
       "source_skill_id": "dual-ai-session-handoff",
-      "source_tree": "cef063bf0c6821938dcdd094635a8e6f4d6a1c26",
+      "source_tree": "b5fd5ac0604e24cd842cd70c34946af1df16daa3",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "same_primary_session_transition",
@@ -219,7 +211,7 @@
     },
     {
       "source_skill_id": "dual-ai-tooling",
-      "source_tree": "73bda7067e0299e68202217df748ae325eec7f6d",
+      "source_tree": "aec8d2f776962a15697700e2634b9843187aa047",
       "source_relationship": "user_owned_original",
       "license": "Apache-2.0",
       "current_role": "bounded_reusable_capability_governance",
@@ -270,20 +262,25 @@
       "source_tree": "32d7f4abb8c9dd8ab17a793b5e0b1a3a1fa35aeb",
       "source_relationship": "adapted_third_party",
       "license": "MIT",
-      "current_role": "internal_ai_implementation_discipline",
-      "current_visibility": "implicit_internal_companion",
+      "current_role": "optional_ai_implementation_discipline_companion",
+      "current_visibility": "explicit_only_non_default_non_owner",
       "delegates_to": [],
       "role_evidence": [
         "project-init assigns coding behavior to this Skill",
         "the Skill defines simplicity, surgical edits, assumptions and verifiable goals",
         "it does not own project lifecycle, user authority or product state"
       ],
-      "adoption_status": "adapted",
-      "implementation_mode": "platform_adaptation",
+      "adoption_status": "retained_optional_companion",
+      "implementation_mode": "retained_predecessor_adaptation",
       "bundling_status": "user_confirmed",
       "target_skill_id": "karpathy-guidelines",
       "naming_status": "preserve_third_party_identity_if_bundled",
-      "required_notice": "Retain the upstream-contributor MIT attribution and license text"
+      "required_notice": "Retain the upstream-contributor MIT attribution and license text",
+      "preserve": [
+        "MIT attribution",
+        "optional explicit use",
+        "no lifecycle project-state or default-route authority"
+      ]
     }
   ],
   "deferred_platform_carriers": [
@@ -317,10 +314,16 @@
     "repository_source_carrier": "skills/",
     "repository_source_implemented": true,
     "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-08-01-1-v1-79-adoption",
+    "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-08-12-2-v2-01-r17-adoption",
     "live_install_authorized": false,
     "live_install_performed": false,
     "plugin_or_marketplace_carrier": "github_root_candidate_local_verified",
-    "final_framework_lock_exists": true
-  }
+    "final_framework_lock_exists": true,
+    "local_artifact": "cotend-codex-r000017",
+    "installation_state": "installed_exact_target"
+  },
+  "source_anchor": "fe21e970bc2bdc69de5e2ce1710aef2dd156a54d",
+  "skill_file_count": 104,
+  "source_skill_count": 9,
+  "source_skill_file_count": 94
 }

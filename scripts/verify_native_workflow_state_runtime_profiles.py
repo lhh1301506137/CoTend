@@ -22,7 +22,7 @@ PROJECT_INIT_PATH = ROOT / "skills" / "cotend-project-init" / "SKILL.md"
 COLLABORATION_PATH = ROOT / "skills" / "cotend-collaboration" / "SKILL.md"
 DOCUMENT_PATH = ROOT / "docs" / "NATIVE-WORKFLOW-STATE-AND-RUNTIME-PROFILES.md"
 
-NativeState = Literal["absent", "current", "dormant", "conflict"]
+NativeState = Literal["uninitialized", "current", "stale", "conflict"]
 ProfileInput = Literal["full", "adaptive", "invalid", "none"]
 ExternalState = Literal["none", "reference", "historical", "conflict"]
 
@@ -30,37 +30,31 @@ VALID_PROFILES = {"full", "adaptive"}
 EXECUTION_MODE = {"full": "delegated_pair", "adaptive": "inline"}
 
 REQUIRED_RUNTIME_MARKERS = (
-    "## Native State Owner",
-    "Use the existing `STATUS.md`",
-    "Do not create a hidden state directory",
-    "`current`",
-    "`dormant`",
-    "`conflict`",
-    "## External Framework Classification",
-    "Never write CoTend state, profile, dispatch, or migration metadata into external framework files.",
-    "External lifecycle procedures are never invoked as CoTend Core.",
-    "1. a user-explicit current-session selection;",
-    "2. one valid native project record;",
-    "3. one unambiguous project-local legacy selection",
-    "4. the CoTend product default `full`.",
-    "`full` | `v1.79-full` | `delegated_pair`",
-    "`adaptive` | `v1.79-A` | `inline`",
-    "Migrate only when all of these are true:",
-    "Do not modify, delete, or normalize the source file.",
+    "single canonical contract for selecting and executing the cotend runtime profile",
+    "must not define a second selector",
+    "Persist the selected profile in the existing canonical project status carrier",
+    "cotend_workflow:",
+    "runtime_profile: full | adaptive",
+    "execution_dispatch_mode: delegated_pair | inline",
+    "Map `full -> delegated_pair` and `adaptive -> inline`",
+    "without creating a state directory",
+    "Plan Tree/current project truth",
+    "| `full` | `v2.01-full` |",
+    "| `adaptive` | `v2.01-A` |",
 )
 REQUIRED_INIT_MARKERS = (
-    "## Native Workflow State And Runtime Profile",
-    "Persist the record in `STATUS.md` or the project's explicitly mapped equivalent.",
-    "external_framework_owner: false",
-    "execution_mode: delegated_pair | inline",
-    "state: current | dormant | conflict",
-    "Never write CoTend profile or execution metadata into an external framework configuration.",
-    "external_frameworks:",
+    "Resolve the canonical CoTend workflow binding",
+    "`STATUS.md#cotend_workflow`",
+    "`current | uninitialized | stale | conflict`",
+    "Plan Tree and the current\n   task/spec links remain the only route and work authority",
+    "must\n   not create a task directory, task runtime, hook or parallel state tree",
+    "Safe initialization/repair may continue for the first three states",
 )
 REQUIRED_COLLABORATION_MARKERS = (
-    "Detection may be `absent`; persisted state is `current | dormant | conflict`.",
-    "`full` maps to native `delegated_pair`; `adaptive` maps to native `inline`.",
-    "Never write CoTend profile or execution metadata into its configuration",
+    "Plan Tree/current project truth owns the active route and task/spec links.",
+    "Implementation/Verification pair. Adaptive performs the same contracts",
+    "`STATUS.md#cotend_workflow` is the canonical readiness/reporting record",
+    "External framework\n  artifacts remain `reference_only | historical | conflict`.",
 )
 REQUIRED_DOCUMENT_MARKERS = (
     "# CoTend 原生工作流状态与运行档位",
@@ -167,8 +161,10 @@ def evaluate_workflow(
         raise NativeWorkflowStateError(
             "project persistence requires an explicit session profile"
         )
-    if explicit_resume and native_state != "dormant":
-        raise NativeWorkflowStateError("only a dormant record can be resumed")
+    if explicit_resume:
+        raise NativeWorkflowStateError(
+            "v2.01 has no dormant/resume state; use stale repair or normal continuation"
+        )
     if external_affects_route and external_state != "conflict":
         raise NativeWorkflowStateError(
             "only a classified external conflict can affect the route"
@@ -200,12 +196,12 @@ def evaluate_workflow(
             reason="native_record_conflict",
             external_state=external_state,
         )
-    if native_state == "absent" and native_profiles:
+    if native_state == "uninitialized" and native_profiles:
         return _blocked_result(
-            reason="absent_state_has_native_profile",
+            reason="uninitialized_state_has_native_profile",
             external_state=external_state,
         )
-    if native_state in {"current", "dormant"} and (
+    if native_state in {"current", "stale"} and (
         len(native_profiles) != 1 or native_profiles[0] not in VALID_PROFILES
     ):
         reason = (
@@ -220,7 +216,7 @@ def evaluate_workflow(
     state_source = "native_project_record"
     profile_source = "project_persistent"
 
-    if native_state == "absent":
+    if native_state == "uninitialized":
         valid_legacy = [
             profile for profile in legacy_profiles if profile in VALID_PROFILES
         ]
@@ -254,25 +250,11 @@ def evaluate_workflow(
     else:
         persisted_profile = native_profiles[0]
         state = native_state
-        if state == "dormant" and not explicit_resume:
-            return WorkflowResult(
-                state="dormant",
-                state_source=state_source,
-                effective_profile=persisted_profile,
-                execution_mode=EXECUTION_MODE[persisted_profile],
-                persisted_profile=persisted_profile,
-                persisted_execution_mode=EXECUTION_MODE[persisted_profile],
-                profile_source=profile_source,
-                write_native_record=False,
-                user_decision_required=True,
-                can_continue=False,
-                external_classification=_external_classification(external_state),
-                migration_result="explicit_resume_required",
-            )
-        if state == "dormant" and explicit_resume:
+        if state == "stale":
             state = "current"
             write_native_record = True
-            migration_result = "dormant_record_resumed"
+            state_source = "repaired_native_project_record"
+            migration_result = "stale_record_repaired"
 
     effective_profile = (
         session_profile if session_profile in VALID_PROFILES else persisted_profile
@@ -283,7 +265,7 @@ def evaluate_workflow(
             write_native_record = True
             migration_result = (
                 "persistent_profile_changed"
-                if native_state != "absent"
+                if native_state != "uninitialized"
                 else migration_result
             )
         profile_source = "session_explicit_saved_to_project"
@@ -308,7 +290,7 @@ def evaluate_workflow(
 
 EXPECTED_SCENARIOS = {
     "fresh_default_full": {
-        "kwargs": {"native_state": "absent"},
+        "kwargs": {"native_state": "uninitialized"},
         "expected": {
             "state": "current",
             "effective_profile": "full",
@@ -372,26 +354,29 @@ EXPECTED_SCENARIOS = {
             "write_native_record": True,
         },
     },
-    "dormant_requires_resume": {
+    "stale_record_repairs": {
         "kwargs": {
-            "native_state": "dormant",
+            "native_state": "stale",
             "native_profiles": ("adaptive",),
         },
         "expected": {
-            "state": "dormant",
-            "can_continue": False,
-            "user_decision_required": True,
+            "state": "current",
+            "can_continue": True,
+            "user_decision_required": False,
+            "write_native_record": True,
+            "migration_result": "stale_record_repaired",
         },
     },
-    "dormant_explicit_resume": {
+    "uninitialized_explicit_project_selection": {
         "kwargs": {
-            "native_state": "dormant",
-            "native_profiles": ("adaptive",),
-            "explicit_resume": True,
+            "native_state": "uninitialized",
+            "session_profile": "adaptive",
+            "persist_session": True,
         },
         "expected": {
             "state": "current",
             "effective_profile": "adaptive",
+            "persisted_profile": "adaptive",
             "write_native_record": True,
         },
     },
@@ -453,7 +438,7 @@ EXPECTED_SCENARIOS = {
     },
     "legacy_adaptive_migrates_without_source_write": {
         "kwargs": {
-            "native_state": "absent",
+            "native_state": "uninitialized",
             "legacy_profiles": ("adaptive",),
         },
         "expected": {
@@ -465,7 +450,7 @@ EXPECTED_SCENARIOS = {
     },
     "ambiguous_legacy_fails_closed": {
         "kwargs": {
-            "native_state": "absent",
+            "native_state": "uninitialized",
             "legacy_profiles": ("full", "adaptive"),
         },
         "expected": {
@@ -476,7 +461,7 @@ EXPECTED_SCENARIOS = {
     },
     "fresh_session_override_preserves_project_default": {
         "kwargs": {
-            "native_state": "absent",
+            "native_state": "uninitialized",
             "session_profile": "adaptive",
         },
         "expected": {

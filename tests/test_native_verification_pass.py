@@ -21,8 +21,8 @@ class NativeVerificationPassTests(unittest.TestCase):
         self.assertEqual(result["runtime_files"], 0)
         self.assertEqual(result["td05_commands"], 0)
         self.assertEqual(result["remaining_commands"], 0)
-        self.assertEqual(result["skill_files"], 71)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000016")
+        self.assertEqual(result["skill_files"], 104)
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000017")
 
     def test_full_and_adaptive_use_the_same_result_contract(self) -> None:
         full = verification.evaluate_verification(profile="full")
@@ -155,6 +155,8 @@ class NativeVerificationPassTests(unittest.TestCase):
             path.read_text(encoding="utf-8")
             for path in sorted((ROOT / "skills").rglob("*"))
             if path.is_file()
+            and "__pycache__" not in path.parts
+            and path.suffix != ".pyc"
         ).lower()
         self.assertNotIn(verification.REMOVED_TD05_COMMAND, text)
         for command in verification.REQUIRED_REMAINING_COMMANDS:

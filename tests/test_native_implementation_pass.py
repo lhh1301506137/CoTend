@@ -21,8 +21,8 @@ class NativeImplementationPassTests(unittest.TestCase):
         self.assertEqual(result["runtime_files"], 0)
         self.assertEqual(result["td04_commands"], 0)
         self.assertEqual(result["remaining_commands"], 0)
-        self.assertEqual(result["skill_files"], 71)
-        self.assertEqual(result["target_artifact"], "cotend-codex-r000016")
+        self.assertEqual(result["skill_files"], 104)
+        self.assertEqual(result["target_artifact"], "cotend-codex-r000017")
 
     def test_full_and_adaptive_use_the_same_result_contract(self) -> None:
         full = implementation.evaluate_implementation(profile="full")
@@ -121,6 +121,8 @@ class NativeImplementationPassTests(unittest.TestCase):
             path.read_text(encoding="utf-8")
             for path in sorted((ROOT / "skills").rglob("*"))
             if path.is_file()
+            and "__pycache__" not in path.parts
+            and path.suffix != ".pyc"
         ).lower()
         self.assertNotIn(implementation.REMOVED_TD04_COMMAND, text)
         for command in implementation.REQUIRED_REMAINING_COMMANDS:

@@ -102,7 +102,9 @@ class SemanticAlignmentSkillTests(unittest.TestCase):
             "Do not run or require `cotend-init` or full `cotend-project-init`",
             semantic,
         )
-        self.assertIn("This pointer is a report-only handback", init)
+        self.assertIn(
+            "Init propagates it without interpreting product", init
+        )
         self.assertIn("classified_by_init: no", init)
         self.assertIn("executed: no", init)
         self.assertIn(

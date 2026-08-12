@@ -30,26 +30,29 @@ Runtime profile and continuous-risk authorization are separate user-facing choic
 
 1. a user-explicit current-window `low | medium | dev_high` choice;
 2. a valid project-persistent user choice;
-3. `medium` with `authorization_basis: default_medium`.
+3. the applicable adapter's declared initial tier, normalized to its non-user
+   authorization basis.
 
-Both Adaptive and Full permit all three autonomy tiers. Runtime profile, project eligibility, model capability, repeated `continue`, and prior AI inference never activate or rewrite `dev_high`.
+Both Adaptive and Full permit all three autonomy tiers. Runtime profile, project eligibility, model capability, repeated `继续`, and prior AI inference never activate or rewrite `dev_high`.
 
-A persisted project choice is valid only when its tier has the matching `user_explicit_low | user_explicit_medium | user_explicit_dev_high` basis and its recorded scope or expiry is current. A bare tier, missing or mismatched basis, AI-derived label, or stale scope is not user confirmation and falls through to `default_medium`.
+A persisted project choice is valid only when its tier has the matching `user_explicit_low | user_explicit_medium | user_explicit_dev_high` basis and its recorded scope/expiry is current. A bare tier, missing/mismatched basis, AI-derived label, or stale scope is not user confirmation and falls through to the declared adapter default.
 
-A current-window override is session state. It must not overwrite the underlying project-persistent choice unless the user also asks to persist the new tier for the project. When the window ends, resolve the preserved project choice again before falling back to `default_medium`.
+A current-window override is session state. It must not overwrite the
+underlying project-persistent choice unless the user also asks to persist the
+new tier for the project. When the window ends, resolve the preserved project
+choice again before consulting the applicable adapter's declared initial tier.
 
-Recommendation posture is advisory only. Apply it when no valid user choice exists, or when the user explicitly asks for a recommendation:
-
-| Effective runtime profile | Current evidence | Recommendation |
-|---|---|---|
-| `adaptive` | confirmed personal/local/prototype, local-only, no other people's private data, no public deployment/upload, no real payment, user-owned or disposable data | `recommend_dev_high` once |
-| `adaptive` | eligibility unresolved or unsuitable | `recommend_medium` or no recommendation |
-| `full` | any non-Critical posture | `recommend_medium` |
-| missing / invalid | any | `recommend_medium` and resolve the profile separately |
+Recommendation posture is advisory only. When no valid user choice exists, or
+the user explicitly asks for a recommendation, validate and consume the
+applicable adapter's recommendation for the effective profile and current
+evidence. The shared owner does not invent a product mapping. A missing,
+malformed, profile-mismatched or evidence-inapplicable recommendation is
+`none`/`unknown`, not a reason to infer one from model strength, conversation,
+carrier or project label.
 
 A recommendation never blocks otherwise safe `medium` work and never counts as user confirmation. Use the existing persisted `recommendation` value as the dedup carrier: after an unchanged recommendation has been reported once, do not report it again. Once the user selects any tier, honor that choice without repeating the recommendation unless the user asks again or materially new evidence changes the recommendation. User selection persists for its recorded scope/expiry across runtime-profile and framework changes until the user changes it.
 
-Historical `default_personal_local_dev_high`, `temporary_medium_until_classified`, and versioned default-dev-high or temporary-medium aliases were AI-derived defaults, not user choices. During Init or repair, normalize them to `default_medium`; when current Adaptive evidence supports the local fast path, retain only a non-authorizing `recommend_dev_high` suggestion.
+Historical `default_personal_local_dev_high`, `temporary_medium_until_classified`, and versioned default-dev-high / temporary-medium aliases were AI-derived defaults, not user choices. During Init/repair, normalize them to `default_medium`; when current Adaptive evidence supports the local fast path, retain only a non-authorizing `recommend_dev_high` suggestion.
 
 Historical `user_restricted_low` is different: it records an actual user restriction. When its scope/expiry is current, preserve the `low` choice and normalize it to `user_explicit_low` without changing the tier. Never raise that record to `medium`.
 
@@ -57,9 +60,13 @@ Use `critical` stop boundaries regardless of runtime profile or risk selection.
 
 ## Dev-High Posture Notice
 
-When `dev_high` is active and current evidence materially suggests the project is no longer purely private/local/prototype, emit one concise non-blocking notice at that transition. Do not silently rewrite the user's selected tier and do not repeat the same notice on every step. Render the notice in the resolved user-facing governance language and explain that Critical operations still stop separately.
+When `dev_high` is active and current evidence materially suggests the project
+is no longer inside its recorded local/prototype scope, emit one concise non-
+blocking transition notice. Do not silently rewrite the tier or repeat the
+notice. State only that the user choice remains recorded while Critical/public/
+private-data/payment boundaries still stop.
 
-Record a compact `posture_notice` fingerprint in the existing risk or status carrier only when needed to suppress duplicates. The notice is not authority. If the next action itself is Critical, stop instead of merely warning.
+Record a compact `posture_notice` fingerprint in the existing risk/status carrier only when needed to suppress duplicates. The notice is not authority. If the next action itself is Critical, stop instead of merely warning.
 
 A material transition must produce a non-empty deterministic fingerprint before recording the notice. A missing or empty fingerprint is a validation defect; never treat two absent values as proof that the first notice was already shown.
 
@@ -84,11 +91,20 @@ Local commits are risk-lowering checkpoints when they only capture verified, in-
 
 Default rule:
 
-- Without recorded `local_closeout_authorization`, stop before commit or archive and ask the user. Neither Full nor Adaptive activates local closeout by itself.
-- With recorded `local_closeout_authorization.status: active`, native durable-record synchronization plus an optional local commit may proceed inside the current authorized scope when all conditions in `continuous-and-unattended.md` and `closeout-pass.md` are satisfied.
+- Without recorded `local_closeout_authorization`, stop before commit/archive
+  unless the applicable adapter declares materialization for the proven scope.
+- Adapter materialization still requires a runtime-profile predicate matching
+  the effective profile, known task-local scope, classified ownership, passing
+  verification and no user-only/Critical boundary. The shared risk owner does
+  not invent a local-closeout default.
+- Full does not materialize local closeout from its runtime profile; it remains opt-in unless the project already contains an active authorization record.
+- With recorded `local_closeout_authorization.status: active`, a local commit
+  plus the Native Closeout Pass may proceed inside the current authorized scope
+  when all conditions in `continuous-and-unattended.md` are satisfied.
 - Commit messages must identify the task/slice and avoid secrets or private data.
-- Before staging, inspect `git status`, classify ownership, and use explicit path selection to exclude unrelated or user changes. Their mere presence is not a blocker; unresolved ownership or staged overlap is.
-- After local closeout, report the closeout result, commit hash or not-applicable reason, synchronized records, post-commit verification, and whether any stop boundary was encountered.
+- Before staging, inspect `git status`, classify ownership, and use explicit path selection to exclude unrelated/user changes. Their mere presence is not a blocker; unresolved ownership or staged overlap is.
+- After local closeout, report commit hash, Native Closeout result, verification,
+  durable-carrier updates, and whether any stop boundary was encountered.
 
 Never covered by local closeout authorization: any item in the canonical Critical / Never-Unattended Stop List in `authority-and-triggers.md`.
 
@@ -100,7 +116,7 @@ When tightening, convert previous `dev_high` shortcuts into blockers or cleanup 
 
 ## Human Rejoin Explanation
 
-Use this for user approval, user acceptance, scope expansion, product direction choice, release/deploy, destructive operation, or any stop boundary. Render the canonical Human Rejoin semantic fields from `templates.md` through the active adapter in the resolved governance language, adding the risk tier and exact technical evidence where required.
+Use this for user approval, user acceptance, scope expansion, product direction choice, release/deploy, destructive operation, or any stop boundary. Render the canonical Human Rejoin semantic fields from `collaboration-packet-templates.md` through the active adapter in the resolved governance language, adding the risk tier and exact technical evidence where required.
 
 Keep it short and non-technical. If exact commands, destructive targets, costs, secrets, or public exposure are involved, include exact path/command, backup/rollback status, and verification plan.
 
@@ -134,7 +150,7 @@ local_closeout_authorization:
   scope: current_window | current_project | named_milestone
   allowed_actions:
     - local_git_commit
-    - native_closeout_records_and_local_commit
+    - native_closeout
     - durable_status_review_log_updates
   excluded_actions:
     # Canonical summary only; exact boundaries live in `authority-and-triggers.md`.
@@ -145,4 +161,4 @@ local_closeout_authorization:
     - scope_expansion_or_user_acceptance
 ```
 
-Existing project records using `default_personal_local_dev_high`, `temporary_medium_until_classified`, the v1.52 through v1.61 `default_*_dev_high_local` or `temporary_*_medium_until_classified` labels, including `default_v1.61_dev_high_local` and `temporary_v1.61_medium_until_classified`, remain accepted historical aliases for migration only. They do not prove user selection and normalize to `default_medium`. Existing explicit risk choices remain valid when their scope and expiry are current; migrate `user_restricted_low` to `user_explicit_low` without changing its tier, scope, or expiry. Delegation maturity never selects or raises risk authorization and never bypasses Human Rejoin.
+Existing project records using `default_personal_local_dev_high`, `temporary_medium_until_classified`, the v1.52 through v1.61 `default_*_dev_high_local` / `temporary_*_medium_until_classified` labels, including `default_v1.61_dev_high_local` and `temporary_v1.61_medium_until_classified`, remain accepted historical aliases for migration only. They do not prove user selection and normalize to `default_medium`. Existing explicit risk choices remain valid when their scope/expiry is current; migrate `user_restricted_low` to `user_explicit_low` without changing its tier, scope, or expiry. No acceptance-rate or historical recommendation mechanism selects or raises risk authorization or bypasses Human Rejoin.

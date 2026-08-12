@@ -1,4 +1,4 @@
 interface:
   display_name: "CoTend Collaboration"
-  short_description: "Canonical CoTend project router"
-  default_prompt: "Use $cotend-collaboration v1.79 as the canonical router. Load only directly triggered owners. Route concrete capability reuse to $cotend-tooling and run solution adequacy only for material route uncertainty, cost, contradicted assumptions, patch complexity, or a substantive user candidate. Preserve user-confirmed L0-L2, AI-owned in-scope L3/L4, evidence, review, acceptance, release, and handback gates. CoTend remains Full by default; Full and Adaptive keep identical authority and stop results."
+  short_description: "Carrier-aware actual-model collaboration"
+  default_prompt: "Use $cotend-collaboration v2.01 to route and govern the current CoTend development task. Preserve user, evidence, Primary, and risk authority boundaries; keep Full and Adaptive semantically equivalent; use one Plan Tree and one execution-closure result; load only triggered modules; allow one bounded repair/recheck; and keep acceptance, release, push, deployment, and publication user-owned."

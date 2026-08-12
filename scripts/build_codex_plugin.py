@@ -151,6 +151,8 @@ def path_hash_manifest(root: Path) -> dict[str, str]:
         path.relative_to(root).as_posix(): sha256_file(path)
         for path in sorted(root.rglob("*"))
         if path.is_file()
+        and "__pycache__" not in path.parts
+        and path.suffix != ".pyc"
     }
 
 
@@ -356,9 +358,9 @@ def source_skill_manifest() -> dict[str, str]:
     if actual_directories != CURRENT_REPOSITORY_SKILLS:
         raise PluginPackageError("repository Skill directory inventory drifted")
     manifest = path_hash_manifest(SOURCE_SKILLS_ROOT)
-    if len(manifest) != 71:
+    if len(manifest) != 104:
         raise PluginPackageError(
-            f"expected 71 repository Skill files, found {len(manifest)}"
+            f"expected 104 repository Skill files, found {len(manifest)}"
         )
     for skill in CURRENT_REPOSITORY_SKILLS:
         if f"{skill}/SKILL.md" not in manifest:
@@ -579,8 +581,8 @@ def validate_contract() -> dict[str, Any]:
     if (
         target.get("platform") != "Codex"
         or target.get("lineage") != "cotend-codex"
-        or target.get("artifact_id") != "cotend-codex-r000016"
-        or target.get("revision") != 16
+        or target.get("artifact_id") != "cotend-codex-r000017"
+        or target.get("revision") != 17
         or not isinstance(target.get("manifest_sha256"), str)
         or len(target["manifest_sha256"]) != 64
     ):

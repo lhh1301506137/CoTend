@@ -1,13 +1,13 @@
 # Native Agent Orchestration
 
-Use this module when the Primary may use native subagents, parallel agent work, a multi-packet long task, a fresh final review context, or when an agent has no trustworthy first response. It governs delegation shape. It does not require optional delegation; the one explicit exception is the Full profile's fixed Implementer/Checker quality pair owned by `runtime-profiles.md`.
+Use this module when the Primary may use native subagents, parallel agent work, a multi-packet long task, a fresh final review context, or when an agent has no trustworthy first response. It governs delegation shape. It does not require optional delegation; the one explicit exception is the Full profile's fixed CoTend governance implement/check quality chain owned by `runtime-profiles.md`.
 
 ## Root Responsibility
 
 The root Primary keeps the continuous product context and remains responsible for:
 
 - user-confirmed L0-L2 meaning, authority, risk, and pending decisions;
-- the active CoTend Plan Tree route and dependency graph;
+- the active CoTend-governed/Plan Tree route and dependency graph;
 - packet boundaries, write ownership, integration, and conflict resolution;
 - verification selection, final review, completion claims, and user-facing reporting.
 
@@ -16,7 +16,7 @@ A subagent may explore, implement, test, or review one bounded packet. It cannot
 A bounded subagent's first repository view is not Plan Tree
 `first_project_entry`. The root provides a compact work packet plus canonical
 semantic pointers, and the subagent reads only what its packet needs. It runs
-Project Understanding Reconstruction only if it genuinely takes over
+Project Intelligence only if it genuinely takes over
 route/integration responsibility or its assigned scope independently fires
 another canonical Plan Tree trigger.
 
@@ -24,7 +24,7 @@ another canonical Plan Tree trigger.
 
 For every extra/optional agent and every proposal to split the selected workflow into more packets, delegate only when expected benefit is positive after counting additional model/tool tokens, repeated discovery, coordination, write conflicts, integration effort, machine resources, and verification cost.
 
-The Full profile's fixed Implementer -> Checker pair is a profile-authorized quality baseline, not an optional dispatch decision. The Implementer always uses the native `implementation-pass.md` contract and the Checker always uses the native `verification-pass.md` contract. Do not use this gate to cancel the pair. Apply the rest of this module to both roles, and require positive net benefit before either role creates additional agents or the root decomposes the work beyond the fixed pair.
+The Full profile's fixed `Native Implementation Pass -> Native Verification Pass` pair is a profile-authorized quality baseline, not an optional dispatch decision. Do not use this gate to cancel that pair. Apply the rest of this module to both roles, and require positive net benefit before either role creates additional agents or the root decomposes the work beyond the fixed pair.
 
 Positive signals include:
 
@@ -35,6 +35,8 @@ Positive signals include:
 - repeated failure where an independent hypothesis or fresh review can break the loop.
 
 Outside the Full fixed pair, prefer root-only execution when the task is short, linear, highly coupled, dominated by one shared file/state surface, or would make every agent reread the same full context. Optional native delegation is an optimization, never a completion requirement or a proxy for quality. In Full, keep the fixed pair but avoid further subdivision when its net benefit is not positive.
+
+Plan Tree's coherence-sized execution unit and agent packet size are separate decisions. Choose the product execution unit first; then split agent packets only along genuinely stable, independently owned dependency boundaries. Do not fragment one coherent product unit merely to create more agents, and do not treat several independent packets as one product completion claim merely because they ran in one batch. Internal packets may checkpoint a larger unit, but the root remains responsible for integration and exact-boundary verification.
 
 Do not fix a universal agent count, model, reasoning effort, context size, timeout, nesting depth, CPU/memory percentage, or read/write ratio. Respect the current carrier, project constraints, permissions, and available evidence. Record the dispatch reason only for a material batch, surprising cost, or review-confidence decision; ordinary non-dispatch needs no ceremony.
 
@@ -108,7 +110,7 @@ The packet may reference canonical project truth; it must not copy or redefine i
 ## Execution And Integration
 
 1. The root binds the current goal and confirmed route, then builds the dependency graph.
-2. Run the selected profile's baseline route. For a Full fixed pair, dispatch the Implementer through `implementation-pass.md`, then dispatch an independently scoped Checker through `verification-pass.md`; for every additional/optional packet, dispatch only when it is independent, `ready`, and net-positive.
+2. Run the selected profile's baseline route. For a Full fixed implement/check role, dispatch the role under the profile contract; for every additional/optional packet, dispatch only when it is independent, `ready`, and net-positive.
 3. Continue useful root work that does not depend on their outputs; wait when integration or a user-facing conclusion does depend on them.
 4. Require each worker to return a compressed result and direct evidence, not raw intermediate narration.
 5. The single integration owner checks current workspace state, reconciles concurrent changes, incorporates outputs, and reruns affected integration checks.
@@ -127,11 +129,17 @@ After integration, the root reruns the affected cross-packet checks through `acc
 - verify the integrated active path and local/adjacent/cumulative closure when applicable;
 - keep AI review distinct from user acceptance.
 
-A separate session using the same model improves context independence but is not different-model or different-provider evidence. Use the canonical review identity labels and disclose the limitation.
+The packet, findings-only output, reconciliation priority, review-input/cycle
+dedupe, and three-cycle stop are owned by the Fresh Challenger Protocol in
+`review-and-self-review.md`; do not copy them into a worker packet, a second
+ledger, or a parallel completion result. A separate session using the same
+model improves context independence but is not different-model or
+different-provider evidence. Record the actual receipt and disclose unknown
+identity instead of inferring it from a carrier or persona label.
 
 ## Lightweight Long-Task View
 
-Do not create a permanent `WORK-PACKET-LEDGER.md` or another truth tree. Derive a concise view from the CoTend route owner, classified external task references, STATUS, review records, and current agent state only when a material long task benefits from it:
+Do not create a permanent `WORK-PACKET-LEDGER.md` or another truth tree. Derive a concise view from the active CoTend-governed task, Plan Tree, STATUS, review records, and current agent state only when a material long task benefits from it:
 
 ```yaml
 agent_work_view:
@@ -166,6 +174,6 @@ Do not encode a community article's provider, WebSocket setting, fixed first-eve
 - parallel writes without disjoint ownership and one integration owner;
 - central final testing as a replacement for packet-level verification;
 - fresh-context review described as user acceptance or different-model evidence without identity proof;
-- a second permanent work ledger that competes with the CoTend route owner, STATUS, decision, or review records;
+- a second permanent work ledger that competes with CoTend governance, Plan Tree, STATUS, or review truth;
 - blind retry of an ambiguous side-effecting task.
-- using the optional-agent net-benefit gate to cancel the Full profile's fixed Implementer/Checker quality pair, or using the fixed pair to justify further low-benefit subdivision.
+- using the optional-agent net-benefit gate to cancel the Full profile's fixed implement/check quality chain, or using the fixed pair to justify further low-benefit subdivision.

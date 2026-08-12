@@ -656,3 +656,99 @@ CoTend 将协议推进到 v1.79，并新增第 10 个第一方入口 `cotend-too
 G01-G05 随 r16 做当前仓库回归。G06 保留为已完成并由用户接受的 r13 历史真实项目验收；本轮不重写外部 UAT，不执行真实模型，也不假称完成 r16 真实项目验收。
 
 本记录只覆盖仓库内 exact-source review、CoTend 本地产品适配、r16 锁、本地 artifact 和确定性复审。DEC-170 要求停在本地提交前；全局安装、真实模型、独立/外部 UAT、Claude v1.79 适配、push、tag、Release、submission 和 publish 均未获授权。
+
+## exact-source-2026-08-12-2-v2-01-r17-adoption
+
+```yaml
+status: adopted_verified_local_r17
+source_identity: exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d
+source_anchor_type: exact_source_commit
+source_commit: fe21e970bc2bdc69de5e2ce1710aef2dd156a54d
+source_tree: 076099a1c6888ede804189e1aa125eba92380e94
+source_tree_path: skills-backup/codex
+source_predecessor_commit: c14d4133bf0438d435048858554c88c89a7870a3
+target_publication_state: not_public_release
+consumer_handoff: 2026.08.12.2
+consumer_handoff_work_commit: 3d478ccf5aaf9e0a86d6817c6dfe7dfde5debb94
+handoff_json_sha256: 1367e88f6dd9ec73482ec537cb17149681d7d00c88ed8473745d8ac5d1137b48
+handoff_markdown_sha256: 6626cf9720bc871009e5d3866555def48eefaca275433f9f952f5835c0d2083e
+handoff_checksums_sha256: b58045caf8ba36bc391e13aeef1336049a6f006c2774457965a2e76445a80208
+latest_public_release: 2026.07.28.2
+reviewed_commit_range: 188_commits_from_v1_79_exact_source_exclusive_to_v2_01_exact_source_inclusive
+contract_change_commits: 25
+evidence_only_commits: 150
+consumer_not_applicable_commits: 13
+superseded_or_reverted_commits: 0
+unclassified_commits: 0
+framework_protocol: cotend-collaboration-v2.01
+model_upgrade_packet_family: cotend-model-upgrade-v1.16
+source_skill_count: 9
+upstream_skill_file_count: 94
+target_skill_count: 10
+target_skill_file_count: 104
+target_artifact_id: cotend-codex-r000017
+target_revision: 17
+target_manifest_sha256: f31c668349fc354402415f070f1ab90f1be47fa03d4141b5d8f5b58aee407cbe
+local_artifact_file: dist/local/cotend-codex-r000017-local-f31c668349fc.zip
+local_artifact_entry_count: 106
+local_artifact_sha256: 5b1bfdf6e7f136deb013125aa6d7a8dcbfd9409bb3a00917e0d7efcf81003fd1
+predecessor_target_artifact_id: cotend-codex-r000016
+predecessor_manifest_sha256: a7f7ece2522a5901030e19cd5944359f80c027482f66f822a2053fc5080dcfb5
+G06_status: frozen_completed_user_accepted_r13_not_rerun_for_r17
+rc2_status: frozen_unchanged
+resulting_CoTend_commit: containing_commit
+live_install_performed: false
+model_call_performed: false
+external_UAT_modified: false
+push_release_or_publish: not_performed
+```
+
+### 25 项 included change 精确清单
+
+- `2a06b6e5c8af78f2965819a8bb182155ad43dca3` — coherence-sized execution
+- `4d6081b16325b67706c22644cf95ab5ef8f271fb` — outcome-triggered governance
+- `be3a2288663f9e8094fba3944ddb8adaf2f860d6` — traceable Tooling refresh
+- `871fb858d121d3bbe03ea9e4bb8e7005c3c7e7cb` — adaptive development experience
+- `4f57dbe80b5e32a8c8fde6ccc578e3e38d8356d2` — v1.84 initialization convergence
+- `ad89296bfa3735c4a1dd8bf3ccbc114065c01968` — retire Karpathy default route
+- `143e30714cf09d392c399539dd60c5f3077273dd` — v1.85 reference partition
+- `a74a12dc4c8b5fbe775bfb2cb34c955c65776982` — governance-history lifecycle
+- `50771246402e1648aa2ecaab2208d409a41af43a` — remove Karpathy from Dual v1.87
+- `814cef196b64f92540fba291bf25c7ab966e3eaf` — v1.88 compatibility receipts
+- `368ee9f638a30c1ab35a5bb4ffe5500b1bac96d3` — active design stewardship
+- `405f05fba332c20b5587f212c9c6d48f12ee06a5` — scoped collaboration kernel
+- `b29302a4535abd50f4247acb17ddd91d32c689db` — Project Intelligence
+- `e9fdd26692719fe8b4567aeb744a07a19b22f6d2` — execution-closure convergence
+- `cbc0365ef1b691d08317799d663d064ab11b6675` — cold-path and adapter partition
+- `324a7dca6300a0bbc9766c2d6a1253f98a83467a` — understanding interface
+- `e412bdffb5c0808deefb9b22e0b95010553288a9` — progressive understanding projections
+- `bd9964a56e39a9d22e950faf8482380dd72d4096` — topic-oriented understanding contracts
+- `facc09633a9bfe9caa7583995fa4db8d886bdcd7` — understanding-artifact byte gate
+- `65d6e4cdc9e65c6573c1bf6539dd178aeea3f587` — scope/profile fidelity
+- `3acabb813b6e23432b2ec083a37d28e32f6c4ed5` — scope and Unknown integrity
+- `4d556fd85e04a47f54b1f247e9f28db0580c0aa7` — Fresh Challenger D0
+- `6af162e9b14ce34f466486c97b422a1c559404ff` — material understanding route truth
+- `3ef18e2453b1edc6db0a12cb0c55d9f3f5b0cec5` — separate consumer install authority
+- `fe21e970bc2bdc69de5e2ce1710aef2dd156a54d` — authorized local closeout
+
+### CoTend 产品适配
+
+全部 25 项均以 `adapted` 进入 CoTend 原生 owner，没有直接复制上游私有
+adapter、Trellis runtime/Skill/hook/状态目录/任务权威或内部测试树。需求澄清、
+项目真相与计划、授权实施、验证复审、收尾恢复、提交范围与权威分别由现有
+CoTend Collaboration、Project Init、Semantic Alignment、Plan Tree、Native
+Implementation/Verification/Closeout、Decision/Review/Status 载体承接。
+
+产品修正包括：把 canonical workflow 状态统一为
+`current | uninitialized | stale | conflict`；CodeGraph 未索引时必须先取得用户
+许可，否则使用 `rg_fallback`；Codex `default_prompt` 只保留简短入口；artifact
+安装严格按 owner 文件清单复制，避免 ignored `__pycache__` 混入目标。
+`karpathy-guidelines` 继续作为 CoTend 自主保留的可选、非默认、非 owner MIT
+companion，不宣称属于当前 Dual target。
+
+### 授权边界
+
+本记录覆盖仓库内产品适配、两份 lock、确定性本地 r17 artifact 与任务本地
+提交。它不授权全局 Skills 安装、真实模型、独立/外部 UAT、push、tag、
+Release、submission、publish 或任何公开上传。G06 仍是用户已接受的 r13
+历史真实项目证据，本轮不重写或冒充 r17 真实项目验收。

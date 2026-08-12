@@ -18,7 +18,7 @@ Run Done Gate when any of these are true:
 
 ## Evaluation
 
-Load `acceptance-test-harness.md` and apply its conditional `capability_completion_claim` whenever this gate would express decision-relevant delivery-state intent for an MVP/capability/full goal, including completion/availability/integration/readiness/activity/end-to-end delivery, implementation/build, working/runnable, landing, or equivalent wording. This module decides whether to enter the gate; the Acceptance Harness remains the only owner of completion-claim dimensions, stable-ID decomposition, and derivation. A completed implementation slice or inspection-only verification may support a narrow statement but cannot support the broader goal by itself.
+Load `acceptance-test-harness.md` plus `capability-completion.md` whenever this gate would express decision-relevant delivery-state intent for an MVP/capability/full goal, including completion/availability/integration/readiness/activity/end-to-end delivery, implementation/build, working/runnable, landing, or equivalent wording. Reuse one canonical `execution_closure` result per affected scope; this module consumes its exact result and never creates a Done-specific completion packet. A completed implementation slice or inspection-only verification may support a narrow statement but cannot support the broader goal by itself.
 
 Assess:
 
@@ -33,8 +33,6 @@ Assess:
 - known risks and release blockers;
 - whether remaining tasks are necessary or optional polish.
 - intent drift between the original idea/user-confirmed active truth and the current product behavior.
-
-Goal Completion and Native Closeout are independent. A verified local checkpoint may complete `closeout-pass.md` while the goal remains in progress; a likely-complete goal may still require closeout before acceptance. Neither result inherits the other's authority.
 
 ## Status
 
@@ -63,9 +61,8 @@ goal_completion:
     - step:
       expected_result:
       if_it_fails:
-  capability_completion_claim: <canonical conditional schema from acceptance-test-harness.md when triggered; otherwise omit>
-  open_semantic_implementation_closures:
-    - <existing closure pointer; omit when none>
+  execution_closure_refs:
+    - <one canonical current result per affected required scope; omit when none>
 ```
 
 `not_checked` and `not_applicable` are legal report/template extension values only when the gate was not run or does not apply to the current handoff/review. Do not use them as internal Done Gate / intent drift evaluation results.
@@ -74,7 +71,7 @@ goal_completion:
 
 Run intent drift review at Done Gate, milestone handoff, before user acceptance/release, after a long unattended batch, or when a user correction/advisor recommendation may have changed direction.
 
-At these high-value boundaries, use the Deep Intent Comparison from `plan-tree.md` when Plan Tree/active truth exists or when current documents may be self-consistent but wrong. Reuse its evidence and four-state result rather than running a second competing drift mechanism.
+At these high-value boundaries, use the Deep Intent Comparison from `semantic-reconciliation.md` when Plan Tree/active truth exists or when current documents may be self-consistent but wrong. Reuse its evidence and four-state result rather than running a second competing drift mechanism.
 
 Compare:
 
@@ -88,18 +85,18 @@ Classify:
 - `aligned`: current product still matches the confirmed goal.
 - `acceptable_evolution`: implementation evolved details inside the confirmed goal; explain plainly and continue.
 - `drift_needs_user_decision`: product meaning, priority, route, UX acceptance, risk, or release posture changed; stop affected work and ask the user before calling it done or continuing in the new direction.
-- `insufficient_evidence`: active truth is too thin or stale; ask for confirmation or run idea-to-consensus / Plan Tree reconciliation.
+- `insufficient_evidence`: active truth is too thin or stale; run triggered Project Intelligence / Plan Tree reconciliation, asking the user only for a protected value delta or user-only information.
 
 Do not use intent drift review to reopen every implementation detail. It is for user-visible product meaning and development direction.
 
 ## Rule
 
-If `mvp_status: likely_complete`, require the exact MVP claim to be `supported` or use the Harness's safe partial/blocked/unknown wording. Do not keep developing by default merely to hide a gap, and do not call the MVP complete from a candidate slice. Use the canonical Human Rejoin semantic fields from `templates.md`, rendered by the adapter in the resolved governance language. Explain that the MVP may be complete and continued work may be low-value or drift; offer localized choices for user acceptance, release cleanup, a next-stage goal, or continued scoped development.
+If `mvp_status: likely_complete`, require every necessary current result to carry a supported exact-scope claim and use its safe partial/blocked/unknown wording otherwise. Do not keep developing by default merely to hide a gap, and do not call the MVP complete from a candidate slice. Use the canonical Human Rejoin semantic fields from `collaboration-packet-templates.md`, rendered by the adapter in the resolved governance language. Explain that the MVP may be complete and continued work may be low-value or drift; offer localized choices for user acceptance, release cleanup, a next-stage goal, or continued scoped development.
 
 When recommending `user_acceptance`, include or prepare a concise user acceptance walkthrough in the resolved governance language from `ai-uat.md`. This is the same user-facing control surface as `ai_uat.user_walkthrough`; `goal_completion.user_acceptance_walkthrough` may reference or summarize it at the Done Gate. Do not ask the user to read code as the default acceptance path.
 
 Full goal acceptance is stricter than MVP completion. It usually requires AI UAT, no blocking reviews, release hardening if public, and user acceptance.
 
-An important current-MVP L2/main-chain closure whose status is not `closed`, or whose `next_step_allowed` is not `yes`, is a blocker to the corresponding MVP/full-goal completion claim. Do not hide it under `not_done_but_non_blocking`; use the safe claim wording and keep development on the affected repair route.
+An important current-MVP L2/main-chain result that is absent/non-current, whose state is not `closed`, or whose `advance_allowed` is not `yes`, is a blocker to the corresponding MVP/full-goal completion claim. Do not hide it under `not_done_but_non_blocking`; use the result's safe wording and keep development on the affected repair route.
 
 If this prompt is pending and the user sends a bare `继续`, do not treat that token as choosing option `1` or accepting any mode. Follow `continuous-and-unattended.md`: re-present the pending question, continue only unrelated pre-authorized work if any exists, and keep final user acceptance blocked until the user explicitly answers.

@@ -57,25 +57,25 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
             namespace.base.SOURCE_SKILLS_ROOT, namespace.USER_OWNED_SKILLS
         )
         expected_by_identifier = {
-            "cotend-collaboration": 109,
-            "cotend-diagnose-only": 26,
-            "cotend-init": 14,
-            "cotend-model-upgrade": 22,
-            "cotend-project-init": 30,
-            "cotend-semantic-alignment": 52,
-            "cotend-session-handoff": 49,
-            "cotend-tooling": 20,
+            "cotend-collaboration": 129,
+            "cotend-diagnose-only": 24,
+            "cotend-init": 16,
+            "cotend-model-upgrade": 21,
+            "cotend-project-init": 29,
+            "cotend-semantic-alignment": 42,
+            "cotend-session-handoff": 38,
+            "cotend-tooling": 11,
         }
         expected_by_category = {
             "agent_self_prompt": 8,
-            "explicit_invocation": 136,
+            "explicit_invocation": 109,
             "fallback_path": 4,
             "frontmatter_name": 8,
-            "plain_reference": 62,
-            "protocol_or_version": 22,
-            "reference_path": 82,
+            "plain_reference": 95,
+            "protocol_or_version": 20,
+            "reference_path": 66,
         }
-        self.assertEqual(inventory["files"], 46)
+        self.assertEqual(inventory["files"], 59)
         self.assertEqual(inventory["by_identifier"], expected_by_identifier)
         self.assertEqual(inventory["by_category"], expected_by_category)
         self.assertEqual(
@@ -152,8 +152,8 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
 
         preserve = results["N1-preserve"]
         self.assertEqual(preserve["skills"], 10)
-        self.assertEqual(preserve["skill_files"], 71)
-        self.assertEqual(preserve["package_files"], 77)
+        self.assertEqual(preserve["skill_files"], 104)
+        self.assertEqual(preserve["package_files"], 110)
         self.assertEqual(transforms["N1-preserve"], [])
         self.assertTrue(preserve["source_comparison"]["byte_identical"])
         self.assertEqual(preserve["source_comparison"]["moved_path_count"], 0)
@@ -162,27 +162,27 @@ class PluginNamespaceCandidateTests(unittest.TestCase):
         )
         self.assertEqual(
             preserve["residual_source_identifier_inventory"]["occurrences"],
-            322,
+            310,
         )
         self.assertEqual(preserve["residual_migration_review_required"], 0)
-        self.assertEqual(preserve["plugin_sensitive_reference_count"], 148)
+        self.assertEqual(preserve["plugin_sensitive_reference_count"], 121)
 
         short = results["N2-short"]
         self.assertEqual(short["skills"], 10)
-        self.assertEqual(short["skill_files"], 71)
-        self.assertEqual(short["package_files"], 77)
+        self.assertEqual(short["skill_files"], 104)
+        self.assertEqual(short["package_files"], 110)
         self.assertEqual(len(transforms["N2-short"]), 16)
-        self.assertEqual(short["source_comparison"]["moved_path_count"], 69)
+        self.assertEqual(short["source_comparison"]["moved_path_count"], 102)
         self.assertEqual(
             short["source_comparison"]["byte_changed_file_count"], 16
         )
         self.assertFalse(short["source_comparison"]["byte_identical"])
         self.assertEqual(
             short["residual_source_identifier_inventory"]["occurrences"],
-            306,
+            294,
         )
-        self.assertEqual(short["residual_migration_review_required"], 284)
-        self.assertEqual(short["plugin_sensitive_reference_count"], 140)
+        self.assertEqual(short["residual_migration_review_required"], 274)
+        self.assertEqual(short["plugin_sensitive_reference_count"], 113)
         self.assertEqual(len(short["target_entrypoints"]), 8)
         self.assertEqual(
             {item["canonical_name"] for item in short["target_entrypoints"]},

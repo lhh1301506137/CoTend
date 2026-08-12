@@ -374,7 +374,7 @@ def run_main_journey(
     )
 
     workflow = native_workflow_state.evaluate_workflow(
-        "absent", session_profile=profile, persist_session=True
+        "uninitialized", session_profile=profile, persist_session=True
     )
     if not workflow.can_continue or workflow.effective_profile != profile:
         raise NativeCumulativeJourneyError("workflow profile did not materialize")
@@ -394,7 +394,7 @@ def run_main_journey(
         evaluator="workflow_state_runtime_profile",
     )
 
-    entry = native_project_entry.evaluate_entry("absent")
+    entry = native_project_entry.evaluate_entry("uninitialized")
     if (
         entry.auto_mode != "fresh_init"
         or entry.handback != "resume_same_confirmed_route"
@@ -897,7 +897,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, Any]:
     target = target_lock.get("target")
     if (
         not isinstance(target, dict)
-        or target.get("artifact_id") != "cotend-codex-r000016"
+        or target.get("artifact_id") != "cotend-codex-r000017"
     ):
         raise NativeCumulativeJourneyError("G03 changed the target artifact")
 

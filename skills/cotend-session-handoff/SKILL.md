@@ -8,7 +8,7 @@ description: >-
 
 Protocol version: `cotend-session-handoff-v1.3`
 
-Compatibility baseline: `cotend-collaboration-v1.79`.
+Compatibility baseline: `cotend-collaboration-v2.01`.
 
 ## Literal Invocation Gate
 
@@ -24,15 +24,15 @@ If the literal is absent:
 - do not call tools, run preflight, generate files, or alter project state.
 
 This zero-secondary-read exit is identical in Full and Adaptive. A platform
-false-positive selection therefore costs only this short gate and hint.
+false-positive selection must therefore cost only this short gate and hint.
 
 If the literal is present:
 
 1. Read `references/session-handoff-workflow.md` completely.
-2. Follow that single direct workflow reference. Load further canonical
-   Collaboration modules only when the workflow's existing trigger requires
+2. Follow that single direct workflow reference. Load any further canonical
+   Collaboration modules only when that workflow's existing trigger requires
    them.
-3. If the direct workflow is missing or unreadable, report
+3. If the direct workflow reference is missing or unreadable, report
    `missing_required_modules: [session-handoff-workflow]` and stop.
 
 Do not duplicate the detailed handoff contract in this entry file.

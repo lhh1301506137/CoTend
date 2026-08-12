@@ -8,8 +8,9 @@ Use these labels consistently in Plan Tree, expanded understanding, knowledge ch
 
 | Canonical label | Accepted aliases | Meaning |
 |---|---|---|
-| `user_confirmed` | none | The user explicitly confirmed this understanding, plan, risk posture, or decision. |
+| `user_confirmed` | none | The user explicitly confirmed a user-owned value, protected product meaning, scope, acceptance, risk posture, release choice, or other decision. It does not by itself prove a factual claim or technical superiority. |
 | `primary_ai_auto_within_scope` | `codex_auto_within_scope` | The primary AI updated an L3/L4 leaf/detail inside individually user-confirmed current-MVP L0-L2 ancestors. It never confirms a descendant. |
+| `primary_ai_derived` | none | The Primary derived a current domain/architecture design, invariant, assumption, or evidence obligation from protected semantic inputs. It remains AI-owned, never confirms product meaning, and must refresh when its relevant semantic, route/architecture, or reality basis changes. |
 | `primary_ai_observed_fact` | `codex_observed_fact` | Code, tests, docs, verification, or environment evidence was observed; this is evidence, not user consensus. |
 | `primary_ai_proposed_delta` | `codex_proposed_delta`, `codex_inferred` | The primary AI proposes or infers a higher-level understanding/plan change; user confirmation is required before it becomes active truth. |
 | `advisor_recommended` | none | An identified advisor/reviewer model, formal self-review pass, or human advisor recommended a change; user confirmation is required before it becomes active truth. Carrier brand alone does not identify the model. |
@@ -21,36 +22,37 @@ Alias transition:
 
 - Accepted aliases in this table remain valid and must not be treated as invalid during migration.
 - New or actively edited framework files should prefer `primary_ai_*` unless preserving compatibility with an existing project schema.
-- Historical logs, archived external-framework tasks, and old handoffs do not need mechanical renames.
+- Historical logs, archived CoTend governance tasks, and old handoffs do not need mechanical renames.
 - When validating metadata, report accepted aliases as migration suggestions, not failures, unless a local project has already adopted a stricter schema.
 
-## CoTend Project Truth Authority
+## Scoped Authority Domains
 
-This is the canonical authority contract for project meaning, detailed requirements, active routes, current reality, and project-local constraints. CoTend Core never delegates this authority to another development framework. Framework identity, directory presence, an `active` flag, file age, detail, or internal consistency cannot promote a carrier by itself.
+Authority is domain-specific. Do not sort every source into one global ladder or
+treat `user_confirmed` as permission to override another domain.
 
-Resolve authority by the question being answered:
-
-| Question | Canonical owner | Allowed carriers |
+| Domain | Canonical authority | What it decides |
 |---|---|---|
-| What product meaning and current-MVP L0-L2 outcome did the user authorize? | Latest explicit user intent plus exact verified `user_confirmed` semantic contracts. | User messages, decision-log entries, and the linked confirmed node/understanding or PRD/brief text. |
-| What detailed requirement or acceptance rule applies inside that meaning? | The current requirement carrier that is linked to the confirmed baseline and has not been superseded or contradicted. | Existing PRD, brief, spec, node/understanding doc, or a project-mapped equivalent. |
-| What goal, stage, route, and leaf is active? | One CoTend Plan Tree, or one explicitly mapped existing equivalent route record when a separate tree would be duplicate ceremony. | Plan Tree/node records and linked task records. |
-| What user-facing decision changed the route, meaning, risk, acceptance, or continuation authority? | `PROJECT-DECISION-LOG.md` or its explicit project-local equivalent. | A decision record with the real authority label and affected surfaces. |
-| What is the concise current cockpit? | `STATUS.md` or its explicit project-local equivalent, as a projection rather than an independent source of product meaning. | Status fields linked back to the owners above. |
-| What currently exists or passed? | Direct product, code, test, review, runtime, and environment evidence. | Evidence records under `primary_ai_observed_fact`; existence never proves intended meaning or user acceptance. |
-| Which local coding constraint applies? | Project-local instructions inside the higher user, safety, product-meaning, and authorized-route boundaries. | `AGENTS.md`, repository conventions, toolchain rules, and linked coding guidance. |
+| `value_authority` | user | Project value, desired experience, protected L0-L2 meaning, product scope, final acceptance and release choice. |
+| `fact_authority` | current objective evidence | What code, data, runtime behavior, environment and valid tests presently establish. A user statement, AI claim, plan or document contradicted by stronger current evidence is not factual truth. |
+| `professional_authority` | Primary AI | Architecture, implementation, tools, tests, reversible refactoring and L3/L4 design inside protected outcomes, scope, evidence and risk boundaries. |
+| `risk_authority` | user authorization plus canonical stop constraints | The allowed risk posture. Critical, irreversible, public, secret/data, real-cost and unknown-impact boundaries remain stopping constraints even when adjacent work is authorized. |
 
-Preserve one recoverable chain. Link existing carriers instead of copying their full contents. Do not create a second truth tree, second semantic baseline, or parallel PRD merely because another framework or filename convention exists. A carrier may answer more than one question only when its roles and authority are explicit; it does not thereby gain authority over every question.
+Classify the disputed proposition before resolving it. Preserve the user's value
+choice, correct factual descriptions from current evidence, let the Primary
+select bounded professional means, and stop only affected dependencies for a
+missing value/risk decision or unresolved integrity boundary. Repository rules
+and active task/spec contracts constrain implementation, but they do not convert
+stale text into facts or replace product-value authority.
 
-Classify artifacts owned by another development framework as exactly one of:
+Three collaboration results consume these domains:
 
-- `reference_only`: current and aligned evidence that may be linked without becoming a CoTend route or semantic owner;
-- `historical`: stale, superseded, dormant, or out-of-scope context retained for recovery or audit;
-- `conflict`: applicable content that disagrees with current CoTend meaning, requirements, route, risk, or constraints.
-
-Never activate, update, or obey an external framework merely to resolve this classification. For a protected L0-L2 conflict, stop only affected work, preserve both sides as evidence, and report direct `$cotend-semantic-alignment <affected scope>`; the user must decide the semantic delta. For an L3/L4 route or implementation conflict inside unchanged confirmed ancestors, the Primary reconciles or rebases the affected CoTend route, records the evidence and resulting pointer changes, and continues only from the first reliable boundary. Unknown dependency impact blocks the affected path until classified; unrelated confirmed paths may continue.
-
-When migrating a project that previously delegated authority to another framework, keep useful files in place and reclassify/link them. Migration must not mass-copy content, rewrite historical authority labels, silently discard user decisions, or make the external framework a CoTend Core backend.
+- `autonomous_completion`: complete and verify authorized work when facts,
+  protected meaning and risk are clear.
+- `notify_and_continue`: report a consequential AI-owned choice or non-blocking
+  discovery at the next useful checkpoint without asking for approval.
+- `stop_affected_and_align`: pause only affected work for important protected
+  value/meaning/risk conflict, unknown impact or unresolved integrity failure;
+  state evidence, recommendation and the exact needed decision.
 
 ## Critical / Never-Unattended Stop List
 
@@ -104,7 +106,10 @@ generic retry allowance elsewhere cannot enlarge this P1 repair budget.
 These mechanisms answer "who decides", "what counts as evidence", or "what must stop". They are constitutional boundaries: model capability claims must not remove them, widen them, or make them optional.
 
 - Critical / Never-Unattended Stop List.
-- Authority labels and `user_confirmed` as highest authority.
+- Scoped `value_authority`, `fact_authority`, `professional_authority`, and
+  `risk_authority`; `user_confirmed` remains binding only for the user-owned
+  choice it records and cannot overrule objective facts or create technical
+  superiority.
 - Protected current-MVP L0-L2 semantic baseline and high-level understanding confirmation gates. Confirmation never inherits from an ancestor to an L1/L2 descendant; full and Adaptive profiles preserve this boundary identically.
 - `继续` semantics: it never expands scope, approves review, accepts a product, deploys, pushes, publishes, or answers pending human-only questions.
 - Done Gate.
@@ -122,7 +127,7 @@ Applied to Route Rebase, the unchanged `继续` boundary means a bare resume tok
 
 ## Execution Authorization Contract
 
-This section is the single canonical owner of execution authorization. Runtime profiles, continuous missions, review, Plan Tree, native workflow roles, and control Skills consume it; they must not create another permission system, authority label, ledger, or state tree.
+This section is the single canonical owner of execution authorization. Runtime profiles, continuous missions, review, Plan Tree, CoTend governance, and control Skills consume it; they must not create another permission system, authority label, ledger, or state tree.
 
 Before asking the user, classify the proposed decision in this order:
 
@@ -130,7 +135,7 @@ Before asking the user, classify the proposed decision in this order:
 2. Does it remain inside the current confirmed active route or already-authorized task/slice, scope, risk ceiling, acceptance contract, and stop boundaries?
 3. Does it avoid every user-only boundary below?
 
-When all three answers are yes, continue under `primary_ai_auto_within_scope`; do not turn the decision into a user recommendation, consult Delegation Maturity, or ask for approval. Primary-owned execution includes implementation details, test/tooling choices, reversible route-local refactors, in-scope review repairs, the one bounded failure repair/recheck above, ordinary verification retries below that severity boundary, Plan Tree/status/evidence maintenance, and ordinary subagent orchestration that already satisfies the native-agent contract.
+When all three answers are yes, continue under `primary_ai_auto_within_scope`; do not turn the decision into a user recommendation or ask for approval. Primary-owned execution includes implementation details, test/tooling choices, reversible route-local refactors, in-scope review repairs, the one bounded failure repair/recheck above, ordinary verification retries below that severity boundary, Plan Tree/status/evidence maintenance, and ordinary subagent orchestration that already satisfies the native-agent contract.
 
 Architecture authority is classified by impact, not by code volume, file count,
 or labels such as `large` and `major`. The Primary may choose, replace, or
@@ -143,24 +148,74 @@ or the impact cannot yet be classified safely. Multiple technical
 implementations inside the unchanged boundary are not a user decision. Full
 and Adaptive use the same impact classification; only orchestration differs.
 
-Comparing, selecting, replacing, or materially reshaping an L3/L4 solution
-inside those unchanged boundaries remains Primary-owned. A user-suggested
-implementation, library, architecture, or route is one candidate and evidence
-source: independently assess the conditions under which it works, outcome fit,
-tradeoffs, cost, maintenance, reversibility, and risk. User provenance alone
-does not make it `accepted`, `user_confirmed`, or implementation-authorized.
-Ask the user only when the comparison would change a protected outcome,
-constraint, scope, risk, external effect, or another canonical user-only
-boundary.
+The same impact classification governs Adaptive formal Plan Review. A formal
+review is required when the unit changes protected L0-L2 or user-visible
+results, a public contract, irreversible data/migration state, an existing risk
+boundary, has unknown impact, creates expensive lock-in, requires material
+multi-owner integration, or will run unattended. Architecture, cross-layer,
+multi-file, multi-slice, code volume, or a size label alone does not trigger it.
+Full retains its conservative formal-plan posture for non-trivial work, but the
+same coherence-sized unit is planned and reviewed once rather than once per
+internal leaf. Plan review never substitutes for a user-only authority gate.
 
-A user-authorized task, plan, slice, or mission covers one closure loop: implementation -> checking -> in-scope repair -> rechecking -> evidence/status updates -> already-authorized local closeout. The selected runtime profile supplies exactly one execution posture:
+Execution granularity follows the coherence-sized contract owned by
+`plan-tree.md`, not tree depth, code volume, or a mandatory one-leaf cadence.
+Inside confirmed L0-L2 meaning and the existing scope/risk boundary, the
+Primary may select or resize a single leaf, coherent leaf bundle, vertical
+slice, or bounded subtree without a user approval prompt. Resizing grants no
+new authority: an intervening protected semantic, destructive, release,
+external-effect, or unknown-impact boundary still stops through its existing
+owner. A material multi-node unit may be recorded only in an existing carrier;
+it is not a scope grant or completion claim.
 
-- Adaptive uses `active_route_continuous`: continue across successive L3/L4 leaves on the same confirmed active route, including reversible candidate promotion/rejection and route-local refactoring, and report decisions/evidence at material checkpoints.
-- Full uses `authorized_task_closure`: preserve the fixed native Implementer/Checker pair and complete its implement-check-fix-recheck loop without intermediate approval, but stop before the next material task/slice unless the existing mission or user instruction already covers it.
+Comparing, selecting, or replacing L3/L4 candidate routes inside those unchanged
+boundaries remains Primary-owned. A solution suggested by the user is one
+candidate and one source of evidence: independently assess its enabling
+conditions, expected outcome, tradeoffs, cost, maintenance, reversibility, and
+risk. User provenance does not make the candidate accepted, `user_confirmed`,
+or execution-authorized. Ask the user only when the candidate changes a
+protected outcome/constraint or another user-only boundary, not to offload the
+technical selection itself.
+
+The same authority applies to triggered project/design derivation under
+`project-intelligence.md`. The Primary may establish and maintain domain
+concepts, architecture, invariants, extension seams, and direct-evidence
+obligations as `primary_ai_derived` without user confirmation. A user- or
+AI-supplied future form is evidence input rather than scope or protected truth.
+If a proposed design changes an L0-L2 goal, responsibility, user-visible
+result, relationship, rule, or current-MVP boundary, it exits this authority
+and routes to direct Semantic Alignment.
+
+Classify an important unknown by its actual owner before deciding to stop:
+`user_value_unknown`, `professional_design_unknown`, `evidence_unknown`, or
+`risk_authority_unknown`. Only a real user-value/protected-meaning choice
+creates a default user question. A risk unknown routes through its existing
+owner, which decides whether the affected action needs a stop or authorization;
+it is not automatically rewritten as a user question. Professional design
+unknowns are investigated and resolved by the Primary; evidence unknowns are
+answered by inspection or verification. Architecture, schema, multi-file scope,
+code volume, size, or future extensibility alone is neither an owner nor a gate.
+
+When a technical choice may create a concrete user-visible difference, split
+the mixed question. Explain that experience difference in ordinary language,
+give the Primary's recommendation, and ask the user only for the value choice.
+The Primary still chooses and verifies the schema, interface, algorithm, or
+other technical representation. If the user-visible consequence itself is not
+yet known, investigate it first instead of asking the user to decide an
+unformed technical question.
+
+A user-authorized task, plan, slice, coherence-sized execution unit, or mission
+covers one governance closure loop: plan/impact classification -> implementation -> checking -> in-scope repair -> rechecking -> triggered review -> primary-owner
+state/evidence update -> already-authorized local commit/closeout. Internal leaves,
+files, layers, agent packets, and recovery commits do not restart that loop. The
+selected runtime profile supplies exactly one execution posture:
+
+- Adaptive uses `active_route_continuous`: continue across successive L3/L4 coherence-sized execution units on the same confirmed active route, including reversible candidate promotion/rejection and route-local refactoring, and report decisions/evidence at material checkpoints.
+- Full uses `authorized_task_closure`: preserve the fixed CoTend governance implement/check pair and complete its implement-check-fix-recheck loop without intermediate approval, but stop before the next uncovered material task/slice/execution unit unless the existing mission or user instruction already covers it.
 
 Neither posture creates product scope or risk authority. Stop for a user-only decision, a canonical stop boundary, unresolved verification/integrity failure, semantic-implementation-closure blocker, or completion. The permanent user-only set includes any L0/L1/L2 goal, responsibility, input/output, current-MVP boundary, or user-visible result change; scope expansion; destructive or irreversible action; secrets or private data; real payment, legal/regulatory commitment, or global system change; push/deploy/publish/release/history rewrite; persistent runtime-profile/model-role/framework-thinning change; final acceptance; and genuine high-impact product-direction or reviewer disagreement. These are explicit instances of the unchanged Critical / Never-Unattended boundary, not a replacement list.
 
-If a material checkpoint needs to expose the posture, embed it in the existing runtime-profile, native task, `STATUS.md`, delegated-mission, decision-log, or local-closeout carrier. Do not create `EXECUTION-AUTHORIZATION.md` or a standing execution ledger.
+If a material checkpoint needs to expose the posture, embed it in the existing runtime-profile, CoTend governance task, STATUS, delegated-mission, decision-log, or local-closeout carrier. Do not create `EXECUTION-AUTHORIZATION.md` or a standing execution ledger.
 
 ## Explicit Control-Skill Handback
 
@@ -185,13 +240,32 @@ Do not trigger this handback for implicit/default `cotend-collaboration` loading
 
 ## Same-Primary Session Handoff Routing
 
-The only load authorization is the literal `$cotend-session-handoff` in the user's current input, including a Skill-picker/link invocation or a generated `NEW-SESSION-PROMPT.md` that repeats the literal. After that gate, route a long-conversation/new-task transfer to the Skill only when the verified Primary identity, role, runtime profile, and delegation state remain unchanged. The Skill generates a point-in-time packet, freezes old-session product work, and requires a `current | stale | conflict` preflight before new-session writes.
+The only load authorization is the literal `$cotend-session-handoff` in the
+user's current input, including a Codex Skill-picker/link invocation or a
+generated `NEW-SESSION-PROMPT.md` that repeats the literal. After that gate,
+route a long-conversation/new-task transfer to the Skill only when the verified
+Primary identity, role, and runtime profile remain unchanged.
+The Skill generates a point-in-time packet, freezes old-session product work,
+and requires a `current | stale | conflict` preflight before new-session writes.
 
-An app restart/reconnect, ordinary task resume, bare `continue`, or natural-language mention of a long conversation, new session, or new task does not authorize loading, packet discovery, preflight, or generation. A clear natural-language handoff request without the literal may receive only a short suggestion to invoke the Skill. The suggestion does not grant authority.
+An app restart/reconnect, ordinary task resume, bare `继续`, or natural-language
+mention of a long conversation/new session/new task does not authorize loading,
+packet discovery, preflight, or generation. A clear natural-language handoff
+request without the literal may receive only a short suggestion to invoke the
+Skill. The suggestion does not grant authority.
 
-Any requested model, carrier, provider, material configuration, Primary role, or advisor-role change routes to `$cotend-model-upgrade`; an explicit mixed request generates no same-primary packet. Framework initialization or repair stays with Init, and review-only transfer stays with the existing review handoff. The detailed packet schema lives only in `templates.md`.
+Any requested model, carrier, provider, material configuration, Primary role,
+or advisor-role change routes to `$cotend-model-upgrade`; an explicit mixed
+request generates no same-primary packet. Framework initialization/repair
+stays with Init, and review-only transfer stays with the existing review
+Handoff. The detailed packet schema lives only in `session-handoff-template.md`.
 
-An explicit A/Full selection is not a model/configuration change. When it is combined with a literal `$cotend-session-handoff` invocation, resolve that profile choice first through the canonical runtime-profile owner, then freeze the handoff from the resolved execution state. The handoff still records `runtime_profile_changed: false`: it consumes the selection and never becomes a second selector.
+An explicit A/Full selection is not a model/configuration change. When it is
+combined with a literal `$cotend-session-handoff` invocation, resolve that
+profile choice first through the canonical runtime-profile owner, then freeze
+the handoff from the resolved execution state. The handoff still records
+`runtime_profile_changed: false`: it consumes the selection and never becomes
+a second selector.
 
 ## Semantic Alignment Triggers
 
@@ -245,8 +319,7 @@ Use `decision_worthy_topics` as the canonical label set for deciding whether a u
 | `risk_or_release` | risk tier, release/public posture, privacy/data/payment/cost/security boundary, or stop-boundary handling |
 | `model_role_or_review` | primary/reviewer/advisor role, premium-model takeover, review gate, or external review scope |
 | `continuation_authority` | unattended window, bare `继续` meaning, local closeout authorization, or future resume behavior |
-| `delegation_maturity` | whether one narrow low-risk decision category stays per-decision or moves to user-confirmed execute-then-report delegation, including refusal, scope, cooldown, or restoration |
-| `advisor_or_grill_answer` | answer to a CoTend clarification/grill-me, classified external brainstorm, advisor, takeover, milestone, or Done Gate question when the answer also affects one of the substantive decision topics above |
+| `advisor_or_grill_answer` | answer to a grill-me, Idea to Consensus, advisor, takeover, milestone, or Done Gate question when the answer also affects one of the substantive decision topics above |
 | `user_interruption_or_new_idea` | a midstream user doubt, correction, or new idea changes priority, scope, route, acceptance, risk, model role, or future continuation |
 | `supersession_or_rejection` | a prior decision is superseded, narrowed, rejected, or re-opened |
 
@@ -254,7 +327,7 @@ Use `decision_worthy_topics` as the canonical label set for deciding whether a u
 
 Record a decision when any of these matches a `decision_worthy_topics` label:
 
-- CoTend clarification/grill-me, classified external brainstorm evidence, or direct user Q&A changes root goal, MVP, stage, feature meaning, UX taste, route, priority, acceptance, risk, release, or model role;
+- grill-me, Idea to Consensus, or direct user Q&A changes root goal, MVP, stage, feature meaning, UX taste, route, priority, acceptance, risk, release, or model role;
 - the user replies `1` to accept a recommended answer;
 - the user corrects the primary AI or advisor's understanding;
 - the user interrupts ongoing work with a doubt, correction, or new idea that changes scope, route, acceptance, risk, model role, continuation authority, or active truth;
@@ -262,7 +335,6 @@ Record a decision when any of these matches a `decision_worthy_topics` label:
 - a prior decision is superseded, narrowed, or rejected;
 - a decision explains why the next Plan Tree leaf is the highest-value next step;
 - Done Gate, AI UAT, milestone re-entry, risk gate, or release gate changes the next mode.
-- a delegation-maturity offer is accepted, declined, narrowed, restored, or re-opened; compact eligibility samples follow `references/delegation-maturity.md` and do not become authority by themselves.
 
 Do not log every tiny implementation choice. Leaf-level technical choices may be logged only when they affect future continuation, review, or user control.
 

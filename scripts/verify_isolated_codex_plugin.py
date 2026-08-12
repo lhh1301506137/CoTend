@@ -40,7 +40,7 @@ EXPECTED_SKILLS = (
     "grill-me",
     "karpathy-guidelines",
 )
-EXPECTED_FILE_COUNT = 71
+EXPECTED_FILE_COUNT = 104
 PACKAGE_SUPPORT_FILES = {
     "LICENSE": ROOT / "LICENSE",
     "NOTICE": ROOT / "NOTICE",
@@ -138,7 +138,10 @@ def file_manifest(root: Path) -> dict[str, str]:
     return {
         path.relative_to(root).as_posix(): sha256(path)
         for path in sorted(root.rglob("*"))
-        if path.is_file() and not path.is_symlink()
+        if path.is_file()
+        and not path.is_symlink()
+        and "__pycache__" not in path.parts
+        and path.suffix != ".pyc"
     }
 
 

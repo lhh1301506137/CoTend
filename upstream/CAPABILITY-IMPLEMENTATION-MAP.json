@@ -2,8 +2,8 @@
   "schema": "cotend.capability-implementation-map",
   "schema_version": 1,
   "status": "adopted_verified",
-  "source_release": "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
-  "source_anchor": "c14d4133bf0438d435048858554c88c89a7870a3",
+  "source_release": "exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d",
+  "source_anchor": "fe21e970bc2bdc69de5e2ce1710aef2dd156a54d",
   "source_publication_state": "not_public_release",
   "target_platform": "Codex",
   "skill_set_path": "skills/",
@@ -44,7 +44,10 @@
         "skills/cotend-project-init/SKILL.md",
         "skills/cotend-semantic-alignment/SKILL.md",
         "skills/cotend-collaboration/references/plan-tree.md",
-        "skills/cotend-collaboration/references/templates.md"
+        "skills/cotend-collaboration/references/templates.md",
+        "skills/cotend-collaboration/references/project-intelligence.md",
+        "skills/cotend-collaboration/references/semantic-contract-templates.md",
+        "skills/cotend-collaboration/scripts/validate_understanding_artifacts.py"
       ]
     },
     {
@@ -54,7 +57,9 @@
       "coverage_status": "mapped",
       "owners": [
         "skills/cotend-collaboration/references/plan-tree.md",
-        "skills/cotend-collaboration/references/goal-completion.md"
+        "skills/cotend-collaboration/references/goal-completion.md",
+        "skills/cotend-collaboration/references/route-rebase.md",
+        "skills/cotend-collaboration/references/route-rebase-template.md"
       ]
     },
     {
@@ -64,7 +69,9 @@
       "coverage_status": "mapped",
       "owners": [
         "skills/cotend-collaboration/SKILL.md",
-        "skills/cotend-collaboration/references/continuous-and-unattended.md"
+        "skills/cotend-collaboration/references/continuous-and-unattended.md",
+        "skills/cotend-collaboration/references/adaptive-development-experience.md",
+        "skills/cotend-collaboration/scripts/development_experience.py"
       ]
     },
     {
@@ -85,7 +92,9 @@
       "owners": [
         "skills/cotend-collaboration/SKILL.md",
         "skills/cotend-collaboration/references/acceptance-test-harness.md",
-        "skills/cotend-collaboration/references/templates.md"
+        "skills/cotend-collaboration/references/templates.md",
+        "skills/cotend-collaboration/references/browser-acceptance.md",
+        "skills/cotend-collaboration/references/capability-completion.md"
       ]
     },
     {
@@ -95,7 +104,8 @@
       "coverage_status": "mapped",
       "owners": [
         "skills/cotend-collaboration/references/review-and-self-review.md",
-        "skills/cotend-collaboration/references/quality-sentinel.md"
+        "skills/cotend-collaboration/references/quality-sentinel.md",
+        "skills/cotend-collaboration/references/governance-language-acceptance.md"
       ]
     },
     {
@@ -161,7 +171,13 @@
         "skills/cotend-tooling/SKILL.md",
         "skills/cotend-tooling/references/workflow.md",
         "skills/cotend-tooling/references/capability-catalog.json",
-        "skills/cotend-tooling/scripts/capability_catalog.py"
+        "skills/cotend-tooling/scripts/capability_catalog.py",
+        "skills/cotend-collaboration/references/framework-maintenance/upstream-dependency-review.md",
+        "skills/cotend-collaboration/references/framework-maintenance/framework-change-evaluation.md",
+        "skills/cotend-tooling/references/intake-mode.md",
+        "skills/cotend-tooling/references/evaluate-mode.md",
+        "skills/cotend-tooling/references/refresh-mode.md",
+        "skills/cotend-tooling/references/retire-mode.md"
       ]
     },
     {
@@ -202,7 +218,9 @@
       "coverage_status": "mapped",
       "owners": [
         "skills/cotend-collaboration/references/framework-change-evaluation.md",
-        "skills/cotend-collaboration/references/authority-and-triggers.md"
+        "skills/cotend-collaboration/references/authority-and-triggers.md",
+        "skills/cotend-collaboration/references/governance-carrier-lifecycle.md",
+        "skills/cotend-collaboration/scripts/governance_history.py"
       ]
     },
     {
@@ -211,9 +229,11 @@
       "implementation_mode": "mixed",
       "coverage_status": "mapped",
       "owners": [
-        "skills/karpathy-guidelines/SKILL.md",
         "skills/cotend-collaboration/references/skill-authoring-quality-gate.md",
         "skills/cotend-collaboration/SKILL.md"
+      ],
+      "optional_support": [
+        "skills/karpathy-guidelines/SKILL.md"
       ]
     },
     {
@@ -228,8 +248,14 @@
         "skills/cotend-project-init/scripts/resolve_framework_update.py",
         "skills/cotend-tooling/scripts/project_inventory.py",
         "skills/cotend-collaboration/references/code-context-harness.md",
-        "skills/cotend-collaboration/references/templates.md"
+        "skills/cotend-collaboration/references/templates.md",
+        "skills/cotend-collaboration/references/project-intelligence.md",
+        "skills/cotend-collaboration/references/semantic-reconciliation.md"
       ]
     }
-  ]
+  ],
+  "source_skill_count": 9,
+  "source_skill_file_count": 94,
+  "product_skill_count": 10,
+  "product_skill_file_count": 104
 }

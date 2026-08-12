@@ -26,15 +26,22 @@ P0/P1 bypass budgets and surface immediately.
 
 Spec drift, hardcoded special cases, temporary branches becoming architecture, approvals without evidence, repeated symptom patching, declining UX/maintainability/coherence. These trigger investigation, not automatic alert.
 
-When repeated rework, low-value cycles, review disagreement, or implementation/product-surface mismatch suggests direction rather than local code quality, route to Triggered Semantic Reconciliation in `plan-tree.md`. Start with the active path and recent changes; run deep intent comparison only after the signal or a high-value boundary justifies it. Do not add a second Sentinel truth file or force full-project rereads on ordinary steps.
+When repeated rework, low-value cycles, review disagreement, or implementation/product-surface mismatch suggests direction rather than local code quality, route to `semantic-reconciliation.md`. Start with the active path and recent changes; run deep intent comparison only after the signal or a high-value boundary justifies it. Do not add a second Sentinel truth file or force full-project rereads on ordinary steps.
+
+An evidence-backed rubber stamp or repeated substantive failure may trigger the
+Fresh Challenger Protocol in `review-and-self-review.md`. A single typo,
+format-only defect, ordinary low-risk mechanical change, or a near-miss phrase
+without a material quality fact does not. Sentinel owns only the accumulated
+signal; the review owner owns packet projection, findings, reconciliation, and
+stop state, so do not mirror them here or create another ledger.
 
 ## Harness Ratchet
 
-When the same AI/process failure happens twice in one task/project, or once with high impact, do more than repair the current output. Check whether a small durable prevention would reduce recurrence. Signals include a skipped required Skill/module/external-framework phase/review/verification step, a returning bug/finding class, a handoff that omits material intent/risk/acceptance evidence, a misclassified risk/release/`继续` boundary, repeated symptom patching, or the user/reviewer correcting the same workflow misunderstanding again.
+When the same AI/process failure happens twice in one task/project, or once with high impact, do more than repair the current output. Check whether a small durable prevention would reduce recurrence. Signals include a skipped required Skill/module/CoTend governance phase/review/verification step, a returning bug/finding class, a handoff that omits material intent/risk/acceptance evidence, a misclassified risk/release/`继续` boundary, repeated symptom patching, or the user/reviewer correcting the same workflow misunderstanding again.
 
 Choose the smallest owner-aligned prevention:
 
-- project-specific rule -> active CoTend PRD/spec/STATUS, Plan Tree node, or `AGENTS.md`;
+- project-specific rule -> active PRD/STATUS, `the existing project specification carrier`, or `AGENTS.md`;
 - missing check -> existing test/smoke/lint/type-check/script/checklist;
 - collaboration/process miss -> existing STATUS/review/quality/handoff surface;
 - cross-project recurring failure -> propose a framework change through Framework Change Evaluation;
@@ -49,9 +56,8 @@ high-impact AI-caused incident, or the user explicitly asks to remember,
 compare, or postmortem it, route to `failure-memory.md`.
 
 - Keep the concrete event in the project's existing review/quality evidence.
-- Promote only a reusable cross-project pattern through CoTend framework
-  maintenance.
-- Do not edit an installed global Skill from a downstream project.
+- Promote only a reusable cross-project pattern through framework maintenance.
+- Do not edit the installed global Skill from a downstream project.
 - During ordinary work, use the deterministic selector and load at most three
   compact guard cards. Do not read the whole catalog or pattern library.
 - A returned card is a prevention hint, not new product truth, user authority,

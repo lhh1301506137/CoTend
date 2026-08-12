@@ -6,199 +6,366 @@
       "id": "bmad-method",
       "name": "BMAD Method",
       "kind": "framework",
-      "tasks": ["role-workflow-design", "workflow-depth-selection"],
-      "capabilities": ["adaptive-governance", "named-role-workflows"],
-      "stacks": ["any"],
-      "platforms": ["any"],
+      "tasks": [
+        "role-workflow-design",
+        "workflow-depth-selection"
+      ],
+      "capabilities": [
+        "adaptive-governance",
+        "named-role-workflows"
+      ],
+      "stacks": [
+        "any"
+      ],
+      "platforms": [
+        "any"
+      ],
       "relationship": "reference_only",
-      "eligible_routes": ["adapt"],
+      "eligible_routes": [
+        "adapt"
+      ],
       "review_state": "source_behavior_checked",
       "adoption_disposition": "defer",
       "runtime_state": "not_installed",
       "freshness": "review_due",
-      "evidence_levels": ["readme_claim", "source_proven"],
+      "evidence_levels": [
+        "readme_claim",
+        "source_proven"
+      ],
       "risk_band": "medium",
       "maintenance_burden": "high",
       "cost_band": "unknown",
       "rollback_band": "bounded",
-      "source_pointer": {"path": "UPSTREAM-SOURCES.md", "heading": "RF06 BMAD Method"},
-      "research_pointers": ["docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md"]
+      "source_pointer": {
+        "path": "UPSTREAM-SOURCES.md",
+        "heading": "RF06 BMAD Method"
+      },
+      "research_pointers": []
     },
     {
       "id": "codegraph",
       "name": "CodeGraph",
       "kind": "cli",
-      "tasks": ["code-navigation", "impact-analysis", "symbol-discovery"],
-      "capabilities": ["code-intelligence", "repository-index"],
-      "stacks": ["any"],
-      "platforms": ["linux", "macos", "windows"],
+      "tasks": [
+        "code-navigation",
+        "impact-analysis",
+        "symbol-discovery"
+      ],
+      "capabilities": [
+        "code-intelligence",
+        "repository-index"
+      ],
+      "stacks": [
+        "any"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
       "relationship": "external_runtime",
-      "eligible_routes": ["call"],
+      "eligible_routes": [
+        "call"
+      ],
       "review_state": "local_validation_checked",
       "adoption_disposition": "adopt_partial",
       "runtime_state": "enabled",
       "freshness": "current",
-      "evidence_levels": ["local_validation", "readme_claim", "source_proven"],
+      "evidence_levels": [
+        "local_validation",
+        "readme_claim",
+        "source_proven"
+      ],
       "risk_band": "low",
       "maintenance_burden": "low",
       "cost_band": "free",
       "rollback_band": "easy",
-      "source_pointer": {"path": "UPSTREAM-SOURCES.md", "heading": "RF07 CodeGraph"},
+      "source_pointer": {
+        "path": "UPSTREAM-SOURCES.md",
+        "heading": "RF07 CodeGraph"
+      },
       "research_pointers": []
     },
     {
       "id": "codex-platform",
       "name": "OpenAI Codex Platform",
       "kind": "service",
-      "tasks": ["plugin-delivery", "skill-discovery"],
-      "capabilities": ["marketplace-carrier", "skill-runtime"],
-      "stacks": ["any"],
-      "platforms": ["linux", "macos", "windows"],
+      "tasks": [
+        "plugin-delivery",
+        "skill-discovery"
+      ],
+      "capabilities": [
+        "marketplace-carrier",
+        "skill-runtime"
+      ],
+      "stacks": [
+        "any"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
       "relationship": "external_runtime",
-      "eligible_routes": ["call"],
+      "eligible_routes": [
+        "call"
+      ],
       "review_state": "local_validation_checked",
       "adoption_disposition": "adopt_partial",
       "runtime_state": "enabled",
-      "freshness": "current",
-      "evidence_levels": ["local_validation", "readme_claim"],
+      "freshness": "review_due",
+      "evidence_levels": [
+        "local_validation",
+        "readme_claim"
+      ],
       "risk_band": "medium",
       "maintenance_burden": "medium",
       "cost_band": "mixed",
       "rollback_band": "bounded",
-      "source_pointer": {"path": "UPSTREAM-SOURCES.md", "heading": "PF01 OpenAI Codex 官方平台文档"},
+      "source_pointer": {
+        "path": "UPSTREAM-SOURCES.md",
+        "heading": "PF01 OpenAI Codex 官方平台文档"
+      },
       "research_pointers": []
     },
     {
       "id": "grill-me",
       "name": "Grill Me",
       "kind": "skill",
-      "tasks": ["product-discovery", "requirement-clarification"],
-      "capabilities": ["one-question-interview", "user-decision-elicitation"],
-      "stacks": ["any"],
-      "platforms": ["any"],
+      "tasks": [
+        "product-discovery",
+        "requirement-clarification"
+      ],
+      "capabilities": [
+        "one-question-interview",
+        "user-decision-elicitation"
+      ],
+      "stacks": [
+        "any"
+      ],
+      "platforms": [
+        "any"
+      ],
       "relationship": "bundled_or_adapted",
-      "eligible_routes": ["call"],
+      "eligible_routes": [
+        "call"
+      ],
       "review_state": "source_behavior_checked",
       "adoption_disposition": "adopt_partial",
       "runtime_state": "enabled",
       "freshness": "current",
-      "evidence_levels": ["source_proven"],
+      "evidence_levels": [
+        "source_proven"
+      ],
       "risk_band": "low",
       "maintenance_burden": "low",
       "cost_band": "free",
       "rollback_band": "easy",
-      "source_pointer": {"path": "UPSTREAM-SOURCES.md", "heading": "RF08 grill-me"},
+      "source_pointer": {
+        "path": "UPSTREAM-SOURCES.md",
+        "heading": "RF08 grill-me"
+      },
       "research_pointers": []
     },
     {
       "id": "gsd-core",
       "name": "GSD Core",
       "kind": "framework",
-      "tasks": ["context-isolation", "skill-surface-design"],
-      "capabilities": ["compact-state", "profiled-installation"],
-      "stacks": ["any"],
-      "platforms": ["any"],
+      "tasks": [
+        "context-isolation",
+        "skill-surface-design"
+      ],
+      "capabilities": [
+        "compact-state",
+        "profiled-installation"
+      ],
+      "stacks": [
+        "any"
+      ],
+      "platforms": [
+        "any"
+      ],
       "relationship": "reference_only",
-      "eligible_routes": ["adapt"],
+      "eligible_routes": [
+        "adapt"
+      ],
       "review_state": "source_behavior_checked",
       "adoption_disposition": "defer",
       "runtime_state": "not_installed",
       "freshness": "review_due",
-      "evidence_levels": ["readme_claim", "source_proven"],
+      "evidence_levels": [
+        "readme_claim",
+        "source_proven"
+      ],
       "risk_band": "medium",
       "maintenance_burden": "medium",
       "cost_band": "unknown",
       "rollback_band": "bounded",
-      "source_pointer": {"path": "UPSTREAM-SOURCES.md", "heading": "RF05 GSD Core"},
-      "research_pointers": ["docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md"]
+      "source_pointer": {
+        "path": "UPSTREAM-SOURCES.md",
+        "heading": "RF05 GSD Core"
+      },
+      "research_pointers": []
     },
     {
       "id": "karpathy-guidelines",
       "name": "Karpathy Guidelines",
       "kind": "skill",
-      "tasks": ["implementation-discipline", "refactor-review"],
-      "capabilities": ["minimal-change", "verification-discipline"],
-      "stacks": ["any"],
-      "platforms": ["any"],
+      "tasks": [
+        "implementation-discipline",
+        "refactor-review"
+      ],
+      "capabilities": [
+        "minimal-change",
+        "verification-discipline"
+      ],
+      "stacks": [
+        "any"
+      ],
+      "platforms": [
+        "any"
+      ],
       "relationship": "bundled_or_adapted",
-      "eligible_routes": ["call"],
+      "eligible_routes": [
+        "call"
+      ],
       "review_state": "source_behavior_checked",
-      "adoption_disposition": "adopt_full",
-      "runtime_state": "enabled",
+      "adoption_disposition": "adopt_partial",
+      "runtime_state": "available",
       "freshness": "current",
-      "evidence_levels": ["readme_claim", "source_proven"],
+      "evidence_levels": [
+        "readme_claim",
+        "source_proven"
+      ],
       "risk_band": "low",
       "maintenance_burden": "low",
       "cost_band": "free",
       "rollback_band": "easy",
-      "source_pointer": {"path": "UPSTREAM-SOURCES.md", "heading": "RF09 Karpathy Guidelines"},
+      "source_pointer": {
+        "path": "UPSTREAM-SOURCES.md",
+        "heading": "RF09 Karpathy Guidelines"
+      },
       "research_pointers": []
     },
     {
       "id": "openspec",
       "name": "OpenSpec",
       "kind": "framework",
-      "tasks": ["change-proposal-design", "spec-lifecycle"],
-      "capabilities": ["delta-specs", "progressive-commands"],
-      "stacks": ["any"],
-      "platforms": ["any"],
+      "tasks": [
+        "change-proposal-design",
+        "spec-lifecycle"
+      ],
+      "capabilities": [
+        "delta-specs",
+        "progressive-commands"
+      ],
+      "stacks": [
+        "any"
+      ],
+      "platforms": [
+        "any"
+      ],
       "relationship": "reference_only",
-      "eligible_routes": ["adapt"],
+      "eligible_routes": [
+        "adapt"
+      ],
       "review_state": "source_behavior_checked",
       "adoption_disposition": "defer",
       "runtime_state": "not_installed",
       "freshness": "review_due",
-      "evidence_levels": ["readme_claim", "source_proven"],
+      "evidence_levels": [
+        "readme_claim",
+        "source_proven"
+      ],
       "risk_band": "medium",
       "maintenance_burden": "medium",
       "cost_band": "unknown",
       "rollback_band": "bounded",
-      "source_pointer": {"path": "UPSTREAM-SOURCES.md", "heading": "RF04 OpenSpec"},
-      "research_pointers": ["docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md"]
+      "source_pointer": {
+        "path": "UPSTREAM-SOURCES.md",
+        "heading": "RF04 OpenSpec"
+      },
+      "research_pointers": []
     },
     {
       "id": "spec-kit",
       "name": "GitHub Spec Kit",
       "kind": "framework",
-      "tasks": ["spec-lifecycle", "standards-injection"],
-      "capabilities": ["generated-integration", "modified-file-protection"],
-      "stacks": ["any"],
-      "platforms": ["any"],
+      "tasks": [
+        "spec-lifecycle",
+        "standards-injection"
+      ],
+      "capabilities": [
+        "generated-integration",
+        "modified-file-protection"
+      ],
+      "stacks": [
+        "any"
+      ],
+      "platforms": [
+        "any"
+      ],
       "relationship": "reference_only",
-      "eligible_routes": ["adapt"],
+      "eligible_routes": [
+        "adapt"
+      ],
       "review_state": "source_behavior_checked",
       "adoption_disposition": "defer",
       "runtime_state": "not_installed",
       "freshness": "review_due",
-      "evidence_levels": ["readme_claim", "source_proven"],
+      "evidence_levels": [
+        "readme_claim",
+        "source_proven"
+      ],
       "risk_band": "medium",
       "maintenance_burden": "medium",
       "cost_band": "free",
       "rollback_band": "bounded",
-      "source_pointer": {"path": "UPSTREAM-SOURCES.md", "heading": "RF03 GitHub Spec Kit"},
-      "research_pointers": ["docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md"]
+      "source_pointer": {
+        "path": "UPSTREAM-SOURCES.md",
+        "heading": "RF03 GitHub Spec Kit"
+      },
+      "research_pointers": []
     },
     {
       "id": "superpowers",
       "name": "Superpowers",
       "kind": "framework",
-      "tasks": ["plugin-packaging", "workflow-design"],
-      "capabilities": ["host-adapters", "shared-skills"],
-      "stacks": ["any"],
-      "platforms": ["any"],
+      "tasks": [
+        "plugin-packaging",
+        "workflow-design"
+      ],
+      "capabilities": [
+        "host-adapters",
+        "shared-skills"
+      ],
+      "stacks": [
+        "any"
+      ],
+      "platforms": [
+        "any"
+      ],
       "relationship": "reference_only",
-      "eligible_routes": ["adapt"],
+      "eligible_routes": [
+        "adapt"
+      ],
       "review_state": "source_behavior_checked",
       "adoption_disposition": "adopt_partial",
       "runtime_state": "not_installed",
       "freshness": "review_due",
-      "evidence_levels": ["readme_claim", "source_proven"],
+      "evidence_levels": [
+        "readme_claim",
+        "source_proven"
+      ],
       "risk_band": "medium",
       "maintenance_burden": "medium",
       "cost_band": "free",
       "rollback_band": "bounded",
-      "source_pointer": {"path": "UPSTREAM-SOURCES.md", "heading": "RF01 Superpowers"},
-      "research_pointers": ["docs/REFERENCE-FRAMEWORK-IMPLEMENTATION-STUDY.md"]
+      "source_pointer": {
+        "path": "UPSTREAM-SOURCES.md",
+        "heading": "RF01 Superpowers"
+      },
+      "research_pointers": []
     }
   ]
 }

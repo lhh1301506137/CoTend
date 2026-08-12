@@ -23,14 +23,14 @@ ExternalState = Literal["absent", "aligned", "stale", "conflict", "unknown"]
 SemanticLevel = Literal["none", "L0_L2", "L3_L4"]
 
 REQUIRED_AUTHORITY_MARKERS = (
-    "## CoTend Project Truth Authority",
-    "CoTend Core never delegates this authority to another development framework.",
-    "`reference_only`",
-    "`historical`",
-    "`conflict`",
-    "stop only affected work",
-    "Primary reconciles or rebases the affected CoTend route",
-    "Do not create a second truth tree",
+    "## Scoped Authority Domains",
+    "stop_affected_and_align",
+    "single canonical owner of execution authorization",
+    "must not create another permission system",
+    "Plan Tree/current project truth owns the active route and task/spec links.",
+    "External framework\n  artifacts remain `reference_only | historical | conflict`.",
+    "Current task/specification records remain linked evidence",
+    "create a second task/state tree",
 )
 REQUIRED_DOCUMENT_MARKERS = (
     "# CoTend 原生项目真相权限",
@@ -213,13 +213,22 @@ def scan_forbidden_authority(root: Path = ROOT) -> list[str]:
 
 
 def verify_repository(root: Path = ROOT) -> dict[str, object]:
-    authority_text = (
+    authority_paths = (
         root
         / "skills"
         / "cotend-collaboration"
         / "references"
-        / "authority-and-triggers.md"
-    ).read_text(encoding="utf-8")
+        / "authority-and-triggers.md",
+        root / "skills" / "cotend-collaboration" / "SKILL.md",
+        root
+        / "skills"
+        / "cotend-collaboration"
+        / "references"
+        / "plan-tree.md",
+    )
+    authority_text = "\n".join(
+        path.read_text(encoding="utf-8") for path in authority_paths
+    )
     document_text = (root / "docs" / "PROJECT-TRUTH-AUTHORITY.md").read_text(
         encoding="utf-8"
     )

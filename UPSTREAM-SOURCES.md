@@ -2,18 +2,18 @@
 
 ```yaml
 status: active_productization_and_research_registry
-checked_at: 2026-08-01
+checked_at: 2026-08-12
 relationship: primary_user_owned_productization_source_plus_secondary_public_references
-implementation_dependency: pinned_private_dual_exact_source_c14d4133
+implementation_dependency: pinned_private_dual_exact_source_fe21e970
 candidate_implementation_dependency: none_current_exact_source_adopted_locally
-source_copying: scoped_9_adapted_plus_1_byte_identical_skill
-candidate_source_adaptation: none_current_10_skills_71_files_locked_as_r16
+source_copying: scoped_8_adapted_plus_1_byte_identical_skill_and_1_retained_optional_companion
+candidate_source_adaptation: current_9_source_skills_94_files_to_10_product_skills_104_files_locked_as_r17
 update_policy: manual_pinned_review_before_architecture_adoption_or_release
 ```
 
 本台账同时区分 CoTend 的用户原创产品化母体和外部设计参考。只有 `UP01` 是首要产品化来源；RF01-RF06 仍只是二级比较证据，不能按竞品多数做法改变 CoTend。
 
-当前仓库已从精确私有上游提交采用 10 个 Codex Skill：上游 69 个文件适配为 CoTend r16 的 71 个文件；八个用户原创 Skill 做 CoTend 适配，`grill-me` 保持已审查字节，`karpathy-guidelines` 作为保留 MIT 归属的 CoTend 适配型第三方 Skill，另有 3 个 CoTend 原生 pass；上游 Project Init 的内部单元测试由仓库级 CoTend 测试等价承接，不作为产品 Skill 文件复制。该精确提交明确不是公开 Dual release；采用范围、来源、许可证与更新边界由 consumer handoff、adoption log、framework lock 和自动验证共同约束。
+当前仓库已从精确私有上游提交采用 9 个来源 Skill / 94 个来源文件，并适配为 CoTend r17 的 10 个产品 Skill / 104 个产品文件。八个用户原创 Skill 由 CoTend 原生 owner 承接，`grill-me` 保持已审查字节；上游已移除的 `karpathy-guidelines` 仅作为保留 MIT 归属的可选 companion 留在产品包中，不再参与默认路由或项目权威。CoTend 另保留 Native Implementation、Verification、Closeout 等原生载体和兼容索引；上游 Project Init 的内部单元测试由仓库级 CoTend 测试等价承接，不作为产品 Skill 文件复制。该精确提交不是公开 Dual release；采用范围、来源、许可证与更新边界由 consumer handoff、adoption log、framework lock 和自动验证共同约束。
 
 ## UP01 dual-ai 分享包
 
@@ -21,17 +21,17 @@ update_policy: manual_pinned_review_before_architecture_adoption_or_release
 role: primary_productization_source
 product_relationship: user_owned_upstream_framework
 source: private_upstream_exact_commit_via_consumer_handoff
-reviewed_release: exact-source:c14d4133bf0438d435048858554c88c89a7870a3
+reviewed_release: exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d
 release_anchor: exact_source_commit
 target_publication_state: not_public_release
 latest_public_release: 2026.07.28.2
 latest_public_release_anchor: dual-ai-share-2026.07.28.2
-previous_adoptable_release: exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14
+previous_adoptable_release: exact-source:c14d4133bf0438d435048858554c88c89a7870a3
 superseded_non_adoptable_release: 2026.07.27.1
-latest_reviewed_candidate: exact-source:c14d4133bf0438d435048858554c88c89a7870a3
-latest_candidate_anchor: c14d4133bf0438d435048858554c88c89a7870a3
-latest_candidate_source_tree: a6824559e087f87da90a55bcc6403576db1027c1
-latest_candidate_status: adopted_verified_local_r16_not_public_release
+latest_reviewed_candidate: exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d
+latest_candidate_anchor: fe21e970bc2bdc69de5e2ce1710aef2dd156a54d
+latest_candidate_source_tree: 076099a1c6888ede804189e1aa125eba92380e94
+latest_candidate_status: adopted_verified_local_r17_not_public_release
 successor_candidate: none
 declared_license_scope: Apache-2.0_for_user_owned_content_with_separate_MIT_components
 relationship: rename_first_preserve_first_adopted_source
@@ -41,16 +41,16 @@ codex_role_map: upstream/CODEX-SKILL-ROLE-MAP.json
 adoption_proposal: upstream/FRAMEWORK-ADOPTION-PROPOSAL.md
 adoption_plan: upstream/FRAMEWORK-ADOPTION-PLAN.md
 capability_map: upstream/CAPABILITY-IMPLEMENTATION-MAP.json
-adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-08-01-1-v1-79-adoption
+adoption_record: upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-08-12-2-v2-01-r17-adoption
 adopted_skill_verifier: scripts/verify_adopted_skill_set.py
 mapping_status: codex_skill_source_set_adopted_live_delivery_pending
 final_framework_lock: upstream/framework.lock.json
 automatic_update: forbidden
 ```
 
-`2026.07.28.2` 仍是最近公开 Dual release 和 r13 的来源历史。当前已采用 target 由 consumer handoff 与独立 exact-source 核验固定到精确提交 `c14d4133bf0438d435048858554c88c89a7870a3` 及 canonical source tree `a6824559e087f87da90a55bcc6403576db1027c1`；CoTend r16、framework lock 和 artifact lock 绑定该 v1.79 精确来源，r15 是第一 predecessor。
+`2026.07.28.2` 仍是最近公开 Dual release 和 r13 的来源历史。当前已采用 target 由修正版 consumer handoff 与独立 exact-source 核验固定到精确提交 `fe21e970bc2bdc69de5e2ce1710aef2dd156a54d` 及 canonical source tree `076099a1c6888ede804189e1aa125eba92380e94`；CoTend r17、framework lock 和 artifact lock 绑定该 v2.01 精确来源，r16 是第一 predecessor。
 
-v1.79 精确区间共 13 个提交，只有 v1.77 Tooling、v1.78 solution adequacy、v1.79 impact-directed update/inventory 三项进入实现，其余 10 项仅作范围与历史证据。CoTend 适配为 10 个 Skill、71 个 Skill 文件并保留 C01-C19。交接 JSON 中 27 条不同 lineage 范围的 `contract_deltas` 继续被拒绝且不进入锁；R349 通过 Git ancestry、13 项提交核算、三项直接源码差异、树对象和独立文件清单证明采用范围，因此该派生缺陷没有被伪装为正确，也不再阻断本地 r16。它仍不构成新公开 Dual release 或任何 CoTend 公开发布。
+本次从 r16 精确前序到 v2.01 target 的范围共 188 个提交：25 项 included change 经逐项审查后全部由 CoTend 原生 owner 适配，150 项只作证据，13 项不适用于消费者，0 项标记为 superseded/reverted。修正版交接包固定了完整范围、合同增量子 schema 和三份 SHA-256；CoTend 适配结果保留 C01-C19，不复制上游私有 adapter、工作流 runtime、hook、状态目录或任务权威。它仍不构成新公开 Dual release，也不等于 CoTend 的公开发布。
 
 审查重点：保留已验证的小白入口心智、内部自动路由、治理语义、证据、停止、恢复和模型协作；对用户原创内容直接改名或适配，对两个内置 MIT 组件保留许可证与归属，对 external runtime、platform capability、受限和未知材料分别处理。仓库源树、逐文件 adoption、final lock、本地隔离根载体与真实 GitHub `owner/repo` Open Beta 生命周期已完成。远端 refresh 只验证同 revision，不冒充跨版本升级；真实用户/Desktop 生命周期、Claude 载体和发布者身份认证仍未完成。
 
@@ -62,6 +62,12 @@ upstream: OpenAI_Codex_official_documentation
 upstream_version_or_commit: checked_2026-07-15
 license: documentation_facts_only_not_redistributed
 authority_boundary: platform_capability_facts_only_no_CoTend_product_or_adoption_authority
+update_locator:
+  canonical_source_field: upstream
+  release_source: platform
+  release_channel: platform_managed
+  lookup_method: platform_runtime
+  identity_field: upstream_version_or_commit
 sources:
   - https://learn.chatgpt.com/docs/build-skills#where-to-save-skills
   - https://learn.chatgpt.com/docs/config-file/config-advanced#config-and-state-locations
@@ -84,6 +90,12 @@ upstream: https://github.com/obra/superpowers
 upstream_version_or_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
 license: MIT
 authority_boundary: design_reference_only_no_runtime_or_product_truth_authority
+update_locator:
+  canonical_source_field: upstream
+  release_source: repository
+  release_channel: default_branch
+  lookup_method: git_default_branch
+  identity_field: upstream_version_or_commit
 source: https://github.com/obra/superpowers
 branch: main
 reviewed_commit: d884ae04edebef577e82ff7c4e143debd0bbec99
@@ -119,6 +131,12 @@ upstream: https://github.com/github/spec-kit
 upstream_version_or_commit: 1be42992e64b08ff0dce3d7a914eaabf04284ffb
 license: MIT
 authority_boundary: design_reference_only_no_runtime_or_project_standard_authority
+update_locator:
+  canonical_source_field: upstream
+  release_source: repository
+  release_channel: default_branch
+  lookup_method: git_default_branch
+  identity_field: upstream_version_or_commit
 source: https://github.com/github/spec-kit
 branch: main
 reviewed_commit: 1be42992e64b08ff0dce3d7a914eaabf04284ffb
@@ -138,6 +156,12 @@ upstream: https://github.com/Fission-AI/OpenSpec
 upstream_version_or_commit: 0a99f410457271aa773d8b106f03f637f7c6b3c0
 license: MIT
 authority_boundary: design_reference_only_no_project_truth_or_change_authority
+update_locator:
+  canonical_source_field: upstream
+  release_source: repository
+  release_channel: default_branch
+  lookup_method: git_default_branch
+  identity_field: upstream_version_or_commit
 source: https://github.com/Fission-AI/OpenSpec
 branch: main
 reviewed_commit: 0a99f410457271aa773d8b106f03f637f7c6b3c0
@@ -157,6 +181,12 @@ upstream: https://github.com/open-gsd/gsd-core
 upstream_version_or_commit: e3a8c063b8f6059aa4c0214302aec51615a4f831
 license: MIT
 authority_boundary: selective_design_reference_only_no_runtime_or_install_authority
+update_locator:
+  canonical_source_field: upstream
+  release_source: repository
+  release_channel: default_branch
+  lookup_method: git_default_branch
+  identity_field: upstream_version_or_commit
 source: https://github.com/open-gsd/gsd-core
 branch: next
 reviewed_commit: e3a8c063b8f6059aa4c0214302aec51615a4f831
@@ -178,6 +208,12 @@ upstream: https://github.com/bmad-code-org/BMAD-METHOD
 upstream_version_or_commit: 49069b8b5276afd21402bc3b978b69ad78a7d2ef
 license: MIT
 authority_boundary: design_reference_and_complexity_ceiling_only_no_runtime_authority
+update_locator:
+  canonical_source_field: upstream
+  release_source: repository
+  release_channel: default_branch
+  lookup_method: git_default_branch
+  identity_field: upstream_version_or_commit
 source: https://github.com/bmad-code-org/BMAD-METHOD
 branch: main
 reviewed_commit: 49069b8b5276afd21402bc3b978b69ad78a7d2ef
@@ -197,6 +233,12 @@ upstream: https://github.com/colbymchenry/codegraph
 upstream_version_or_commit: v1.5.0_ea72e1b190921232aa7bd02e96bef5bbe4fe0ab6
 license: MIT
 authority_boundary: fresh_verbatim_source_may_be_read_equivalent_but_graph_relations_are_scope_evidence_not_product_truth_or_runtime_correctness
+update_locator:
+  canonical_source_field: upstream
+  release_source: repository
+  release_channel: stable
+  lookup_method: git_release_or_tag
+  identity_field: upstream_version_or_commit
 relationship: external_runtime
 adoption_status: adopted_partial_for_code_structure_and_impact_discovery
 runtime_state: enabled_local_CLI_1.5.0
@@ -215,6 +257,12 @@ upstream: https://github.com/mattpocock/skills/tree/43ea0884b07a3e67a5a07f025ce9
 upstream_version_or_commit: 43ea0884b07a3e67a5a07f025ce92aefa983177b
 license: MIT
 authority_boundary: clarification_style_only_user_confirmation_and_CoTend_truth_carriers_own_durable_meaning
+update_locator:
+  canonical_source_field: upstream
+  release_source: repository
+  release_channel: default_branch
+  lookup_method: git_default_branch
+  identity_field: upstream_version_or_commit
 relationship: adopted_third_party
 adoption_status: bundled_byte_reviewed
 runtime_state: enabled
@@ -231,9 +279,15 @@ upstream: https://github.com/multica-ai/andrej-karpathy-skills
 upstream_version_or_commit: 2c606141936f1eeef17fa3043a72095b4765b9c2
 license: MIT_with_missing_upstream_standalone_LICENSE_disclosed
 authority_boundary: coding_behavior_only_CoTend_authority_product_direction_and_project_rules_take_precedence
+update_locator:
+  canonical_source_field: upstream
+  release_source: repository
+  release_channel: default_branch
+  lookup_method: git_default_branch
+  identity_field: upstream_version_or_commit
 relationship: adapted_third_party
 adoption_status: bundled_CoTend_adaptation
-runtime_state: enabled
+runtime_state: available_optional_non_default
 redistribution_evidence: THIRD-PARTY-SOURCES.json_and_THIRD-PARTY-NOTICES.md
 ```
 

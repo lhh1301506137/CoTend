@@ -1,68 +1,62 @@
 ---
 name: cotend-init
-description: Use when the user wants one simple entry to initialize, update, repair, migrate, or resume the CoTend development framework, or asks whether a project can continue under it. Delegates only to v1.79 Project Init, including impact-directed update routing and delegated once-if-absent capability inventory; preserves canonical language, project truth, protected L0-L2 semantics, runtime profile, risk, delegation, and one outer handback without creating another owner.
+description: Use when the user wants one simple entry to initialize, update, repair, migrate, or resume the CoTend development framework, or asks whether a project can continue under it. Delegates once to the currently installed Project Init, propagates its canonical result, and returns one outer handback without becoming a second framework owner.
 metadata:
-  short-description: "Init workflow and route idea baseline"
+  short-description: "Thin CoTend initialization entry"
 ---
 
 # CoTend Init
 
-This is the short visible entry point for the user's project workflow setup.
+This is the thin user entry for framework initialization and update. It owns
+only entry recognition, one Project Init delegation, minimal result
+propagation, fallback loading, and one outer handback.
 
-Use this when the user invokes `/cotend-init`, says "初始化开发框架", "更新开发框架", "修复开发框架", "接入 CoTend", "加载开发框架", or asks whether the project can continue under the current framework.
+Use it for `/cotend-init`, `$cotend-init`, “初始化开发框架”, “更新开发框架”,
+“修复开发框架”, “接入双 AI”, “加载开发框架”, or an equivalent request to
+make the project current.
 
-## Action
+## Delegate Once
 
-Load and follow `cotend-project-init` Auto Mode for `cotend-collaboration-v1.79`. That Skill first resolves framework-update impact, loads only selected detail, and delegates once-if-absent capability inventory to `$cotend-tooling`; it also owns classification, the sole `user_facing_language_resolution`, the marked project-root router, deterministic actual-byte validation, supplied same-Primary freshness preflight, Plan Tree result propagation, persistent Full/Adaptive and risk selection, project truth, verification, reporting, and the one outer handback. Neither this thin entry nor Project Init creates a second inventory, semantic, route, or authority owner.
+Load and follow the **currently installed Project Init** for the installed CoTend Collaboration protocol
+exactly once. Project Init and its direct owners
+decide framework-impact scope, language/runtime state, project routing,
+governance writes, validation, readiness, and report rendering. Init must not
+parse the impact index, scan Tooling evidence, choose a Plan Tree execution
+unit, resolve language/risk/profile state, or reproduce any owner algorithm.
 
-Init is a thin entry and must not inspect candidate language sources, normalize a label, choose a default, reconcile a conflict, or persist a language record itself. Propagate Project Init's record unchanged. When it returns `status: human_needed`, preserve that one handback and do not write affected governance prose.
+Propagate Project Init's compact result unchanged, including when present:
 
-This is Init's only control-Skill delegation. Init may inspect and report `semantic_baseline`, affected paths, gaps, and unaffected confirmed paths, but it must not draft a semantic confirmation packet, create or advance a pending semantic decision, or force a rebuild.
+- `framework_update_only`, including loaded/check versions, both framework
+  anchors, actual receipt state, guards, validation and readiness;
+- `user_facing_language_resolution` and actual-byte pre-handback result;
+- protected semantic baseline `coverage / authority / currency / consistency`,
+  derived state, gaps and unaffected confirmed paths;
+- `plan_tree_alignment`, triggered Project Intelligence, active
+  `route_rebase`, and any material `current_execution_unit`;
+- an explicitly invoked `same_primary_session_handoff` freshness result;
+- runtime identity when relevant, the persistent Full/Adaptive profile, the
+  separately user-owned `low | medium | dev_high` tier, project adoption
+  profile, CoTend governance state, readiness and next step.
 
-## Scope Boundary
+For the indexed coherence/governance changes, propagate Project Init's
+active-path-scoped result unchanged. Future-trigger-only Tooling refresh and
+Adaptive Development Experience remain cold during ordinary Init/update/
+continue/resume. Do not open their bodies, catalogues or project history.
 
-Init must not classify, execute, load, call, delegate, or wrap `$cotend-semantic-alignment` or `$cotend-diagnose-only`. Top-level intent routing owns those independent entries:
+If `cotend-project-init` is unavailable in the visible Skill list, read its
+installed `SKILL.md` from `%USERPROFILE%\.codex\skills\cotend-project-init`
+or `~/.codex/skills/cotend-project-init`, then execute it without
+reinterpretation. This is the only fallback.
 
-It must not preflight either flow, inspect extra semantic surfaces for the appended request, or create/advance pending semantic state.
+## Independent Controls
 
-- writable project/feature meaning work enters `$cotend-semantic-alignment` directly;
-- explicitly read-only semantic-drift investigation enters `$cotend-diagnose-only` directly.
+Init **must not classify, execute, load, call, delegate, or wrap**
+`$cotend-semantic-alignment` or `$cotend-diagnose-only`. It must not preflight either flow,
+inspect extra semantic surfaces, or create/advance pending semantic
+state.
 
-If the user explicitly invokes a composite form such as `$cotend-init <semantic request>`, complete Init only. Preserve the appended words without turning them into an Init mode. The outer request determines the informational pointer shown after initialization:
-
-- writable semantic wording -> direct next action `$cotend-semantic-alignment <same request>`;
-- explicit read-only / edit-withholding semantic wording -> direct next action `$cotend-diagnose-only <same request>`.
-
-This pointer is a report-only handback, not nested execution or delegation. Set `classified_by_init: no` and `executed: no`; do not load either independent Skill in the same control flow.
-
-For plain Init, propagate Project Init's canonical `semantic_onboarding_handoff` unchanged when a `fresh_init` shallow-inventories an idea/requirements intake artifact and the affected current-MVP baseline is `absent | partial | stale | conflict`. The handoff may contain paths and standing authority metadata only. Init must not inspect intake product meaning, infer a product shape, ask product questions, or draft L0-L2 merely to decide or populate the handoff.
-
-When that handoff recommends `direct $cotend-semantic-alignment new_baseline`, present one user choice: `1` starts the independent Alignment control flow on the next turn; `2` stops after initialization. Reply `1` is entry authorization only. It is not semantic confirmation, implementation authorization, or nested execution by Init.
-
-If `cotend-project-init` is unavailable in the visible skill list, read the local Codex skill file from one of these fallback paths:
-
-- `%USERPROFILE%\.codex\skills\cotend-project-init\SKILL.md`
-- `~/.codex/skills/cotend-project-init/SKILL.md`
-
-Then execute its Auto Mode exactly. Do not duplicate or reinterpret its detailed rules here.
-
-On resume, propagate Project Init's canonical `route_rebase` reference/state unchanged when one is active. `evaluating` resumes classification only and cannot activate the candidate. `pending_user_confirmation` is the specialized handback for the affected route; bare `继续` must not restore the previous path or choose the candidate. `applying` / `revalidating` may be reported as resumable only when no human gate is pending, and only from the recorded reliable boundary. Omit the packet entirely for ordinary route work.
-
-Only when the current user input explicitly contains `$cotend-session-handoff` and supplies a canonical `same_primary_session_handoff`, propagate Project Init's `current | stale | conflict` result unchanged. The packet is a point-in-time resume input, not truth. `current` may resume only after the required resolved-language takeover teachback; `stale` reconciles known successor changes and recomputes the reliable boundary; `conflict` stops with `human_needed` or the existing recovery owner. Preserve every pending user gate, and never let bare `继续` answer it. Omit this state when no packet is supplied. Never discover or auto-consume an old packet merely because the app restarted, reconnected, or resumed the same task.
-
-After this Skill has returned control, resumed broad product work must pass Project Init's native pre-development readiness route through `cotend-collaboration/references/code-context-harness.md`. Provider or index preparation performed during Init does not satisfy the handback and does not authorize same-response implementation.
-
-## Output Boundary
-
-Report user-facing prose in Project Init's resolved `normalized_tag` using the `cotend-project-init` output contract. The titles below are the CoTend `en` adapter examples; adapters own localized titles and wording:
-
-1. `Initialization Decision Summary`
-2. `Your Confirmation Is Needed` only when a human-only decision is pending
-3. `Detailed Initialization Audit` only when the project-init report mode calls for it
-
-The summary must name the framework-impact result and any delegated inventory result; canonical user-facing governance language, source, carrier/persistence or blocking conflict; project-router and pre-handback results; native workflow state; relevant external-framework classifications; the effective runtime profile (`v1.79-full` or `v1.79-A`); separate continuous-risk tier; semantic-baseline and Plan Tree/rebase state; same-Primary freshness when supplied; project adoption profile; and delegation maturity. Report runtime identity only when relevant, and never use it to select A/Full or risk. Invalid, duplicate, ambiguous, or route-conflicting state requires the user's decision.
-
-For a composite invocation, also report:
+For a composite invocation such as `$cotend-init <semantic request>`, complete
+Init only and preserve the appended words. Report:
 
 ```yaml
 appended_request:
@@ -72,14 +66,34 @@ appended_request:
   independent_next_action: direct $cotend-semantic-alignment | direct $cotend-diagnose-only
 ```
 
-For a fresh-intake onboarding recommendation or deferral, also report the canonical `semantic_onboarding_handoff` from `cotend-collaboration/references/templates.md`. Do not redefine its fields here.
+Project Init may shallow-detect a fresh idea/intake and return the canonical
+`semantic_onboarding_handoff`; Init propagates it without interpreting product
+meaning. Choice `1` authorizes only the independent Alignment entry on the
+next turn; it is not semantic confirmation or implementation permission.
 
-When a material rebase is active, also report the canonical `route_rebase` packet by reference to its existing carrier. Do not redefine its fields here and do not emit it for an ordinary current path.
+Only when the current input contains the literal `$cotend-session-handoff`
+and supplies the canonical packet may Project Init classify that point-in-time
+input as `current | stale | conflict`. Never discover or auto-consume an old
+packet merely because the app restarted, reconnected, or resumed. Preserve
+pending gates; bare `继续` does not answer them.
 
-If no human-only decision is needed, complete safe setup/update/repair and report readiness first. For a standalone invocation, return control once before product development resumes. With no active material rebase, ask only whether to resume the same already-confirmed route; a direct bare `继续` satisfies that generic handback. For `evaluating`, ask only whether to resume materiality/semantic-impact/authority classification, not the previous route. For `applying` / `revalidating` with no human gate, ask only whether to resume authorized propagation/repair from the reliable boundary. For `blocked`, do not offer continuation of the affected route; a generic continuation may name only a separately confirmed, dependency-isolated route. If the same instruction explicitly authorized a bounded ordinary follow-on, it satisfies the generic handback after the Init report and may run without a duplicate prompt; do not continue unrequested work.
+## One Result And One Handback
 
-If a human-only decision is pending, make that specialized decision the handback and do not append a second generic prompt. Bare `继续` does not answer the specialized question unless the user provides a specific preauthorization. The internal delegation to `cotend-project-init` must produce exactly one outer handback, not one prompt from each Skill.
+Use Project Init's outcome-triggered report. Keep verified
+`framework_update_only` compact and unchanged; never reinterpret its
+compatibility result as material project migration. Otherwise show readiness,
+real blockers, current goal/route, actual changes and next step; include other
+fields only when decision-relevant.
 
-For a composite invocation, the independent direct next action is the outer handback. Do not append the generic `继续` prompt and do not start that next action in the same response.
+If Project Init returns `human_needed`, `review_pending`, a failed validator,
+session conflict, non-ready reconstruction, Critical/release stop, or another
+specialized gate, preserve it and do not offer the affected route as ready.
+Do not infer actual model identity from a carrier name and do not use identity
+to select A/Full or risk.
 
-Likewise, a recommended `semantic_onboarding_handoff` is the outer handback and uses `explicit_skill_handback.satisfied_by: semantic_alignment_entry_choice`. Do not append the generic `继续` prompt. If a stronger specialized human decision is already pending, keep that stronger decision as the sole outer handback and report semantic onboarding as `deferred_by_stronger_handback`.
+A standalone invocation returns control once before product work. A specialized
+decision, composite next action, or semantic-onboarding choice is the sole
+outer handback. Otherwise ask once whether to resume the same confirmed route.
+An explicitly authorized bounded ordinary follow-on in the same instruction
+may run after the Init result without a duplicate prompt; it never bypasses a
+specialized decision or expands scope.

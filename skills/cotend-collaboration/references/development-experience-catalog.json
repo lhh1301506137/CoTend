@@ -1,0 +1,51 @@
+{
+  "schema": "cotend.development-experience-catalog.v1",
+  "schema_version": 1,
+  "source_of_truth": "this compact catalog; project evidence remains in its original owner",
+  "record_count": 1,
+  "cards": [
+    {
+      "id": "AEP-001",
+      "title": "Phase-appropriate fidelity",
+      "kind": "reasoning_cue",
+      "lifecycle": "distilled",
+      "lifecycle_evidence_ref": "FRAMEWORK-CHANGE-EVAL.md#2026-08-02-cotend-collaboration-v183-adaptive-development-experience",
+      "retirement": {
+        "reason": "none",
+        "evidence_ref": "none"
+      },
+      "areas": [
+        "functional-validation",
+        "prototyping",
+        "simulation",
+        "migration",
+        "benchmarking",
+        "content-production"
+      ],
+      "trigger_tags": [
+        "early-functional-validation",
+        "high-fidelity-cost",
+        "stage-goal-mismatch",
+        "minimum-sufficient-fidelity",
+        "bridge-validation"
+      ],
+      "related_skills": [
+        "cotend-collaboration"
+      ],
+      "applicability_conditions": [
+        "The current stage needs to prove a bounded causal property rather than production fidelity itself.",
+        "The current artifact's cost, delay, or fragility is material relative to that stage goal.",
+        "A lower-fidelity substitute can preserve the decisive property under test."
+      ],
+      "counter_conditions": [
+        "Fidelity itself is the property under test.",
+        "The substitute would remove a decisive causal property.",
+        "The intended completion claim already requires the production-real object."
+      ],
+      "reasoning_cue": "Name the causal property this stage must prove. Consider the lowest-sufficient-fidelity substitute that preserves it, then bridge back to the production-real object before broadening the completion claim.",
+      "evidence_refs": [
+        "FRAMEWORK-CHANGE-EVAL.md#2026-08-02-cotend-collaboration-v183-adaptive-development-experience"
+      ]
+    }
+  ]
+}

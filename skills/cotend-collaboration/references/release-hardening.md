@@ -25,6 +25,6 @@ Convert local `dev_high` shortcuts into blockers or cleanup tasks:
 
 ## Human Rejoin
 
-Release posture is a user decision. Use the canonical Human Rejoin semantic fields from `templates.md`, rendered by the adapter in the resolved governance language. Explain that the project is moving from local/prototype use toward other users or public exposure and that local shortcuts must be tightened; offer localized choices to begin release cleanup, remain local, or request more explanation.
+Release posture is a user decision. Use the canonical Human Rejoin semantic fields from `collaboration-packet-templates.md`, rendered by the adapter in the resolved governance language. Explain that the project is moving from local/prototype use toward other users or public exposure and that local shortcuts must be tightened; offer localized choices to begin release cleanup, remain local, or request more explanation.
 
 Do not deploy/publish or make the app reachable by others without explicit user approval.

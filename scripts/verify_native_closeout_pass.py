@@ -60,7 +60,7 @@ TEMPLATES_PATH = (
     / "skills"
     / "cotend-collaboration"
     / "references"
-    / "templates.md"
+    / "collaboration-packet-templates.md"
 )
 PROJECT_INIT_PATH = ROOT / "skills" / "cotend-project-init" / "SKILL.md"
 DOCUMENT_PATH = ROOT / "docs" / "NATIVE-CLOSEOUT-ARCHIVE-AND-RECOVERY.md"
@@ -89,7 +89,10 @@ ResumePhase = Literal[
 
 EXPECTED_TRELLIS_MENTIONS = 0
 EXPECTED_TRELLIS_FILES = 0
-EXPECTED_SKILL_FILES = 71
+EXPECTED_SKILL_FILES = 104
+EXPECTED_R16_MANIFEST = (
+    "a7f7ece2522a5901030e19cd5944359f80c027482f66f822a2053fc5080dcfb5"
+)
 EXPECTED_R15_MANIFEST = (
     "acc17586cf713acc85fef9e6be02013de6bc012b7864ade22bed495ee68a9e7b"
 )
@@ -134,28 +137,27 @@ REQUIRED_CLOSEOUT_MARKERS = (
     "## Authority Boundary",
 )
 REQUIRED_COLLABORATION_MARKERS = (
-    "Native Closeout Pass",
-    "references/closeout-pass.md",
-    "native Implementation Pass, native Verification Pass, formal review, and Native Closeout Pass",
+    "Native Closeout alone owns exact staging",
+    "STATUS.md#cotend_workflow",
 )
 REQUIRED_CONTINUOUS_MARKERS = (
-    "synchronize applicable existing project records through `closeout-pass.md`",
+    "local_closeout_authorization.status: active",
+    "Native Closeout commit gate prompt",
+    "Native Closeout Pass still owns exact staging",
     "native_closeout_done: yes | no | not_applicable",
-    "closeout_evidence_pointer:",
 )
 REQUIRED_RISK_MARKERS = (
     "auto_local_commit_and_native_closeout",
-    "native_closeout_records_and_local_commit",
-    "post-commit verification",
+    "Native Closeout Pass may proceed",
+    "After local closeout, report commit hash",
 )
 REQUIRED_RUNTIME_MARKERS = (
-    "current closeout uses `closeout-pass.md`",
-    "Both profiles finish verified checkpoints through `closeout-pass.md`",
-    "neither delegates closeout to an external framework",
+    "Local commit/Native Closeout remains opt-in",
+    "Local closeout never implies push/release/publication",
 )
 REQUIRED_PROJECT_INIT_MARKERS = (
-    "Local closeout always uses `cotend-collaboration/references/closeout-pass.md`",
-    "external task/PRD/spec/closeout artifacts are classified",
+    "one plan/implement/verify/triggered-review/primary-owner-state/commit",
+    "local-closeout authorization",
 )
 REQUIRED_DOCUMENT_MARKERS = (
     "# CoTend 原生收尾、归档与恢复",
@@ -801,9 +803,9 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         texts["project_init"], REQUIRED_PROJECT_INIT_MARKERS, "Project Init"
     )
     _require_markers(texts["document"], REQUIRED_DOCUMENT_MARKERS, "public contract")
-    if "Goal Completion and Native Closeout are independent." not in texts["goal"]:
+    if "this module consumes its exact result and never creates a Done-specific completion packet" not in texts["goal"]:
         raise NativeCloseoutPassError("goal/closeout independence is missing")
-    if "At checkpoint, Native Closeout Pass" not in texts["plan_tree"]:
+    if "At a material checkpoint, after any required actual-artifact gate passes:" not in texts["plan_tree"]:
         raise NativeCloseoutPassError("Plan Tree closeout checkpoint is missing")
     if "native_closeout_allowed: yes | no | not_applicable" not in texts["templates"]:
         raise NativeCloseoutPassError("native closeout template is missing")
@@ -839,7 +841,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     source_lock = json.loads(
         (root / SOURCE_LOCK_PATH.relative_to(ROOT)).read_text(encoding="utf-8")
     )
-    if source_lock.get("skill_file_count") != 69:
+    if source_lock.get("skill_file_count") != 94:
         raise NativeCloseoutPassError("current upstream source inventory drifted")
 
     lock = json.loads(
@@ -849,24 +851,24 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
     predecessors = lock.get("predecessor_targets", [])
     files, digest = skill_manifest(root)
     if (
-        target.get("artifact_id") != "cotend-codex-r000016"
-        or target.get("revision") != 16
+        target.get("artifact_id") != "cotend-codex-r000017"
+        or target.get("revision") != 17
         or target.get("manifest_sha256") != digest
         or lock.get("skill_count") != 10
         or lock.get("skill_file_count") != EXPECTED_SKILL_FILES
         or len(files) != EXPECTED_SKILL_FILES
     ):
-        raise NativeCloseoutPassError("r16 target identity or manifest drifted")
+        raise NativeCloseoutPassError("r17 target identity or manifest drifted")
     if not predecessors or predecessors[0] != {
         "platform": "Codex",
         "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000015",
-        "revision": 15,
-        "source_release_id": "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14",
-        "framework_protocol": "cotend-collaboration-v1.76",
-        "manifest_sha256": EXPECTED_R15_MANIFEST,
+        "artifact_id": "cotend-codex-r000016",
+        "revision": 16,
+        "source_release_id": "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
+        "framework_protocol": "cotend-collaboration-v1.79",
+        "manifest_sha256": EXPECTED_R16_MANIFEST,
     }:
-        raise NativeCloseoutPassError("r15 predecessor identity drifted")
+        raise NativeCloseoutPassError("r16 predecessor identity drifted")
 
     _require_markers(
         texts["evidence"],

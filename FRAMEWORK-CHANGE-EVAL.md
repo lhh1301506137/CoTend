@@ -2,6 +2,52 @@
 
 本文件评估框架本身的行为与维护成本，不替代产品验收。仓库级验证、真实平台验证和用户最终验收必须分开表述。
 
+## 2026-08-12 Dual v2.01 exact-source → CoTend r17
+
+```yaml
+current_framework_version: cotend-collaboration-v2.01
+change_type: workflow_behavior
+source_identity: exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d
+consumer_handoff: 2026.08.12.2
+change_summary: 将 25 项共享行为增量适配到 CoTend 原生 owner，并把 94 个来源文件映射为 104 个产品文件
+intent: 在不恢复外部开发框架运行时或任务权威的前提下，取得 Dual v2.01 的执行尺度、结果触发治理、Project Intelligence、理解产物、交接安装权和本地收尾能力
+expected_benefit:
+  - CoTend 原生 owner 等价承接需求澄清、项目真相与计划、授权实施、验证复审、收尾恢复和提交边界
+  - Full 与 Adaptive 保持相同语义、证据、停止和接受合同
+  - Project Init 只加载命中的影响 owner，CodeGraph 初始化继续要求用户明确许可
+  - 本地 artifact 以 r16 为第一前序并可确定性重建
+possible_harm:
+  - 上游冷路径过多可能增加上下文与维护成本
+  - 理解投影或治理历史可能被误当成第二真相树
+  - 自动本地收尾可能被误读为 push/release/publication 授权
+deviations:
+  - 不复制私有 adapter、runtime、hook、状态目录、任务树或内部测试载体
+  - karpathy-guidelines 由 CoTend 自主保留为非默认、非 owner 的 MIT companion
+  - Codex default_prompt 保持简短入口，详细合同只在 Skill 正文中维护
+validation_scenarios:
+  - scenario: exact_source_and_handoff_integrity
+    expected: 188 个提交全部分类，目标 commit/tree 与三份摘要精确匹配
+    validation_result_type: executed
+    result: passed
+  - scenario: native_owner_and_zero_runtime_regression
+    expected: 10 Skills、104 files、C01-C19、原生 G01-G05 与零 Trellis runtime 通过
+    validation_result_type: executed
+    result: passed_repository_native_and_exact_source_gates
+  - scenario: deterministic_local_r17_artifact
+    expected: 两次本地构建字节一致且不执行全局安装或公开动作
+    validation_result_type: executed
+    result: passed_2_byte_identical_builds_106_entries_sha256_5b1bfdf6e7f136deb013125aa6d7a8dcbfd9409bb3a00917e0d7efcf81003fd1
+decision: adopt_with_cotend_adaptation
+rollback_triggers:
+  - 任一外部 runtime、hook、状态目录或任务权威重新成为产品依赖
+  - CodeGraph 未经许可自动初始化，或 ignored/untracked 治理变化再次被 Git clean 状态掩盖
+  - Full/Adaptive、原生 owner、C01-C19、artifact predecessor 或冻结 rc.2 发生回归
+```
+
+该评估只授权仓库内产品适配、lock、确定性本地 artifact 与任务本地提交；
+不授权真实模型、外部 UAT、全局 Skills、push、tag、release、submission 或
+publish。
+
 ## 2026-07-26 G05 第一方运行包零外部开发框架依赖
 
 ```yaml

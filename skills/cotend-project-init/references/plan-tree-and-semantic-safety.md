@@ -1,39 +1,77 @@
 # Plan Tree And Semantic Safety
 
-This reference preserves the detailed Plan Tree, semantic-contract binding,
-Route Rebase, and closure checks used by the initialization workflow.
+This is a thin Project Init adapter. Plan Tree and the semantic/closure owners
+retain their algorithms and schemas; Init only decides whether to call them,
+propagates their result, and enforces their stop.
 
-10. Configure plan review and slicing.
-   - Select and report the post-init dynamic route; do not execute product diagnosis, semantic alignment, brainstorming, or implementation during Init.
-   - Decide whether Plan Review Gate is needed.
-   - For complex work, draft vertical slices before execution.
+## Trigger
 
-11. Configure Plan Tree.
-    - Load `cotend-collaboration/references/plan-tree.md` when the project is standard/full with multiple stages, unattended/continuous development, high-value next-step selection, plan-external work, or drift/confusion risk.
-    - If required and missing, create only the minimum structural `PROJECT-PLAN-TREE.md` index and related directories/records needed by the selected profile, populated from already user-confirmed facts. Do not propose or persist new L0/L1/L2 meaning during Init. Direct `$cotend-semantic-alignment new_baseline` owns the minimum semantic structure and truth updates when protected meaning is absent.
-    - During init/rebuild, read active truth fully enough to record canonical `semantic_baseline` `coverage / authority / currency / consistency` and derive `status: not_required | absent | partial | confirmed | stale | conflict`; during ordinary resume, read only the compact derived status/non-default gaps, current work summary/acceptance, protected parent-chain summaries, per-node contract references, and unresolved/recent decision/knowledge entries that affect the route.
-    - Detect only observable Project Understanding Reconstruction reasons and pass them to the sole owner in `cotend-collaboration/references/plan-tree.md`: root-Primary first project entry with route/integration responsibility, explicit same-Primary new-session takeover, confirmed new-Primary takeover, L0/L1 rebase, new L1/L2 domain scope, cross-domain/architecture/cumulative-main-chain work, or drift/rework/route-break/stale-assumption signals. A bounded subagent's first repository view is not that lifecycle trigger. Do not copy the trigger resolver, scope table, synthesis, or ready/failure rule into Init.
-    - When Plan Tree returns a triggered result, propagate its optional `plan_tree_alignment.project_understanding_reconstruction` block unchanged. When no trigger fires, omit that block and preserve the ordinary active-path/parent-summary load; ordinary same-route L3/L4 continuation must not acquire a full-project reread cost.
-    - Do not reconstruct product meaning inside Init. A non-ready result blocks only the affected product route and reports Plan Tree's existing Triggered Semantic Reconciliation next action. Init must not auto-run `$cotend-semantic-alignment`; that direct route becomes applicable only if the existing owner later identifies protected L0-L2 meaning needing confirmation or change.
-    - When the current input explicitly contains `$cotend-session-handoff` and supplies the canonical `same_primary_session_handoff`, consume it by reference and compare its hash/containing-commit method, including committed-packet single-parent, parent-equals-source-snapshot, exact two-output delta, and current-HEAD reachability checks, plus HEAD/branch/worktree ownership, active task/truth/path, pending gates, verification, and reliable boundary with their current owners. `HEAD == containing_commit` may be current, a later determinable descendant is stale, and contradictory or unreachable history is conflict. Classify exactly `current | stale | conflict` before any product write. The packet is never active truth and Init must not discover or create a second session ledger.
-    - Check that every current-MVP L0-L2 node required by the next product route has its own explicit user-confirmation evidence. For every new or materially changed confirmation, require one unique decision-log `cotend.semantic-contract.v1` payload whose digest verifies through the Semantic Alignment helper. During ordinary resume, consume an unchanged recorded `verified` reference without recomputing every node; rerun mechanical verification during init/rebuild, an active important-close/material-rebase/decision-relevant-completion boundary, or when a payload/reference/currency anomaly appears. Using the zero-dependency helper to inspect an existing payload is not execution/delegation of the Semantic Alignment control flow and must not draft or write meaning. Parent confirmation, successful code, old AI-written docs, bare `继续`, `dev_high`, Adaptive, or delegation maturity are not descendant confirmation or contract binding.
-    - Treat mismatch as stale and missing/ambiguous/unverifiable binding as unknown only for the affected route. Do not silently regenerate a digest. Report historical `legacy_unbound` without launching a whole-project re-confirmation; migrate it only when the exact node next reaches writable alignment, important closure, material rebase, or decision-relevant completion. Unrelated dependency-isolated paths remain eligible to continue.
-    - Use semantic importance rather than node ID/depth. Preserve legacy IDs; add `semantic_level` when actively reviewing nodes and use the replacement-impact test before classifying a node L3.
-    - If present, check whether the selected next step binds to an active node and whether the active path has supporting node docs.
-    - If the request also contains project/feature meaning work, do not classify its scope or edit authorization during Init. Report the standing baseline and preserve the appended wording for the independent direct next action; do not inspect extra semantic surfaces merely to prepare that later flow.
-    - After framework setup, evaluate the Fresh-Intake Semantic Onboarding Handoff from `auto_mode`, shallow intake inventory, standing baseline status, appended-request precedence, and stronger handback state only. Never use intake content interpretation as an input.
-    - If the next step does not fit the tree, set `plan_tree_alignment.status: needs_reconciliation` and reconcile before implementation.
-    - Treat `mainline` only as the current `active_path`; never infer a permanent main/branch node type during resume. When an existing canonical Route Rebase is active, validate its carrier/reference, status, authority gate, previous/candidate/resulting path, reliable boundary, and blockers without copying its schema.
-    - For `evaluating`, resume only materiality/semantic-impact/authority classification and do not activate the candidate. For `pending_user_confirmation`, keep the candidate pending and report direct `$cotend-semantic-alignment semantic_change` as the specialized affected-route handback; bare `继续`, a new session/model, or successful tests cannot select or reject it. For `applying` / `revalidating` with no pending human gate, report the authorized repair/revalidation route beginning at the reliable boundary. For `blocked`, prevent dependent `current_next_leaf` advancement. Permit an unrelated confirmed route only when its dependencies are explicitly isolated.
-    - For same-Primary takeover, `current` may resume only at the first invalid or unverified point after the recorded reliable boundary, after Plan Tree's canonical `full_current_mvp` reconstruction returns `ready`, and after the required complete-current-MVP resolved-language teachback. `stale` first reconciles determinable successor differences and recomputes the boundary before reconstruction. `conflict` stops at `human_needed` or the existing recovery owner. Preserve every pending human gate; bare `continue` cannot answer it.
-    - Do not create a packet for ordinary leaf ordering with no material route/meaning/evidence change. Init reports an existing material rebase but does not originate its L3/L4 route decision, protected write, impact inventory, completion result, or implementation repair.
-    - If an existing important current-MVP L2/main-chain node is marked complete, is about to advance, or already carries `semantic_implementation_closure`, load that cold-path module only far enough to validate/report its compact state. An open/invalid closure keeps the affected node on an implementation-repair route; Init reports it but does not execute the repair.
-    - If any required current-MVP L0-L2 node is absent, inferred, stale, or conflicting, stop only affected product work and report the gap plus unaffected confirmed paths. Init must never create `draft_pending_user_confirmation`, a confirmation packet, or a new semantic decision. It may report a pre-existing pending decision without advancing it and may point to the independent direct entry. Future/non-MVP unaligned nodes do not block unrelated confirmed paths.
-    - If the Plan Tree strictly indexes individually user-confirmed current-MVP L0-L2 plus L3/L4 facts that preserve them, continue without asking and report the active path, baseline status, supporting docs, unaffected confirmed paths, knowledge status, and load policy used.
-    - Codex may create/update L3/L4 node docs and knowledge entries automatically only when all required L0-L2 ancestors are individually confirmed, user-visible outcomes remain unchanged, scope/risk is authorized, and entries are marked `primary_ai_auto_within_scope` or `primary_ai_observed_fact`.
-    - Premium-model advisor or takeover recommendations that affect understanding/route must be logged as `advisor_recommended` or `primary_ai_proposed_delta`, not merged into user consensus until the user confirms. If the advisor asks the user a product/architecture/model-role question and the user answers, record that answer in `PROJECT-DECISION-LOG.md`.
-    - If existing capability trees, glossaries, domain models, taxonomies, expanded understanding, or equivalent semantic assets are encountered in the active route, preserve their real authority and link/reuse them through the existing Plan Tree/understanding surfaces. File existence is not confirmation; Init must not create a parallel semantic asset or resolve a protected conflict itself.
-    - Accepted aliases from `cotend-collaboration/references/authority-and-triggers.md` remain valid during migration. Report them as migration suggestions, not initialization failures, unless the project has already adopted a stricter schema.
-    - In projects with external development-framework artifacts, classify and record useful task/PRD/spec links in Plan Tree/node docs; do not duplicate full content or treat the links as route authority.
-    - Before declaring the project `continue_ready`, run the Plan Tree Post-Init Consistency Self-Check, including multidimensional `semantic_baseline_coverage`, triggered semantic-contract binding verification, active truth/navigation pointer closure, explicitly invoked same-Primary session-handoff freshness when supplied, any triggered Project Understanding Reconstruction result, and material Route Rebase continuity when referenced. Fix safe control-plane drift when clearly in scope; never repair product meaning or re-sign a contract without user confirmation.
-    - Run the Triggered Semantic Reconciliation depth needed to report Init safety: check protected lineage first, then inspect the active path/recent decisions and changes for init/update/resume/repair. Run deeper comparison only when an anomaly or possible self-consistent wrong baseline is needed to classify `stale` / `conflict`; report the result without drafting replacement meaning. Include the standing baseline and four-state reconciliation result when reconciliation runs.
+10. Configure Plan Tree.
+
+Load `cotend-collaboration/references/plan-tree.md` only for a multi-stage
+standard/full project, a current CoTend governance binding, unattended work, material next-step or
+route selection, plan-external work, protected L0-L2/semantic-contract work,
+Route Rebase, material-node closure, drift/rework, or a canonical Project
+Intelligence trigger. Add
+`cotend-collaboration/references/project-intelligence.md` and
+`cotend-collaboration/references/semantic-contract-templates.md` only when
+Project Intelligence triggers. Add
+`cotend-collaboration/references/semantic-reconciliation.md` for post-init
+consistency, a semantic anomaly, or plan-external reconciliation. A material
+Route Rebase additionally requires
+`cotend-collaboration/references/route-rebase.md` and
+`cotend-collaboration/references/route-rebase-template.md`.
+
+- On init/rebuild, establish the current semantic-baseline scope from existing
+  authority: `coverage / authority / currency / consistency` plus derived
+  status and gaps. On ordinary resume, consume only the compact status,
+  active-path/parent summaries and relevant unresolved pointers.
+- Pass observable project/model/design reasons to Project Intelligence. Do not
+  copy its trigger resolver, purpose/scope/view selection, synthesis,
+  freshness/permission rule or result schema.
+- For delivery-state intent, route to the unique execution-closure schema plus
+  Acceptance/Capability, adding Semantic Implementation Closure only on its
+  material trigger. Init propagates one result reference and never turns file
+  presence, an old packet or an old `done` label into current completion.
+- Resolve `semantic_contract_ref` only on the affected high-value trigger.
+  Missing/stale/unknown binding blocks or downgrades only the affected claim;
+  unrelated dependency-isolated paths may continue.
+
+## Propagate
+
+- When Project Intelligence triggers, propagate its optional
+  `plan_tree_alignment.project_intelligence` link unchanged.
+  Omit it for ordinary same-route L3/L4 continuation.
+- Propagate the active path, next node, semantic-baseline result, binding state,
+  `current_execution_unit`, reconciliation result and reliable boundary by
+  reference to their canonical carriers. Do not create a second tree or
+  packet.
+- Propagate at most one `execution_closure_ref` per affected current scope plus
+  its necessary safe-wording/advance/next-owner summary. Do not copy evidence,
+  dimensions, three boundaries or derivation.
+- When a material Route Rebase exists, propagate its canonical packet by
+  reference. Ordinary reports use `route_rebase: not_applicable`; do not copy
+  the schema. Maintain `material_route_rebase_continuity` and the one resulting
+  path selected by Plan Tree.
+- An unaffected confirmed route must not ask for a new confirmation merely
+  because another route is rebasing.
+- For an explicitly invoked supplied `same_primary_session_handoff`, propagate
+  the separate `same_primary_session_takeover_result`; never write status back
+  into the frozen packet.
+
+## Stop
+
+- A non-ready reconstruction blocks the affected product route and reports
+  `semantic-reconciliation.md`. Project Init does not
+  automatically invoke Semantic Alignment.
+- `route_rebase.status: evaluating` resumes classification only;
+  `pending_user_confirmation` is a specialized human gate;
+  `applying | revalidating` resumes only from the reliable boundary;
+  `blocked` cannot be reopened by bare `继续`.
+- A session result `stale` requires reconciliation before Project Intelligence;
+  `conflict` stops with the current recovery/human owner; `current` still needs
+  current, permitted `full_current_project` intelligence and the required
+  takeover teachback in the persisted governance language before product writes.
+- Language, Critical/release, unresolved P0/P1, scope, acceptance, integrity,
+  semantic-authority and existing user-decision boundaries remain unchanged
+  under Full and Adaptive.

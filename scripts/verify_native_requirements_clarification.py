@@ -44,13 +44,14 @@ REQUIRED_IDEA_MARKERS = (
     "Init never executes this contract.",
 )
 REQUIRED_SEMANTIC_MARKERS = (
-    "CoTend Native Requirements Clarification",
-    "Ask no more than one unresolved material question per turn",
-    "persist a decision-worthy answer before it changes active truth or navigation",
+    "For a fuzzy idea or intake artifact entering `new_baseline`",
+    "Use the active CoTend-governed brainstorm/PRD",
+    "never create a parallel requirements source",
 )
 REQUIRED_INIT_MARKERS = (
-    "Report the independent direct `$cotend-semantic-alignment new_baseline` handback",
-    "Init does not ask product questions or dispatch to an external brainstorm",
+    "complete Init only",
+    "independently invoked `$cotend-semantic-alignment new_baseline`",
+    "must not read or summarize the artifact to infer the product goal",
 )
 REQUIRED_DOCUMENT_MARKERS = (
     "# CoTend 原生需求澄清",

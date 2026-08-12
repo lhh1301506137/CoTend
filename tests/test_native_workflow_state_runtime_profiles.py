@@ -45,21 +45,17 @@ class NativeWorkflowStateRuntimeProfilesTests(unittest.TestCase):
         self.assertEqual(result.persisted_execution_mode, "delegated_pair")
         self.assertTrue(result.write_native_record)
 
-    def test_dormant_record_requires_explicit_resume(self) -> None:
-        blocked = native_state.evaluate_workflow(
-            "dormant",
+    def test_stale_record_is_safely_repaired(self) -> None:
+        repaired = native_state.evaluate_workflow(
+            "stale",
             native_profiles=("adaptive",),
         )
-        self.assertFalse(blocked.can_continue)
-        self.assertTrue(blocked.user_decision_required)
-        resumed = native_state.evaluate_workflow(
-            "dormant",
-            native_profiles=("adaptive",),
-            explicit_resume=True,
-        )
-        self.assertTrue(resumed.can_continue)
-        self.assertEqual(resumed.state, "current")
-        self.assertEqual(resumed.effective_profile, "adaptive")
+        self.assertTrue(repaired.can_continue)
+        self.assertFalse(repaired.user_decision_required)
+        self.assertEqual(repaired.state, "current")
+        self.assertEqual(repaired.effective_profile, "adaptive")
+        self.assertEqual(repaired.migration_result, "stale_record_repaired")
+        self.assertTrue(repaired.write_native_record)
 
     def test_duplicate_native_record_fails_closed(self) -> None:
         result = native_state.evaluate_workflow(
@@ -84,7 +80,7 @@ class NativeWorkflowStateRuntimeProfilesTests(unittest.TestCase):
 
     def test_legacy_migration_preserves_source_and_unrelated_truth(self) -> None:
         result = native_state.evaluate_workflow(
-            "absent",
+            "uninitialized",
             legacy_profiles=("adaptive",),
         )
         self.assertEqual(result.persisted_profile, "adaptive")

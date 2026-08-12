@@ -4,9 +4,9 @@ Use when the user asks Codex to keep going, sends repeated or pre-seeded `继续
 
 ## Runtime Posture Versus Unattended Mission
 
-Adaptive's `active_route_continuous` posture is ordinary execution authorization, not an unattended mission. When the active route, individually confirmed current-MVP L0-L2 ancestors, risk tier, and stop boundaries are known, the Primary continues successive in-scope L3/L4 leaves and reports at material checkpoints without asking between them. It does not require a separate away/asleep request, delegated-mission packet, or pre-seeded `继续`.
+Adaptive's `active_route_continuous` posture is ordinary execution authorization, not an unattended mission. When the active route, individually confirmed current-MVP L0-L2 ancestors, risk tier, and stop boundaries are known, the Primary continues successive in-scope L3/L4 coherence-sized execution units and reports at material checkpoints without asking between them. A unit may be one leaf or the material multi-node shape selected by Plan Tree; profile posture never forces micro-leaf execution. It does not require a separate away/asleep request, delegated-mission packet, or pre-seeded `继续`.
 
-The activation requirements below apply when the user actually authorizes an unattended window or delegated batch. Full's `authorized_task_closure` likewise completes only the already-authorized task or slice through implement-check-fix-recheck; it does not create an unattended window or cover the next material slice.
+The activation requirements below apply when the user actually authorizes an unattended window or delegated batch. Full's `authorized_task_closure` likewise completes only the already-authorized task/slice or coherence-sized unit through implement-check-fix-recheck; it does not create an unattended window or cover the next uncovered material unit.
 
 ## Activation Requirements
 
@@ -83,21 +83,32 @@ When `preflight_baseline` is degraded or not run, record why before starting. Th
 
 - Interpret `继续` as a resume token when unattended mode is active or explicitly pre-seeded. The sole non-unattended exception is the generic explicit control-Skill handback defined below and in `authority-and-triggers.md`.
 - Each token continues the same authorized unattended window from the latest checkpoint.
-- Consume a token only after closing the current checkpoint, confirming the next step stays inside the authorized risk tier, and preserving any required semantic implementation closure gate.
+- Consume a token only after closing the current checkpoint, confirming the next step stays inside the authorized risk tier, and preserving any required canonical execution-closure gate.
+- Preserve any material `current_execution_unit` boundary from the existing carrier. A token may resume its internal checkpoint but cannot silently widen it, split around a blocker, or treat partial children as complete.
 - Tokens never widen scope, approve review, accept the product, push, deploy, dismiss review debt, or cross a stop boundary.
-- Tokens may continue in-scope repair leaves under an open material node, but they cannot move to the next important L2/main-chain node while `semantic_implementation_closure.next_step_allowed` is `no`.
+- Tokens may continue in-scope repair leaves under an open material node, but they cannot move to the next important L2/main-chain node while its canonical `execution_closure.advance_allowed` is `no` or the required result is absent/stale/unknown.
 - For an active material Route Rebase, tokens may continue `applying` / `revalidating` work only when no human gate is pending and only from the canonical reliable resume boundary. They cannot revive the previous path or jump to a later `current_next_leaf`.
-- If a pending Human Rejoin question exists, including a high-level Route Rebase confirmation, Done Gate, release, critical, Baseline confirmation, user interruption/new idea reconciliation, or product-direction approval, a bare `continue` or `继续` does not choose any option or accept the recommended answer. Re-present the question in the resolved governance language. If unrelated work remains inside the already authorized unattended scope, it may continue only with dependency-isolation evidence while the question stays pending.
+- If a pending Human Rejoin question exists, including a high-level Route Rebase confirmation, Done Gate, release, critical, Baseline confirmation, user interruption/new idea reconciliation, or product-direction approval, a bare `继续` does not choose any option or accept the recommended answer. Re-present the question in the resolved governance language. If unrelated work remains inside the already authorized unattended scope, it may continue only with dependency-isolation evidence while the question stays pending.
 - The user may explicitly pre-authorize a choice with wording such as `继续=同意推荐项`; without that explicit mapping, never infer consent from a resume token.
-- One narrow non-unattended exception exists for the generic explicit control-Skill handback defined in `authority-and-triggers.md`: when the completed Skill has no specialized pending decision and asks only whether to resume the same confirmed route, a direct bare `continue` or `继续` satisfies that handback. It still cannot answer a Human Rejoin question, select option `1`, widen scope/risk, approve review, accept the product or advisor advice, or cross any stop boundary.
+- One narrow non-unattended exception exists for the generic explicit control-Skill handback defined in `authority-and-triggers.md`: when the completed Skill has no specialized pending decision and asks only whether to resume the same confirmed route, a direct bare `继续` satisfies that handback. It still cannot answer a Human Rejoin question, select option `1`, widen scope/risk, approve review, accept the product or advisor advice, or cross any stop boundary.
 
 ## Local Closeout Authorization
 
-Use this only when the project status explicitly records `local_closeout_authorization.status: active`. CoTend never activates local closeout from Adaptive or Full alone.
+Use this only when the project status explicitly records
+`local_closeout_authorization.status: active`. An applicable adapter may
+materialize that canonical block only when its declared runtime-profile
+predicate matches the effective profile and the shared risk owner proves the
+scope, ownership, verification and stop conditions. A profile name, model or
+project label alone is never materialization authority.
+
+Full remains opt-in unless the project already contains an active
+local-closeout authorization record; adapter data cannot use another profile's
+predicate to bypass that contract.
 
 `继续` may include local closeout work only when all conditions hold:
 
-- the user explicitly enabled local closeout authorization for this project, milestone, or unattended window;
+- the authorization is active through either explicit project/milestone/window
+  enablement or a matching, validated adapter declaration under the rule above;
 - the completed work stays inside the current agreed scope/task and authorized risk tier;
 - unrelated or user-owned changes are classified and excluded with explicit staging paths; unresolved ownership, staged overlap, overwrite, or inclusion blocks closeout;
 - no secrets, private data, large generated files, public artifacts, or ignored local-only config are staged;
@@ -106,13 +117,27 @@ Use this only when the project status explicitly records `local_closeout_authori
   scope expansion, P0, unresolved P1/validation failure after the canonical
   bounded repair/recheck, or `critical` risk appeared.
 
+When every condition holds, create the verified task-local commit without a
+Native Closeout commit gate prompt. This is a required closeout action under
+the active authorization, not a discretionary suggestion. With a current CoTend governance binding,
+the authorization satisfies the generic one-shot commit confirmation; CoTend governance
+the Native Closeout Pass still owns exact staging, commit, and durable
+status/review/handoff ordering. Stage only
+literal exact task paths. A checkpoint commit does not create a generic
+handback or end `active_route_continuous`; continue remaining work on the same
+authorized route unless a canonical stop or completed mission applies.
+
 Allowed local closeout actions:
 
-- create a local git commit for the verified in-scope checkpoint;
-- synchronize applicable existing project records through `closeout-pass.md`, including `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, decision/knowledge records, Plan Tree, or milestone reports;
-- update a handoff only when the active route or user actually requires one.
+- create the required local git commit for the verified in-scope checkpoint;
+- run the Native Closeout Pass and update the existing durable status/review/handoff carriers for the verified task;
+- update durable project logs such as `STATUS.md`, `REVIEW-LOG.md`, `QUALITY-SIGNALS.md`, CoTend governance task notes, or milestone reports.
 
-If an optional archive helper requires a fully clean worktree, defer only that archive or journal step and report the reason; a verified task-local commit may still proceed when unrelated changes are classified and excluded.
+If a durable closeout carrier cannot be updated safely because ownership or
+worktree evidence is ambiguous, stop that closeout boundary and report the
+reason. A verified task-local commit may proceed only when the active
+authorization explicitly permits it and every unrelated change is classified
+and excluded.
 
 Still requires the user:
 
@@ -123,6 +148,7 @@ Use the canonical Critical / Never-Unattended Stop List in `authority-and-trigge
 Create `review_pending` or valid `self_reviewed` checkpoints when:
 
 - a runnable/verifiable vertical slice is complete;
+- a material coherent bundle or bounded subtree reaches an internal recovery boundary even though its product-level result remains open;
 - an important current-MVP L2/main-chain boundary is ready for semantic implementation closure;
 - the material diff becomes large enough that reviewer context or rollback confidence would degrade, typically about 8+ material files or about 1000 meaningful changed lines by the Checkpoint Measurement Method;
 - about 5 task units accumulate under one unattended window;
@@ -189,8 +215,9 @@ unattended_development_summary:
       rollback_path:
       verification:
       self_review:
-  loaded_protocol_modules:
-    -
+  # Omit on ordinary Human Rejoin. Include only for a missing required module,
+  # routing diagnosis, explicit user request, or formal evidence provenance.
+  loaded_protocol_modules: <conditional; otherwise omit>
   completed_checkpoints:
     - id:
       status: review_pending | self_reviewed | blocked | ready_for_review
@@ -211,7 +238,6 @@ unattended_development_summary:
     commits_created:
       -
     native_closeout_done: yes | no | not_applicable
-    closeout_evidence_pointer:
     blocked_reason:
   goal_completion:
     mvp_status:

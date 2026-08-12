@@ -6,6 +6,9 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 
 ### Added
 
+- Adopted the exact private-upstream commit `fe21e970bc2bdc69de5e2ce1710aef2dd156a54d` through the corrected `2026.08.12.2` consumer handoff, with all 188 range commits classified and 25 shared behavior changes adapted to CoTend-native owners.
+- Added v2.01 Project Intelligence, understanding-artifact byte gates, governance-history lifecycle, traceable Tooling refresh, adaptive development experience, route-rebase/session-handoff templates, and result-triggered execution closure without creating a second project-truth or task tree.
+
 - Frozen Trellis decoupling parity contract covering eight governance interfaces, six evidence gates, and the exact current 241-mention/22-file runtime baseline.
 - Repository verification that rejects premature runtime text deletion, missing capability coverage, mechanical renaming, or status advancement without implementation.
 - CoTend-native project-truth authority with executable external-framework alignment, history, conflict, stop, and route-rebase scenarios.
@@ -30,6 +33,10 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - Conditional outcome-driven solution adequacy and impact-directed Project Init updates without creating a second project truth or automatic adoption authority.
 
 ### Changed
+
+- Advanced the repository carrier to `cotend-codex-r000017`: nine exact-source Skills / 94 source files adapted into ten CoTend Skills / 104 product files, with r16 as the exact first predecessor.
+- Kept `karpathy-guidelines` as an optional, non-default, non-owner MIT companion after its upstream removal, and shortened Codex interface prompts while preserving full contracts in the Skill bodies.
+- Replaced obsolete `dormant` workflow-state verification with `current | uninitialized | stale | conflict`, and require explicit user approval before project-local CodeGraph initialization.
 
 - Removed Trellis identity and active-state precedence from project meaning, requirements, route, decision, status, evidence, and coding-constraint authority.
 - Advanced the repository carrier to internal target `cotend-codex-r000003` while preserving the adopted Dual AI v1.65 source lock.

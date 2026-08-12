@@ -75,8 +75,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         return Artifact.from_directory(
             source,
             source_release_id=self.artifact.source_release_id,
-            artifact_id="cotend-codex-r000017",
-            revision=17,
+            artifact_id="cotend-codex-r000018",
+            revision=18,
             protocol=self.artifact.protocol,
         )
 
@@ -154,13 +154,13 @@ class DeliveryLifecycleTests(unittest.TestCase):
 
     def test_artifact_identity_dry_run_and_idempotent_install(self) -> None:
         self.assertEqual(len(self.artifact.skills), 10)
-        self.assertEqual(len(self.artifact.files), 71)
+        self.assertEqual(len(self.artifact.files), 104)
         self.assertEqual(
             self.artifact.source_release_id,
-            "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
+            "exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d",
         )
-        self.assertEqual(self.artifact.artifact_id, "cotend-codex-r000016")
-        self.assertEqual(self.artifact.revision, 16)
+        self.assertEqual(self.artifact.artifact_id, "cotend-codex-r000017")
+        self.assertEqual(self.artifact.revision, 17)
         before = tree_manifest(self.project)
 
         preview = self.manager.execute("install", self.artifact)
@@ -173,7 +173,7 @@ class DeliveryLifecycleTests(unittest.TestCase):
         self.assertEqual(state["installation"], "complete")
         self.assertEqual(state["enablement"], "enabled")
         self.assertEqual(state["candidate_relation"], "same_as_current")
-        self.assertEqual(state["managed_files"], 71)
+        self.assertEqual(state["managed_files"], 104)
         receipt = self.load_receipt()
         self.assertEqual(receipt["schema_version"], 2)
         self.assertEqual(receipt["source_release_id"], self.artifact.source_release_id)
@@ -247,18 +247,18 @@ class DeliveryLifecycleTests(unittest.TestCase):
         self.assert_protected_unchanged()
 
     def test_repository_artifact_loads_exact_predecessor_chain(self) -> None:
-        self.assertEqual(len(self.artifact.predecessor_targets), 14)
+        self.assertEqual(len(self.artifact.predecessor_targets), 15)
         first = self.artifact.predecessor_targets[0]
-        self.assertEqual(first.artifact_id, "cotend-codex-r000015")
-        self.assertEqual(first.revision, 15)
+        self.assertEqual(first.artifact_id, "cotend-codex-r000016")
+        self.assertEqual(first.revision, 16)
         self.assertEqual(
             first.source_release_id,
-            "exact-source:774aab64e778d2e3a57b66cfd65d808ac8235e14",
+            "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
         )
-        self.assertEqual(first.protocol, "cotend-collaboration-v1.76")
+        self.assertEqual(first.protocol, "cotend-collaboration-v1.79")
         self.assertEqual(
             first.manifest_sha256,
-            "acc17586cf713acc85fef9e6be02013de6bc012b7864ade22bed495ee68a9e7b",
+            "a7f7ece2522a5901030e19cd5944359f80c027482f66f822a2053fc5080dcfb5",
         )
 
     def test_locked_r1_predecessor_updates_across_protocol_and_inventory(self) -> None:
@@ -358,11 +358,11 @@ class DeliveryLifecycleTests(unittest.TestCase):
         self.assertEqual(before["candidate_relation"], "update_available")
         updated = self.manager.execute("update", candidate, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
-        self.assertEqual(updated["state_after"]["managed_files"], 71)
+        self.assertEqual(updated["state_after"]["managed_files"], 104)
         current_receipt = self.load_receipt()
-        self.assertEqual(current_receipt["artifact_id"], "cotend-codex-r000016")
-        self.assertEqual(current_receipt["target_revision"], 16)
-        self.assertEqual(current_receipt["protocol"], "cotend-collaboration-v1.79")
+        self.assertEqual(current_receipt["artifact_id"], "cotend-codex-r000017")
+        self.assertEqual(current_receipt["target_revision"], 17)
+        self.assertEqual(current_receipt["protocol"], "cotend-collaboration-v2.01")
         self.assertTrue(
             (
                 self.project
@@ -445,8 +445,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000016")
-        self.assertEqual(receipt["target_revision"], 16)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000017")
+        self.assertEqual(receipt["target_revision"], 17)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
@@ -503,8 +503,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000016")
-        self.assertEqual(receipt["target_revision"], 16)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000017")
+        self.assertEqual(receipt["target_revision"], 17)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
@@ -530,8 +530,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000016")
-        self.assertEqual(receipt["target_revision"], 16)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000017")
+        self.assertEqual(receipt["target_revision"], 17)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
@@ -557,8 +557,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000016")
-        self.assertEqual(receipt["target_revision"], 16)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000017")
+        self.assertEqual(receipt["target_revision"], 17)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
@@ -584,8 +584,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000016")
-        self.assertEqual(receipt["target_revision"], 16)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000017")
+        self.assertEqual(receipt["target_revision"], 17)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
@@ -611,8 +611,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000016")
-        self.assertEqual(receipt["target_revision"], 16)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000017")
+        self.assertEqual(receipt["target_revision"], 17)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
@@ -639,8 +639,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000016")
-        self.assertEqual(receipt["target_revision"], 16)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000017")
+        self.assertEqual(receipt["target_revision"], 17)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
@@ -667,8 +667,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000016")
-        self.assertEqual(receipt["target_revision"], 16)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000017")
+        self.assertEqual(receipt["target_revision"], 17)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
@@ -695,8 +695,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000016")
-        self.assertEqual(receipt["target_revision"], 16)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000017")
+        self.assertEqual(receipt["target_revision"], 17)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
@@ -723,8 +723,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         updated = self.manager.execute("update", self.artifact, apply=True)
         self.assertEqual(updated["state_after"]["candidate_relation"], "same_as_current")
         receipt = self.load_receipt()
-        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000016")
-        self.assertEqual(receipt["target_revision"], 16)
+        self.assertEqual(receipt["artifact_id"], "cotend-codex-r000017")
+        self.assertEqual(receipt["target_revision"], 17)
         self.assertEqual(receipt["manifest_sha256"], self.artifact.manifest_sha256)
         self.assert_protected_unchanged()
 
@@ -765,8 +765,8 @@ class DeliveryLifecycleTests(unittest.TestCase):
         candidate = Artifact.from_directory(
             self.artifact.root,
             source_release_id=self.artifact.source_release_id,
-            artifact_id="cotend-codex-r000016",
-            revision=16,
+            artifact_id="cotend-codex-r000018",
+            revision=18,
             protocol="cotend-collaboration-v99",
         )
 

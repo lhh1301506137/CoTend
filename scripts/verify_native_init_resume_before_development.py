@@ -38,7 +38,7 @@ EVIDENCE_PATH = (
 )
 TARGET_LOCK_PATH = ROOT / "delivery" / "codex-artifact.lock.json"
 
-NativeState = Literal["absent", "current", "dormant", "conflict"]
+NativeState = Literal["uninitialized", "current", "stale", "conflict"]
 CompositeRequest = Literal["none", "writable_semantic", "read_only_semantic"]
 ProviderState = Literal[
     "codegraph_fresh",
@@ -63,31 +63,29 @@ EXPECTED_TRELLIS_FILES = 0
 EXPECTED_PROJECT_INIT_TRELLIS_MENTIONS = 0
 
 REQUIRED_PROJECT_INIT_MARKERS = (
-    "## Native Initialization And Resume Boundary",
-    "classify exactly one Auto Mode when the no-op fast path does not apply;",
-    "report readiness and return control exactly once.",
-    "a second run with unchanged inputs",
-    "must produce no diff.",
-    "A standalone explicit Init invocation never starts product implementation in",
-    "The native pre-development readiness gate",
-    "current CoTend truth -> active leaf and route -> requirements/acceptance/risk -> code-context provider and impact set -> direct file verification",
+    "Project Init is the canonical initialization orchestrator.",
+    "select exactly one Auto Mode",
+    "Re-running with unchanged inputs must be byte-idempotent.",
+    "A standalone invocation returns control before product work.",
+    "ignored/untracked governance files still count",
+    "return the sole outer handback",
+    "`current | uninitialized | stale | conflict`",
 )
 REQUIRED_CODE_CONTEXT_MARKERS = (
-    "## Native Pre-Development Readiness Gate",
-    "Initialization may prepare the provider or index, but it cannot satisfy the explicit Init handback",
-    "read current CoTend truth first",
-    "A generic `continue` never clears a specialized decision.",
-    "current_truth_loaded_before_code_context: true | false",
-    "external_framework_owner: false",
-    "project_truth_modified: false",
+    "stop provider calls\n  for that project",
+    "offer user-approved initialization",
+    "continue with the best safe fallback",
+    "`codegraph init .` is run from that project root only after the user approves",
+    "graph relationships and impact paths are scope evidence, not runtime",
+    "direct tools for configs, documentation, unindexed details",
 )
 REQUIRED_INIT_MARKERS = (
-    "After this Skill has returned control",
-    "does not authorize same-response implementation",
+    "A standalone invocation returns control once before product work.",
+    "specialized gate, preserve it and do not offer the affected route as ready.",
 )
 REQUIRED_COLLABORATION_MARKERS = (
-    "After an explicit Init handback is satisfied",
-    "pass native pre-development readiness before broad edits",
+    "`STATUS.md#cotend_workflow` is the canonical readiness/reporting record",
+    "Initialize/update/repair/migrate/resume through `cotend-project-init`.",
 )
 REQUIRED_DOCUMENT_MARKERS = (
     "# CoTend 原生初始化、续接与开发前门",
@@ -155,9 +153,11 @@ def evaluate_entry(
     fresh_intake: bool = False,
     baseline_requires_alignment: bool = False,
 ) -> EntryResult:
-    if explicit_resume and native_state != "dormant":
-        raise NativeProjectEntryError("only a dormant native record can be resumed")
-    if legacy_protocol and native_state == "absent":
+    if explicit_resume:
+        raise NativeProjectEntryError(
+            "v2.01 has no dormant/resume state; use stale repair or normal continuation"
+        )
+    if legacy_protocol and native_state == "uninitialized":
         raise NativeProjectEntryError(
             "legacy update requires a durable legacy/native project carrier"
         )
@@ -169,8 +169,6 @@ def evaluate_entry(
         blocked_reason = "native_record_conflict"
     elif external_route_conflict:
         blocked_reason = "external_route_conflict"
-    elif native_state == "dormant" and not explicit_resume:
-        blocked_reason = "explicit_resume_required"
 
     if blocked_reason:
         return EntryResult(
@@ -185,7 +183,7 @@ def evaluate_entry(
             specialized_decision_preserved=True,
         )
 
-    if native_state == "absent":
+    if native_state == "uninitialized":
         auto_mode = "fresh_init"
         write_actions = (
             "materialize_native_record",
@@ -198,14 +196,12 @@ def evaluate_entry(
             "preserve_and_migrate_active_truth",
             "update_protocol_modules",
         )
-    elif repair_needed:
+    elif repair_needed or native_state == "stale":
         auto_mode = "partial_repair"
         write_actions = ("repair_safe_control_plane_drift",)
     else:
         auto_mode = "current_resume"
-        write_actions = (
-            ("resume_native_record",) if explicit_resume else ()
-        )
+        write_actions = ()
 
     if composite_request == "writable_semantic":
         readiness = "human_needed"
@@ -260,7 +256,7 @@ def _scope_signature(provider: str) -> str:
 def evaluate_predevelopment(
     *,
     init_handback_satisfied: bool = True,
-    workflow_state: Literal["current", "dormant", "conflict"] = "current",
+    workflow_state: Literal["current", "stale", "conflict"] = "current",
     specialized_decision_pending: bool = False,
     route_authorized: bool = True,
     current_truth_available: bool = True,
@@ -270,7 +266,7 @@ def evaluate_predevelopment(
     risk_authorized: bool = True,
     canonical_root_clear: bool = True,
     provider_state: ProviderState = "codegraph_fresh",
-    safe_index_write_allowed: bool = True,
+    safe_index_write_allowed: bool = False,
     fallback_allowed: bool = True,
     broad_work_required: bool = True,
 ) -> PreDevelopmentResult:
@@ -289,7 +285,7 @@ def evaluate_predevelopment(
 
     blockers = (
         (not init_handback_satisfied, "init_handback_unsatisfied"),
-        (workflow_state == "dormant", "workflow_dormant"),
+        (workflow_state == "stale", "workflow_stale_requires_repair"),
         (workflow_state == "conflict", "workflow_conflict"),
         (specialized_decision_pending, "specialized_decision_required"),
         (not route_authorized, "route_not_authorized"),
@@ -371,7 +367,7 @@ def evaluate_predevelopment(
 
 ENTRY_SCENARIOS = {
     "fresh_init": {
-        "kwargs": {"native_state": "absent"},
+        "kwargs": {"native_state": "uninitialized"},
         "expected": {"auto_mode": "fresh_init", "write_performed": True},
     },
     "legacy_update": {
@@ -386,17 +382,18 @@ ENTRY_SCENARIOS = {
         "kwargs": {"native_state": "current"},
         "expected": {"auto_mode": "current_resume", "write_performed": False},
     },
-    "dormant_stops": {
-        "kwargs": {"native_state": "dormant"},
+    "stale_repairs": {
+        "kwargs": {"native_state": "stale"},
         "expected": {
-            "auto_mode": "blocked_human_decision",
-            "bare_continue_allowed": False,
+            "auto_mode": "partial_repair",
+            "workflow_state": "current",
+            "write_performed": True,
         },
     },
-    "dormant_explicit_resume": {
-        "kwargs": {"native_state": "dormant", "explicit_resume": True},
+    "stale_legacy_update": {
+        "kwargs": {"native_state": "stale", "legacy_protocol": True},
         "expected": {
-            "auto_mode": "current_resume",
+            "auto_mode": "legacy_update",
             "workflow_state": "current",
             "write_performed": True,
         },
@@ -438,7 +435,7 @@ ENTRY_SCENARIOS = {
     },
     "fresh_intake_handoff": {
         "kwargs": {
-            "native_state": "absent",
+            "native_state": "uninitialized",
             "fresh_intake": True,
             "baseline_requires_alignment": True,
         },
@@ -460,7 +457,10 @@ PREDEVELOPMENT_SCENARIOS = {
         "expected": {"status": "ready", "provider": "codegraph"},
     },
     "unindexed_codegraph_initializes": {
-        "kwargs": {"provider_state": "codegraph_unindexed"},
+        "kwargs": {
+            "provider_state": "codegraph_unindexed",
+            "safe_index_write_allowed": True,
+        },
         "expected": {
             "status": "ready",
             "provider_action": "initialize_index",
@@ -468,7 +468,10 @@ PREDEVELOPMENT_SCENARIOS = {
         },
     },
     "stale_codegraph_refreshes": {
-        "kwargs": {"provider_state": "codegraph_stale"},
+        "kwargs": {
+            "provider_state": "codegraph_stale",
+            "safe_index_write_allowed": True,
+        },
         "expected": {"provider_action": "refresh_index"},
     },
     "missing_codegraph_records_fallback": {
@@ -644,7 +647,7 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
             )
         entry_results[scenario_id] = payload
 
-    first = evaluate_entry("absent")
+    first = evaluate_entry("uninitialized")
     second = evaluate_entry("current")
     if not first.write_performed or second.write_performed:
         raise NativeProjectEntryError("repeated initialization is not idempotent")
@@ -673,7 +676,8 @@ def verify_repository(root: Path = ROOT) -> dict[str, object]:
         predevelopment_results[scenario_id] = payload
 
     first_context = evaluate_predevelopment(
-        provider_state="codegraph_unindexed"
+        provider_state="codegraph_unindexed",
+        safe_index_write_allowed=True,
     )
     repeated_context = evaluate_predevelopment(provider_state="codegraph_fresh")
     if (

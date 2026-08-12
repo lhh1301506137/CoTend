@@ -2,22 +2,29 @@
   "schema": "cotend.framework-lock",
   "schema_version": 1,
   "status": "adopted_verified",
-  "release_id": "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
-  "framework_protocol": "cotend-collaboration-v1.79",
-  "model_upgrade_packet_family": "cotend-model-upgrade-v1.14",
+  "release_id": "exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d",
+  "framework_protocol": "cotend-collaboration-v2.01",
+  "model_upgrade_packet_family": "cotend-model-upgrade-v1.16",
   "source_anchor": {
     "type": "exact_source_commit",
     "publication_state": "not_public_release",
-    "commit": "c14d4133bf0438d435048858554c88c89a7870a3",
-    "canonical_source_tree": "a6824559e087f87da90a55bcc6403576db1027c1",
+    "commit": "fe21e970bc2bdc69de5e2ce1710aef2dd156a54d",
+    "canonical_source_tree": "076099a1c6888ede804189e1aa125eba92380e94",
     "canonical_source_tree_path": "skills-backup/codex",
+    "predecessor_commit": "c14d4133bf0438d435048858554c88c89a7870a3",
     "consumer_handoff": {
-      "id": "2026.08.01.1",
+      "id": "2026.08.12.2",
       "schema": "dual-ai.consumer-range-handoff",
       "schema_version": 1,
-      "handoff_json_sha256": "4d16e8a1ba29a2a71e0974e79f0967b2ec4cfa8afe42e0d24c43b32102df47af",
-      "handoff_markdown_sha256": "fe8dfcbd787cfa9116567f6f2730dd3bb345b0774a882c1a4987614394d6c52c",
-      "checksums_sha256": "6ea9ad1602d3cc331314b2ec8b06e7f29019b6715dfc553da7c1481d9cd3ea3a"
+      "work_commit": "3d478ccf5aaf9e0a86d6817c6dfe7dfde5debb94",
+      "exact_range_count": 188,
+      "included_change_count": 25,
+      "evidence_only_count": 150,
+      "consumer_not_applicable_count": 13,
+      "superseded_or_reverted_count": 0,
+      "handoff_json_sha256": "1367e88f6dd9ec73482ec537cb17149681d7d00c88ed8473745d8ac5d1137b48",
+      "handoff_markdown_sha256": "6626cf9720bc871009e5d3866555def48eefaca275433f9f952f5835c0d2083e",
+      "checksums_sha256": "b58045caf8ba36bc391e13aeef1336049a6f006c2774457965a2e76445a80208"
     }
   },
   "latest_public_release": {
@@ -34,18 +41,17 @@
   "target_platform": "Codex",
   "source_carrier": "skills/",
   "skill_count": 10,
-  "skill_file_count": 69,
+  "skill_file_count": 94,
   "source_skill_trees": {
-    "diagnose-only": "dd5ba26517f032c3dfcdd5c69fabc27825c6bf25",
-    "dual-ai-collaboration": "82146af99b711170878d0b396d3936919b3f4f24",
-    "dual-ai-init": "3e5998f4742585656d1d585b2bf2338b848809ae",
-    "dual-ai-project-init": "ce9974142862fb3e6a4c18523433b212079c8a1b",
-    "dual-ai-semantic-alignment": "943c95550ccd6a9602d406f9cd3348b494b7e5f1",
-    "dual-ai-session-handoff": "cef063bf0c6821938dcdd094635a8e6f4d6a1c26",
-    "dual-ai-tooling": "73bda7067e0299e68202217df748ae325eec7f6d",
-    "dual-model-upgrade": "fb58aa7c246bae683a1204901f6a9a61ca6c026b",
-    "grill-me": "70df660726ef12349a40dc0353a681c82414fe95",
-    "karpathy-guidelines": "32d7f4abb8c9dd8ab17a793b5e0b1a3a1fa35aeb"
+    "diagnose-only": "7bb5b228c675f778ce4b62a46385a9e507a3691f",
+    "dual-ai-collaboration": "335e3f0fe98ef2bb6a3f26fce83dc955e518bed0",
+    "dual-ai-init": "0447d65ef270153d69858953b174e97e2666e409",
+    "dual-ai-project-init": "1b3d56e52d489cbc6241d4e1e8e71268ea01147d",
+    "dual-ai-semantic-alignment": "59508c69b48143f22ebb5fea8c932511caa457cd",
+    "dual-ai-session-handoff": "b5fd5ac0604e24cd842cd70c34946af1df16daa3",
+    "dual-ai-tooling": "aec8d2f776962a15697700e2634b9843187aa047",
+    "dual-model-upgrade": "809e7f5a32943b8a60bb6d29d364bf81cf3ef008",
+    "grill-me": "70df660726ef12349a40dc0353a681c82414fe95"
   },
   "skill_mapping": [
     {
@@ -105,12 +111,12 @@
     {
       "source": "karpathy-guidelines",
       "target": "karpathy-guidelines",
-      "disposition": "adapted",
-      "implementation_mode": "platform_adaptation"
+      "disposition": "retained_optional_companion",
+      "implementation_mode": "retained_predecessor_adaptation"
     }
   ],
   "capability_map": "upstream/CAPABILITY-IMPLEMENTATION-MAP.json",
-  "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-08-01-1-v1-79-adoption",
+  "adoption_record": "upstream/FRAMEWORK-ADOPTION-LOG.md#exact-source-2026-08-12-2-v2-01-r17-adoption",
   "provenance_records": [
     "upstream/FRAMEWORK-CANDIDATE.json",
     "upstream/CODEX-SKILL-ROLE-MAP.json",
@@ -127,5 +133,17 @@
     "claude_carrier": "deferred",
     "push_release_or_publish": "not_performed"
   },
-  "update_policy": "manual_pinned_review_and_same_commit_adoption_record"
+  "update_policy": "manual_pinned_review_and_same_commit_adoption_record",
+  "source_skill_count": 9,
+  "retained_optional_companions": [
+    {
+      "source": "karpathy-guidelines",
+      "target": "karpathy-guidelines",
+      "source_anchor": "exact-source:c14d4133bf0438d435048858554c88c89a7870a3",
+      "source_tree": "32d7f4abb8c9dd8ab17a793b5e0b1a3a1fa35aeb",
+      "disposition": "retained_optional_companion",
+      "routing": "non_default_non_owner",
+      "license": "MIT"
+    }
+  ]
 }

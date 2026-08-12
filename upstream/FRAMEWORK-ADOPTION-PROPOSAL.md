@@ -1,12 +1,12 @@
-# Dual exact source 2026.08.01.1 产品化采用记录
+# Dual exact source 2026.08.12.2 产品化采用记录
 
 ```yaml
-status: adopted_verified
-candidate_release: exact-source:c14d4133bf0438d435048858554c88c89a7870a3
-source_identity: exact-source:c14d4133bf0438d435048858554c88c89a7870a3
+status: adopted_verified_local_r17
+candidate_release: exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d
+source_identity: exact-source:fe21e970bc2bdc69de5e2ce1710aef2dd156a54d
 source_anchor_type: exact_source_commit
 target_publication_state: not_public_release
-consumer_handoff: 2026.08.01.1
+consumer_handoff: 2026.08.12.2
 role_layer_status: user_confirmed
 role_layer_decision: product_owner_confirmed
 user_owned_skill_name_status: user_confirmed
@@ -15,17 +15,36 @@ codex_skill_set_decisions_status: complete
 adoption_state: adopted
 final_framework_lock_exists: true
 analysis_language: zh-CN
-current_framework_protocol: cotend-collaboration-v1.79
-current_model_upgrade_packet: cotend-model-upgrade-v1.14
+current_framework_protocol: cotend-collaboration-v2.01
+current_model_upgrade_packet: cotend-model-upgrade-v1.16
 skill_count: 10
-source_skill_file_count: 69
-target_skill_file_count: 71
-target_artifact_id: cotend-codex-r000016
-target_revision: 16
-target_manifest_sha256: a7f7ece2522a5901030e19cd5944359f80c027482f66f822a2053fc5080dcfb5
-local_artifact_sha256: 2779bb7a49f66fbb2a637b74fcf3ae3918e2e5d5aec2c158706b8ad78173482d
+source_skill_file_count: 94
+target_skill_file_count: 104
+target_artifact_id: cotend-codex-r000017
+target_revision: 17
+target_manifest_sha256: f31c668349fc354402415f070f1ab90f1be47fa03d4141b5d8f5b58aee407cbe
+local_artifact_file: dist/local/cotend-codex-r000017-local-f31c668349fc.zip
+local_artifact_entry_count: 106
+local_artifact_sha256: 5b1bfdf6e7f136deb013125aa6d7a8dcbfd9409bb3a00917e0d7efcf81003fd1
 latest_public_release: 2026.07.28.2
 ```
+
+## 当前结论
+
+CoTend 已独立核验修正版 `2026.08.12.2` consumer handoff、目标提交
+`fe21e970...`、canonical tree `076099a1...` 和三份摘要。完整区间 188
+个提交中，25 项共享行为变化全部采用 CoTend 原生适配，150 项只作证据，
+13 项不适用，0 项 superseded/reverted。CoTend 以 v1.79/r16 为第一前序，
+将协议推进到 v2.01、模型角色包推进到 v1.16，并把需求澄清、项目真相与
+计划、授权实施、验证复审、收尾恢复、提交范围与权威继续绑定到既有
+CoTend owner。
+
+本次不复制或恢复 Trellis runtime、Skill、hook、状态目录与任务权威；
+也不把 Dual 私有 adapter 或内部测试树装入产品。`karpathy-guidelines`
+继续作为 CoTend 自主保留的可选 MIT companion，非默认、非项目 owner。
+全局安装、真实模型、外部 UAT 和任何公开动作仍未授权。
+
+## v1.79/r16 前序采用说明（历史基线）
 
 ## 结论摘要
 
