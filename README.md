@@ -176,6 +176,8 @@ CI is configured to run the repository checks on Windows and Ubuntu with Python 
 CoTend-owned material is licensed under [Apache License 2.0](LICENSE). Bundled third-party material retains its own license and attribution; see [NOTICE](NOTICE), [Third-Party Notices](THIRD-PARTY-NOTICES.md), and [Third-Party Sources](THIRD-PARTY-SOURCES.json).
 
 ## Contributing during pre-release
-感谢 LINUX DO https://linux.do/社区一直以来的支持。
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a change. Keep changes scoped and evidence-backed. Do not weaken human decision boundaries, convert unexecuted cases into success claims, add secrets or private project data, or describe unverified Desktop or Public Directory coverage as complete. Changes to bundled third-party files must preserve their license and source records.
+
+## 致谢
+感谢 LINUX DO 社区 https://linux.do/ 一直以来的支持。
