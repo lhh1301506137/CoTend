@@ -40,6 +40,17 @@ class RepositoryMaturityTests(unittest.TestCase):
                 requirements_text="PyYAML>=6.0\n",
             )
 
+    def test_ci_uploads_the_current_release_candidate(self) -> None:
+        original = maturity.CI_PATH.read_text(encoding="utf-8")
+        for marker in (
+            "name: cotend-2.1.0-beta.1",
+            "dist/cotend-2.1.0-beta.1.zip",
+            "dist/cotend-2.1.0-beta.1.zip.sha256",
+        ):
+            with self.subTest(marker=marker):
+                with self.assertRaises(maturity.RepositoryMaturityError):
+                    maturity.validate_ci_workflow(original.replace(marker, ""))
+
     def test_release_workflow_is_manual_tag_bound_and_draft_only(self) -> None:
         result = maturity.validate_release_workflow()
         self.assertTrue(result["manual_only"])
