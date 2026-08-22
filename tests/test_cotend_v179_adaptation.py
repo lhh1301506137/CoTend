@@ -35,6 +35,28 @@ def digest(path: Path) -> str:
 
 
 class CoTendV201AdaptationTests(unittest.TestCase):
+    def initialize_inventory_project(self, project: Path) -> list[Path]:
+        project.mkdir()
+        files = {
+            "STATUS.md": "# 项目状态\n\n当前项目可以继续。\n",
+            "PROJECT-PLAN-TREE.md": "# 项目计划树\n\n当前活动叶已经确认。\n",
+            "REVIEW-LOG.md": "# 审查记录\n\n当前验证已经通过。\n",
+        }
+        watched: list[Path] = []
+        for relative, payload in files.items():
+            path = project / relative
+            path.write_text(payload, encoding="utf-8")
+            watched.append(path)
+        for command in (
+            ["git", "init", "--quiet"],
+            ["git", "config", "user.email", "cotend-ci@example.invalid"],
+            ["git", "config", "user.name", "CoTend CI"],
+            ["git", "add", "--", *files],
+            ["git", "commit", "--quiet", "-m", "inventory fixture"],
+        ):
+            subprocess.run(command, cwd=project, check=True, capture_output=True)
+        return watched
+
     def test_v201_identity_is_promoted_to_exact_r17_locks(self) -> None:
         role_map = json.loads(read("upstream/CODEX-SKILL-ROLE-MAP.json"))
         self.assertEqual(
@@ -101,20 +123,22 @@ class CoTendV201AdaptationTests(unittest.TestCase):
         self.assertNotIn("adoption_authorized", selected)
 
     def test_inventory_is_bounded_read_only_and_initializes_empty_or_nonempty_state(self) -> None:
-        watched = [
-            ROOT / "STATUS.md",
-            ROOT / "PROJECT-PLAN-TREE.md",
-            ROOT / "REVIEW-LOG.md",
-        ]
-        before = {path: (digest(path), path.stat().st_mtime_ns) for path in watched}
-        result = run_json(
-            str(TOOLING / "scripts" / "project_inventory.py"),
-            "--project-root",
-            str(ROOT),
-            "--mode",
-            "bootstrap_full",
-        )
-        after = {path: (digest(path), path.stat().st_mtime_ns) for path in watched}
+        with tempfile.TemporaryDirectory(prefix="cotend-inventory-project-") as temp:
+            project = Path(temp) / "project"
+            watched = self.initialize_inventory_project(project)
+            before = {
+                path: (digest(path), path.stat().st_mtime_ns) for path in watched
+            }
+            result = run_json(
+                str(TOOLING / "scripts" / "project_inventory.py"),
+                "--project-root",
+                str(project),
+                "--mode",
+                "bootstrap_full",
+            )
+            after = {
+                path: (digest(path), path.stat().st_mtime_ns) for path in watched
+            }
         self.assertEqual(before, after)
         self.assertEqual(
             result["contract"], "cotend.project-capability-inventory-scan.v1"
@@ -168,14 +192,16 @@ class CoTendV201AdaptationTests(unittest.TestCase):
 
     def test_inventory_reconciles_from_checkpoint_and_fails_safe_on_tamper(self) -> None:
         script = str(TOOLING / "scripts" / "project_inventory.py")
-        bootstrap = run_json(
-            script,
-            "--project-root",
-            str(ROOT),
-            "--mode",
-            "bootstrap_full",
-        )
-        with tempfile.TemporaryDirectory(prefix="cotend-inventory-checkpoint-") as temp:
+        with tempfile.TemporaryDirectory(prefix="cotend-inventory-project-") as temp:
+            project = Path(temp) / "project"
+            self.initialize_inventory_project(project)
+            bootstrap = run_json(
+                script,
+                "--project-root",
+                str(project),
+                "--mode",
+                "bootstrap_full",
+            )
             checkpoint = Path(temp) / "checkpoint.json"
             checkpoint.write_text(
                 json.dumps(bootstrap["new_checkpoint"], sort_keys=True),
@@ -184,7 +210,7 @@ class CoTendV201AdaptationTests(unittest.TestCase):
             incremental = run_json(
                 script,
                 "--project-root",
-                str(ROOT),
+                str(project),
                 "--mode",
                 "incremental_reconcile",
                 "--checkpoint",
@@ -205,7 +231,7 @@ class CoTendV201AdaptationTests(unittest.TestCase):
             fallback = run_json(
                 script,
                 "--project-root",
-                str(ROOT),
+                str(project),
                 "--mode",
                 "incremental_reconcile",
                 "--checkpoint",

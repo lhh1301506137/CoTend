@@ -45,8 +45,22 @@ class NativeRealProjectAcceptanceTests(unittest.TestCase):
             },
         )
         self.boundary_patcher.start()
+        real_which = shutil.which
+
+        def test_which(command: str, *args: object, **kwargs: object) -> str | None:
+            if command == "codex":
+                return str(self.root / "mock-codex")
+            return real_which(command, *args, **kwargs)
+
+        self.codex_patcher = mock.patch.object(
+            g06.shutil,
+            "which",
+            side_effect=test_which,
+        )
+        self.codex_patcher.start()
 
     def tearDown(self) -> None:
+        self.codex_patcher.stop()
         self.boundary_patcher.stop()
         self.temp.cleanup()
         if self.private.exists():
