@@ -2710,7 +2710,7 @@ def production_plugin_package_errors(
 
     for key, expected in {
         "name": "cotend",
-        "version": "0.1.0-rc.2",
+        "version": "2.1.0-beta.1",
         "skills": "./skills/",
         "license": "Apache-2.0",
     }.items():
@@ -2746,18 +2746,18 @@ def production_plugin_package_errors(
     source_lock = package_lock.get("source")
     output_lock = package_lock.get("package")
     authority = package_lock.get("authority")
-    if package_lock.get("status") != "production_candidate_not_published":
+    if package_lock.get("status") != "github_open_beta_release_candidate":
         errors.append("production Plugin package status must remain candidate-only")
-    if package_lock.get("schema_version") != 2:
+    if package_lock.get("schema_version") != 3:
         errors.append("production Plugin package lock schema mismatch")
     if not isinstance(plugin_lock, dict) or plugin_lock.get("manifest_sha256") != manifest_hash:
         errors.append("production Plugin manifest hash lock mismatch")
     if not isinstance(source_lock, dict) or source_lock.get(
         "path_hash_manifest_sha256"
-    ) != "ce3253e553f1a95ec81858b2b1e2429a771816e7477516da779b1a99e0c2c0de":
+    ) != "26a19e3ea721863dbbc92e6bacec0161880ea2c750bed677b3d957e0a5f27f4b":
         errors.append("production Plugin source manifest lock mismatch")
     if not isinstance(source_lock, dict) or source_lock.get("source_commit") != (
-        "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1"
+        "c6cd0c80f825eac7e8cb9a983c8d92427589d13e"
     ):
         errors.append("production Plugin historical source commit mismatch")
     if not isinstance(source_lock, dict) or (
@@ -2765,16 +2765,16 @@ def production_plugin_package_errors(
         source_lock.get("revision"),
         source_lock.get("target_manifest_sha256"),
     ) != (
-        "cotend-codex-r000002",
-        2,
-        "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b",
+        "cotend-codex-r000017",
+        17,
+        "f31c668349fc354402415f070f1ab90f1be47fa03d4141b5d8f5b58aee407cbe",
     ):
         errors.append("production Plugin predecessor target binding mismatch")
     if not isinstance(output_lock, dict) or output_lock.get(
         "path_hash_manifest_sha256"
-    ) != "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2":
+    ) != "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c":
         errors.append("production Plugin package digest lock mismatch")
-    if not isinstance(output_lock, dict) or output_lock.get("file_count") != 48:
+    if not isinstance(output_lock, dict) or output_lock.get("file_count") != 115:
         errors.append("production Plugin package file count mismatch")
     expected_brand_assets = [
         {
@@ -2805,13 +2805,15 @@ def production_plugin_package_errors(
     if authority != {
         "candidate_identity_only": False,
         "final_plugin_identity_confirmed": True,
-        "release_or_publish_authorized": False,
+        "github_release_authorized": True,
+        "public_plugin_directory_submission_authorized": False,
+        "release_tag": "v2.01",
     }:
         errors.append("production Plugin package authority boundary drifted")
 
     builder_text = read("scripts/build_codex_plugin.py")
     for marker in (
-        'PLUGIN_VERSION = "0.1.0-rc.2"',
+        'PLUGIN_VERSION = "2.1.0-beta.1"',
         'ALLOWED_OUTPUT_ROOTS = {".private-provenance", "dist"}',
         "expected_package_manifest",
         "PACKAGE_BRAND_ASSETS",
@@ -3327,15 +3329,15 @@ def plugin_submission_material_errors(
         errors.append("Plugin submission contract must remain draft_not_submitted")
     if package_binding.get("plugin_id") != "cotend" or package_binding.get(
         "version"
-    ) != "0.1.0-rc.2":
+    ) != "2.1.0-beta.1":
         errors.append("Plugin submission package identity drifted")
-    if package_binding.get("file_count") != 48 or package_binding.get(
+    if package_binding.get("file_count") != 115 or package_binding.get(
         "path_hash_manifest_sha256"
-    ) != "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2":
+    ) != "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c":
         errors.append("Plugin submission package digest drifted")
     if (
         package_binding.get("identity_authority")
-        != "initial_submission_identity_confirmed_not_release"
+        != "github_v2_01_release_confirmed_portal_submission_not_authorized"
         or package_binding.get("final_identity_confirmed") is not True
     ):
         errors.append("Plugin submission final identity state drifted")
@@ -3367,13 +3369,13 @@ def plugin_submission_material_errors(
     else:
         expected_identity_value = {
             "plugin_id": "cotend",
-            "version": "0.1.0-rc.2",
+            "version": "2.1.0-beta.1",
             "package_digest": (
-                "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2"
+                "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c"
             ),
-            "confirmed_on": "2026-07-23",
+            "confirmed_on": "2026-08-22",
             "confirmation_scope": (
-                "initial_submission_identity_not_release_or_platform_acceptance"
+                "github_v2_01_release_identity_not_portal_submission_or_platform_acceptance"
             ),
             "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected",
         }
@@ -3429,8 +3431,10 @@ def plugin_submission_material_errors(
         "submitted_for_review": False,
         "approved": False,
         "published": False,
-        "release_authorized": False,
-        "push_authorized": False,
+        "github_release_authorized": True,
+        "github_push_authorized": True,
+        "portal_submission_authorized": False,
+        "portal_publication_authorized": False,
     }:
         errors.append("Plugin submission authority boundary drifted")
 
@@ -3529,13 +3533,13 @@ def public_repository_onboarding_errors(
     for marker in (
         "# CoTend",
         "Pre-release AI development governance framework",
-        "CoTend is available as a GitHub Open Beta for Codex.",
+        "CoTend v2.01 is available as a GitHub Open Beta for Codex.",
         "not yet available in the Public Plugin Directory",
         "The current pre-release adapter targets Codex",
         "`CoTend Init` is the normal start or resume entry",
         "codex plugin marketplace add lhh1301506137/CoTend",
         "codex plugin add cotend@cotend",
-        "Use the GitHub Marketplace commands instead of copying internal files.",
+        "Use the GitHub Marketplace commands for normal installation.",
         "Codex or ChatGPT platform login, network access, permissions",
         "python scripts/build_codex_plugin.py --output dist/cotend --json",
         "python scripts/verify_plugin_submission_materials.py",
@@ -3676,7 +3680,7 @@ def github_repository_maturity_errors(
         "python -m pip install --disable-pip-version-check --requirement requirements-ci.txt",
         "python scripts/prepare_reviewer_fixtures.py",
         "python scripts/verify_codex_plugin_package.py --repository-only",
-        "python scripts/build_release_archive.py --check-tag v0.1.0-rc.2",
+        "python scripts/build_release_archive.py --check-tag v2.01",
         "python scripts/verify_repository_maturity.py --no-build",
         "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0",
         "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0",
@@ -3779,7 +3783,7 @@ def submission_prerequisite_packet_errors(
             "decisions=7",
             "active=none",
             "blocked=Q07-policy-attestations",
-            "digest=a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
+            "digest=b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c",
         ):
             if marker not in result.stdout:
                 errors.append(
@@ -4223,7 +4227,13 @@ def delivery_product_errors(candidates: set[str]) -> list[str]:
             "carrier": framework_lock.get("source_carrier"),
             "framework_protocol": framework_lock.get("framework_protocol"),
         }
-        or product != {"version": None}
+        or product
+        != {
+            "version": "2.1.0-beta.1",
+            "display_version": "2.01",
+            "release_tag": "v2.01",
+            "channel": "github_open_beta",
+        }
         or target_lock.get("skill_count") != 10
         or target_lock.get("skill_file_count") != 104
     ):

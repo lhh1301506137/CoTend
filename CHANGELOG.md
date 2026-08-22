@@ -4,8 +4,13 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 
 ## [Unreleased]
 
+## [2.1.0-beta.1] - 2026-08-22
+
+Public release name: **CoTend v2.01**. The Codex Plugin manifest uses the strict SemVer representation `2.1.0-beta.1`; the corresponding target artifact is `cotend-codex-r000017`.
+
 ### Added
 
+- Promoted the complete v2.01/r17 ten-Skill carrier into the GitHub Open Beta package and release path while preserving the unpublished rc.2 bytes as immutable historical evidence.
 - Adopted the exact private-upstream commit `fe21e970bc2bdc69de5e2ce1710aef2dd156a54d` through the corrected `2026.08.12.2` consumer handoff, with all 188 range commits classified and 25 shared behavior changes adapted to CoTend-native owners.
 - Added v2.01 Project Intelligence, understanding-artifact byte gates, governance-history lifecycle, traceable Tooling refresh, adaptive development experience, route-rebase/session-handoff templates, and result-triggered execution closure without creating a second project-truth or task tree.
 
@@ -75,10 +80,10 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - G01-G05 are revalidated for v1.76/r15; the retained G06 real-project/user-acceptance evidence remains frozen at r13 and is not relabeled as r15 evidence.
 - G01-G05 are revalidated for v1.79/r16; the retained G06 real-project/user-acceptance evidence remains frozen at r13 and is not relabeled as r16 evidence.
 - The v1.67/r13 retained-project journey includes real model-mediated Init and implementation, independent checking, a reviewed repair, AI UAT, exact predecessor rollback/restore, explicit maintainer acceptance, and fresh-session recovery before and after acceptance.
-- Plugin package identity, release tag, remote repository, real-user installation, and submission state did not change.
-- G01-G05 completion satisfies the technical prerequisite for a future rc.3 build, and G06 closes the current real-project stability gate; neither result authorizes that build or any release action.
+- G01-G05 are revalidated for v2.01/r17; the retained G06 real-project/user-acceptance evidence remains frozen at r13 and is not relabeled as r17 evidence.
+- The GitHub release is a Pre-release and not a stable release. Public Plugin Directory submission, review, approval, and publication have not occurred.
 
-## [0.1.0-rc.2] - Unreleased
+## [0.1.0-rc.2] - Unpublished, superseded
 
 ### Added
 
@@ -116,5 +121,6 @@ All notable changes to CoTend are recorded here. CoTend follows Semantic Version
 - Public Plugin Directory submission, approval, and publication have not occurred.
 - Codex is the only current platform adapter; other AI development tools are not compatibility claims.
 
-[0.1.0-rc.2]: https://github.com/lhh1301506137/CoTend/compare/v0.1.0-rc.1...HEAD
+[2.1.0-beta.1]: https://github.com/lhh1301506137/CoTend/compare/v0.1.0-rc.1...v2.01
+[0.1.0-rc.2]: docs/releases/v0.1.0-rc.2.md
 [0.1.0-rc.1]: https://github.com/lhh1301506137/CoTend/releases/tag/v0.1.0-rc.1

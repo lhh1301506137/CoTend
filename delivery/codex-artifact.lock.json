@@ -16,7 +16,10 @@
     "manifest_sha256": "f31c668349fc354402415f070f1ab90f1be47fa03d4141b5d8f5b58aee407cbe"
   },
   "product": {
-    "version": null
+    "version": "2.1.0-beta.1",
+    "display_version": "2.01",
+    "release_tag": "v2.01",
+    "channel": "github_open_beta"
   },
   "skill_count": 10,
   "skill_file_count": 104,

@@ -28,7 +28,7 @@ class ReleaseArchiveTests(unittest.TestCase):
     def test_release_metadata_matches_both_manifests_and_notes(self) -> None:
         result = release.validate_release_metadata(release.expected_tag())
         self.assertEqual(result["version"], package.PLUGIN_VERSION)
-        self.assertEqual(result["tag"], f"v{package.PLUGIN_VERSION}")
+        self.assertEqual(result["tag"], package.PUBLIC_RELEASE_TAG)
 
     def test_two_release_archives_are_byte_deterministic(self) -> None:
         first = release.build_release_archive(self.output / "first")
@@ -38,7 +38,7 @@ class ReleaseArchiveTests(unittest.TestCase):
             Path(first["archive_path"]).read_bytes(),
             Path(second["archive_path"]).read_bytes(),
         )
-        self.assertEqual(first["package_files"], 48)
+        self.assertEqual(first["package_files"], 115)
 
     def test_wrong_release_tag_is_rejected_before_build(self) -> None:
         with self.assertRaises(release.ReleaseArchiveError):

@@ -36,7 +36,7 @@ def sha256_bytes(payload: bytes) -> str:
 
 
 def expected_tag() -> str:
-    return f"v{package.PLUGIN_VERSION}"
+    return package.PUBLIC_RELEASE_TAG
 
 
 def archive_filename() -> str:
@@ -83,7 +83,7 @@ def validate_release_metadata(tag: str | None = None) -> dict[str, str]:
     except OSError as exc:
         raise ReleaseArchiveError("release notes or changelog are missing") from exc
     if f"## [{version}]" not in changelog:
-        raise ReleaseArchiveError("changelog does not contain the candidate version")
+        raise ReleaseArchiveError("changelog does not contain the Plugin package version")
     if not notes.startswith(f"# CoTend {required_tag}\n"):
         raise ReleaseArchiveError("release notes title differs from the candidate tag")
     if "Pre-release" not in notes or "not a stable release" not in notes:

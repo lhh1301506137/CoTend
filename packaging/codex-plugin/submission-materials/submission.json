@@ -9,17 +9,17 @@
   },
   "package": {
     "plugin_id": "cotend",
-    "version": "0.1.0-rc.2",
-    "package_status": "production_candidate_not_published",
+    "version": "2.1.0-beta.1",
+    "package_status": "github_open_beta_release_candidate",
     "package_lock": "packaging/codex-plugin/package.lock.json",
     "manifest": "packaging/codex-plugin/cotend/.codex-plugin/plugin.json",
-    "manifest_sha256": "e4faeb216b1dc003e93422f0aa8266a947957dfc91d9f286e2cd119dfb3b5dfa",
-    "file_count": 48,
-    "path_hash_manifest_sha256": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
-    "skill_count": 8,
-    "skill_file_count": 37,
-    "source_skill_manifest_sha256": "ce3253e553f1a95ec81858b2b1e2429a771816e7477516da779b1a99e0c2c0de",
-    "identity_authority": "initial_submission_identity_confirmed_not_release",
+    "manifest_sha256": "f3b0e3ead00972ccaa2f28c5838a63dfbc950ae850fcbdae6075c366178a6868",
+    "file_count": 115,
+    "path_hash_manifest_sha256": "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c",
+    "skill_count": 10,
+    "skill_file_count": 104,
+    "source_skill_manifest_sha256": "26a19e3ea721863dbbc92e6bacec0161880ea2c750bed677b3d957e0a5f27f4b",
+    "identity_authority": "github_v2_01_release_confirmed_portal_submission_not_authorized",
     "final_identity_confirmed": true
   },
   "listing": {
@@ -50,8 +50,8 @@
     "bundle_type": "skills_only",
     "bundle_status": "production_candidate_locally_verified",
     "bundle_source": "packaging/codex-plugin/package.lock.json",
-    "skill_count": 8,
-    "skill_file_count": 37,
+    "skill_count": 10,
+    "skill_file_count": 104,
     "upload_performed": false,
     "mcp_server_required": false
   },
@@ -75,7 +75,7 @@
   "release_notes": {
     "status": "draft_not_submitted",
     "submission_kind": "initial_submission",
-    "what_plugin_does": "CoTend packages eight skills that help people govern AI-assisted software development from project initialization and semantic alignment through continuation, diagnosis, review, and model handoff.",
+    "what_plugin_does": "CoTend packages ten skills that help people govern AI-assisted software development from project initialization and semantic alignment through continuation, diagnosis, review, model handoff, and capability lifecycle management.",
     "initial_or_update": "Initial submission.",
     "changes_since_prior_submitted_version": "Not applicable. This is the initial submission.",
     "reviewer_setup": "No CoTend account, backend, API key, demo credentials, or private network is required. Use the disposable local fixtures described in reviewer-tests.json."
@@ -90,10 +90,10 @@
       "status": "resolved",
       "value": {
         "plugin_id": "cotend",
-        "version": "0.1.0-rc.2",
-        "package_digest": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
-        "confirmed_on": "2026-07-23",
-        "confirmation_scope": "initial_submission_identity_not_release_or_platform_acceptance",
+        "version": "2.1.0-beta.1",
+        "package_digest": "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c",
+        "confirmed_on": "2026-08-22",
+        "confirmation_scope": "github_v2_01_release_identity_not_portal_submission_or_platform_acceptance",
         "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected"
       },
       "required_before": "portal_submission",
@@ -196,7 +196,9 @@
     "submitted_for_review": false,
     "approved": false,
     "published": false,
-    "release_authorized": false,
-    "push_authorized": false
+    "github_release_authorized": true,
+    "github_push_authorized": true,
+    "portal_submission_authorized": false,
+    "portal_publication_authorized": false
   }
 }

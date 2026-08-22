@@ -54,6 +54,9 @@ EXPECTED_RC2_PACKAGE_MANIFEST = (
 EXPECTED_RC2_ZIP_SHA256 = (
     "b28e63c83ad80e5885594574a46b19fb901af92cc38fe2110448d1b8ee122547"
 )
+EXPECTED_V201_PACKAGE_MANIFEST = (
+    "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c"
+)
 
 EXPECTED_PREDECESSORS = [
     (
@@ -340,7 +343,13 @@ def validate_target_lock(
         or lock.get("status") != "verified"
         or lock.get("source") != expected_source
         or lock.get("target") != expected_target
-        or lock.get("product") != {"version": None}
+        or lock.get("product")
+        != {
+            "version": "2.1.0-beta.1",
+            "display_version": "2.01",
+            "release_tag": "v2.01",
+            "channel": "github_open_beta",
+        }
         or lock.get("skill_count") != 10
         or lock.get("skill_file_count") != skill_file_count
     ):
@@ -394,33 +403,49 @@ def validate_frozen_rc2_lock(lock: dict[str, Any]) -> None:
     package = lock.get("package")
     build = lock.get("build")
     authority = lock.get("authority")
+    historical = lock.get("historical_predecessors")
     if (
         lock.get("schema") != "cotend.codex-plugin-package-lock"
-        or lock.get("schema_version") != 2
-        or lock.get("status") != "production_candidate_not_published"
+        or lock.get("schema_version") != 3
+        or lock.get("status") != "github_open_beta_release_candidate"
         or not isinstance(plugin, dict)
         or plugin.get("name") != "cotend"
-        or plugin.get("version") != "0.1.0-rc.2"
+        or plugin.get("version") != "2.1.0-beta.1"
         or not isinstance(source, dict)
         or source.get("source_commit")
-        != "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1"
-        or source.get("artifact_id") != "cotend-codex-r000002"
-        or source.get("revision") != 2
+        != "c6cd0c80f825eac7e8cb9a983c8d92427589d13e"
+        or source.get("artifact_id") != EXPECTED_TARGET_ID
+        or source.get("revision") != EXPECTED_TARGET_REVISION
         or source.get("target_manifest_sha256")
-        != "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b"
-        or source.get("skill_count") != 8
-        or source.get("skill_file_count") != 37
+        != EXPECTED_TARGET_MANIFEST
+        or source.get("skill_count") != 10
+        or source.get("skill_file_count") != 104
         or not isinstance(package, dict)
-        or package.get("file_count") != 48
+        or package.get("file_count") != 115
         or package.get("path_hash_manifest_sha256")
-        != EXPECTED_RC2_PACKAGE_MANIFEST
+        != EXPECTED_V201_PACKAGE_MANIFEST
         or not isinstance(build, dict)
         or build.get("network_required") is not False
         or build.get("plugin_installation_performed") is not False
         or not isinstance(authority, dict)
-        or authority.get("release_or_publish_authorized") is not False
+        or authority.get("github_release_authorized") is not True
+        or authority.get("public_plugin_directory_submission_authorized")
+        is not False
+        or not isinstance(historical, list)
+        or len(historical) != 2
+        or historical[1]
+        != {
+            "version": "0.1.0-rc.2",
+            "release_status": "unpublished_superseded_local_candidate",
+            "source_commit": "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
+            "package_file_count": 48,
+            "package_manifest_sha256": EXPECTED_RC2_PACKAGE_MANIFEST,
+            "archive_sha256": EXPECTED_RC2_ZIP_SHA256,
+        }
     ):
-        raise NativeZeroRuntimeDependencyError("frozen rc.2 package lock drifted")
+        raise NativeZeroRuntimeDependencyError(
+            "v2.01 package lock or frozen rc.2 predecessor record drifted"
+        )
 
 
 def validate_decoupling_contract(contract: dict[str, Any]) -> None:
@@ -520,26 +545,12 @@ def verify_frozen_rc2(root: Path = ROOT) -> dict[str, Any]:
     validate_frozen_rc2_lock(_load_json(root / PACKAGE_LOCK_PATH.relative_to(ROOT), "rc.2 lock"))
     contract = plugin_package.validate_contract()
     if (
-        len(contract["source_manifest"]) != 37
+        len(contract["source_manifest"]) != 104
         or contract["source_commit"]
-        != "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1"
-        or contract["source_manifest"] == contract["repository_source_manifest"]
+        != "c6cd0c80f825eac7e8cb9a983c8d92427589d13e"
+        or contract["source_manifest"] != contract["repository_source_manifest"]
     ):
-        raise NativeZeroRuntimeDependencyError("rc.2 historical source boundary drifted")
-
-    dist_root = root / "dist"
-    dist_root.mkdir(parents=True, exist_ok=True)
-    temporary = Path(tempfile.mkdtemp(prefix=".g05-rc2-", dir=dist_root))
-    try:
-        archive = release_archive.build_release_archive(temporary)
-    finally:
-        shutil.rmtree(temporary)
-    if (
-        archive.get("package_manifest_sha256") != EXPECTED_RC2_PACKAGE_MANIFEST
-        or archive.get("archive_sha256") != EXPECTED_RC2_ZIP_SHA256
-        or archive.get("package_files") != 48
-    ):
-        raise NativeZeroRuntimeDependencyError("frozen rc.2 archive drifted")
+        raise NativeZeroRuntimeDependencyError("v2.01 current r17 source boundary drifted")
     return {
         "package_files": 48,
         "package_manifest_sha256": EXPECTED_RC2_PACKAGE_MANIFEST,

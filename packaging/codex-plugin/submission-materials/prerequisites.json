@@ -14,11 +14,11 @@
   },
   "package": {
     "plugin_id": "cotend",
-    "version": "0.1.0-rc.2",
-    "file_count": 48,
-    "path_hash_manifest_sha256": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
-    "source_skill_manifest_sha256": "ce3253e553f1a95ec81858b2b1e2429a771816e7477516da779b1a99e0c2c0de",
-    "identity_authority": "initial_submission_identity_confirmed_not_release"
+    "version": "2.1.0-beta.1",
+    "file_count": 115,
+    "path_hash_manifest_sha256": "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c",
+    "source_skill_manifest_sha256": "26a19e3ea721863dbbc92e6bacec0161880ea2c750bed677b3d957e0a5f27f4b",
+    "identity_authority": "github_v2_01_release_confirmed_portal_submission_not_authorized"
   },
   "decision_policy": {
     "mode": "one_at_a_time",
@@ -92,7 +92,7 @@
       "blocker_ids": [
         "final_plugin_identity_and_version"
       ],
-      "question_zh": "是否把当前 cotend@0.1.0-rc.2 候选作为首次提交身份与版本，还是先调整？",
+      "question_zh": "是否把当前 cotend@2.1.0-beta.1（CoTend v2.01）候选作为首次提交身份与版本，还是先调整？",
       "why_it_matters_zh": "最终身份会决定 manifest、package lock、logo、公开页面和后续更新兼容性，候选值本身不等于发布授权；OpenAI Platform 对预发布版本的实际接受尚未验证。",
       "recommended_option_id": "1",
       "options": [
@@ -115,8 +115,8 @@
       "answer": "1",
       "evidence": {
         "evidence_type": "user_explicit",
-        "recorded_on": "2026-07-23",
-        "scope": "confirmed_cotend_identity_carried_to_required_rc2_revision_not_submission_or_release"
+        "recorded_on": "2026-08-22",
+        "scope": "confirmed_github_v2_01_release_identity_not_portal_submission_or_platform_acceptance"
       }
     },
     {
@@ -324,10 +324,10 @@
       "status": "resolved",
       "value": {
         "plugin_id": "cotend",
-        "version": "0.1.0-rc.2",
-        "package_digest": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
-        "confirmed_on": "2026-07-23",
-        "confirmation_scope": "initial_submission_identity_not_release_or_platform_acceptance",
+        "version": "2.1.0-beta.1",
+        "package_digest": "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c",
+        "confirmed_on": "2026-08-22",
+        "confirmation_scope": "github_v2_01_release_identity_not_portal_submission_or_platform_acceptance",
         "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected"
       },
       "decision_authority": "publisher",
@@ -343,7 +343,7 @@
         "manifest、package lock、submission contract 与重建产物保持一致",
         "package、submission、lifecycle 与全仓回归通过"
       ],
-      "boundary_zh": "cotend@0.1.0-rc.2 已确认用于首次提交候选，但仍未发布；若 OpenAI Platform 不接受预发布版本，必须重新打开 Q02，且当前决定不构成提交或发布授权。"
+      "boundary_zh": "cotend@2.1.0-beta.1 已确认用于 GitHub v2.01 Open Beta；若 OpenAI Platform 不接受预发布版本，必须重新打开 Q02。当前决定不构成 Public Plugin Directory 提交或发布授权。"
     },
     {
       "id": "verified_publisher_identity",

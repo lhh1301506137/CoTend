@@ -1,5 +1,7 @@
 # Codex 安装与分发渠道复验
 
+> 历史研究说明：本文主体保留 rc.1/rc.2 时期的渠道结论与证据。当前 GitHub Open Beta 为 CoTend v2.01（Plugin `2.1.0-beta.1`、target r17）；Public Plugin Directory 仍未提交或发布。当前发布边界见 [`v2.01` 发布说明](releases/v2.01.md)。
+
 ```yaml
 status: three_layer_channel_confirmed_rc2_local_revalidated
 authority: research_evidence_only

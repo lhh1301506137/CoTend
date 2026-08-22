@@ -125,12 +125,20 @@ def make_predecessor_artifact(fixture: Path, current: Artifact) -> Artifact:
             encoding="utf-8"
         )
     )
-    source_lock = lock.get("source")
-    if not isinstance(source_lock, dict) or not isinstance(
-        source_lock.get("source_commit"), str
-    ):
-        raise LifecycleError("Plugin package historical source lock is invalid")
-    source_commit = source_lock["source_commit"]
+    historical_predecessors = lock.get("historical_predecessors")
+    if not isinstance(historical_predecessors, list):
+        raise LifecycleError("Plugin package predecessor history is invalid")
+    rc2 = next(
+        (
+            item
+            for item in historical_predecessors
+            if isinstance(item, dict) and item.get("version") == "0.1.0-rc.2"
+        ),
+        None,
+    )
+    if not isinstance(rc2, dict) or not isinstance(rc2.get("source_commit"), str):
+        raise LifecycleError("Plugin package rc2 source lock is invalid")
+    source_commit = rc2["source_commit"]
     source = fixture / "artifacts" / "predecessor-r2"
     source.mkdir(parents=True)
     for relative, payload in plugin_package._historical_source_skill_entries(

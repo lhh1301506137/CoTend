@@ -115,7 +115,7 @@ def validate_ci_workflow(
             "python scripts/verify_codex_plugin_package.py --repository-only",
             "python scripts/verify_plugin_submission_materials.py",
             "python scripts/prepare_reviewer_fixtures.py",
-            "python scripts/build_release_archive.py --check-tag v0.1.0-rc.2",
+            "python scripts/build_release_archive.py --check-tag v2.01",
             "python scripts/verify_repository_maturity.py --no-build",
             "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0",
             "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0",

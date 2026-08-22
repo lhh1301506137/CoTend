@@ -69,7 +69,7 @@ jobs:
         run: python scripts/prepare_reviewer_fixtures.py
 
       - name: Build deterministic release archive
-        run: python scripts/build_release_archive.py --check-tag v0.1.0-rc.2
+        run: python scripts/build_release_archive.py --check-tag v2.01
 
       - name: Verify GitHub repository maturity
         run: python scripts/verify_repository_maturity.py --no-build

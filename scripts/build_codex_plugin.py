@@ -32,19 +32,9 @@ DEFAULT_OUTPUT = (
     / "cotend"
 )
 PLUGIN_NAME = "cotend"
-PLUGIN_VERSION = "0.1.0-rc.2"
+PLUGIN_VERSION = "2.1.0-beta.1"
+PUBLIC_RELEASE_TAG = "v2.01"
 EXPECTED_SKILLS = (
-    "cotend-collaboration",
-    "cotend-diagnose-only",
-    "cotend-init",
-    "cotend-model-upgrade",
-    "cotend-project-init",
-    "cotend-semantic-alignment",
-    "cotend-session-handoff",
-    "grill-me",
-    "karpathy-guidelines",
-)
-CURRENT_REPOSITORY_SKILLS = (
     "cotend-collaboration",
     "cotend-diagnose-only",
     "cotend-init",
@@ -56,9 +46,14 @@ CURRENT_REPOSITORY_SKILLS = (
     "grill-me",
     "karpathy-guidelines",
 )
+CURRENT_REPOSITORY_SKILLS = EXPECTED_SKILLS
+EXPECTED_SKILL_FILE_COUNT = 104
 FROZEN_RC2_SKILLS = tuple(
-    skill for skill in EXPECTED_SKILLS if skill != "cotend-session-handoff"
+    skill
+    for skill in EXPECTED_SKILLS
+    if skill not in {"cotend-session-handoff", "cotend-tooling"}
 )
+FROZEN_RC2_SKILL_FILE_COUNT = 37
 EXPECTED_DISPLAY_NAMES = {
     "cotend-collaboration": "CoTend Collaboration",
     "cotend-diagnose-only": "CoTend Diagnose Only",
@@ -66,6 +61,8 @@ EXPECTED_DISPLAY_NAMES = {
     "cotend-model-upgrade": "CoTend Model Upgrade",
     "cotend-project-init": "CoTend Project Init",
     "cotend-semantic-alignment": "CoTend Semantic Alignment",
+    "cotend-session-handoff": "CoTend Session Handoff",
+    "cotend-tooling": "CoTend Tooling",
 }
 PACKAGE_SUPPORT_FILES = {
     "LICENSE": ROOT / "LICENSE",
@@ -404,7 +401,8 @@ def validate_historical_source_commit(commit: Any) -> str:
 @functools.lru_cache(maxsize=4)
 def _historical_source_skill_entries(
     commit: str,
-    expected_file_count: int = 37,
+    expected_file_count: int = FROZEN_RC2_SKILL_FILE_COUNT,
+    expected_skills: tuple[str, ...] = FROZEN_RC2_SKILLS,
 ) -> tuple[tuple[str, bytes], ...]:
     commit = validate_historical_source_commit(commit)
     listed = _run_git(["ls-tree", "-r", "-z", commit, "--", "skills"])
@@ -466,14 +464,14 @@ def _historical_source_skill_entries(
     actual_directories = tuple(
         sorted({PurePosixPath(relative).parts[0] for relative, _ in entries})
     )
-    if actual_directories != FROZEN_RC2_SKILLS:
+    if actual_directories != expected_skills:
         raise PluginPackageError("historical Skill directory inventory drifted")
     if len(entries) != expected_file_count:
         raise PluginPackageError(
             f"expected {expected_file_count} historical Skill files, found {len(entries)}"
         )
     relative_paths = {relative for relative, _ in entries}
-    for skill in FROZEN_RC2_SKILLS:
+    for skill in expected_skills:
         if f"{skill}/SKILL.md" not in relative_paths:
             raise PluginPackageError(
                 f"historical Skill is missing SKILL.md: {skill}"
@@ -481,10 +479,18 @@ def _historical_source_skill_entries(
     return tuple(entries)
 
 
-def historical_source_skill_manifest(commit: str) -> dict[str, str]:
+def historical_source_skill_manifest(
+    commit: str,
+    expected_file_count: int = FROZEN_RC2_SKILL_FILE_COUNT,
+    expected_skills: tuple[str, ...] = FROZEN_RC2_SKILLS,
+) -> dict[str, str]:
     return {
         relative: sha256_bytes(payload)
-        for relative, payload in _historical_source_skill_entries(commit)
+        for relative, payload in _historical_source_skill_entries(
+            commit,
+            expected_file_count=expected_file_count,
+            expected_skills=expected_skills,
+        )
     }
 
 
@@ -524,7 +530,11 @@ def expected_package_manifest(
 ) -> dict[str, str]:
     validate_brand_assets()
     if source_manifest is None:
-        source_manifest = historical_source_skill_manifest(_locked_source_commit())
+        source_manifest = historical_source_skill_manifest(
+            _locked_source_commit(),
+            expected_file_count=EXPECTED_SKILL_FILE_COUNT,
+            expected_skills=EXPECTED_SKILLS,
+        )
     if support_manifest is None:
         support_manifest = historical_support_manifest(_locked_source_commit())
     manifest = {
@@ -550,9 +560,9 @@ def validate_contract() -> dict[str, Any]:
     lock = load_json_object(PACKAGE_LOCK_PATH, "Plugin package lock")
     if lock.get("schema") != "cotend.codex-plugin-package-lock":
         raise PluginPackageError("Plugin package lock schema drifted")
-    if lock.get("schema_version") != 2:
+    if lock.get("schema_version") != 3:
         raise PluginPackageError("Plugin package lock version drifted")
-    if lock.get("status") != "production_candidate_not_published":
+    if lock.get("status") != "github_open_beta_release_candidate":
         raise PluginPackageError("Plugin package lock status drifted")
 
     plugin = lock.get("plugin")
@@ -588,44 +598,21 @@ def validate_contract() -> dict[str, Any]:
     ):
         raise PluginPackageError("current target artifact identity drifted")
     source_commit = validate_historical_source_commit(source.get("source_commit"))
-    locked_source_manifest = historical_source_skill_manifest(source_commit)
-    locked_support_manifest = historical_support_manifest(source_commit)
-    predecessor_targets = artifact_lock.get("predecessor_targets")
-    if not isinstance(predecessor_targets, list):
-        raise PluginPackageError("target artifact predecessor inventory is invalid")
-    package_predecessor = next(
-        (
-            item
-            for item in predecessor_targets
-            if isinstance(item, dict)
-            and item.get("artifact_id") == source.get("artifact_id")
-            and item.get("revision") == source.get("revision")
-        ),
-        None,
+    locked_source_manifest = historical_source_skill_manifest(
+        source_commit,
+        expected_file_count=EXPECTED_SKILL_FILE_COUNT,
+        expected_skills=EXPECTED_SKILLS,
     )
-    if package_predecessor != {
-        "platform": "Codex",
-        "lineage": "cotend-codex",
-        "artifact_id": "cotend-codex-r000002",
-        "revision": 2,
-        "source_release_id": "2026.07.23.2",
-        "framework_protocol": "cotend-collaboration-v1.65",
-        "manifest_sha256": (
-            "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b"
-        ),
-    }:
-        raise PluginPackageError(
-            "Plugin package source is not a trusted target predecessor"
-        )
+    locked_support_manifest = historical_support_manifest(source_commit)
     expected_source = {
         "carrier": "skills/",
         "source_commit": source_commit,
         "artifact_lock": "delivery/codex-artifact.lock.json",
-        "artifact_id": package_predecessor["artifact_id"],
-        "revision": package_predecessor["revision"],
-        "target_manifest_sha256": package_predecessor["manifest_sha256"],
-        "skill_count": len(FROZEN_RC2_SKILLS),
-        "skill_file_count": 37,
+        "artifact_id": target["artifact_id"],
+        "revision": target["revision"],
+        "target_manifest_sha256": target["manifest_sha256"],
+        "skill_count": len(EXPECTED_SKILLS),
+        "skill_file_count": EXPECTED_SKILL_FILE_COUNT,
         "path_hash_manifest_sha256": path_hash_manifest_sha256(
             locked_source_manifest
         ),
@@ -671,9 +658,35 @@ def validate_contract() -> dict[str, Any]:
     if authority != {
         "candidate_identity_only": False,
         "final_plugin_identity_confirmed": True,
-        "release_or_publish_authorized": False,
+        "github_release_authorized": True,
+        "public_plugin_directory_submission_authorized": False,
+        "release_tag": PUBLIC_RELEASE_TAG,
     }:
         raise PluginPackageError("Plugin package authority boundary drifted")
+    if lock.get("historical_predecessors") != [
+        {
+            "version": "0.1.0-rc.1",
+            "release_status": "published_github_prerelease",
+            "tag": "v0.1.0-rc.1",
+            "commit": "1679e3b102f92a27e7a2fdacb555f2137c23ab57",
+            "archive_sha256": (
+                "af277084e947d914c42855b0c8023b730c52a249c32c5a0060f3e5d111c108eb"
+            ),
+        },
+        {
+            "version": "0.1.0-rc.2",
+            "release_status": "unpublished_superseded_local_candidate",
+            "source_commit": "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
+            "package_file_count": 48,
+            "package_manifest_sha256": (
+                "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2"
+            ),
+            "archive_sha256": (
+                "b28e63c83ad80e5885594574a46b19fb901af92cc38fe2110448d1b8ee122547"
+            ),
+        },
+    ]:
+        raise PluginPackageError("Plugin package predecessor history drifted")
     return {
         "manifest": manifest,
         "lock": lock,
@@ -760,7 +773,7 @@ def verify_package(package_root: Path) -> dict[str, Any]:
         "plugin_name": PLUGIN_NAME,
         "plugin_version": PLUGIN_VERSION,
         "package_files": len(actual_manifest),
-        "skills": len(FROZEN_RC2_SKILLS),
+        "skills": len(EXPECTED_SKILLS),
         "skill_files": len(contract["source_manifest"]),
         "friendly_display_names": len(EXPECTED_DISPLAY_NAMES),
         "relative_notice_links": len(relative_notice_links),
@@ -783,7 +796,9 @@ def _materialize_package(package_root: Path, contract: dict[str, Any]) -> None:
     (package_root / ".codex-plugin").mkdir(parents=True)
     shutil.copy2(MANIFEST_SOURCE, package_root / ".codex-plugin" / "plugin.json")
     for relative, payload in _historical_source_skill_entries(
-        contract["source_commit"]
+        contract["source_commit"],
+        expected_file_count=EXPECTED_SKILL_FILE_COUNT,
+        expected_skills=EXPECTED_SKILLS,
     ):
         target = package_root / "skills" / Path(PurePosixPath(relative))
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -831,6 +846,8 @@ def run_official_validator(package_root: Path, validator: Path) -> dict[str, str
     validator = validator.expanduser().resolve()
     if not validator.is_file():
         raise PluginPackageError("Plugin Creator validator is unavailable")
+    environment = os.environ.copy()
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
     completed = subprocess.run(
         [sys.executable, str(validator), str(package_root)],
         cwd=ROOT,
@@ -838,6 +855,7 @@ def run_official_validator(package_root: Path, validator: Path) -> dict[str, str
         text=True,
         encoding="utf-8",
         errors="replace",
+        env=environment,
         timeout=60,
     )
     if completed.returncode != 0:

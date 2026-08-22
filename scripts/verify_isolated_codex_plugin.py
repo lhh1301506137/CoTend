@@ -285,7 +285,21 @@ def protected_user_paths() -> dict[str, Path]:
 
 def protected_user_snapshot() -> dict[str, dict[str, Any]]:
     # Deliberately stat-only: config, auth, plugin, and Skill contents are never opened.
-    return {label: stat_only(path) for label, path in protected_user_paths().items()}
+    snapshot = {
+        label: stat_only(path) for label, path in protected_user_paths().items()
+    }
+    # An active Codex Desktop process updates unrelated immediate children of
+    # ~/.codex, so the root directory mtime is not attributable to this verifier.
+    # Preserve exact stat checks for config/auth/plugins/skills and keep only the
+    # existence/type boundary for the ambient Codex root itself.
+    for label in ("user_codex_root", "configured_codex_root"):
+        state = snapshot.get(label)
+        if state is not None and state.get("kind") == "directory":
+            snapshot[label] = {
+                "exists": state["exists"],
+                "kind": state["kind"],
+            }
+    return snapshot
 
 
 def assert_protected_unchanged(

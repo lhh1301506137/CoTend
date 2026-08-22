@@ -37,11 +37,11 @@ EXPECTED_BLOCKER_IDS = [
 ]
 EXPECTED_IDENTITY_VALUE = {
     "plugin_id": "cotend",
-    "version": "0.1.0-rc.2",
-    "package_digest": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
-    "confirmed_on": "2026-07-23",
+    "version": "2.1.0-beta.1",
+    "package_digest": "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c",
+    "confirmed_on": "2026-08-22",
     "confirmation_scope": (
-        "initial_submission_identity_not_release_or_platform_acceptance"
+        "github_v2_01_release_identity_not_portal_submission_or_platform_acceptance"
     ),
     "platform_prerelease_acceptance": "not_verified_reopen_q02_if_rejected",
 }
@@ -78,8 +78,10 @@ EXPECTED_AUTHORITY = {
     "submitted_for_review": False,
     "approved": False,
     "published": False,
-    "release_authorized": False,
-    "push_authorized": False,
+    "github_release_authorized": True,
+    "github_push_authorized": True,
+    "portal_submission_authorized": False,
+    "portal_publication_authorized": False,
 }
 EXPECTED_REVIEW_CONTEXT = {
     "plugin_specific_authentication_required": False,
@@ -191,7 +193,9 @@ def _expected_package_binding(contract: dict[str, Any]) -> dict[str, Any]:
         "skill_count": lock["source"]["skill_count"],
         "skill_file_count": lock["source"]["skill_file_count"],
         "source_skill_manifest_sha256": lock["source"]["path_hash_manifest_sha256"],
-        "identity_authority": "initial_submission_identity_confirmed_not_release",
+        "identity_authority": (
+            "github_v2_01_release_confirmed_portal_submission_not_authorized"
+        ),
         "final_identity_confirmed": lock["authority"][
             "final_plugin_identity_confirmed"
         ],
@@ -277,8 +281,10 @@ def _validate_submission(
         "bundle_type": "skills_only",
         "bundle_status": "production_candidate_locally_verified",
         "bundle_source": "packaging/codex-plugin/package.lock.json",
-        "skill_count": 8,
-        "skill_file_count": 37,
+        "skill_count": package_contract["lock"]["source"]["skill_count"],
+        "skill_file_count": package_contract["lock"]["source"][
+            "skill_file_count"
+        ],
         "upload_performed": False,
         "mcp_server_required": False,
     }:

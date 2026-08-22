@@ -78,6 +78,30 @@ class IsolatedCodexPluginTests(unittest.TestCase):
         self.assertNotIn("sha256", snapshot)
         self.assertNotIn("manifest", snapshot)
 
+    def test_protected_snapshot_normalizes_only_ambient_codex_root(self) -> None:
+        codex_root = self.fixture / ".codex"
+        codex_root.mkdir()
+        config = codex_root / "config.toml"
+        config.write_text("opaque-value\n", encoding="utf-8")
+        with mock.patch.object(
+            plugin_fixture,
+            "protected_user_paths",
+            return_value={
+                "user_codex_root": codex_root,
+                "user_codex_config": config,
+            },
+        ):
+            snapshot = plugin_fixture.protected_user_snapshot()
+
+        self.assertEqual(
+            snapshot["user_codex_root"],
+            {"exists": True, "kind": "directory"},
+        )
+        self.assertEqual(
+            set(snapshot["user_codex_config"]),
+            {"exists", "kind", "size", "mtime_ns"},
+        )
+
     def test_fixture_manifest_is_skills_only_and_non_release(self) -> None:
         manifest = plugin_fixture.plugin_manifest()
         self.assertEqual(manifest["name"], "cotend")

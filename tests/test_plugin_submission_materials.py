@@ -49,11 +49,11 @@ class PluginSubmissionMaterialTests(unittest.TestCase):
             result["package_digest"],
             package.path_hash_manifest_sha256(contract["expected_package_manifest"]),
         )
-        self.assertEqual(self.materials["package"]["file_count"], 48)
+        self.assertEqual(self.materials["package"]["file_count"], 115)
         self.assertTrue(self.materials["package"]["final_identity_confirmed"])
         self.assertEqual(
             self.materials["package"]["identity_authority"],
-            "initial_submission_identity_confirmed_not_release",
+            "github_v2_01_release_confirmed_portal_submission_not_authorized",
         )
 
     def test_listing_and_starter_prompts_match_plugin_manifest(self) -> None:

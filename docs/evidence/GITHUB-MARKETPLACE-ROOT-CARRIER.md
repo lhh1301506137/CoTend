@@ -1,6 +1,6 @@
 # GitHub Marketplace 仓库根载体验证证据
 
-> 范围说明：本文记录当前候选的本地根载体验证，因此远端字段保持本轮真实的 `not_run`。已公开 `rc.1` 的真实 GitHub 历史验证见 [REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md](REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md)；它不能替代尚未推送的 `rc.2` 远端重验。
+> 历史证据：本文主体固定记录 `0.1.0-rc.2` 时期的本地根载体验证。v2.01/r17 已在 2026-08-22 以 Codex CLI 0.145.0 重新通过 15 步本地载体流程和 5 步故障恢复；公开 Git 源复验必须在 v2.01 推送后执行，不能由本文的旧 `not_run` 字段替代。当前版本与包摘要见 [`v2.01` 发布说明](../releases/v2.01.md)。
 
 ```yaml
 status: passed_isolated_github_marketplace_root_carrier

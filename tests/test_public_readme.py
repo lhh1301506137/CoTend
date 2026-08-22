@@ -25,7 +25,7 @@ EXPECTED_COMMANDS = {
     "python scripts/verify_codex_plugin_package.py --repository-only",
     "python scripts/verify_plugin_submission_materials.py",
     "python scripts/prepare_reviewer_fixtures.py",
-    "python scripts/build_release_archive.py --check-tag v0.1.0-rc.2",
+    "python scripts/build_release_archive.py --check-tag v2.01",
     "python scripts/verify_repository_maturity.py",
     "python -m unittest discover -s tests",
     "python scripts/check_repository.py",
@@ -59,8 +59,8 @@ class PublicReadmeTests(unittest.TestCase):
             "codex plugin remove cotend@cotend",
             "search `/cotend` in the Skill picker",
             "select **CoTend Init**",
-            "initial submission identity and version are confirmed",
-            "Use the GitHub Marketplace commands instead of copying internal files.",
+            "GitHub release authorization does not authorize a Public Plugin Directory submission",
+            "Use the GitHub Marketplace commands for normal installation.",
         ):
             self.assertIn(marker, self.text)
         self.assertNotIn("Install CoTend from the Public Plugin Directory", self.text)

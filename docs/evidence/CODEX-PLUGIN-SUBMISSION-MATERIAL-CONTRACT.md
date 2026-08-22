@@ -1,5 +1,7 @@
 # Codex Plugin Submission Material Contract 证据
 
+> 历史证据：本文主体固定记录 `0.1.0-rc.2` 的 Portal 提交材料草案。当前草案已重新绑定 v2.01/r17，但仍是 `draft_not_submitted`；本次 GitHub Open Beta 发布授权不等于 Public Plugin Directory 提交或发布授权。当前绑定以 `packaging/codex-plugin/submission-materials/` 和 [`v2.01` 发布说明](../releases/v2.01.md) 为准。
+
 ```yaml
 status: passed_repo_only_submission_material_contract
 evidence_type: executed

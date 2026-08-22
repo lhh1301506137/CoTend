@@ -73,10 +73,10 @@ EXPECTED_ANSWERED_DECISIONS = {
         "answer": "1",
         "evidence": {
             "evidence_type": "user_explicit",
-            "recorded_on": "2026-07-23",
+            "recorded_on": "2026-08-22",
             "scope": (
-                "confirmed_cotend_identity_carried_to_required_rc2_revision_"
-                "not_submission_or_release"
+                "confirmed_github_v2_01_release_identity_not_portal_"
+                "submission_or_platform_acceptance"
             ),
         },
     },
@@ -235,7 +235,9 @@ def _expected_package(contract: dict[str, Any]) -> dict[str, Any]:
         "file_count": package["file_count"],
         "path_hash_manifest_sha256": package["path_hash_manifest_sha256"],
         "source_skill_manifest_sha256": package["source_skill_manifest_sha256"],
-        "identity_authority": "initial_submission_identity_confirmed_not_release",
+        "identity_authority": (
+            "github_v2_01_release_confirmed_portal_submission_not_authorized"
+        ),
     }
 
 

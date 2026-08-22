@@ -983,6 +983,23 @@ class DeliveryLifecycleTests(unittest.TestCase):
         with self.assertRaisesRegex(DeliveryError, "Target artifact inventory"):
             Artifact.from_repository(repository)
 
+    def test_target_lock_product_identity_drift_is_rejected(self) -> None:
+        repository = self.temp_root / "repository"
+        shutil.copytree(ROOT / "skills", repository / "skills")
+        shutil.copytree(ROOT / "upstream", repository / "upstream")
+        target_lock = repository / "delivery" / "codex-artifact.lock.json"
+        target_lock.parent.mkdir()
+        shutil.copy2(ROOT / "delivery" / "codex-artifact.lock.json", target_lock)
+        value = json.loads(target_lock.read_text(encoding="utf-8"))
+        value["product"]["release_tag"] = "v2.01-drift"
+        target_lock.write_text(
+            json.dumps(value, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+        with self.assertRaisesRegex(DeliveryError, "product identity"):
+            Artifact.from_repository(repository)
+
     def test_repair_restores_modified_and_missing_owned_files(self) -> None:
         self.install()
         managed = self.project / ".agents" / "skills" / "cotend-init" / "SKILL.md"

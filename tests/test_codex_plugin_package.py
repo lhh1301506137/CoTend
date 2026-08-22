@@ -40,7 +40,7 @@ class CodexPluginPackageTests(unittest.TestCase):
         manifest = contract["manifest"]
         lock = contract["lock"]
         self.assertEqual(manifest["name"], "cotend")
-        self.assertEqual(manifest["version"], "0.1.0-rc.2")
+        self.assertEqual(manifest["version"], package.PLUGIN_VERSION)
         self.assertEqual(manifest["skills"], "./skills/")
         self.assertEqual(manifest["interface"]["brandColor"], "#139C98")
         self.assertEqual(
@@ -53,21 +53,25 @@ class CodexPluginPackageTests(unittest.TestCase):
         self.assertNotIn("apps", manifest)
         self.assertNotIn("mcpServers", manifest)
         self.assertNotIn("hooks", manifest)
-        self.assertEqual(lock["status"], "production_candidate_not_published")
-        self.assertEqual(lock["schema_version"], 2)
+        self.assertEqual(lock["status"], "github_open_beta_release_candidate")
+        self.assertEqual(lock["schema_version"], 3)
         self.assertEqual(
             lock["source"]["source_commit"],
-            "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
+            "c6cd0c80f825eac7e8cb9a983c8d92427589d13e",
         )
         self.assertEqual(contract["source_commit"], lock["source"]["source_commit"])
-        self.assertNotEqual(
+        self.assertEqual(
             contract["source_manifest"], contract["repository_source_manifest"]
         )
         self.assertEqual(len(lock["package"]["brand_assets"]), 4)
         self.assertNotIn("assets", lock["package"]["forbidden_components"])
         self.assertFalse(lock["authority"]["candidate_identity_only"])
         self.assertTrue(lock["authority"]["final_plugin_identity_confirmed"])
-        self.assertFalse(lock["authority"]["release_or_publish_authorized"])
+        self.assertTrue(lock["authority"]["github_release_authorized"])
+        self.assertFalse(
+            lock["authority"]["public_plugin_directory_submission_authorized"]
+        )
+        self.assertEqual(lock["authority"]["release_tag"], package.PUBLIC_RELEASE_TAG)
 
     def test_two_builds_are_byte_deterministic(self) -> None:
         first = self.build("first")
@@ -75,24 +79,41 @@ class CodexPluginPackageTests(unittest.TestCase):
         first_manifest = package.path_hash_manifest(first)
         second_manifest = package.path_hash_manifest(second)
         self.assertEqual(first_manifest, second_manifest)
-        self.assertEqual(len(first_manifest), 48)
+        self.assertEqual(len(first_manifest), 115)
         self.assertEqual(
             package.path_hash_manifest_sha256(first_manifest),
-            "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
+            "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c",
         )
 
-    def test_rc2_build_uses_locked_historical_skills_not_current_r15(self) -> None:
-        output = self.build("historical-source")
+    def test_official_validator_cannot_write_bytecode_to_global_skill(self) -> None:
+        output = self.build("official-validator")
+        validator = self.root / "validate_plugin.py"
+        validator.write_text("raise SystemExit(0)\n", encoding="utf-8")
+        completed = package.subprocess.CompletedProcess(
+            args=[], returncode=0, stdout="", stderr=""
+        )
+        with mock.patch.object(
+            package.subprocess, "run", return_value=completed
+        ) as run:
+            result = package.run_official_validator(output, validator)
+
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(
+            run.call_args.kwargs["env"]["PYTHONDONTWRITEBYTECODE"], "1"
+        )
+
+    def test_v201_build_uses_locked_current_r17_skills(self) -> None:
+        output = self.build("current-source")
         contract = package.validate_contract()
         packaged = package.path_hash_manifest(output / "skills")
         self.assertEqual(packaged, contract["source_manifest"])
-        self.assertNotEqual(packaged, contract["repository_source_manifest"])
+        self.assertEqual(packaged, contract["repository_source_manifest"])
         result = package.verify_package(output)
-        self.assertTrue(result["repository_source_ahead"])
+        self.assertFalse(result["repository_source_ahead"])
         self.assertEqual(result["source_commit"], contract["source_commit"])
 
-    def test_rc2_build_uses_locked_historical_support_not_current_r15(self) -> None:
-        output = self.build("historical-support")
+    def test_v201_build_uses_locked_current_support(self) -> None:
+        output = self.build("current-support")
         contract = package.validate_contract()
         packaged_support = {
             relative: package.sha256_file(output / relative)
@@ -103,7 +124,7 @@ class CodexPluginPackageTests(unittest.TestCase):
             for relative, source in package.PACKAGE_SUPPORT_FILES.items()
         }
         self.assertEqual(packaged_support, contract["support_manifest"])
-        self.assertNotEqual(packaged_support, current_support)
+        self.assertEqual(packaged_support, current_support)
 
     def test_historical_source_commit_must_be_full_available_ancestor(self) -> None:
         for value in ("37e657f", "G" * 40, "0" * 40):
@@ -216,7 +237,7 @@ class CodexPluginPackageTests(unittest.TestCase):
     def test_n3_display_metadata_and_prompt_limits_are_preserved(self) -> None:
         output = self.build("display")
         result = package.verify_package(output)
-        self.assertEqual(result["friendly_display_names"], 6)
+        self.assertEqual(result["friendly_display_names"], 8)
         self.assertEqual(result["relative_notice_links"], 4)
         self.assertEqual(result["brand_assets"], 4)
         manifest = json.loads(

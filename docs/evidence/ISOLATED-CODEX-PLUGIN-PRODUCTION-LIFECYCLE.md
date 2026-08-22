@@ -1,5 +1,7 @@
 # 隔离 Codex Plugin 生产候选生命周期证据
 
+> 历史证据：本文固定记录 `0.1.0-rc.2` 的隔离生命周期，不代表当前 v2.01/r17。v2.01 已在 2026-08-22 以 Codex CLI 0.145.0 对同一 17 步正常流程和 5 步故障恢复重新通过；当前版本与包摘要以 [`v2.01` 发布说明](../releases/v2.01.md) 和 package lock 为准。
+
 ```yaml
 metadata:
   status: passed_isolated_production_plugin_lifecycle

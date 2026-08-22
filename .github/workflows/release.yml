@@ -6,7 +6,7 @@ on:
       tag:
         description: Existing release tag
         required: true
-        default: v0.1.0-rc.2
+        default: v2.01
         type: string
       confirmation:
         description: Type create-draft-release to authorize a draft only
@@ -79,11 +79,11 @@ jobs:
         shell: bash
         run: |
           gh release create "$RELEASE_TAG" \
-            dist/cotend-0.1.0-rc.2.zip \
-            dist/cotend-0.1.0-rc.2.zip.sha256 \
+            dist/cotend-2.1.0-beta.1.zip \
+            dist/cotend-2.1.0-beta.1.zip.sha256 \
             --verify-tag \
             --draft \
             --prerelease \
             --latest=false \
-            --title "CoTend $RELEASE_TAG" \
+            --title "CoTend v2.01" \
             --notes-file "docs/releases/$RELEASE_TAG.md"

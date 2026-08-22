@@ -5,7 +5,7 @@
 
 **Pre-release AI development governance framework for people who build software with AI.**
 
-> CoTend is available as a GitHub Open Beta for Codex. It is not yet available in the Public Plugin Directory and is not a stable release.
+> CoTend v2.01 is available as a GitHub Open Beta for Codex. The Plugin package version is `2.1.0-beta.1`; it is not yet available in the Public Plugin Directory and is not a stable release.
 
 CoTend helps developers keep AI-assisted software projects understandable, verifiable, and under control without having to manually coordinate every development detail. It gives the AI a repeatable way to start or resume a project, continue an approved plan, verify work, diagnose failures, prepare model handoffs, and stop when a human decision is required.
 
@@ -94,23 +94,21 @@ The eight CoTend-owned Skills use the `cotend-` prefix. The two bundled companio
 
 ## Current availability
 
-CoTend is currently a repository-verified pre-release project:
-
-The initial submission identity and version are confirmed for repository preparation only; this does not authorize a Portal submission, release, push, or publication.
+CoTend v2.01 is a repository-verified GitHub Open Beta pre-release. GitHub release authorization does not authorize a Public Plugin Directory submission or publication.
 
 | Area | Current state |
 |---|---|
-| Source carrier | Ten Codex Skills are adopted in [`skills/`](skills/) as internal target r16 from an exact private-upstream source commit that is explicitly not a public Dual release. |
-| Package candidate | `cotend@0.1.0-rc.2` remains frozen at its historical eight-Skill, 48-file source and is unpublished; r16 does not silently change that package identity. |
+| Source carrier | Ten Codex Skills are adopted in [`skills/`](skills/) as target `cotend-codex-r000017`, with 104 Skill files and an exact verified source lineage. |
+| Package candidate | GitHub release `v2.01` contains `cotend@2.1.0-beta.1`: 10 Skills and 115 total package files. The unpublished 48-file rc.2 candidate remains historical and is not overwritten. |
 | Isolated lifecycle | Package add, install, discovery, coexistence, remove, recovery, and cleanup are verified in redirected disposable roots. |
-| GitHub Marketplace carrier | The local repository-root carrier verifies ten-Skill discovery; remote fetch, refresh, install, remove, recovery, and cleanup must be revalidated against a future authorized public commit. |
+| GitHub Marketplace carrier | Repository-root discovery, redirected install/update/remove/recovery, and package lifecycle checks cover the ten-Skill v2.01 carrier; public-source installation is rechecked after release. |
 | Submission materials | English listing, three starter prompts, five positive cases, three negative cases, and release-note structure exist as a repository draft. |
 | Public installation | GitHub Open Beta is available through the personal Marketplace commands above. The Plugin has not been submitted to or published in the Public Plugin Directory. |
 | External readiness | Repository Logo assets are ready, but Portal format is not yet verified. Publisher identity, public support and legal URLs, availability, and policy attestations remain unresolved. |
 | Reviewer execution | The five positive and three negative cases have a deterministic disposable fixture kit; model behavior remains a reviewer contract and has not been run by an external directory reviewer. |
 | Desktop coverage | Basic picker visibility and new-task refresh have evidence; the complete production Desktop lifecycle is not yet verified. |
 
-The repository source tree and generated `dist/` package are development artifacts. Use the GitHub Marketplace commands instead of copying internal files.
+Use the GitHub Marketplace commands for normal installation. The Release ZIP and its SHA-256 sidecar provide an auditable offline package artifact.
 
 ## Accounts, data, and infrastructure
 
@@ -128,7 +126,7 @@ python scripts/build_codex_plugin.py --output dist/cotend --json
 python scripts/verify_codex_plugin_package.py --repository-only
 python scripts/verify_plugin_submission_materials.py
 python scripts/prepare_reviewer_fixtures.py
-python scripts/build_release_archive.py --check-tag v0.1.0-rc.2
+python scripts/build_release_archive.py --check-tag v2.01
 python scripts/verify_repository_maturity.py
 python -m unittest discover -s tests
 python scripts/check_repository.py
@@ -155,9 +153,10 @@ CI is configured to run the repository checks on Windows and Ubuntu with Python 
 - [Behavior specification index](docs/BEHAVIOR-SPEC-INDEX.md)
 - [Capability coverage](docs/CAPABILITY-COVERAGE.md)
 - [Installation channel revalidation](docs/CODEX-INSTALLATION-CHANNEL-REVALIDATION.md)
-- [Production candidate package evidence](docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-PACKAGE.md)
-- [Isolated production lifecycle evidence](docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-LIFECYCLE.md)
-- [GitHub Marketplace root-carrier evidence](docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md)
+- [CoTend v2.01 release contract](docs/releases/v2.01.md)
+- [Historical rc.2 package evidence](docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-PACKAGE.md)
+- [Historical rc.2 isolated lifecycle evidence](docs/evidence/ISOLATED-CODEX-PLUGIN-PRODUCTION-LIFECYCLE.md)
+- [Historical rc.2 root-carrier evidence](docs/evidence/GITHUB-MARKETPLACE-ROOT-CARRIER.md)
 - [Real GitHub Marketplace lifecycle evidence](docs/evidence/REMOTE-GITHUB-MARKETPLACE-LIFECYCLE.md)
 - [Submission material contract evidence](docs/evidence/CODEX-PLUGIN-SUBMISSION-MATERIAL-CONTRACT.md)
 - [Structured submission draft](packaging/codex-plugin/submission-materials/submission.json)

@@ -147,7 +147,9 @@ def main() -> int:
         "plugin": {
             "name": first_result["plugin_name"],
             "version": first_result["plugin_version"],
-            "identity_authority": "initial_submission_identity_confirmed_not_release",
+            "identity_authority": (
+                "github_v2_01_release_confirmed_portal_submission_not_authorized"
+            ),
         },
         "package": {
             "builds_compared": 2,

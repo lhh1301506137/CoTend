@@ -1,5 +1,7 @@
 # 隔离 Codex Plugin 生产候选包证据
 
+> 历史证据：本文固定记录未公开的 `0.1.0-rc.2` 候选，不是当前 v2.01/r17 发布状态。当前版本、包摘要和发布边界以 [`v2.01` 发布说明](../releases/v2.01.md) 与 `packaging/codex-plugin/package.lock.json` 为准；旧候选字节与摘要保留用于证明未被覆盖。
+
 ```yaml
 metadata:
   status: passed_isolated_production_candidate_contract

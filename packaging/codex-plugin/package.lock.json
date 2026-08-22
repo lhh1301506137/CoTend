@@ -1,28 +1,28 @@
 {
   "schema": "cotend.codex-plugin-package-lock",
-  "schema_version": 2,
-  "status": "production_candidate_not_published",
+  "schema_version": 3,
+  "status": "github_open_beta_release_candidate",
   "plugin": {
     "name": "cotend",
-    "version": "0.1.0-rc.2",
+    "version": "2.1.0-beta.1",
     "manifest": "packaging/codex-plugin/cotend/.codex-plugin/plugin.json",
-    "manifest_sha256": "e4faeb216b1dc003e93422f0aa8266a947957dfc91d9f286e2cd119dfb3b5dfa"
+    "manifest_sha256": "f3b0e3ead00972ccaa2f28c5838a63dfbc950ae850fcbdae6075c366178a6868"
   },
   "source": {
     "carrier": "skills/",
-    "source_commit": "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
+    "source_commit": "c6cd0c80f825eac7e8cb9a983c8d92427589d13e",
     "artifact_lock": "delivery/codex-artifact.lock.json",
-    "artifact_id": "cotend-codex-r000002",
-    "revision": 2,
-    "target_manifest_sha256": "0f6c8781869a723846394fe9161e01c29793a7b366e9566dba79ae41ed691c1b",
-    "skill_count": 8,
-    "skill_file_count": 37,
-    "path_hash_manifest_sha256": "ce3253e553f1a95ec81858b2b1e2429a771816e7477516da779b1a99e0c2c0de"
+    "artifact_id": "cotend-codex-r000017",
+    "revision": 17,
+    "target_manifest_sha256": "f31c668349fc354402415f070f1ab90f1be47fa03d4141b5d8f5b58aee407cbe",
+    "skill_count": 10,
+    "skill_file_count": 104,
+    "path_hash_manifest_sha256": "26a19e3ea721863dbbc92e6bacec0161880ea2c750bed677b3d957e0a5f27f4b"
   },
   "package": {
     "output_directory_name": "cotend",
-    "file_count": 48,
-    "path_hash_manifest_sha256": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
+    "file_count": 115,
+    "path_hash_manifest_sha256": "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c",
     "support_files": [
       "LICENSE",
       "NOTICE",
@@ -71,6 +71,25 @@
   "authority": {
     "candidate_identity_only": false,
     "final_plugin_identity_confirmed": true,
-    "release_or_publish_authorized": false
-  }
+    "github_release_authorized": true,
+    "public_plugin_directory_submission_authorized": false,
+    "release_tag": "v2.01"
+  },
+  "historical_predecessors": [
+    {
+      "version": "0.1.0-rc.1",
+      "release_status": "published_github_prerelease",
+      "tag": "v0.1.0-rc.1",
+      "commit": "1679e3b102f92a27e7a2fdacb555f2137c23ab57",
+      "archive_sha256": "af277084e947d914c42855b0c8023b730c52a249c32c5a0060f3e5d111c108eb"
+    },
+    {
+      "version": "0.1.0-rc.2",
+      "release_status": "unpublished_superseded_local_candidate",
+      "source_commit": "37e657f0a1e2ddb7b2094f8e4708c2b7563380c1",
+      "package_file_count": 48,
+      "package_manifest_sha256": "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2",
+      "archive_sha256": "b28e63c83ad80e5885594574a46b19fb901af92cc38fe2110448d1b8ee122547"
+    }
+  ]
 }

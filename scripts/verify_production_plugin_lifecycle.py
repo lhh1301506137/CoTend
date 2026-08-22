@@ -26,7 +26,7 @@ PRIVATE_ROOT = ROOT / ".private-provenance"
 DEFAULT_RUN_ROOT = PRIVATE_ROOT / "L46-isolated-production-plugin-lifecycle"
 MARKETPLACE_NAME = "cotend-production-candidate-local"
 EXPECTED_PACKAGE_DIGEST = (
-    "a61b75d08572c95d2c8593939724b48f1b06dce2aa916bab8fb00b2439d76dc2"
+    "b9cadaeee938491cb0e515cd3efecdd81318bcb796d817a24e65e697186f468c"
 )
 PRODUCTION_IDENTITY = lifecycle.PluginLifecycleIdentity(
     plugin_id=package.PLUGIN_NAME,
@@ -460,7 +460,9 @@ def main() -> int:
                 "name": package.PLUGIN_NAME,
                 "version": package.PLUGIN_VERSION,
                 "marketplace": MARKETPLACE_NAME,
-                "identity_authority": "initial_submission_identity_confirmed_not_release",
+                "identity_authority": (
+                    "github_v2_01_release_confirmed_portal_submission_not_authorized"
+                ),
             },
             "package": {
                 "files": success["preparation"]["package"]["package_files"],

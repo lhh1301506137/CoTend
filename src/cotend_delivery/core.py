@@ -64,6 +64,13 @@ CHECKPOINT_SCHEMA_VERSION = 2
 LEGACY_SCHEMA_VERSION = 1
 TARGET_PLATFORM = "Codex"
 TARGET_LINEAGE = "cotend-codex"
+TARGET_PRODUCT_IDENTITY = {
+    "version": "2.1.0-beta.1",
+    "display_version": "2.01",
+    "release_tag": "v2.01",
+    "channel": "github_open_beta",
+}
+LEGACY_TARGET_PRODUCT_IDENTITY = {"version": None}
 OPERATIONS = {
     "inspect",
     "install",
@@ -826,10 +833,21 @@ class Artifact:
                 "target_lock_mismatch",
                 "Target artifact source identity differs from the adopted framework lock",
             )
-        if product_identity != {"version": None}:
+        target_revision = target_identity.get("revision")
+        if target_revision == 17:
+            expected_product_identity = TARGET_PRODUCT_IDENTITY
+        elif (
+            isinstance(target_revision, int)
+            and not isinstance(target_revision, bool)
+            and 1 <= target_revision < 17
+        ):
+            expected_product_identity = LEGACY_TARGET_PRODUCT_IDENTITY
+        else:
+            expected_product_identity = None
+        if product_identity != expected_product_identity:
             raise DeliveryError(
                 "target_lock_invalid",
-                "Target lock product version must remain undecided",
+                "Target lock product identity does not match its artifact revision",
             )
         mappings_value = target_lock.get("legacy_receipt_mappings")
         if not isinstance(mappings_value, list):
